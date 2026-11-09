@@ -1,355 +1,153 @@
 # Museum Mystery
 
-**Gruppenprojekt im Kurs Introduction to Programming**
+Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/27)**. Diese README ist unser Einstiegspunkt für Teammitglieder und neue KI-Chats. **Vor jeder Aufgabe zuerst diese Datei und den aktuellen Code lesen.** Danach den Stand auf GitHub prüfen. Ein Chat kennt spätere Änderungen nicht automatisch.
 
-Dieses Repository ist für das gemeinsam programmierte Spiel **Museum Mystery** vorgesehen. Es ist ein eigenständiges Gruppenprojekt und darf nicht mit dem Solo-Projekt **Plot Twist** vermischt werden.
+**Stand: 9. November 2026.** Das GitHub-Repository enthält bisher nur diese Dokumentation; eine lauffähige App, Tests, Login und Datenbank sind noch nicht umgesetzt. Beschreibungen des Spiels und der Technik unten sind Vorschläge, bis wir sie als Team entscheiden und im Code nachweisen.
 
-GitHub-Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
+Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 
-## 1. Voraussetzungen
+Kurs: <https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html>
 
-Empfohlen werden:
+Ideenvergleich: <https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8>
 
-- Python 3.11 oder neuer
-- [uv](https://docs.astral.sh/uv/) für Python-Version, virtuelle Umgebung und Pakete
-- Git
-- ein GitHub-Konto
-- ein Code-Editor, zum Beispiel Visual Studio Code
+## Unser Ziel im Kurs
 
-Installation prüfen:
+Wir entwickeln eine funktionierende App beziehungsweise ein Spiel mit KI-Unterstützung. Entscheidend ist, dass **jedes Teammitglied das gemeinsam abgegebene Ergebnis erklären kann**, auch Code, den jemand anderes oder eine KI geschrieben hat. Wir halten die Lösung daher klein, lesbar und überprüfbar. Unverstandene Funktionen werden erklärt, vereinfacht oder entfernt, bevor wir sie übernehmen.
 
-```powershell
-python --version
-uv --version
-git --version
+Die [offizielle Bewertungsseite](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/evaluation.html) nennt für das Teamprojekt eine Präsentation mit **Live-Demo an einer bereitgestellten URL und Code-Walkthrough** (40 % der Kursnote). Jedes Mitglied kann zu fremdem Code befragt werden. Die Kriterien sind Funktion, Design, Umfang/Ambition, Überprüfung und Erklärung. Die schriftliche Prüfung (60 %) betrifft teilweise das **eigene Solo-Projekt** und allgemeines Lesen von Code; diese beiden Leistungen sollten wir nicht verwechseln. Laut Kursseite lebt die Arbeit auf GitHub, nicht als Moodle-Dateiupload.
+
+Der [Kursüberblick](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html) beschreibt das Teamprojekt für Wochen 8–10 und die Präsentationen für Wochen 11–12. Er spricht davon, das Beste aus Solo-Projekten weiterzuentwickeln. **Museum Mystery ist unser gewähltes Teamthema.** Ob und welche Ideen aus Solo-Projekten einfließen, entscheidet das Team ausdrücklich. Das separate Solo-Repository **Plot Twist** wird nicht als Git-Remote dieses Projekts verwendet.
+
+## Was wir bauen wollen
+
+**Museum Mystery** ist als kurzes Detektivspiel mit echten Kunstwerken gedacht. In einem Fall ist ein Werk gesucht. Spielerinnen und Spieler sehen mehrere Kandidaten, vergleichen Bild und sachliche Angaben, kaufen bei Bedarf Hinweise und geben einen begrenzten Tipp ab. Die [Collection API des Metropolitan Museum of Art](https://metmuseum.github.io/) soll Bilder und überprüfbare Werkdaten liefern. Die API ist damit Teil des Rätsels und nicht bloß eine dekorative Zusatzfunktion.
+
+Der [geteilte Ideenvergleich](https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8) verglich zwölf Spielideen und empfahl Museum Mystery als Balance aus anschaulicher Demo, klaren Regeln und machbarer Umsetzung für Anfänger. Dort wurden **3–4 Personen, 4–6 Wochen und fast kein Budget nur angenommen**. Diese Zahlen sind keine bestätigten Teamdaten. Ein Quiz war die risikoärmere Alternative; ein Wetter-Festival die ambitioniertere. Wir haben Museum Mystery als Thema gewählt.
+
+### Vorläufiger, noch nicht implementierter Spielentwurf
+
+- Zuerst **drei sorgfältig geprüfte Fälle** mit ungefähr 24 kuratierten Kunstwerken; kein unbegrenzter Zufallsgenerator.
+- Ein Fall zeigt sechs mögliche Werke, Werkansichten mit überprüfbaren Angaben und einen kostenlosen Anfangshinweis.
+- Start mit 100 Punkten. Bis zu drei zusätzliche Hinweise kosten je 15 Punkte. Ein erster falscher Tipp kostet 25 Punkte und scheidet den Kandidaten aus. Ein zweiter falscher Tipp beendet den Versuch. Ein richtiger Tipp löst den Fall.
+- Hinweise müssen anhand der sichtbaren Werkdaten auf **genau eine Lösung** führen. Fehlende API-Felder oder Bilder dürfen keinen unlösbaren Fall erzeugen.
+- Eigene Konten und gespeicherte Spielstände; perspektivisch Fallhistorie und Bestenliste. Getrennte Konten bedeuten **nicht** automatisch gleichzeitiges Mehrspieler-Spiel.
+- Für eine faire Bestenliste wurde im Ideenvergleich **ein gewerteter Versuch pro Konto und Fall**, daneben ein Übungsmodus, vorgeschlagen.
+
+Diese Punkte sind ein **Designvorschlag aus dem Ideenvergleich**, keine bestätigte Kursvorschrift und keine vorhandene Funktion. Vor dem Programmieren legt das Team die endgültigen Regeln, den kleinsten spielbaren Umfang und die erwarteten Ergebnisse schriftlich fest. Die genaue Login-, Speicher- und Hosting-Lösung ist noch offen. Ein früher Vorschlag nannte einen verwalteten Login- und Datenbankdienst; die bisherige README empfahl Python, Streamlit, SQLite und pytest. Wir entscheiden die Kombination erst nach Abgleich mit Kursanforderungen, Teamkenntnissen und dem Bedarf an echten getrennten Online-Konten. Eine lokale SQLite-Datei allein ist keine fertige gemeinsame Online-Anmeldung.
+
+Bewusst zunächst außerhalb des Umfangs: 3D-Museum, Live-Multiplayer, freie Texteingaben als Anschuldigung, ungeprüft KI-generierte Rätsel und beliebige API-Werksuche. Erst drei zuverlässige Fälle, dann mögliche Extras.
+
+## So arbeiten wir bei jeder Aufgabe
+
+1. **Stand lesen:** README, relevante Dateien, `git status` und jüngste Commits prüfen. Bei neuen Chats diese README nennen und die konkrete Aufgabe abgrenzen.
+2. **Aufgabe beschreiben:** In wenigen Sätzen festhalten: *Warum? Was genau? Was ausdrücklich nicht? Woran erkennen wir, dass es fertig ist?* Mindestens einen erlaubten, einen abgelehnten und gegebenenfalls einen Neustart-Fall formulieren.
+3. **Erst verstehen, dann bauen:** KI darf einen Vorschlag für Dateien, Datenfluss, Regeln und Tests machen. Ein Mensch prüft die erwarteten Ergebnisse. Falsche Tests werden gegen die beschlossenen Regeln korrigiert, nicht bloß für grüne Ausgabe abgeschwächt.
+4. **Klein umsetzen:** Eine überschaubare Aufgabe pro Branch. Spiellogik von Bildschirm und Speicherung trennen, damit wir Regeln ohne Klicks testen können. Keine unnötigen Dienste oder komplizierten Abstraktionen einführen.
+5. **Selbst prüfen:** Tests ausführen, die App durchklicken, einen ungültigen Zug ausprobieren und gespeicherten Fortschritt nach einem echten App-Neustart prüfen. Ein Browser-Refresh allein ist kein Neustart-Test.
+6. **Erklären und dokumentieren:** Vor dem Commit festhalten, welche Dateien geändert wurden, was jede Änderung bewirkt, wer die Idee/Umsetzung lieferte, welche KI beteiligt war, welche Tests tatsächlich liefen und welches Ergebnis sie hatten. Behauptungen durch Commit, Pull Request, Testausgabe oder Screenshot belegbar machen.
+7. **Gemeinsam prüfen:** Branch pushen, Pull Request nach `main` öffnen, eine andere Person den Code und die Erklärung lesen lassen, Fragen klären, dann mergen. Anschließend `main` lokal aktualisieren und die README bei geänderten Entscheidungen ergänzen.
+
+**Verständnis-Check für jedes Mitglied:** Wo startet die Aktion? Welche Eingabe wird geprüft? Welche Regel entscheidet? Welche Daten ändern sich? Wo werden sie gespeichert? Was passiert bei ungültiger Eingabe oder fehlender API-Antwort? Welcher Test belegt das? Wenn wir das nicht in einfachen Worten beantworten können, ist die Aufgabe noch nicht abgeschlossen.
+
+## Dokumentationsregel: jede relevante Aktion nachvollziehbar machen
+
+Git speichert **welche Dateien** sich wann durch einen Commit änderten. Es erklärt nicht automatisch **warum**, was eine KI vorschlug, welche Alternativen verworfen wurden oder wie ein Test manuell verlief. Deshalb dokumentieren wir Entscheidungen und Prüfungen zusätzlich. Für jede Aufgabe gehört eine kurze, dauerhaft im Repository gespeicherte Notiz in `docs/arbeitsprotokoll.md` (Datei bei der ersten Implementierungsaufgabe anlegen). Ein Link auf einen Chat ist ergänzende Quelle, kein Ersatz für die Zusammenfassung: Links können unzugänglich werden oder spätere Nachrichten nicht enthalten.
+
+Vorlage für einen Eintrag:
+
+```markdown
+### YYYY-MM-DD – Kurzer Titel
+- Beteiligte: Namen/Initialen; KI-Werkzeug und Chat-Link, falls verwendet
+- Ausgangslage und Ziel: Was war vorher vorhanden? Was sollte sich ändern?
+- Entscheidung und Grund: Welche Regel, Technik oder Gestaltung wurde gewählt? Was wurde verworfen?
+- Umsetzung: Branch/PR/Commit und betroffene Dateien; was passiert dort in einfachen Worten?
+- Prüfung: genauer Befehl oder Klickfolge, tatsächliches Ergebnis, Fehler und Korrektur
+- Verständnis: Wer hat die Änderung erklärt oder gegengeprüft? Offene Fragen?
 ```
 
-Fehlt `uv`, kann es unter Windows in PowerShell installiert werden:
+Dokumentiert auch GitHub-Aktionen (Repository angelegt, Branch gepusht, PR geprüft/gemergt), Beiträge anderer Teammitglieder, Datenquellen und Lizenzen, Hosting-Änderungen sowie Hilfe durch KI. **Nichts rückwirkend erfinden.** Unbekannte Zeitpunkte, Beteiligte oder Testergebnisse als „nicht dokumentiert“ markieren und nachfragen. Vor jedem Merge prüfen, ob die Notiz und README zum tatsächlichen Stand passen. Kurze Notizen nach jeder Aufgabe sind zuverlässiger als ein Rekonstruktionsversuch am Semesterende.
 
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+### Bisher nachvollziehbare Projektgeschichte
 
-Danach PowerShell neu öffnen und `uv --version` erneut ausführen.
+| Zeitpunkt/Beleg | Was geschah | Was wir daraus wissen |
+|---|---|---|
+| [Ideenvergleich](https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8) | Zwölf Konzepte verglichen; Museum Mystery empfohlen. | Spielregeln, Met-API und Login waren Vorschläge, kein implementierter Code. |
+| 09.11.2026 · [Initial commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/aaf0940) | GitHub-Repository `Museum-Mystery` entstand mit einer kurzen README. | Die exakte Einrichtung durch die anlegende Person ist hier nicht weiter dokumentiert. |
+| 09.11.2026 · [Dokumentations-Commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/070fe3c) | Dieser lokale Gruppenordner wurde über **HTTPS** mit dem bestehenden Repository verbunden; eine ausführliche deutsche Setup-README entstand im Branch `docs/project-readme`. | SSH war mangels hinterlegtem öffentlichem Schlüssel nicht eingerichtet; `gh` war lokal nicht installiert. Normales Git über HTTPS funktionierte. |
+| 09.11.2026 · [Pull Request #1](https://github.com/florianstodden-afk/Museum-Mystery/pull/1) / [Merge-Commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/0c4cf0a) | Die README wurde in `main` übernommen; danach wurde `main` lokal aktualisiert und der erledigte **lokale** Dokumentations-Branch gelöscht. | Der Remote-Branch existierte bei der letzten Prüfung noch. Ob er später gelöscht wurde, muss aktuell geprüft werden. |
+| Diese README-Überarbeitung | Kursziel, Museum-Mystery-Entwurf und Dokumentationsablauf werden an einem Ort erklärt. | Dieser Eintrag beschreibt die aktuelle Arbeit und braucht nach einem späteren Commit den zugehörigen Beleg. |
 
-## 2. Empfohlener Projektaufbau
+Der geteilte Chat ist eine Momentaufnahme der **Ideenwahl**. Er dokumentiert keine danach erfolgte Implementierung. Für neue Änderungen gilt immer der aktuelle Repository-Stand.
 
-Für ein kleines Spiel mit Streamlit, SQLite und pytest eignet sich zum Beispiel:
+## Git und GitHub in einfachen Worten
+
+`main` ist die gemeinsame Hauptversion. Ein **Branch** ist ein eigener Arbeitszweig für eine Aufgabe. Ein **Commit** speichert einen benannten Stand zunächst lokal. **Push** lädt Commits zu GitHub hoch. **Pull** holt neue Änderungen von GitHub herunter. Ein **Pull Request (PR)** schlägt vor, den Arbeitszweig nach Prüfung in `main` zu übernehmen; **Merge** führt ihn dort tatsächlich zusammen. Ein Push allein ändert `main` nicht.
 
 ```text
-Group Project/
-├── app.py
-├── game/
-│   ├── __init__.py
-│   ├── logic.py
-│   └── database.py
-├── tests/
-│   └── test_logic.py
-├── data/
-│   └── .gitkeep
-├── .gitignore
-├── pyproject.toml
-├── uv.lock
-└── README.md
+GitHub/main → pull → eigener Computer → Branch → ändern und testen
+                                                   → commit → push → PR → Review → Merge nach main
 ```
 
-- `app.py`: Einstiegspunkt der Streamlit-App
-- `game/`: Spiellogik und Datenbankzugriff, getrennt von der Oberfläche
-- `tests/`: automatisierte Tests
-- `data/`: lokale Laufzeitdaten; Datenbankdateien werden nicht committed
-- `pyproject.toml`: Projekt- und Paketdefinition
-- `uv.lock`: festgeschriebene Paketversionen; diese Datei wird committed
-
-Der Aufbau kann angepasst werden, sobald die Spielidee und die Anforderungen feststehen.
-
-## 3. Aktueller GitHub-Stand
-
-Das gemeinsame Repository wurde bereits auf GitHub angelegt. Die Verbindung verwendet HTTPS:
-
-```text
-https://github.com/florianstodden-afk/Museum-Mystery.git
-```
-
-SSH wird derzeit nicht benötigt. Die Adresse `git@github.com:florianstodden-afk/Museum-Mystery.git` funktioniert erst, nachdem im GitHub-Konto ein öffentlicher SSH-Schlüssel hinterlegt wurde.
-
-Weitere Teammitglieder klonen das Repository wie in Abschnitt 8 beschrieben. Sie führen in ihrem geklonten Ordner **nicht** zusätzlich `git init` aus.
-
-## 4. Python-Projekt mit uv einrichten
-
-Diese Schritte werden einmalig ausgeführt, nachdem geklärt ist, welcher lokale Ordner das gemeinsame Repository sein soll:
+Im Projektordner vor einer neuen Aufgabe:
 
 ```powershell
-uv init
-uv add streamlit
-uv add --dev pytest
+git switch main
+git pull --ff-only origin main
+git switch -c feature/kurzer-name
 ```
 
-`sqlite3` gehört bereits zur Python-Standardbibliothek und wird nicht separat installiert.
-
-Nach einem Klonen oder Pull installiert beziehungsweise synchronisiert jedes Teammitglied die festgelegten Abhängigkeiten mit:
+Nach Änderungen:
 
 ```powershell
-uv sync
-```
-
-Alle Befehle sollten aus dem Projektordner ausgeführt werden. `uv run` verwendet automatisch die passende virtuelle Umgebung; eine manuelle Aktivierung ist normalerweise nicht nötig.
-
-## 5. App starten und Tests ausführen
-
-Streamlit-App starten:
-
-```powershell
-uv run python -m streamlit run app.py
-```
-
-Tests ausführen:
-
-```powershell
-uv run python -m pytest
-```
-
-Ausführlichere Testausgabe:
-
-```powershell
-uv run python -m pytest -v
-```
-
-Auf manchen Windows-Rechnern blockiert die Anwendungssteuerung den Python-Starter in `.venv`. Falls das passiert: zuerst `uv sync`, dann den installierten Python-Interpreter mit den Paketen der Projektumgebung verwenden. Die Python-Version in der folgenden Zeile muss zur Version der `.venv` passen:
-
-```powershell
-$env:PYTHONPATH = (Join-Path (Get-Location) '.venv\Lib\site-packages')
-$python = uv python find --no-project --managed-python --system 3.14
-& $python -m streamlit run app.py
-# Für Tests: & $python -m pytest
-```
-
-Falls das Projekt am Ende keine Streamlit-Oberfläche oder keine SQLite-Datenbank benötigt, können diese Teile entfallen. Die Kernlogik sollte trotzdem möglichst unabhängig von der Oberfläche testbar bleiben.
-
-## 6. `.gitignore` und lokale Datenbanken
-
-Eine passende `.gitignore` sollte mindestens Folgendes enthalten:
-
-```gitignore
-# Virtuelle Python-Umgebung
-.venv/
-
-# Python-Zwischendateien
-__pycache__/
-*.py[cod]
-.pytest_cache/
-
-# Lokale Einstellungen und Geheimnisse
-.env
-.streamlit/secrets.toml
-
-# Lokale SQLite-Datenbanken und Begleitdateien
-*.db
-*.sqlite
-*.sqlite3
-*.db-journal
-*.db-shm
-*.db-wal
-
-# Betriebssystem und Editor
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-```
-
-Grundregeln:
-
-- `.venv/` niemals committen; sie wird mit `uv sync` neu erstellt.
-- `pyproject.toml` und `uv.lock` committen, damit alle dieselben Abhängigkeiten verwenden.
-- Lokale SQLite-Datenbanken nicht committen. Binäre Datenbankdateien führen schnell zu Merge-Konflikten und können persönliche Testdaten enthalten.
-- Falls die App Startdaten braucht, stattdessen ein kleines SQL-Skript, JSON/CSV-Testdaten oder eine Initialisierungsfunktion committen.
-- Passwörter, Tokens und API-Schlüssel niemals in Git speichern.
-- Wurde eine Datenbank bereits committed, reicht ein Eintrag in `.gitignore` allein nicht; sie muss zusätzlich einmal aus dem Git-Index entfernt werden, zum Beispiel mit `git rm --cached data/game.db`. Vorher Dateiname und Pfad genau prüfen.
-
-## 7. GitHub-Verbindung prüfen
-
-Der ursprüngliche lokale Projektordner wird einmalig per HTTPS mit GitHub verbunden:
-
-```powershell
-git init
-git branch -M main
-git remote add origin https://github.com/florianstodden-afk/Museum-Mystery.git
-git fetch origin main
-```
-
-Vor jedem ersten Push kontrollieren:
-
-```powershell
-git remote -v
 git status
+git diff
+git add README.md
+git commit -m "Explain project workflow"
+git push -u origin feature/kurzer-name
 ```
 
-Als `origin` muss eindeutig `florianstodden-afk/Museum-Mystery` angezeigt werden, nicht **Plot Twist** oder ein anderes Repository.
+`git add README.md` ist nur ein Beispiel: immer die **tatsächlich geänderten Dateien** auswählen. Auf GitHub den PR von diesem Branch nach `main` öffnen, die Änderung und die Prüfung erklären und nach Review mergen. Danach:
 
-## 8. Repository für weitere Teammitglieder klonen
+```powershell
+git switch main
+git pull --ff-only origin main
+```
 
-Jedes weitere Teammitglied öffnet den gewünschten übergeordneten Ordner und klont über HTTPS:
+Bei einem Konflikt nicht blind überschreiben oder `--force` verwenden; gemeinsam die betroffenen Zeilen und Absichten klären. Vor dem ersten Push `git remote -v` prüfen: `origin` muss `https://github.com/florianstodden-afk/Museum-Mystery.git` sein.
+
+Weitere Teammitglieder klonen über HTTPS:
 
 ```powershell
 git clone https://github.com/florianstodden-afk/Museum-Mystery.git
 cd Museum-Mystery
+```
+
+Das vorhandene Repository wird nicht noch einmal mit `git init` begonnen. `gh repo clone ...` wäre nur mit installierter und angemeldeter GitHub-CLI nötig; normales `git clone` genügt. Eine SSH-Adresse (`git@github.com:...`) setzt einen im GitHub-Konto hinterlegten SSH-Schlüssel voraus.
+
+## Technischer Start und aktueller Zustand
+
+Die [Kurs-Einrichtung](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/setup.html) verwendet **uv, Python, Codex und Streamlit**. Die [Solo-Projekt-Anleitung](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/weeks/week-05/index.html) nennt für eine erste App Python, Streamlit, SQLite und pytest sowie die Trennung von Oberfläche, Regeln, Speicherung und Tests. Wir können diese vertraute Struktur als Ausgangspunkt nehmen, sofern sie zu unserem Teamprojekt passt.
+
+**Noch nicht vorhanden:** `app.py`, `pyproject.toml`, `uv.lock`, `.gitignore`, `tests/`, Datenbank und Deployment. Deshalb funktionieren Start- und Testbefehle derzeit noch nicht. Erst nach der technischen Entscheidung und dem Anlegen der Dateien gilt beispielsweise:
+
+```powershell
 uv sync
-uv run python -m pytest
-uv run python -m streamlit run app.py
+uv run streamlit run app.py
+uv run pytest
 ```
 
-Falls `pyproject.toml`, Tests oder `app.py` noch nicht angelegt wurden, sind die letzten drei Befehle erst nach der entsprechenden Projekteinrichtung verfügbar.
+Eine spätere `.gitignore` soll `.venv/`, Python-Caches, lokale SQLite-Dateien (`*.db`, `*.sqlite*`) und Geheimnisse ausschließen. `pyproject.toml` und `uv.lock` gehören dagegen ins Repository. Beispieldaten und reproduzierbare Initialisierung können versioniert werden; persönliche oder lokale Datenbanken nicht. API-Bilder und Metadaten müssen auf Eignung, Quellenangabe und Nutzungsrechte geprüft werden. Die im Ideenvergleich genannten API-Bedingungen waren eine Prüfung vom **6. November 2026** und sind vor dem konkreten Einsatz erneut anhand der [offiziellen Met-Dokumentation](https://metmuseum.github.io/) zu prüfen.
 
-## 9. Empfohlener täglicher Git-Ablauf
+## Nächste gemeinsame Entscheidungen
 
-### 1. Vor der Arbeit aktualisieren
+1. Teamgröße, Zeitplan und genaue Anforderungen der Lehrperson bestätigen; insbesondere klären, ob Login und API-Integration Pflicht sind oder aus unserem eigenen Ideenkonzept stammen. Die öffentlich erreichbare Bewertungsseite nennt diese beiden Punkte nicht ausdrücklich.
+2. Den kleinsten vollständigen Fall spezifizieren: Kandidaten, eindeutig lösbare Hinweise, gültige und ungültige Aktionen, Punkte und Neustart-Verhalten. Die erwarteten Tests vor dem Code besprechen.
+3. Technische Lösung für getrennte Konten, gemeinsame gespeicherte Ergebnisse und öffentliche Demo-URL wählen und verständlich begründen.
+4. Ein erstes vollständiges Spielstück mit wenigen kuratierten Werken bauen, testen und durchklicken. Danach erst auf drei Fälle erweitern.
+5. Nach **jeder** Aufgabe Protokoll, README und PR-Erklärung aktualisieren. Vor der Präsentation lässt jedes Mitglied eine fremde Funktion und den gesamten Spielweg erklären.
 
-```powershell
-git switch main
-git pull --ff-only origin main
-```
+## Für einen neuen KI-Chat
 
-### 2. Einen eigenen Branch anlegen
+Kopiere als Auftrag: „Lies zuerst die README und den aktuellen Stand des Repositories Museum Mystery. Nenne mir in einfachen Worten, was bereits umgesetzt ist und was nur geplant ist. Bearbeite dann ausschließlich **[konkrete Aufgabe]** auf einem eigenen Branch. Erkläre jede Änderung, prüfe sie und ergänze die Dokumentation so, dass jedes Teammitglied sie später erklären kann.“
 
-Ein Branch sollte genau eine überschaubare Aufgabe enthalten:
-
-```powershell
-git switch -c feature/kurze-beschreibung
-```
-
-Beispiele: `feature/start-screen`, `feature/score-system`, `fix/database-path`.
-
-### 3. Arbeiten und regelmäßig prüfen
-
-```powershell
-uv run python -m pytest
-git status
-git diff
-```
-
-### 4. Änderungen committen
-
-```powershell
-git add <GEAENDERTE-DATEIEN>
-git commit -m "Add score calculation"
-```
-
-Nach Möglichkeit nur die tatsächlich zusammengehörenden Dateien hinzufügen. `git add .` ist bequem, sollte aber erst nach `git status` verwendet werden.
-
-### 5. Aktuellen Stand von `main` übernehmen
-
-```powershell
-git fetch origin
-git merge origin/main
-```
-
-Bei einem Konflikt die betroffenen Dateien gemeinsam prüfen, Konfliktmarkierungen entfernen, Tests ausführen und dann fortsetzen:
-
-```powershell
-git add <GELOESTE-DATEIEN>
-git merge --continue
-```
-
-Falls der Merge abgebrochen werden soll:
-
-```powershell
-git merge --abort
-```
-
-### 6. Branch pushen
-
-```powershell
-git push -u origin feature/kurze-beschreibung
-```
-
-Bei diesem Ablauf ist kein Force-Push nötig. Falls Git dennoch einen Force-Push verlangt, zuerst im Team klären, warum die Branch-Historie abweicht.
-
-### 7. Pull Request erstellen
-
-Auf GitHub einen Pull Request vom eigenen Branch nach `main` öffnen:
-
-- kurze, verständliche Beschreibung ergänzen
-- erklären, wie die Änderung getestet wurde
-- mindestens eine andere Person um Review bitten
-- offene Kommentare klären
-- erst mergen, wenn die Tests erfolgreich sind
-- danach den Feature-Branch löschen
-
-Danach lokal wieder aktualisieren:
-
-```powershell
-git switch main
-git pull --ff-only origin main
-git branch -d feature/kurze-beschreibung
-```
-
-## 10. Teamregeln, die Konflikte vermeiden
-
-- Nicht direkt auf `main` arbeiten oder pushen.
-- Pro Aufgabe einen kleinen Branch und einen überschaubaren Pull Request verwenden.
-- Vor Arbeitsbeginn pullen und vor dem Push Tests ausführen.
-- Nicht gleichzeitig dieselben großen Codebereiche bearbeiten, ohne sich abzusprechen.
-- Datenbankdateien, virtuelle Umgebungen und Geheimnisse nicht committen.
-- Keine Änderungen aus dem Solo-Projekt **Plot Twist** kopieren oder dessen Git-Remote verwenden, außer das Team und die Kursregeln erlauben ausdrücklich die Wiederverwendung einzelner eigener Inhalte.
-- Commit-Nachrichten kurz und konkret im Imperativ formulieren, zum Beispiel `Add player validation`.
-
-## 11. Typische Fehler und Lösungen
-
-### `uv` wird nicht gefunden
-
-PowerShell nach der Installation neu starten. Danach `uv --version` prüfen. Falls nötig, die offizielle uv-Installationsanleitung verwenden.
-
-### `No such file or directory: app.py`
-
-Der Befehl wurde wahrscheinlich im falschen Ordner ausgeführt oder die App-Datei heißt anders. Mit `Get-Location` und `Get-ChildItem` prüfen.
-
-### `ModuleNotFoundError`
-
-Zuerst `uv sync` ausführen. Prüfen, ob das Paket in `pyproject.toml` steht und ob der Befehl mit `uv run ...` gestartet wurde.
-
-### SQLite meldet `database is locked`
-
-Andere laufende App- oder Python-Prozesse schließen. Lange Schreibvorgänge vermeiden und Datenbankverbindungen zuverlässig schließen. Eine SQLite-Datei nicht über Git zwischen mehreren Personen synchronisieren.
-
-### `failed to push some refs`
-
-Der entfernte Branch enthält neue Änderungen. Nicht sofort erzwingen. Zuerst:
-
-```powershell
-git fetch origin
-git merge origin/main
-uv run python -m pytest
-```
-
-Danach den eigenen Feature-Branch erneut pushen.
-
-### Merge- oder Rebase-Konflikt
-
-Nicht raten und keine fremden Änderungen löschen. Konfliktmarkierungen (`<<<<<<<`, `=======`, `>>>>>>>`) sorgfältig auflösen, bei Unklarheit die betroffene Person fragen und danach alle Tests ausführen.
-
-### Falsches Remote verbunden
-
-Vor jedem ersten Push `git remote -v` prüfen. Falls noch nichts gepusht wurde, kann die Adresse nach sorgfältiger Kontrolle geändert werden:
-
-```powershell
-git remote set-url origin <ECHTE-GRUPPEN-REPO-URL>
-```
-
-Für dieses Projekt lautet der vollständige Befehl:
-
-```powershell
-git remote set-url origin https://github.com/florianstodden-afk/Museum-Mystery.git
-```
-
-### Eine ignorierte Datei erscheint weiterhin in Git
-
-`.gitignore` wirkt nicht rückwirkend auf bereits getrackte Dateien. Mit `git status` und `git ls-files` prüfen und nur die konkrete Datei mit `git rm --cached <DATEI>` aus dem Index entfernen. Die lokale Datei bleibt dabei erhalten.
-
-## 12. Vor dem ersten gemeinsamen Commit klären
-
-- Wer hat Schreibzugriff beziehungsweise wurde als Collaborator eingeladen?
-- Welche Python-Version verwendet der Kurs verbindlich?
-- Ist Streamlit für die Oberfläche vorgesehen?
-- Welche Daten sollen in SQLite gespeichert werden?
-- Welche Mindesttests und Abgabekriterien verlangt der Kurs?
-- Soll `main` auf GitHub durch Pull Requests und Reviews geschützt werden?
+**Regel für KI und Team:** Behauptungen über erledigte Arbeit nur mit Datei, Commit, PR oder tatsächlichem Prüfergebnis belegen. Wenn eine Quelle nicht zugänglich ist, die Lücke nennen. Keine Funktion als fertig bezeichnen, nur weil sie in dieser README als Idee steht.
