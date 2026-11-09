@@ -80,10 +80,13 @@ export function interact(state, id) {
   return { state, text: "Hier gibt es nichts zu entdecken." };
 }
 
-export function openVault(state) {
+export function openVault(state, code) {
   if (state.ending || state.player.x !== 17 || state.player.y !== 9
       || !state.pass || !hasAllEvidence(state)) {
     return { state, text: "Depot verschlossen: Du brauchst drei Belege und den Ausweis des Wachmanns." };
+  }
+  if (code !== "2114") {
+    return { state, text: "Der Zahlencode ist falsch. Welche Uhrzeit stand im Besucherprotokoll?" };
   }
   return { state: { ...state, vaultOpen: true }, text: "Der Ausweis klickt. Die Depottür ist offen!" };
 }

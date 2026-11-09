@@ -30,7 +30,9 @@ test('guard gives pass after ledger; depot needs all three clues',()=>{
   s=interact(at(s,12,12),'note').state;
   assert.equal(hasAllEvidence(s),true);
   assert.equal(openVault(s).state.vaultOpen,false);
-  s=openVault(at(s,17,9)).state;
+  s=at(s,17,9);
+  assert.equal(openVault(s,'0000').state.vaultOpen,false);
+  s=openVault(s,'2114').state;
   assert.equal(s.vaultOpen,true);
   assert.equal(move(at(s,17,9),1,0).player.x,18);
 });
@@ -75,7 +77,8 @@ test('a real walking route reaches both endings',()=>{
   // Von der Galerie aus ist das Depot erst nach Interaktion an der Tür erreichbar.
   state=at(state,17,9);
   assert.equal(move(state,1,0),state);
-  state=openVault(state).state;
+  assert.equal(openVault(state,'0000').state.vaultOpen,false);
+  state=openVault(state,'2114').state;
   state=move(state,1,0);
   state=walkToObject(state,'vault');
   assert.equal(chooseEnding(state,'restore').ending,'restore');

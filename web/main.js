@@ -25,7 +25,7 @@ function updateSidebar() {
   document.querySelector('#steps').textContent = `${state.steps} Schritte`;
   const labels = { ledger: 'Besucherprotokoll', painting: 'Frischer Firnis', note: 'Restaurierungsnotiz' };
   const journal = Object.entries(labels).map(([id,label]) => `<div class="journal-item ${state.clues.includes(id) ? '' : 'missing'}"><b>${state.clues.includes(id) ? '✓' : '○'}</b>${label}</div>`).join('');
-  const next = !state.clues.includes('ledger') ? 'Suche das Protokoll im Empfang.' : !state.pass ? 'Sprich mit dem Wachmann.' : !hasAllEvidence(state) ? 'Untersuche Galerie und Restaurierung.' : !state.vaultOpen ? 'Öffne die orange Depottür mit E.' : state.ending ? 'Fall abgeschlossen.' : 'Finde das Original im Depot.';
+  const next = !state.clues.includes('ledger') ? 'Suche das Protokoll im Empfang.' : !state.pass ? 'Sprich mit dem Wachmann.' : !hasAllEvidence(state) ? 'Untersuche Galerie und Restaurierung.' : !state.vaultOpen ? 'Löse den Code an der orangefarbenen Depottür.' : state.ending ? 'Fall abgeschlossen.' : 'Finde das Original im Depot.';
   document.querySelector('#journal').innerHTML = journal + `<p><strong>Nächster Schritt:</strong> ${next}</p>`;
 }
 
@@ -82,7 +82,16 @@ function showArtwork(){
 }
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
-  if(state.player.x===17&&state.player.y===9){const result=openVault(state);state=result.state;save();showDialog('Depottür',result.text);return;}
+  if(state.player.x===17&&state.player.y===9){
+    if(!state.pass||!hasAllEvidence(state)){showDialog('Depottür',openVault(state,'').text);return;}
+    if(state.vaultOpen){showDialog('Depottür','Die Tür ist bereits offen. Geh hindurch.');return;}
+    showDialog('Zahlenschloss','Die Restauratorin deutete auf die Uhrzeit des verdächtigen Eintrags. Gib vier Ziffern ein.',[
+      {label:'Code prüfen',action:()=>{const code=document.querySelector('#vault-code').value.trim();const result=openVault(state,code);state=result.state;save();showDialog('Depottür',result.text);}},
+      {label:'Später',action:closeDialog,secondary:true},
+    ]);
+    const input=document.createElement('input');input.id='vault-code';input.inputMode='numeric';input.maxLength=4;input.placeholder='Vier Ziffern';input.setAttribute('aria-label','Vierstelliger Zahlencode');document.querySelector('#dialog-body').append(input);input.focus();
+    return;
+  }
   const object=nearbyObject(state);if(!object){showDialog('Niemand in der Nähe','Geh an ein markiertes Objekt oder eine Person heran.');return;}
   const result=interact(state,object.id);state=result.state;save();
   if(result.choice){showDialog('Die letzte Entscheidung',result.text,[

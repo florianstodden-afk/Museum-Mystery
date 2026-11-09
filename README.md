@@ -24,7 +24,7 @@ Der [Kursüberblick](https://nova-sbe-introduction-to-programming.github.io/intr
 
 ### Aktueller Prototyp: Die Nacht der Fälschung
 
-Die Spielfigur besucht Empfang, Galerie und Depot. Drei Belege und der Ausweis des Wachmanns öffnen die Depottür. Am Original entscheidet man zwischen **stiller Rückgabe** und **öffentlicher Aufdeckung**; beide Enden erzählen andere Folgen. Bewegung: WASD oder Pfeiltasten, Interaktion: `E`. Ein Journal zeigt den nächsten Schritt. Der Fortschritt wird zunächst nur im Browser gespeichert. Die genauen Regeln, Grenzen und Prüfpunkte stehen in [specs/museum-walk.md](specs/museum-walk.md).
+Die Spielfigur besucht Empfang, Galerie und Depot. Drei Belege, der Ausweis des Wachmanns und ein aus dem Protokoll abgeleiteter Zahlencode öffnen die Depottür. Am Original entscheidet man zwischen **stiller Rückgabe** und **öffentlicher Aufdeckung**; beide Enden erzählen andere Folgen. Bewegung: WASD oder Pfeiltasten, Interaktion: `E`. Ein Journal zeigt den nächsten Schritt. Der Fortschritt wird zunächst nur im Browser gespeichert. Die genauen Regeln, Grenzen und Prüfpunkte stehen in [specs/museum-walk.md](specs/museum-walk.md).
 
 **Aktuelle Startseite:** `web/index.html` über einen lokalen Webserver (Anleitung unten). `web/engine.js` enthält Regeln, `web/main.js` Zeichnung, Eingaben und Met-Abfrage. `web/engine.test.js` prüft die Regeln mit Node. Die frühere Python-App und ihre SQLite-Datei sind **nicht** mit diesem Browser-Spielstand verbunden.
 

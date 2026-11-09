@@ -6,7 +6,7 @@ Der erste Prototyp war ein statisches Bilderrätsel und für die Gruppe zu einfa
 
 ## Kleinster spielbarer Rundgang
 
-Die Spielfigur bewegt sich mit WASD oder Pfeiltasten durch Empfang, Galerie und Restaurierungsraum. `E` untersucht ein Objekt oder spricht mit einer nahen Person. Die Journalanzeige nennt das nächste Ziel. Die Spielerin sammelt drei Belege: ein verdächtiges Besucherprotokoll, eine Beobachtung am ausgetauschten Gemälde und eine Restaurierungsnotiz. Nach dem Protokoll gibt der Wachmann einen Zugangsausweis. Nur mit drei Belegen und Ausweis öffnet sich die Tür zum Depot. Dort wird das Original entdeckt.
+Die Spielfigur bewegt sich mit WASD oder Pfeiltasten durch Empfang, Galerie und Restaurierungsraum. `E` untersucht ein Objekt oder spricht mit einer nahen Person. Die Journalanzeige nennt das nächste Ziel. Die Spielerin sammelt drei Belege: ein verdächtiges Besucherprotokoll, eine Beobachtung am ausgetauschten Gemälde und eine Restaurierungsnotiz. Nach dem Protokoll gibt der Wachmann einen Zugangsausweis. An der Depottür braucht man drei Belege, den Ausweis und den vierstelligen Code aus der Uhrzeit des verdächtigen Protokolleintrags (21:14 → `2114`). Dort wird das Original entdeckt.
 
 Am Ende entscheidet die Spielerin zwischen zwei **verschiedenen, erreichbaren** Ausgängen: Das Original still zurückbringen oder die Fälschung öffentlich aufdecken. Der Abspann nennt die Konsequenz der Wahl. Ein Neustart setzt den Fall zurück. Ein Spielstand wird im Browser gespeichert, damit ein Neuladen nicht alles löscht.
 
@@ -17,14 +17,14 @@ Das ausgestellte Bild und überprüfbare Werkangaben stammen aus der Met Collect
 - Bewegung nur auf begehbaren Feldern; Wände und Depot-Tür blockieren den Weg.
 - Interaktion nur mit einem Objekt direkt neben der Spielfigur.
 - Belege zählen je nur einmal; der Wachmann gibt den Ausweis nach dem Fund des Protokolls.
-- Die Depot-Tür öffnet nur mit drei Belegen und Ausweis.
+- Die Depot-Tür öffnet nur mit drei Belegen, Ausweis und richtigem Zahlencode. Ein falscher Code lässt sie verschlossen.
 - Eine Endentscheidung ist erst beim Original im Depot möglich.
 - Zwei Enden müssen in einem vollständigen Durchgang auswählbar sein.
 - Keine echten Konten, gemeinsamen Online-Spielstände, Gegner, Kämpfe oder weiteren Räume in dieser Aufgabe.
 
 ## Fertig, wenn …
 
-- Bewegungs-, Interaktions- und Türregeln automatisiert getestet sind.
+- Bewegungs-, Interaktions-, Code- und Türregeln automatisiert getestet sind.
 - Beide Enden durch Tests erreichbar sind.
 - Der Browser das Museum mit Spielfigur, Objekten, Dialog und Journal zeigt.
 - Met-Daten geladen werden oder ein verständlicher Offline-Ersatz erscheint.
