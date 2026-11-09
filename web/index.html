@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Museum Mystery – Die Nacht der Fälschung</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div><p class="eyebrow">MUSEUM MYSTERY · KAPITEL 01</p><h1>Die Nacht der Fälschung</h1></div>
+      <button id="reset" class="plain">↻ Neues Spiel</button>
+    </header>
+    <section class="game-layout">
+      <div class="stage-wrap">
+        <div class="stage-head"><span id="room">Empfangshalle</span><span>WASD / Pfeile bewegen · E untersuchen</span></div>
+        <canvas id="game" width="896" height="576" aria-label="Begehbare 2D-Museumskarte"></canvas>
+        <div class="controls" aria-label="Bewegung für Touch-Geräte">
+          <button data-move="up" aria-label="Nach oben">▲</button>
+          <div><button data-move="left" aria-label="Nach links">◀</button><button id="touch-interact">E · Untersuchen</button><button data-move="right" aria-label="Nach rechts">▶</button></div>
+          <button data-move="down" aria-label="Nach unten">▼</button>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="panel case"><p class="eyebrow">DEIN AUFTRAG</p><h2>Ein Bild ist verschwunden.</h2><p>In der Galerie hängt eine Fälschung. Finde drei Belege, öffne das Depot und entscheide, was mit der Wahrheit geschieht.</p></div>
+        <div class="panel"><p class="eyebrow">ERMITTLUNGSJOURNAL</p><div id="journal"></div></div>
+        <div class="panel status"><span id="progress">0 / 3 Belege</span><span id="pass">Kein Ausweis</span><span id="steps">0 Schritte</span></div>
+        <div class="panel help"><p class="eyebrow">SO SPIELST DU</p><p>Bewege dich an eine Person oder ein markiertes Objekt heran. Wenn es aufleuchtet, drücke <kbd>E</kbd>. Die orange Depottür braucht drei Belege und den Ausweis.</p></div>
+      </aside>
+    </section>
+    <p class="credit">Originale Pixelgrafik für dieses Projekt. Kunstdaten und Bild: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
+  </main>
+  <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="dialog-card"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Entdeckung</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
