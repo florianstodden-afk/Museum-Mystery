@@ -1,0 +1,13 @@
+# Arbeitsprotokoll
+
+Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](../README.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
+
+### 2026-11-09 – Erster lokaler Museum-Mystery-Fall
+
+- **Beteiligte:** Nutzerauftrag; Umsetzung und Textvorschlag durch Codex. Eine menschliche Durchsicht des Codes und der Oberfläche steht noch aus.
+- **Ausgangslage und Ziel:** Nach PR #2 enthielt das Repository nur die README. Gewünscht waren eine eigenständig formulierte Einschätzung der Anforderungen, eine Nachricht an das Team sowie ein dokumentierter und umgesetzter erster Fall.
+- **Entscheidung und Grund:** Die offizielle Bewertungsseite fordert eine Live-Demo und Code-Erklärung durch alle Mitglieder. Login und API wurden im geteilten Ideenchat als Bewertungskriterien genannt, sind auf der öffentlich erreichbaren Bewertungsseite aber nicht ausdrücklich aufgeführt. Für den ersten vertikalen Spielweg wurden deshalb Met-API, feste sechs Werke, einfache Regeln, Streamlit und lokales SQLite gewählt. Echte Online-Konten und Bestenliste bleiben getrennte Aufgaben.
+- **Datenprüfung:** Am 09.11.2026 wurden die Met-Objekt-IDs 436535, 437133, 436121, 12127, 10393 und 435876 per Objekt-API abgefragt. Alle hatten `isPublicDomain=true`, ein kleines Primärbild und Angaben zu Titel, Künstler, Datum und Medium. Ziel-ID 436535 lieferte in einem zusätzlichen Python-API-Test *Wheat Field with Cypresses* und eine Bildadresse.
+- **Umsetzung:** `specs/first-case.md` legt den Fall fest; `game.py` enthält Punkte und gültige Aktionen; `storage.py` speichert den Versuch in einer ignorierten SQLite-Datei; `app.py` zeigt Met-Werke, Hinweise und Tipps; `tests/` prüft Regeln und Speicherung. `pyproject.toml`, `uv.lock` und `.gitignore` richten das Projekt ein. Branch/PR/Commit nach Veröffentlichung ergänzen.
+- **Prüfung:** `uv sync` installierte die Pakete. Der erste Testlauf scheiterte beim Import von `game`; die `pythonpath`-Einstellung in `pyproject.toml` behob das. Danach: `uv run pytest -q` → **6 passed**. Python rief die Met-API für Ziel-ID 436535 erfolgreich ab. Die direkte Streamlit-Startdatei wurde lokal durch die Windows-Anwendungssteuerung blockiert; mit dem verwalteten Python und `PYTHONPATH` startete der Server, und der Health-Endpunkt lieferte `ok`. Eine vollständige manuelle Klickprüfung und ein echter App-Neustart mit Spielstand stehen noch aus.
+- **Verständnis/Review:** Noch keine zweite Person hat Code und Regeln gegengeprüft. Offene Fragen: Sind Login und API echte Kurs-Pflichten? Welche Online-Speicherung und welches Hosting verwenden wir? Ist der Hinweisweg für Spieler fair?

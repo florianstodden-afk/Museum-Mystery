@@ -1,0 +1,13 @@
+[project]
+name = "museum-mystery"
+version = "0.1.0"
+description = "Ein kleines Detektivspiel mit Kunstwerken aus der Met Collection API"
+requires-python = ">=3.11"
+dependencies = ["streamlit>=1.40"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
