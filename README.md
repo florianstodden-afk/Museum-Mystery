@@ -147,6 +147,8 @@ $projectPython = uv python find --no-project --managed-python --system 3.14
 
 Die `.gitignore` schließt `.venv/`, Python-Caches, lokale SQLite-Dateien und Geheimnisse aus. `pyproject.toml` und `uv.lock` gehören ins Repository. Persönliche oder lokale Datenbanken werden nicht committed. API-Bilder und Metadaten müssen auf Eignung, Quellenangabe und Nutzungsrechte geprüft werden. Die sechs konkreten Objekt-IDs wurden am 09.11.2026 per Met-API auf öffentliche Bilder und notwendige Daten geprüft; die [offizielle Met-Dokumentation](https://metmuseum.github.io/) beschreibt die API ohne Registrierung oder Schlüssel. Vor einer öffentlichen Bereitstellung die aktuellen Bedingungen erneut prüfen.
 
+**Korrektur vom 09.11.2026:** Zwei zuerst ausgewählte Werke hatten entgegen der ersten Prüfung kein nutzbares öffentliches Bild. Nach der Fehlermeldung beim Öffnen wurden sie ersetzt und alle sechs aktuellen IDs erneut geprüft. Der Fehler und die Tests stehen im [Arbeitsprotokoll](docs/arbeitsprotokoll.md).
+
 ## Nächste gemeinsame Entscheidungen
 
 1. Teamgröße, Zeitplan und genaue Anforderungen der Lehrperson bestätigen; insbesondere klären, ob Login und API-Integration Pflicht sind oder aus unserem eigenen Ideenkonzept stammen. Die öffentlich erreichbare Bewertungsseite nennt diese beiden Punkte nicht ausdrücklich.
