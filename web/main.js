@@ -15,6 +15,9 @@ catch { landscapeState = initialLandscape(); }
 try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
 catch { state = initialState(); }
 let metArtwork = null;
+const hallPaintings = [436121, 436535, 12127].map(id => {
+  const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
+});
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
 hallBackdrop.src = './assets/great-hall.png';
@@ -67,8 +70,12 @@ function drawPerson(x,y,kind){
 function drawHall(){
   if(hallBackdrop.complete && hallBackdrop.naturalWidth) ctx.drawImage(hallBackdrop,0,0,canvas.width,canvas.height);
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,canvas.width,canvas.height);}
-  // Fill the central frame with the real Met artwork when the API succeeds.
-  if(artworkReady)ctx.drawImage(wallArtwork,410,244,77,55);
+  // Public-domain Met works are stored locally so every frame works offline.
+  for (const [index, x, y, width, height] of [[0,159,247,35,59],[1,410,244,77,55],[2,701,247,35,59]]) {
+    const image = hallPaintings[index];
+    if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
+    else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
+  }
   const guard=OBJECTS.find(o=>o.id==='guard'); const ledger=OBJECTS.find(o=>o.id==='ledger');
   const desk=hallPosition(ledger.x,ledger.y);ctx.fillStyle='#5b4633';ctx.beginPath();ctx.ellipse(desk.x,desk.y+3,45,12,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#b79c71';ctx.fillRect(desk.x-28,desk.y-14,56,16);ctx.fillStyle='#f0e2bc';ctx.fillRect(desk.x-10,desk.y-17,20,12);

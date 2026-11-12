@@ -59,3 +59,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Ziel und Entscheidung:** Eingangshalle bildschirmfüllend und detailreicher darstellen. Die generierte Illustration orientiert sich an der beschriebenen Great Hall der Met; sie ist keine maßstabsgetreue Darstellung. Der helle Boden orientiert sich am beschriebenen Marmoraggregat ohne Schachbrettmuster. Das Met-Werk wird weiterhin aus der API in den mittleren Rahmen geladen.
 - **Umsetzung:** `web/assets/great-hall.png` ist der generierte Hintergrund; `web/main.js` zeichnet größere Figuren und den Saal, `web/style.css` macht das Spielfeld bildschirmfüllend und das Journal aufklappbar. Andere Räume verwenden noch die frühere Darstellung.
 - **Prüfung:** Node `--test`: 9 Tests bestanden. Browser: Vollbildhalle, Laden des Kunstwerks, Journal und Bewegung überprüft. Ein manueller Durchlauf aller Räume und ein mobiler Gerätetest stehen noch aus.
+
+### 2026-11-12 – Kunst in allen Rahmen
+
+- **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
+- **Umsetzung:** Alle drei Rahmen der Eingangshalle zeigen gemeinfreie Met-Werke. Die Met-API meldete für die Objekte 436121, 436535 und 12127 `isPublicDomain=true`; ihre kleinen Originalbilder wurden als lokale Dateien gespeichert. Quellenlinks stehen im Journal. So erscheinen sie auch ohne API-Verbindung.
+- **Prüfung:** Node `--test`: 9 Tests bestanden. Im Browser wurden alle drei gefüllten Rahmen sichtbar geprüft. Ein vollständiger manueller Offline-Test steht noch aus.
