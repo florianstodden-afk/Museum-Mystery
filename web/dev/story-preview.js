@@ -66,13 +66,27 @@ const modal = document.querySelector('#modal');
 const modalBody = document.querySelector('#modal-body');
 const modalActions = document.querySelector('#modal-actions');
 
+// Remember which button opened the modal, so keyboard users land there again after closing.
+let openerLabel = null;
+
 function openModal(title) {
   document.querySelector('#modal-title').textContent = title;
   modalBody.replaceChildren();
   modalActions.replaceChildren();
-  if (!modal.open) modal.showModal();
+  if (!modal.open) {
+    openerLabel = document.activeElement?.textContent ?? null;
+    modal.showModal();
+  }
   return modalBody;
 }
+
+// The page is re-rendered after every action, so the old button may be gone.
+// We look for a button with the same label, otherwise the first room button.
+modal.addEventListener('close', () => {
+  const buttons = [...document.querySelectorAll('main button, header button')];
+  const target = buttons.find(b => b.textContent === openerLabel) ?? document.querySelector('#rooms button');
+  target?.focus();
+});
 
 function setActions(...buttons) {
   modalActions.replaceChildren(...buttons);
