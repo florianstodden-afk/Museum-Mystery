@@ -31,7 +31,7 @@ export function hasAllEvidence(state) {
 
 export function canEnter(state, x, y) {
   if (x <= 0 || y <= 0 || x >= WIDTH - 1 || y >= HEIGHT - 1) return false;
-  if (x < 9 && y === 1) return false; // The visible Great Hall back wall.
+  if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x === 9 && y !== 9) return false;
   if (x === 18 && y !== 9) return false;
   if (x === 18 && y === 9 && !state.vaultOpen) return false;

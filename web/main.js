@@ -15,6 +15,8 @@ try { landscapeState = JSON.parse(localStorage.getItem(landscapeKey)) || initial
 catch { landscapeState = initialLandscape(); }
 try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
 catch { state = initialState(); }
+// Older saves may place the player inside the newly solid picture wall.
+if (state.player.x < 9 && state.player.y < 4) state = { ...state, player: { ...state.player, y: 4 } };
 let metArtwork = null;
 const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
@@ -59,8 +61,10 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
   ctx.fillStyle='rgba(25,20,15,.24)';ctx.beginPath();ctx.ellipse(0,2,17,5,0,0,Math.PI*2);ctx.fill();
   if(kind==='rick'){
     // An expressive, larger character with a white coat and blue spiky hair.
-    const stride=moving ? Math.sin(time/110)*3 : 0;
-    ctx.fillStyle='#52483d';ctx.fillRect(-11,-8+stride,9,9);ctx.fillRect(3,-8-stride,9,9);
+    const stride=moving ? Math.sin(time/100)*5 : 0;
+    ctx.strokeStyle='#303c3a';ctx.lineWidth=5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-6,-11);ctx.lineTo(-7-stride,-1);ctx.moveTo(6,-11);ctx.lineTo(7+stride,-1);ctx.stroke();
+    ctx.strokeStyle='#5b3b2a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-10-stride,0);ctx.lineTo(-4-stride,0);ctx.moveTo(4+stride,0);ctx.lineTo(10+stride,0);ctx.stroke();
     ctx.fillStyle='#f5f0df';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-7);ctx.lineTo(-17,-7);ctx.closePath();ctx.fill();
     ctx.fillStyle='#77afbd';ctx.fillRect(-5,-32,10,22);ctx.fillStyle='#d4caba';ctx.fillRect(-1,-28,2,18);
     ctx.fillStyle='#e8c4a9';ctx.beginPath();ctx.ellipse(0,-41,10,11,0,0,Math.PI*2);ctx.fill();
@@ -75,7 +79,10 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
     ctx.fillStyle='#263743';ctx.fillRect(-10,-9,8,10);ctx.fillRect(2,-9,8,10);
     ctx.fillStyle='#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
     ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(Math.sin(time/2200)*2,-40,9,10,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);ctx.fillStyle='#d5bd80';ctx.fillRect(-2,-28,4,5);
+    ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
+    const look=Math.sin(time/2200)*2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3+look,-41,2.6,0,Math.PI*2);ctx.arc(4+look,-41,2.6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#243038';ctx.fillRect(-3+look,-42,1.3,2.5);ctx.fillRect(4+look,-42,1.3,2.5);ctx.strokeStyle='#6c4237';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2+look,-35);ctx.lineTo(3+look,-35);ctx.stroke();
+    ctx.fillStyle='#d5bd80';ctx.fillRect(-2,-28,4,5);
   }
   ctx.restore();
 }

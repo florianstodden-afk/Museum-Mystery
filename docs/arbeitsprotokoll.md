@@ -72,3 +72,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Ziel:** Gleichmäßige sichtbare Bewegung, erkennbare Begrenzungen und lebendigere Figuren.
 - **Umsetzung:** `web/motion.js` berechnet die Dauer eines Schritts anhand der tatsächlichen Bildschirmdistanz, einschließlich der unterschiedlichen Skalierung im Saal. `web/main.js` zeichnet Blickrichtung und Schrittanimation der Spielfigur, eine leichte Bewegung der NPCs innerhalb ihres bisherigen Interaktionsfelds sowie Begrenzungen des Saalbodens. UI-Akzente wurden kräftiger gestaltet.
 - **Prüfung:** Node `--test`: 10 Tests bestanden, darunter Geschwindigkeitsvergleich auf beiden Achsen. Im Browser wurden Saal, Pfeiltasten und Blickrichtung geprüft. NPCs wechseln ihre Position noch nicht zwischen Spielfeldern; mobiler Gerätetest steht aus.
+
+### 2026-11-12 – Wandkollision und Figuren überarbeiten
+
+- **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
+- **Umsetzung:** Die Grenze der Bilderwand sperrt alle Felder oberhalb des begehbaren Saals; Spielstände in diesem Bereich werden beim Laden auf das nächste begehbare Feld gesetzt. Die Spielfigur hat deutlich schwingende Beine, der Wachmann Augen und Mund. Ein vorgeschlagener neuer Cartoon-Hintergrund wurde auf ausdrücklichen Wunsch nicht verwendet.
+- **Prüfung:** Node `--test`: 10 Tests bestanden, darunter Wandfelder zwischen den Bildern. Im Browser wurde die Pfeiltaste nach oben gehalten und die Figur blieb unterhalb der Bildwand stehen. Die Animationen benötigen noch menschliches Feedback.

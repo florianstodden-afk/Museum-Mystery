@@ -87,7 +87,7 @@ test('a real walking route reaches both endings',()=>{
 
 test('the visible Great Hall back wall blocks the player',()=>{
   const state=initialState();
-  assert.equal(canEnter(state,4,1),false);
-  const byWall=at(state,4,2);
+  for (const x of [1, 3, 4, 6, 8]) assert.equal(canEnter(state,x,3),false);
+  const byWall=at(state,4,4);
   assert.equal(move(byWall,0,-1),byWall);
 });
