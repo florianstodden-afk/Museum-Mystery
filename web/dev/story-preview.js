@@ -225,6 +225,7 @@ function renderRooms() {
     actions: [
       button(state.notes.includes('transport-cart') ? 'Monitor wall ✓' : 'Check the monitor wall', () => showNote('transport-cart', 'Monitor wall')),
       button(state.notes.includes('duty-roster') ? 'Shift schedule ✓' : 'Read the shift schedule', () => showNote('duty-roster', 'Shift schedule')),
+      el('a', { className: 'story-button', text: 'Room preview →', props: { href: 'security-office.html' } }),
     ],
   }));
   for (const station of CASE.stations) {

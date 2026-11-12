@@ -34,6 +34,7 @@
   background: #29343a; border: 1px solid var(--story-gold-deep); border-radius: 8px; padding: 10px 14px;
   transition: background .15s, border-color .15s, transform .15s;
 }
+a.story-button { display: inline-block; text-decoration: none; }
 .story-button:hover, .story-choice:hover { background: #39474e; border-color: var(--story-gold); }
 .story-button:active, .story-choice:active { transform: translateY(1px); }
 .story-button:disabled { opacity: .55; cursor: default; }
