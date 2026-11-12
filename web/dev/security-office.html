@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Museum Nocturne – Security Office Preview</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../story/story.css">
+  <link rel="stylesheet" href="story-preview.css">
+  <style>
+    .office-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; max-width: 1400px; margin: 0 auto; padding: 8px 24px 24px; align-items: start; }
+    .office-stage { position: relative; border: 1px solid #866d42; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 50px #060b0d90; background: #0d151b; }
+    .office-stage canvas { display: block; width: 100%; height: auto; cursor: default; }
+    .office-stage canvas.is-pointing { cursor: pointer; }
+    .office-points { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .office-side { display: grid; gap: 14px; }
+    .office-text { min-height: 6em; }
+    @media (max-width: 1000px) { .office-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .office-layout { padding-left: 16px; padding-right: 16px; } }
+  </style>
+</head>
+<body class="story-page">
+  <header class="story-top">
+    <div>
+      <p class="story-eyebrow">MUSEUM NOCTURNE · ROOM PREVIEW</p>
+      <h1 class="story-page-title">Security Office</h1>
+      <p class="story-muted">Standalone story room. Hover or click the monitor wall, the shift schedule, the key cabinet or the walkie-talkie.</p>
+    </div>
+    <div class="story-top-actions"><a class="story-button" href="story.html">← Story preview</a></div>
+  </header>
+
+  <main class="office-layout">
+    <div>
+      <div class="office-stage">
+        <canvas id="office" width="1672" height="941" aria-label="Security office with a wall of nine camera monitors, a desk, key cabinet, shift schedule and locker"></canvas>
+      </div>
+      <div id="points" class="office-points" aria-label="Things to examine"></div>
+    </div>
+    <div class="office-side">
+      <section class="story-panel office-text" aria-live="polite">
+        <p class="story-eyebrow">EXAMINE</p>
+        <h2 id="point-title" class="story-title">Nine screens, one night</h2>
+        <p id="point-text" class="story-text">The room smells of cold coffee. Most cameras show the empty wings. Two have lost their signal.</p>
+        <p id="point-message" class="story-feedback"></p>
+      </section>
+      <aside id="journal" class="story-panel story-journal-panel" aria-label="Investigation journal"></aside>
+    </div>
+  </main>
+
+  <footer class="story-footer">Fictional museum and characters · Artworks: The Met, Open Access</footer>
+  <script type="module" src="security-office-preview.js"></script>
+</body>
+</html>
