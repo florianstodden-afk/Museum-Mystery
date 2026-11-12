@@ -65,3 +65,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
 - **Umsetzung:** Alle drei Rahmen der Eingangshalle zeigen gemeinfreie Met-Werke. Die Met-API meldete für die Objekte 436121, 436535 und 12127 `isPublicDomain=true`; ihre kleinen Originalbilder wurden als lokale Dateien gespeichert. Quellenlinks stehen im Journal. So erscheinen sie auch ohne API-Verbindung.
 - **Prüfung:** Node `--test`: 9 Tests bestanden. Im Browser wurden alle drei gefüllten Rahmen sichtbar geprüft. Ein vollständiger manueller Offline-Test steht noch aus.
+
+### 2026-11-12 – Bewegungsrichtung, Geschwindigkeit und Figuren
+
+- **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
+- **Ziel:** Gleichmäßige sichtbare Bewegung, erkennbare Begrenzungen und lebendigere Figuren.
+- **Umsetzung:** `web/motion.js` berechnet die Dauer eines Schritts anhand der tatsächlichen Bildschirmdistanz, einschließlich der unterschiedlichen Skalierung im Saal. `web/main.js` zeichnet Blickrichtung und Schrittanimation der Spielfigur, eine leichte Bewegung der NPCs innerhalb ihres bisherigen Interaktionsfelds sowie Begrenzungen des Saalbodens. UI-Akzente wurden kräftiger gestaltet.
+- **Prüfung:** Node `--test`: 10 Tests bestanden, darunter Geschwindigkeitsvergleich auf beiden Achsen. Im Browser wurden Saal, Pfeiltasten und Blickrichtung geprüft. NPCs wechseln ihre Position noch nicht zwischen Spielfeldern; mobiler Gerätetest steht aus.
