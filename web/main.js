@@ -108,6 +108,11 @@ function end(choice){state=chooseEnding(state,choice);save();
 function reset(){state=initialState();save();closeDialog();}
 function handleMove(dx,dy){if(!dialog.classList.contains('hidden'))return;const next=move(state,dx,dy);if(next!==state){state=next;save();}}
 document.addEventListener('keydown',event=>{
+  // Leave keyboard input and button activation to the open dialog.
+  if (!dialog.classList.contains('hidden')) {
+    if (event.key === 'Escape') closeDialog();
+    return;
+  }
   const key=event.key.toLowerCase();const directions={arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
   if(directions[key]){event.preventDefault();handleMove(...directions[key]);}
   else if(key==='e'||key==='enter'){event.preventDefault();handleInteract();}

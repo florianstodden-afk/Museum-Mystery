@@ -1,5 +1,13 @@
 # Arbeitsprotokoll
 
+### 2026-11-12 – Bestehenden Rundgang als Ausgangspunkt übernehmen
+
+- **Beteiligte:** Nutzerauftrag; Codex. Menschliche Durchsicht steht aus.
+- **Ausgangslage:** Der gemeinsame Branch `feature/museum-walk` enthält einen begehbaren Prototyp; das neuere Nocturne-Konzept mit vier Stationen ist dort noch nicht umgesetzt.
+- **Entscheidung:** Der bestehende Branch wurde in einen neuen Arbeitszweig von `main` übernommen, damit seine Geschichte erhalten bleibt. Die Spielregeln des neuen Konzepts müssen noch umgesetzt werden.
+- **Umsetzung:** `web/main.js` lässt Tastatureingaben in geöffneten Dialogen beim Dialog, statt sie für die Spielfigur abzufangen.
+- **Prüfung:** Der vorhandene Testlauf mit Node `--test` meldete 6 bestandene Tests. Ein manueller Browsertest dieser Änderung steht aus.
+
 Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](../README.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
 
 ### 2026-11-09 – Erster lokaler Museum-Mystery-Fall
