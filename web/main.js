@@ -1,5 +1,6 @@
 import { WIDTH, HEIGHT, OBJECTS, initialState, validState, hasAllEvidence,
   move, nearbyObject, interact, openVault, chooseEnding } from './engine.js';
+import { start as startLandscape, initialLandscape } from './minigames/landscape.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -7,6 +8,10 @@ const ctx = canvas.getContext('2d');
 const dialog = document.querySelector('#dialog');
 const storeKey = 'museum-mystery-walk-v1';
 let state;
+const landscapeKey = 'museum-nocturne-landscape-v1';
+let landscapeState;
+try { landscapeState = JSON.parse(localStorage.getItem(landscapeKey)) || initialLandscape(); }
+catch { landscapeState = initialLandscape(); }
 try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
 catch { state = initialState(); }
 let metArtwork = null;
@@ -93,6 +98,18 @@ function handleInteract(){
     return;
   }
   const object=nearbyObject(state);if(!object){showDialog('Niemand in der Nähe','Geh an ein markiertes Objekt oder eine Person heran.');return;}
+  if (object.id === 'painting') {
+    showDialog('Landschaftsgalerie · Station B', '');
+    startLandscape(document.querySelector('#dialog-body'), {
+      state: landscapeState,
+      onChange: next => { landscapeState = next; localStorage.setItem(landscapeKey, JSON.stringify(next)); }
+    }, result => {
+      const current = interact(state, 'painting'); state = current.state; save();
+      const notice = document.createElement('p'); notice.textContent = `Beweis im Journal: ${result.evidence}`;
+      document.querySelector('#dialog-body').append(notice);
+    });
+    return;
+  }
   const result=interact(state,object.id);state=result.state;save();
   if(result.choice){showDialog('Die letzte Entscheidung',result.text,[
     {label:'Original heimlich zurückbringen',action:()=>end('restore')},
@@ -105,7 +122,7 @@ function end(choice){state=chooseEnding(state,choice);save();
   const expose='Du zeigst Protokoll, Firnis und Notiz der Öffentlichkeit. Die Fälschung wird aufgedeckt; das Museum muss Verantwortung übernehmen. ENDE B: Die Wahrheit ans Licht.';
   showDialog('Fall abgeschlossen',choice==='restore'?restore:expose,[{label:'Neues Spiel',action:reset}]);
 }
-function reset(){state=initialState();save();closeDialog();}
+function reset(){state=initialState();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
 function handleMove(dx,dy){if(!dialog.classList.contains('hidden'))return;const next=move(state,dx,dy);if(next!==state){state=next;save();}}
 document.addEventListener('keydown',event=>{
   // Leave keyboard input and button activation to the open dialog.
