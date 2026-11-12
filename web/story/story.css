@@ -101,3 +101,7 @@ a.story-button { display: inline-block; text-decoration: none; }
   .story-slot-room { display: none; }
   .story-score-table td:nth-child(2) { display: none; }
 }
+
+/* Scenes opened by host.js: content on top, a row of buttons below. */
+.story-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.story-actions:empty { display: none; }

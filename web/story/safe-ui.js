@@ -16,6 +16,7 @@ export function safeModel(state) {
 
 export function renderSafe(container, { state, message = '' }, onTry) {
   const model = safeModel(state);
+  let input = null;
   const feedback = el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } });
   const parts = [
     el('p', { className: 'story-eyebrow', text: 'THE SAFE' }),
@@ -27,7 +28,7 @@ export function renderSafe(container, { state, message = '' }, onTry) {
   } else if (!model.ready) {
     parts.push(el('p', { className: 'story-text', text: 'A brass dial with four letters. It will not turn until you hold proof from all four stations.' }));
   } else {
-    const input = el('input', {
+    input = el('input', {
       className: 'story-input',
       attrs: { id: 'story-safe-word', name: 'word', autocomplete: 'off', maxlength: '12', spellcheck: 'false' },
     });
@@ -45,4 +46,5 @@ export function renderSafe(container, { state, message = '' }, onTry) {
 
   parts.push(feedback);
   container.replaceChildren(el('section', { className: 'story-safe' }, parts));
+  if (input) input.focus(); // ready to type, also again after a wrong word
 }
