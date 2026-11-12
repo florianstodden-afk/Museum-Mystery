@@ -201,7 +201,7 @@ function draw() {
   }
 }
 
-function showDialog(title,text,options=[{label:'Weiter',action:closeDialog}]){
+function showDialog(title,text,options=[{label:'Weiter (E)',action:closeDialog}]){
   stopMovement();
   document.querySelector('#dialog-title').textContent=title;
   const body=document.querySelector('#dialog-body');body.replaceChildren();
@@ -293,7 +293,15 @@ function animate(now){
 }
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
-  if (!dialog.classList.contains('hidden')) { if (event.key === 'Escape') closeDialog(); return; }
+  if (!dialog.classList.contains('hidden')) {
+    const editing = event.target instanceof HTMLElement &&
+      (event.target.matches('textarea, input:not([inputmode="numeric"]):not([type="number"])') || event.target.isContentEditable);
+    if (event.key === 'Escape' || (!editing && !event.repeat && event.key.toLowerCase() === 'e')) {
+      event.preventDefault();
+      closeDialog();
+    }
+    return;
+  }
   const key=event.key.toLowerCase();
   if(directions[key]){ event.preventDefault(); heldKeys.set(key,directions[key]); }
   else if((key==='e'||key==='enter') && !event.repeat){event.preventDefault();handleInteract();}
