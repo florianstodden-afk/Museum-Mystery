@@ -51,7 +51,7 @@ columns = st.columns(3)
 for index, object_id in enumerate(CANDIDATE_IDS):
     work = works[object_id]
     with columns[index % 3]:
-        st.image(work["primaryImageSmall"], use_container_width=True)
+        st.image(work["primaryImageSmall"], width="stretch")
         st.markdown(f"**{work['title']}**")
         st.caption(f"{work['artistDisplayName']} · {work['objectDate']} · {work['medium']}")
         st.link_button("Werk im Met ansehen", work["objectURL"])

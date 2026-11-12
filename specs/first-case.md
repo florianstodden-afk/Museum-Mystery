@@ -6,9 +6,9 @@ Wir brauchen einen kleinen, durchspielbaren Fall, dessen Regeln jedes Teammitgli
 
 ## Was?
 
-Sechs vorab geprüfte Met-Objekt-IDs: 436535 (Ziel), 437133, 436121, 12127, 10393 und 435876. Alle wurden am 09.11.2026 mit öffentlichem Bild, Künstler, Datum und Medium überprüft. Das Ziel ist *Wheat Field with Cypresses* (1889) von Vincent van Gogh. Bilder und Metadaten werden beim Start über den Objekt-Endpunkt abgefragt und für 24 Stunden im laufenden Streamlit-Prozess zwischengespeichert.
+Sechs Met-Objekt-IDs: 436535 (Ziel), 459193, 436121, 12127, 435882 und 435876. Diese sechs wurden am 09.11.2026 mit `isPublicDomain=true`, öffentlichem Bild, Künstler, Datum und Medium überprüft. Die ursprünglich ausgewählten 437133 und 10393 waren ungeeignet und wurden nach einem App-Fehler ersetzt; siehe Arbeitsprotokoll. Das Ziel ist *Wheat Field with Cypresses* (1889) von Vincent van Gogh. Bilder und Metadaten werden beim Start über den Objekt-Endpunkt abgefragt und für 24 Stunden im laufenden Streamlit-Prozess zwischengespeichert.
 
-Ein kostenloser Hinweis beschreibt das Werk als Landschaft. Drei weitere Hinweise kosten je 15 von anfänglich 100 Punkten. Ein erster falscher Tipp kostet 25 Punkte und schließt das gewählte Werk aus. Ein zweiter falscher Tipp beendet den Fall; ein richtiger Tipp gewinnt. Ein ungültiger oder wiederholter Tipp sowie Aktionen nach Spielende werden abgelehnt. Der lokale Versuch wird in SQLite gespeichert. Nach Ende darf man einen neuen Übungsversuch beginnen.
+Ein kostenloser Hinweis beschreibt das Werk als Landschaft im Freien. Damit bleiben zunächst das Ziel und *Road in Etten* (1881) möglich. Der erste bezahlte Hinweis „nach 1885“ unterscheidet die beiden. Drei weitere Hinweise kosten je 15 von anfänglich 100 Punkten. Ein erster falscher Tipp kostet 25 Punkte und schließt das gewählte Werk aus. Ein zweiter falscher Tipp beendet den Fall; ein richtiger Tipp gewinnt. Ein ungültiger oder wiederholter Tipp sowie Aktionen nach Spielende werden abgelehnt. Der lokale Versuch wird in SQLite gespeichert. Nach Ende darf man einen neuen Übungsversuch beginnen.
 
 ## Außerhalb dieser Aufgabe
 

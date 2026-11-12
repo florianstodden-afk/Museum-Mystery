@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 CASE_ID = "cypresses"
 TARGET_ID = 436535
-CANDIDATE_IDS = (436535, 437133, 436121, 12127, 10393, 435876)
-FREE_CLUE = "Gesucht ist eine Landschaft, kein Porträt einer Person."
+CANDIDATE_IDS = (436535, 459193, 436121, 12127, 435882, 435876)
+FREE_CLUE = "Gesucht ist eine Landschaft mit einer Ansicht im Freien."
 PAID_CLUES = (
     "Das Werk entstand nach 1885.",
     "Der Künstler kam aus den Niederlanden.",
