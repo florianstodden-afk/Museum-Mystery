@@ -1,0 +1,107 @@
+/* Styles for the story components in web/story/.
+   Colours and fonts follow web/style.css. Every class starts with "story-",
+   so nothing here collides with the main game's CSS. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+
+:root {
+  --story-ink: #e9dfca;
+  --story-muted: #b3ae9c;
+  --story-gold: #f6c56e;
+  --story-gold-deep: #c99a45;
+  --story-panel: #1d2931;
+  --story-panel-2: #22313a;
+  --story-line: #425058;
+  --story-night: #111b23;
+  --story-danger: #f0a08c;
+  --story-ok: #9fd6b0;
+}
+
+/* Shared text pieces */
+.story-eyebrow { font: 700 .72rem/1.2 'DM Sans', sans-serif; letter-spacing: .18em; color: var(--story-gold); margin: 0 0 8px; }
+.story-title, .story-heading, .story-ending-title { font-family: Fraunces, Georgia, serif; color: #f8e9c9; margin: 0; }
+.story-title { font-size: 1.3rem; line-height: 1.3; margin-bottom: 14px; }
+.story-heading { font-size: 1rem; margin: 18px 0 8px; }
+.story-text { line-height: 1.6; margin: 0 0 12px; }
+.story-muted { color: var(--story-muted); margin: 4px 0 0; font-size: .88rem; line-height: 1.45; }
+.story-status { display: inline-block; background: #34434a; padding: 6px 11px; border-radius: 99px; font-size: .82rem; margin: 0 0 12px; }
+.story-feedback { min-height: 1.4em; margin: 12px 0 0; line-height: 1.5; color: var(--story-gold); }
+.story-feedback:empty { min-height: 0; margin: 0; }
+.story-disclaimer { font-size: .78rem; color: var(--story-muted); border-top: 1px solid #ffffff1c; padding-top: 10px; margin-top: 18px; }
+
+/* Buttons and inputs */
+.story-button, .story-choice {
+  font: inherit; cursor: pointer; color: var(--story-ink);
+  background: #29343a; border: 1px solid var(--story-gold-deep); border-radius: 8px; padding: 10px 14px;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+a.story-button { display: inline-block; text-decoration: none; }
+.story-button:hover, .story-choice:hover { background: #39474e; border-color: var(--story-gold); }
+.story-button:active, .story-choice:active { transform: translateY(1px); }
+.story-button:disabled { opacity: .55; cursor: default; }
+.story-button:focus-visible, .story-choice:focus-visible, .story-input:focus-visible { outline: 3px solid var(--story-gold); outline-offset: 3px; }
+.story-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.story-label { width: 100%; font-size: .85rem; color: var(--story-muted); }
+.story-input {
+  flex: 1 1 160px; font: 600 1.4rem 'DM Sans', sans-serif; letter-spacing: .35em; text-transform: uppercase;
+  background: #0d151b; color: var(--story-gold); border: 1px solid var(--story-gold-deep); border-radius: 8px; padding: 10px 12px;
+}
+.story-choices { display: grid; gap: 10px; }
+.story-choice { display: grid; gap: 2px; text-align: left; padding: 12px 14px; }
+.story-choice strong { font-family: Fraunces, Georgia, serif; font-size: 1.05rem; color: #f8e9c9; }
+.story-choice-role { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--story-gold); }
+.story-choice-text { font-size: .86rem; color: var(--story-muted); line-height: 1.4; }
+
+/* Journal */
+.story-next { background: #f6c56e14; border-left: 3px solid var(--story-gold); padding: 9px 12px; border-radius: 0 8px 8px 0; line-height: 1.45; font-size: .92rem; }
+.story-slots { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.story-slot { display: grid; justify-items: center; gap: 4px; padding: 10px 4px 8px; border: 1px dashed var(--story-line); border-radius: 8px; background: #0f181e; }
+.story-slot.is-found { border-style: solid; border-color: var(--story-gold-deep); background: linear-gradient(180deg, #2c2a20, #19221f); }
+.story-slot-letter { font: 700 1.7rem Fraunces, Georgia, serif; color: var(--story-muted); }
+.story-slot.is-found .story-slot-letter { color: var(--story-gold); text-shadow: 0 0 12px #f6c56e55; }
+.story-slot-room { font-size: .62rem; text-align: center; color: var(--story-muted); line-height: 1.2; }
+.story-list { margin: 0; padding-left: 18px; display: grid; gap: 7px; font-size: .9rem; line-height: 1.45; }
+.story-list strong { color: var(--story-gold); font-weight: 500; }
+.story-score { margin: 16px 0 0; font-weight: 700; color: #f8e9c9; }
+
+/* Dialogue */
+.story-dialogue { display: grid; gap: 10px; }
+.story-dialogue-line { margin: 0; padding: 10px 13px; background: #2a3940; border-radius: 4px 12px 12px 12px; line-height: 1.5; }
+.story-dialogue.is-away .story-dialogue-line { background: transparent; border: 1px dashed var(--story-line); color: var(--story-muted); font-style: italic; }
+
+/* Chain of evidence */
+.story-chain { margin-top: 16px; }
+.story-chain-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.story-chain-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px; border: 1px solid #f6c56e40; border-radius: 8px; background: #1a2329; }
+.story-chain-item.is-missing { opacity: .5; }
+.story-chain-letter { flex: 0 0 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--story-gold); color: #1d2931; font: 700 1rem Fraunces, Georgia, serif; }
+
+/* Placeholder station */
+.story-placeholder-works { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 6px 0 16px; }
+.story-placeholder-work { margin: 0; }
+.story-placeholder-work img { width: 100%; height: 170px; object-fit: contain; background: #0d151b; border-radius: 6px; }
+.story-placeholder-work p { font-size: .82rem; margin: 6px 0 0; color: var(--story-muted); }
+
+/* Endings */
+.story-ending-title { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 14px; }
+.story-ending.is-heist .story-ending-title { color: var(--story-danger); }
+.story-ending.is-open-file .story-ending-title { color: var(--story-gold); }
+.story-ending-figure { margin: 0 0 16px; }
+.story-ending-figure img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; border: 4px solid #5c4a2c; box-shadow: 0 16px 40px #0008; }
+.story-ending.is-heist .story-ending-figure img { filter: grayscale(.55) brightness(.7) contrast(1.1); }
+.story-ending-figure figcaption { font-size: .78rem; color: var(--story-muted); margin-top: 6px; }
+.story-ending-figure a { color: var(--story-gold); }
+.story-score-table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: .88rem; }
+.story-score-table caption { text-align: left; font: 700 .72rem 'DM Sans', sans-serif; letter-spacing: .18em; color: var(--story-gold); padding-bottom: 6px; text-transform: uppercase; }
+.story-score-table th, .story-score-table td { text-align: left; padding: 7px 6px; border-bottom: 1px solid #ffffff14; }
+.story-score-table td:nth-child(2) { color: var(--story-muted); }
+.story-score-table tfoot th, .story-score-table tfoot td { font-weight: 700; color: #f8e9c9; border-bottom: 0; }
+.story-num { text-align: right !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 480px) {
+  .story-slot-room { display: none; }
+  .story-score-table td:nth-child(2) { display: none; }
+}
+
+/* Scenes opened by host.js: content on top, a row of buttons below. */
+.story-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.story-actions:empty { display: none; }
