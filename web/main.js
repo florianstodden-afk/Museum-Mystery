@@ -23,7 +23,7 @@ const hallPaintings = [436121, 436535, 12127].map(id => {
 });
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall.png';
+hallBackdrop.src = './assets/great-hall-nyc.png';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
@@ -65,14 +65,18 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
     ctx.strokeStyle='#303c3a';ctx.lineWidth=5;ctx.lineCap='round';
     ctx.beginPath();ctx.moveTo(-6,-11);ctx.lineTo(-7-stride,-1);ctx.moveTo(6,-11);ctx.lineTo(7+stride,-1);ctx.stroke();
     ctx.strokeStyle='#5b3b2a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-10-stride,0);ctx.lineTo(-4-stride,0);ctx.moveTo(4+stride,0);ctx.lineTo(10+stride,0);ctx.stroke();
-    ctx.fillStyle='#f5f0df';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-7);ctx.lineTo(-17,-7);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#77afbd';ctx.fillRect(-5,-32,10,22);ctx.fillStyle='#d4caba';ctx.fillRect(-1,-28,2,18);
+    ctx.fillStyle='#473927';ctx.fillRect(-9,-14,18,7);
+    ctx.fillStyle='#faf9eb';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-7);ctx.lineTo(-17,-7);ctx.closePath();ctx.fill();ctx.strokeStyle='#394648';ctx.lineWidth=1.2;ctx.stroke();
+    ctx.fillStyle='#9bd9d5';ctx.fillRect(-6,-32,12,21);
+    ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(-12,-34);ctx.lineTo(-4,-31);ctx.lineTo(-8,-24);ctx.lineTo(-5,-20);ctx.lineTo(-10,-10);ctx.lineTo(-15,-9);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(12,-34);ctx.lineTo(4,-31);ctx.lineTo(8,-24);ctx.lineTo(5,-20);ctx.lineTo(10,-10);ctx.lineTo(15,-9);ctx.closePath();ctx.fill();ctx.stroke();
     ctx.fillStyle='#e8c4a9';ctx.beginPath();ctx.ellipse(0,-41,10,11,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#8ddcea';ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(-17,-51);ctx.lineTo(-9,-51);ctx.lineTo(-12,-59);ctx.lineTo(-4,-54);ctx.lineTo(0,-63);ctx.lineTo(4,-54);ctx.lineTo(12,-59);ctx.lineTo(10,-51);ctx.lineTo(17,-51);ctx.lineTo(9,-44);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#a8e7f1';ctx.strokeStyle='#34464a';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(-21,-49);ctx.lineTo(-12,-52);ctx.lineTo(-18,-61);ctx.lineTo(-8,-56);ctx.lineTo(-7,-65);ctx.lineTo(-2,-58);ctx.lineTo(3,-67);ctx.lineTo(6,-58);ctx.lineTo(16,-64);ctx.lineTo(12,-54);ctx.lineTo(21,-52);ctx.lineTo(10,-44);ctx.closePath();ctx.fill();ctx.stroke();
     if(direction!=='up'){
       const offset = direction==='left' ? -3 : direction==='right' ? 3 : 0;
       ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-4+offset,-42,3.7,0,Math.PI*2);ctx.arc(4+offset,-42,3.7,0,Math.PI*2);ctx.fill();ctx.stroke();
       ctx.fillStyle='#293037';ctx.fillRect(-4+offset,-43,1.5,3);ctx.fillRect(4+offset,-43,1.5,3);
+      ctx.strokeStyle='#53665e';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-7+offset,-47);ctx.lineTo(-1+offset,-46);ctx.moveTo(2+offset,-46);ctx.lineTo(8+offset,-47);ctx.moveTo(-3+offset,-36);ctx.lineTo(4+offset,-36);ctx.stroke();
     }
     ctx.strokeStyle='#53635d';ctx.beginPath();ctx.moveTo(-13,-32);ctx.lineTo(-16,-8);ctx.lineTo(16,-8);ctx.lineTo(13,-32);ctx.stroke();
   } else {

@@ -78,3 +78,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
 - **Umsetzung:** Die Grenze der Bilderwand sperrt alle Felder oberhalb des begehbaren Saals; Spielstände in diesem Bereich werden beim Laden auf das nächste begehbare Feld gesetzt. Die Spielfigur hat deutlich schwingende Beine, der Wachmann Augen und Mund. Ein vorgeschlagener neuer Cartoon-Hintergrund wurde auf ausdrücklichen Wunsch nicht verwendet.
 - **Prüfung:** Node `--test`: 10 Tests bestanden, darunter Wandfelder zwischen den Bildern. Im Browser wurde die Pfeiltaste nach oben gehalten und die Figur blieb unterhalb der Bildwand stehen. Die Animationen benötigen noch menschliches Feedback.
+
+### 2026-11-12 – New York und Figuren
+
+- **Beteiligte:** Nutzerauftrag, Codex und ImageGen; Teamreview steht aus.
+- **Umsetzung:** `web/assets/great-hall-nyc.png` ist eine neue, generierte Variante der bisherigen Halle mit New Yorker Skyline in den Fenstern; die abgelehnte Cartoon-Variante wurde nicht eingebaut. Die Spielfigur erhielt ausgeprägteres blaues Haar, größere Augen, ein blaues Hemd und einen offenen weißen Kittel.
+- **Prüfung:** Node `--test`: 10 Tests bestanden. Die Fenster, Bilderrahmen und Figuren wurden im Browser visuell überprüft.
