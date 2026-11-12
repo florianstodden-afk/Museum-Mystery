@@ -76,7 +76,7 @@ export function start(container, caseData, onSolved) {
 
 ## Ausprobieren ohne Hauptspiel
 
-In `web/dev/story.html` werden Stationen 2–4 mit dem Platzhalter `web/story/placeholder-station.js` geöffnet. Um deine Station dort zu testen, reicht später eine Zeile in `web/dev/story-preview.js` (Tabelle `STATION_MODULES`): Platzhalter durch dein Modul ersetzen.
+In `web/dev/story.html` werden Stationen 2–4 mit dem Platzhalter `web/story/placeholder-station.js` geöffnet. Um deine Station dort zu testen, reicht eine Zeile in `web/dev/story-preview.js`: dein Modul importieren und bei `createStoryHost({ stations: { … } })` eintragen, z. B. `stations: { landscape: landscapeStation, archive: archiveStation }`. Stationen ohne Eintrag bekommen automatisch den Platzhalter.
 
 Der Adapter `openStation` in `web/story/stations.js` übersetzt deine Rückmeldung. Er akzeptiert:
 

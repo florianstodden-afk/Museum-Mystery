@@ -16,7 +16,51 @@ Bis jetzt wurde **keine bestehende Datei geändert**. Alle Schritte unten änder
 
 Wichtig: Die Karte bleibt der „Host“. Sie entscheidet, **wo** etwas passiert (welches Objekt in der Nähe ist). Die Story-Engine entscheidet, **was** passiert.
 
-## Schritt für Schritt
+## Kurzer Weg: mit `web/story/host.js` (empfohlen)
+
+Seit dem 12.11.2026 gibt es `createStoryHost` in `web/story/host.js`. Der Host erledigt Laden/Speichern, Stationen, Gespräche, Safe → Schlussfrage → Entscheidung → Abspann, Hinweise und „New game“. `main.js` muss ihm nur einen Dialog leihen. So sieht der ganze Story-Teil in `main.js` aus:
+
+```js
+import { createStoryHost } from './story/host.js';
+import { journalModel, renderJournal } from './story/journal.js';
+import * as landscape from './minigames/landscape.js';
+
+const story = createStoryHost({
+  openPanel(title) { showDialog(title, ''); return document.querySelector('#dialog-body'); },
+  closePanel: closeDialog,
+  onChange() { renderJournal(document.querySelector('#journal'), journalModel(story.state)); },
+  stations: { landscape },                      // später: portraits, restoration, archive
+  storageKey: 'museum-nocturne-story-v1',
+});
+story.start();                                  // zeigt beim ersten Besuch die Nachricht von M
+
+// in handleInteract(), je nach Objekt in der Nähe:
+const STORY_OBJECTS = {
+  painting:   () => story.openStation('landscape'),
+  portraitLog:() => story.openStation('portraits'),
+  workbench:  () => story.openStation('restoration'),
+  frameRack:  () => story.openStation('archive'),
+  vault:      () => story.openVault(),
+  guard:      () => story.talkTo('leon'),
+  restorer:   () => story.talkTo('imani'),
+  curator:    () => story.talkTo('vale'),
+  monitors:   () => story.examine('monitor-wall'),
+};
+STORY_OBJECTS[object.id]?.();
+
+// Knöpfe oben rechts:
+//   „New Game“ → story.confirmNewGame()     „Hint“ → story.showHint()
+```
+
+Die Story-Bausteine zeichnen ihre Knöpfe selbst. `#dialog-actions` wird für Story-Szenen also leer gelassen. Die Objekt-ids sind Vorschläge; Fabian legt sie fest.
+
+**Der Beweis, dass das funktioniert:** `web/dev/story-preview.js` benutzt genau diesen Host (mit einem `<dialog>` statt `#dialog`), und `web/story/tests/host.test.js` spielt über den Host ein ganzes Spiel durch.
+
+Mit dem Host schrumpfen die Schritte 2, 4 und 5 unten auf die Zeilen oben. Schritte 1, 3, 6 und 7 bleiben nötig. **Geschätzter Aufwand mit Host: ca. 2–3 Stunden statt 5–6.**
+
+Die ausführlichen Schritte unten beschreiben, was der Host intern tut. Sie helfen, wenn ihr bewusst ohne Host integrieren wollt.
+
+## Schritt für Schritt (ausführlich)
 
 ### Schritt 1 – Alte Story-Logik sichern (ca. 30 min)
 1. Neuen Ordner `web/legacy/` anlegen.
@@ -104,7 +148,8 @@ if (entry) {
 
 | | Aufwand |
 |---|---|
-| Schritte 1–7 zusammen | **ca. 5–6 Stunden**, zu zweit an einem Nachmittag |
+| Schritte 1–7 ohne Host | **ca. 5–6 Stunden**, zu zweit an einem Nachmittag |
+| Mit `host.js` (Schritte 1, 3, 6, 7 + kurzer Weg) | **ca. 2–3 Stunden** |
 
 | Risiko | Gegenmaßnahme |
 |---|---|

@@ -107,3 +107,25 @@ Eigene Datei, damit es keinen Konflikt mit dem gemeinsamen `docs/arbeitsprotokol
 3. Tests nach dem Merge: `cd web && node --test` → **74 Tests, 74 bestanden** (17 alte + 57 neue). `uv run pytest` → **6 bestanden**.
 4. `git diff --name-status origin/main...HEAD`: ausschließlich **neue** Dateien (Status `A`), keine bestehende Datei geändert.
 5. Browser: `web/index.html` (Hauptspiel) und `web/dev/story.html` laden ohne fehlgeschlagene Ressourcen (Screenshots 13, 14).
+6. Merge-Check-Dokumentation committet: `1f05d73 Record merge check and prepare pull request text`.
+
+## Zusatz A – Hinweis-System (`web/story/hints.js`)
+
+- **Ziel:** Konzept „Niemand kann dauerhaft feststecken“ auch außerhalb der Stationen erfüllen.
+- **Entscheidungen:** `hintFor(state, level)` ist eine reine Funktion. Stufe 1 gibt einen sanften Hinweis, Stufe 2 einen konkreten. Story-Hinweise kosten **keine** Punkte; die Hinweise innerhalb einer Station kosten dort weiterhin −5, das regelt die Station selbst. Nach zwei falschen Safe-Wörtern bzw. zwei falschen Anklagen ist schon Stufe 1 konkret (nennt B – I – L – D bzw. das Rahmenetikett). Hinweise kommen von Imani.
+- **Prüfung:** 6 neue Tests (für jeden Story-Schritt ein Hinweis, Sicherheitsnetz nach zwei Fehlversuchen, Zustand und Punkte bleiben unverändert). `node --test` → **80 / 80 bestanden**.
+- **Commit:** `fc5eaac Add story hints so nobody stays stuck`
+
+## Zusatz B – Story-Host (`web/story/host.js`)
+
+- **Ziel:** Die Integration ins Hauptspiel vereinfachen und ihr Risiko senken.
+- **Entscheidungen:** `createStoryHost({ openPanel, closePanel, onChange, stations, storage, storageKey })` bündelt Laden/Speichern (immer mit try/catch, gesperrter Speicher → Spiel läuft trotzdem), Stationen über den Adapter, Gespräche, Security-Office-Punkte, Safe → Schlussfrage → Entscheidung → Abspann (`openVault()` wählt den passenden Schritt), Hinweise und „New game“ mit Bestätigung. Die Seite leiht dem Host nur einen Dialog. Der Speicher ist austauschbar (`memoryStorage()` für Tests). Das Safe-Eingabefeld bekommt jetzt automatisch den Fokus, auch nach einem falschen Wort.
+- **Prüfung:** 8 neue Tests in `host.test.js`, u. a. ein komplettes Spiel über den Host (falsches Wort, falsche Anklage, Ende B, **87 / 100**), Laden in einem neuen Host, kaputter und gesperrter Speicher. `node --test` → **88 / 88 bestanden**.
+- **Commit:** `624ec55 Add story host that wires the story into any page`
+
+## Zusatz C – Vorschau auf den Host umgestellt
+
+- `web/dev/story-preview.js` nutzt jetzt `createStoryHost` und zeichnet nur noch die Raumkarten (deutlich kürzer). Neuer Knopf „💡 Hint“. Speicherschlüssel und Format unverändert, alte Vorschau-Stände bleiben gültig.
+- **Browserprüfung:** New game mit Bestätigung → Auftrag → Hinweis und „Tell me more“ → echte Station 1 (1× falsch, dann richtig, 17 Punkte) → drei Platzhalter → Safe-Feld hat Fokus → zwei falsche Wörter → Hinweis nennt B – I – L – D → `b i l d` → falsche Anklage Dr. Vale (Beweiskette bleibt verborgen) → Voss (Erklärung „mécène“) → Ende A, **87 / 100**. Seite neu geladen: Stand und Punkte erhalten. Tastatur: Hint mit Enter geöffnet, Escape, Fokus zurück auf „💡 Hint“. Konsole ohne Fehler, keine fehlgeschlagenen Ressourcen. Screenshot 15.
+- **Doku:** Integrationsplan mit „Kurzer Weg“ über den Host (Aufwand ca. 2–3 h statt 5–6 h), README und Minispiel-Vertrag angepasst.
+- **Erneuter Abgleich:** `git fetch origin` → weiterhin keine neuen Commits auf `main`. `node --test` → **88 / 88**, `uv run pytest` → **6 bestanden**.

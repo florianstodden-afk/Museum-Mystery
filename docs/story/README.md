@@ -13,12 +13,14 @@ Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nich
 | `web/story/scoring.js` | Punkte: `stationPoints`, `safePoints`, `accusationPoints`, `scoreBreakdown`, `totalScore` (max. 100). |
 | `web/story/save.js` | `serialize` / `deserialize` mit Prüfung (kaputt, alte Version, unmögliche Zustände → `null`). |
 | `web/story/stations.js` | Adapter `openStation`: hängt jede Station gleich an, übersetzt die Rückmeldung in `{ mistakes, hints }`. |
+| `web/story/hints.js` | `hintFor(state, level)`: Hinweis passend zum Fortschritt (kostet keine Punkte, nach zwei Fehlversuchen konkret). |
 | `web/story/security-office/interactions.js` | Interaktionspunkte des Security Office und `examine(state, id)`. |
 
 **Oberfläche (rendern in jeden Container)**
 
 | Datei | Inhalt |
 |---|---|
+| `web/story/host.js` | `createStoryHost(...)`: verbindet die Story mit jeder Seite (Speichern, Stationen, Gespräche, Safe bis Abspann, Hinweise). Die Vorschau benutzt ihn; das Hauptspiel soll ihn auch benutzen. |
 | `web/story/dom.js` | Kleine Helfer `el()` und `button()`, Bild-URL der Met-Werke. |
 | `web/story/placeholder-station.js` | Platzhalter für noch nicht gebaute Stationen. |
 | `web/story/dialogues.js` | `dialogueFor(characterId, state)` und `renderDialogue`. |
@@ -51,12 +53,12 @@ Dann im Browser öffnen:
 - <http://localhost:8000/dev/security-office.html> – Security Office
 
 **Durchklicken (ca. 3 Minuten):**
-1. Nachricht von M lesen, „Accept the mission“.
+1. Nachricht von M lesen, „Accept the mission“. Oben rechts „💡 Hint“ ausprobieren, dann „Tell me more“.
 2. Security Office: Monitorwand und Schichtplan ansehen (Notizen im Journal).
 3. „Talk to Leon“ – dann Portrait Hall lösen – noch einmal mit Leon sprechen (er ist entlastet).
 4. Landscape Gallery: echte Station 1. Einmal falsch (1881 + Oil), dann richtig (1889 + Oil).
 5. Die drei anderen Stationen mit dem Platzhalter lösen. Im Journal stehen B‑I‑L‑D an festen Plätzen.
-6. Safe: erst `DLIB` (Fehlermeldung), dann `bild`.
+6. Safe: zweimal ein falsches Wort (z. B. `DLIB`, `LIBD`), dann „💡 Hint“ (nennt jetzt die Buchstaben), dann `bild`.
 7. „Look at the documents“: erst Leon oder Dr. Vale wählen (Feedback, welcher Beleg dagegen spricht), dann Adrien Voss.
 8. Ein Ende wählen, Punkte ansehen, „New game“ → bestätigen, zweites Ende spielen.
 

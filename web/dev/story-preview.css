@@ -47,7 +47,7 @@ body.story-page > :not(dialog) { position: relative; } /* paint above the blurre
 .story-modal-title { font: 600 1.25rem Fraunces, Georgia, serif; color: #f8e9c9; margin: 0; }
 .story-icon-button { font: inherit; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--story-line); background: #29343a; color: var(--story-ink); }
 .story-icon-button:focus-visible { outline: 3px solid var(--story-gold); outline-offset: 2px; }
-.story-modal-body { padding: 18px 20px 4px; }
+.story-modal-body { padding: 18px 20px 20px; }
 .story-modal-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 20px; }
 .story-modal-actions:empty { padding: 0 0 12px; }
 
