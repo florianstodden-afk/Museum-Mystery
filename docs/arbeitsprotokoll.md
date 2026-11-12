@@ -44,3 +44,11 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Umsetzung:** `web/minigames/landscape.js` enthält die Katalogvergleich-Station B mit Fehler- und Hinweisabzügen. Met-Bilder werden über die API geladen, lokale Katalogdaten und Quellenlinks bleiben bei API-Ausfall sichtbar. Der Browser speichert den Fortschritt lokal. `web/main.js` öffnet die Station am Gemälde.
 - **Prüfung:** Node `--test`: 8 Tests bestanden. Im lokalen Browser wurde die Station erreicht und mit 1889 und Öl auf Leinwand gelöst; beide API-Bilder erschienen. Die Prüfung deckt noch keinen API-Ausfall oder einen vollständigen Neustart ab.
 - **Offen:** Drei weitere Stationen, neues Journal, BILD-Safe, Voss-Schlussfrage, die vorgesehenen Enden und Offline-Bilddateien fehlen. Der restliche Rundgang verwendet vorläufig die alten Regeln; Punkte dieser Station sind noch keine Gesamtwertung.
+
+### 2026-11-12 – Bewegung und erste Halle
+
+- **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
+- **Ziel:** Flüssigere Bewegung und ein erster an die Met angelehnter Museumsraum mit sichtbarer Wand und Kunst.
+- **Entscheidung:** Der Rasterzustand und seine Kollisionsregeln bleiben erhalten; die Darstellung interpoliert zwischen Feldern. Gedrückte Tasten bewegen wiederholt, Loslassen, Fokusverlust und Dialoge stoppen die Bewegung. Die Eingangshalle verwendet helle Steinbögen, Säulen und einen Marmorboden; Architekturvorbild: https://www.metmuseum.org/press-releases/the-great-hall-of-the-metropolitan-museum-of-art-2010-general-information. Die Figur erhielt blaues Haar und einen weißen Kittel nach Nutzerwunsch.
+- **Umsetzung:** `web/main.js` zeichnet Halle, Met-Werk und Figur und steuert Bewegung; `web/engine.js` sperrt die sichtbare Rückwand.
+- **Prüfung:** Node `--test`: 9 Tests bestanden, darunter die Wandkollision. Browser: Raum visuell geprüft; eine 600 ms gehaltene Pfeiltaste bewegte vier Felder. Menschlicher Review und Touch-Langdruck stehen noch aus.
