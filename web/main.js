@@ -1,12 +1,14 @@
 import { WIDTH, HEIGHT, OBJECTS, initialState, validState, hasAllEvidence,
-  move, nearbyObject, interact, openVault, chooseEnding } from './engine.js';
+  canEnter, nearbyObject, interact, openVault, chooseEnding } from './engine.js';
 import { start as startLandscape, initialLandscape } from './minigames/landscape.js';
-import { movementDuration } from './motion.js';
+import { movementDuration, advancePlayer } from './motion.js';
 import { chooseGuardAction } from './guard.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
+ctx.setTransform(2,0,0,2,0,0);
+function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.max(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
 const storeKey = 'museum-mystery-walk-v1';
 let state;
@@ -17,7 +19,7 @@ catch { landscapeState = initialLandscape(); }
 try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
 catch { state = initialState(); }
 // Older saves may place the player inside the newly solid picture wall.
-if (state.player.x < 9 && state.player.y < 4) state = { ...state, player: { ...state.player, y: 4 } };
+if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
 let metArtwork = null;
 const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
@@ -32,15 +34,14 @@ let displayPlayer = { ...state.player };
 let movementAnimation = null;
 let facing = 'down';
 let animationTime = 0;
-let guardPosition = {x:5,y:5};
+// Old saves may start near the guard; choose a safe starting tile without moving the player.
+const guardStarts=[{x:5,y:5},{x:7,y:8},{x:2,y:12}];
+let guardPosition = guardStarts.find(p=>Math.abs(p.x-state.player.x)>=0.45 || Math.abs(p.y-state.player.y)>=2.4) || guardStarts[0];
 let guardMotion = null;
 let guardDelay = 1200;
 let guardLastFacing = 'down';
 let lastFrame = 0;
-function currentGuard(){
-  if (!guardMotion) return guardPosition;
-  return guardMotion.elapsed >= guardMotion.duration / 2 ? guardMotion.to : guardMotion.from;
-}
+function currentGuard(){return guardDisplay();}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
@@ -67,11 +68,12 @@ function updateSidebar() {
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
 function tile(x,y,color){rect(x*TILE,y*TILE,TILE,TILE,color);}
-function hallPosition(x,y){ return {x: (x + 0.5) * canvas.width / 9, y: 345 + (y - 2) * 14}; }
+function hallPosition(x,y){ return {x: (x + 0.5) * 896 / 9, y: 345 + (y - 2) * 14}; }
 function drawPerson(x,y,kind,direction='down',time=0,moving=false){
   ctx.save(); ctx.translate(x,y);
   const sway = kind === 'guard' ? Math.sin(time / 800) * 1.5 : moving ? Math.sin(time / 100) * 2 : 0;
   ctx.translate(0,sway);
+  if(direction==='left'||direction==='right')ctx.scale(.78,1);
   ctx.lineWidth=1.5;ctx.strokeStyle='#263036';
   ctx.fillStyle='rgba(25,20,15,.24)';ctx.beginPath();ctx.ellipse(0,2,17,5,0,0,Math.PI*2);ctx.fill();
   if(kind==='rick'){
@@ -82,10 +84,12 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
     ctx.strokeStyle='#5b3b2a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-10-stride,0);ctx.lineTo(-4-stride,0);ctx.moveTo(4+stride,0);ctx.lineTo(10+stride,0);ctx.stroke();
     ctx.fillStyle='#473927';ctx.fillRect(-9,-14,18,7);
     ctx.fillStyle='#faf9eb';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-13);ctx.lineTo(-17,-13);ctx.closePath();ctx.fill();ctx.strokeStyle='#394648';ctx.lineWidth=1.2;ctx.stroke();
-    ctx.fillStyle='#9bd9d5';ctx.fillRect(-6,-32,12,21);
-    ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(-12,-34);ctx.lineTo(-4,-31);ctx.lineTo(-8,-24);ctx.lineTo(-5,-20);ctx.lineTo(-10,-15);ctx.lineTo(-15,-14);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.moveTo(12,-34);ctx.lineTo(4,-31);ctx.lineTo(8,-24);ctx.lineTo(5,-20);ctx.lineTo(10,-15);ctx.lineTo(15,-14);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.strokeStyle='#4b5552';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-13,-31);ctx.lineTo(-20,-15);ctx.moveTo(13,-31);ctx.lineTo(20,-15);ctx.stroke();
+    if(direction!=='up'){ctx.fillStyle='#9bd9d5';ctx.fillRect(-6,-32,12,21);}
+    if(direction!=='up'){ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(-12,-34);ctx.lineTo(-4,-31);ctx.lineTo(-8,-24);ctx.lineTo(-5,-20);ctx.lineTo(-10,-15);ctx.lineTo(-15,-14);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(12,-34);ctx.lineTo(4,-31);ctx.lineTo(8,-24);ctx.lineTo(5,-20);ctx.lineTo(10,-15);ctx.lineTo(15,-14);ctx.closePath();ctx.fill();ctx.stroke();}
+    const armSwing=moving?Math.sin(time/100)*4:0;
+    ctx.strokeStyle='#4b5552';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-13,-31);ctx.lineTo(-19+armSwing,-14);ctx.moveTo(13,-31);ctx.lineTo(19-armSwing,-14);ctx.stroke();
+    ctx.strokeStyle='#faf9eb';ctx.lineWidth=3;ctx.stroke();
     ctx.fillStyle='#e8c4a9';ctx.beginPath();ctx.ellipse(0,-41,10,11,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#a8e7f1';ctx.strokeStyle='#34464a';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(-21,-49);ctx.lineTo(-12,-52);ctx.lineTo(-18,-61);ctx.lineTo(-8,-56);ctx.lineTo(-7,-65);ctx.lineTo(-2,-58);ctx.lineTo(3,-67);ctx.lineTo(6,-58);ctx.lineTo(16,-64);ctx.lineTo(12,-54);ctx.lineTo(21,-52);ctx.lineTo(10,-44);ctx.closePath();ctx.fill();ctx.stroke();
     if(direction!=='up'){
@@ -100,6 +104,7 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
     ctx.strokeStyle='#263743';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,-12);ctx.lineTo(-7-stride,0);ctx.moveTo(6,-12);ctx.lineTo(7+stride,0);ctx.stroke();
     ctx.fillStyle='#263743';ctx.fillRect(-11-stride,-2,7,4);ctx.fillRect(4+stride,-2,7,4);
     ctx.fillStyle='#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
+    const guardArm=moving?Math.sin(time/210)*3:0;ctx.strokeStyle='#263743';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-11,-30);ctx.lineTo(-16+guardArm,-13);ctx.moveTo(11,-30);ctx.lineTo(16-guardArm,-13);ctx.stroke();
     ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(Math.sin(time/2200)*2,-40,9,10,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
     if(direction!=='up'){
@@ -111,10 +116,14 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
   ctx.restore();
 }
 function drawHall(){
-  if(hallBackdrop.complete && hallBackdrop.naturalWidth) ctx.drawImage(hallBackdrop,0,0,canvas.width,canvas.height);
-  else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,canvas.width,canvas.height);}
+  if(hallBackdrop.complete && hallBackdrop.naturalWidth){
+    // Crop the sides to the game aspect ratio instead of stretching the room.
+    const cropWidth=hallBackdrop.naturalHeight*896/576;
+    ctx.drawImage(hallBackdrop,(hallBackdrop.naturalWidth-cropWidth)/2,0,cropWidth,hallBackdrop.naturalHeight,0,0,896,576);
+  }
+  else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
   // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[0,159,247,35,59],[1,410,244,77,55],[2,701,247,35,59]]) {
+  for (const [index, x, y, width, height] of [[0,118,247,40,59],[1,405,244,88,55],[2,737,247,40,59]]) {
     const image = hallPaintings[index];
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
@@ -132,11 +141,13 @@ function drawHall(){
   ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
   // Indicate the connecting doorway, which is reached at the middle of the east wall.
   ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALERIE  →',782,385);
-  const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,Boolean(movementAnimation));
+  const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
 function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cameraX=state.player.x<9?Math.max(0,Math.min(100,(displayPlayer.x-1)/7*100)):50;
+  canvas.style.objectPosition=`${cameraX}% 100%`;
+  ctx.clearRect(0,0,896,576);
   if(state.player.x < 9){drawHall();return;}
   for(let y=0;y<HEIGHT;y++) for(let x=0;x<WIDTH;x++) {
     const base=x<9?'#d1c5ad':x<18?'#7e7768':'#596b6e';
@@ -185,13 +196,13 @@ function draw() {
   rect(px+8,py+26,6,5,'#654836');rect(px+18,py+26,6,5,'#654836');
   ctx.fillStyle='#f7e5b4';ctx.font='bold 13px sans-serif';
   ctx.fillText('EMPFANG',50,85);ctx.fillText('GALERIE',360,54);ctx.fillText('DEPOT',665,54);
-  const target=nearbyObject(state,currentGuard());if(target || (p.x===17&&p.y===9)){
+  const target=nearbyObject(state,currentGuard());if(target || (Math.abs(p.x-17)<0.55&&Math.abs(p.y-9)<0.55)){
     rect(px-14,py-29,120,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(`E  ${target?.label??'Depottür'}`,px-8,py-12);
   }
 }
 
 function showDialog(title,text,options=[{label:'Weiter',action:closeDialog}]){
-  heldKeys.clear();
+  stopMovement();
   document.querySelector('#dialog-title').textContent=title;
   const body=document.querySelector('#dialog-body');body.replaceChildren();
   const p=document.createElement('p');p.textContent=text;body.append(p);
@@ -209,7 +220,7 @@ function showArtwork(){
 }
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
-  if(state.player.x===17&&state.player.y===9){
+  if(Math.abs(state.player.x-17)<0.55&&Math.abs(state.player.y-9)<0.55){
     if(!state.pass||!hasAllEvidence(state)){showDialog('Depottür',openVault(state,'').text);return;}
     if(state.vaultOpen){showDialog('Depottür','Die Tür ist bereits offen. Geh hindurch.');return;}
     showDialog('Zahlenschloss','Die Restauratorin deutete auf die Uhrzeit des verdächtigen Eintrags. Gib vier Ziffern ein.',[
@@ -247,44 +258,35 @@ function end(choice){state=chooseEnding(state,choice);save();
 function reset(){state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
 const heldKeys = new Map();
-function handleMove(dx,dy){
-  facing = dx < 0 ? 'left' : dx > 0 ? 'right' : dy < 0 ? 'up' : 'down';
-  if (!dialog.classList.contains('hidden') || movementAnimation) return;
-  const next = move(state,dx,dy,currentGuard());
-  if(next === state) return;
-  if(guardMotion && [guardMotion.from,guardMotion.to].some(p=>p.x===next.player.x&&p.y===next.player.y)) return;
-  const from = {...state.player}; state = next;
-  const viewport=canvas.getBoundingClientRect();
-  const duration=movementDuration(from,next.player,viewport,from.x<9?'hall':'gallery');
-  movementAnimation = {from, to: {...next.player}, start: performance.now(), duration};
-  save();
-}
+let lastSavedAt=0;
+function savePosition(){localStorage.setItem(storeKey,JSON.stringify(state));updateSidebar();}
+function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
   if(state.player.x < 9 && dialog.classList.contains('hidden')) {
     if(guardMotion) {
-      guardMotion.elapsed+=delta;
+      const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
+      const t=nextElapsed/guardMotion.duration;
+      const future={x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t,y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
+      if(Math.abs(future.x-state.player.x)>=0.45 || Math.abs(future.y-state.player.y)>=2.4)guardMotion.elapsed=nextElapsed;
       if(guardMotion.elapsed>=guardMotion.duration){guardLastFacing=guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down';guardPosition=guardMotion.to;guardDelay=guardMotion.pause;guardMotion=null;}
     } else {
       guardDelay-=delta;
       if(guardDelay<=0){
         const action=chooseGuardAction(state,guardPosition);
         if(action.kind==='wait')guardDelay=action.duration;
-        else guardMotion={from:{...guardPosition},to:action.target,elapsed:0,duration:Math.max(250,movementDuration(guardPosition,action.target,canvas.getBoundingClientRect(),'hall')*4.4),pause:action.pause};
+        else guardMotion={from:{...guardPosition},to:action.target,elapsed:0,duration:Math.max(250,movementDuration(guardPosition,action.target,viewportForGame(),'hall')*4.4),pause:action.pause};
       }
     }
   }
 
-  if(movementAnimation){
-    const t = Math.min(1, (now - movementAnimation.start) / movementAnimation.duration);
-    displayPlayer = {x: movementAnimation.from.x + (movementAnimation.to.x - movementAnimation.from.x)*t,
-      y: movementAnimation.from.y + (movementAnimation.to.y - movementAnimation.from.y)*t};
-    if(t >= 1) movementAnimation = null;
-    draw();
-  }
-  if(!movementAnimation && heldKeys.size && dialog.classList.contains('hidden')){
-    const direction = [...heldKeys.values()].at(-1); handleMove(...direction);
+  if(heldKeys.size && dialog.classList.contains('hidden')){
+    const direction=[...heldKeys.values()].at(-1);
+    facing=direction[0]<0?'left':direction[0]>0?'right':direction[1]<0?'up':'down';
+    const guards=[guardDisplay()];
+    const next=advancePlayer(state,direction,delta,viewportForGame(),guards,canEnter);
+    if(next!==state){state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
   }
   draw(); // Animate NPCs even while the player is idle.
   requestAnimationFrame(animate);
@@ -296,10 +298,16 @@ document.addEventListener('keydown',event=>{
   if(directions[key]){ event.preventDefault(); heldKeys.set(key,directions[key]); }
   else if((key==='e'||key==='enter') && !event.repeat){event.preventDefault();handleInteract();}
 });
-document.addEventListener('keyup',event=>heldKeys.delete(event.key.toLowerCase()));
-window.addEventListener('blur',()=>heldKeys.clear());
-document.addEventListener('visibilitychange',()=>{if(document.hidden) heldKeys.clear();});
-document.querySelectorAll('[data-move]').forEach(button=>button.addEventListener('click',()=>{const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};handleMove(...d[button.dataset.move]);}));
+document.addEventListener('keyup',event=>{heldKeys.delete(event.key.toLowerCase());if(!heldKeys.size)savePosition();});
+window.addEventListener('blur',stopMovement);
+document.addEventListener('visibilitychange',()=>{if(document.hidden) stopMovement();});
+document.querySelectorAll('[data-move]').forEach(button=>{
+  const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}, key='pointer-'+button.dataset.move;
+  button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);heldKeys.set(key,d[button.dataset.move]);});
+  for(const eventName of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(eventName,()=>{heldKeys.delete(key);if(!heldKeys.size)savePosition();});
+  button.addEventListener('keydown',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();event.stopPropagation();heldKeys.set(key,d[button.dataset.move]);}});
+  button.addEventListener('keyup',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();event.stopPropagation();heldKeys.delete(key);if(!heldKeys.size)savePosition();}});
+});
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
 document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
 document.querySelector('#reset').addEventListener('click',()=>showDialog('Neues Spiel?','Der bisherige Fortschritt dieses Falls wird zurückgesetzt.',[{label:'Zurücksetzen',action:reset},{label:'Abbrechen',action:closeDialog,secondary:true}]));

@@ -18,7 +18,7 @@ export function initialState() {
 }
 
 export function validState(value) {
-  return value && Number.isInteger(value.player?.x) && Number.isInteger(value.player?.y)
+  return value && Number.isFinite(value.player?.x) && Number.isFinite(value.player?.y) && value.player.x >= 0.5 && value.player.x < WIDTH-1.5 && value.player.y >= 0.5 && value.player.y < HEIGHT-1.5
     && Array.isArray(value.clues) && value.clues.every(c => EVIDENCE.includes(c))
     && typeof value.pass === "boolean" && typeof value.vaultOpen === "boolean"
     && (value.ending === null || ["restore", "expose"].includes(value.ending))
@@ -51,15 +51,23 @@ export function move(state, dx, dy, guardPosition) {
   return { ...state, player: { x, y }, steps: state.steps + 1 };
 }
 
+function interactionDistance(player, object) {
+  // Hall characters are tall on screen, while the underlying vertical grid is compressed.
+  if (object.id === 'guard' && player.x < 9) {
+    const dx=Math.abs(object.x-player.x), dy=Math.abs(object.y-player.y);
+    return dx <= 1.1 && dy <= 3.5 ? Math.max(dx,dy/3.5) : Infinity;
+  }
+  return Math.abs(object.x-player.x)+Math.abs(object.y-player.y) <= 1.15 ?
+    Math.abs(object.x-player.x)+Math.abs(object.y-player.y) : Infinity;
+}
 export function nearbyObject(state, guardPosition) {
-  return objectsWithGuard(guardPosition).find(object =>
-    Math.abs(object.x - state.player.x) + Math.abs(object.y - state.player.y) === 1
-  ) ?? null;
+  return objectsWithGuard(guardPosition).map(object => ({object, distance:interactionDistance(state.player,object)}))
+    .filter(item => Number.isFinite(item.distance)).sort((a,b)=>a.distance-b.distance)[0]?.object ?? null;
 }
 
 export function interact(state, id, guardPosition) {
   const object = objectsWithGuard(guardPosition).find(item => item.id === id);
-  if (!object || Math.abs(object.x - state.player.x) + Math.abs(object.y - state.player.y) !== 1) {
+  if (!object || !Number.isFinite(interactionDistance(state.player,object))) {
     return { state, text: "Geh näher an das Objekt heran." };
   }
   if (state.ending) return { state, text: "Der Fall ist abgeschlossen. Starte ein neues Spiel." };
@@ -86,7 +94,7 @@ export function interact(state, id, guardPosition) {
 }
 
 export function openVault(state, code) {
-  if (state.ending || state.player.x !== 17 || state.player.y !== 9
+  if (state.ending || Math.abs(state.player.x - 17) > 0.55 || Math.abs(state.player.y - 9) > 0.55
       || !state.pass || !hasAllEvidence(state)) {
     return { state, text: "Depot verschlossen: Du brauchst drei Belege und den Ausweis des Wachmanns." };
   }
@@ -98,7 +106,7 @@ export function openVault(state, code) {
 
 export function chooseEnding(state, ending) {
   if (!state.vaultOpen || !hasAllEvidence(state) || !["restore", "expose"].includes(ending)
-      || Math.abs(state.player.x - 23) + Math.abs(state.player.y - 5) !== 1) {
+      || Math.abs(state.player.x - 23) + Math.abs(state.player.y - 5) > 1.15) {
     return state;
   }
   return { ...state, ending };
