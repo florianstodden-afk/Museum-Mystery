@@ -2,6 +2,7 @@ import { WIDTH, HEIGHT, OBJECTS, initialState, validState, hasAllEvidence,
   move, nearbyObject, interact, openVault, chooseEnding } from './engine.js';
 import { start as startLandscape, initialLandscape } from './minigames/landscape.js';
 import { movementDuration } from './motion.js';
+import { chooseGuardAction } from './guard.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -31,6 +32,20 @@ let displayPlayer = { ...state.player };
 let movementAnimation = null;
 let facing = 'down';
 let animationTime = 0;
+let guardPosition = {x:5,y:5};
+let guardMotion = null;
+let guardDelay = 1200;
+let guardLastFacing = 'down';
+let lastFrame = 0;
+function currentGuard(){
+  if (!guardMotion) return guardPosition;
+  return guardMotion.elapsed >= guardMotion.duration / 2 ? guardMotion.to : guardMotion.from;
+}
+function guardDisplay(){
+  if (!guardMotion) return guardPosition;
+  const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
+  return {x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t, y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
+}
 let metStatus = 'lädt';
 
 fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
@@ -62,14 +77,15 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
   if(kind==='rick'){
     // An expressive, larger character with a white coat and blue spiky hair.
     const stride=moving ? Math.sin(time/100)*5 : 0;
-    ctx.strokeStyle='#303c3a';ctx.lineWidth=5;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(-6,-11);ctx.lineTo(-7-stride,-1);ctx.moveTo(6,-11);ctx.lineTo(7+stride,-1);ctx.stroke();
+    ctx.strokeStyle='#74552c';ctx.lineWidth=5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-6,-17);ctx.lineTo(-7-stride,-1);ctx.moveTo(6,-17);ctx.lineTo(7+stride,-1);ctx.stroke();
     ctx.strokeStyle='#5b3b2a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-10-stride,0);ctx.lineTo(-4-stride,0);ctx.moveTo(4+stride,0);ctx.lineTo(10+stride,0);ctx.stroke();
     ctx.fillStyle='#473927';ctx.fillRect(-9,-14,18,7);
-    ctx.fillStyle='#faf9eb';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-7);ctx.lineTo(-17,-7);ctx.closePath();ctx.fill();ctx.strokeStyle='#394648';ctx.lineWidth=1.2;ctx.stroke();
+    ctx.fillStyle='#faf9eb';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-13);ctx.lineTo(-17,-13);ctx.closePath();ctx.fill();ctx.strokeStyle='#394648';ctx.lineWidth=1.2;ctx.stroke();
     ctx.fillStyle='#9bd9d5';ctx.fillRect(-6,-32,12,21);
-    ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(-12,-34);ctx.lineTo(-4,-31);ctx.lineTo(-8,-24);ctx.lineTo(-5,-20);ctx.lineTo(-10,-10);ctx.lineTo(-15,-9);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.moveTo(12,-34);ctx.lineTo(4,-31);ctx.lineTo(8,-24);ctx.lineTo(5,-20);ctx.lineTo(10,-10);ctx.lineTo(15,-9);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(-12,-34);ctx.lineTo(-4,-31);ctx.lineTo(-8,-24);ctx.lineTo(-5,-20);ctx.lineTo(-10,-15);ctx.lineTo(-15,-14);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(12,-34);ctx.lineTo(4,-31);ctx.lineTo(8,-24);ctx.lineTo(5,-20);ctx.lineTo(10,-15);ctx.lineTo(15,-14);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.strokeStyle='#4b5552';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-13,-31);ctx.lineTo(-20,-15);ctx.moveTo(13,-31);ctx.lineTo(20,-15);ctx.stroke();
     ctx.fillStyle='#e8c4a9';ctx.beginPath();ctx.ellipse(0,-41,10,11,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#a8e7f1';ctx.strokeStyle='#34464a';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(-21,-49);ctx.lineTo(-12,-52);ctx.lineTo(-18,-61);ctx.lineTo(-8,-56);ctx.lineTo(-7,-65);ctx.lineTo(-2,-58);ctx.lineTo(3,-67);ctx.lineTo(6,-58);ctx.lineTo(16,-64);ctx.lineTo(12,-54);ctx.lineTo(21,-52);ctx.lineTo(10,-44);ctx.closePath();ctx.fill();ctx.stroke();
     if(direction!=='up'){
@@ -78,14 +94,18 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
       ctx.fillStyle='#293037';ctx.fillRect(-4+offset,-43,1.5,3);ctx.fillRect(4+offset,-43,1.5,3);
       ctx.strokeStyle='#53665e';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-7+offset,-47);ctx.lineTo(-1+offset,-46);ctx.moveTo(2+offset,-46);ctx.lineTo(8+offset,-47);ctx.moveTo(-3+offset,-36);ctx.lineTo(4+offset,-36);ctx.stroke();
     }
-    ctx.strokeStyle='#53635d';ctx.beginPath();ctx.moveTo(-13,-32);ctx.lineTo(-16,-8);ctx.lineTo(16,-8);ctx.lineTo(13,-32);ctx.stroke();
+    ctx.strokeStyle='#53635d';ctx.beginPath();ctx.moveTo(-13,-32);ctx.lineTo(-16,-13);ctx.lineTo(16,-13);ctx.lineTo(13,-32);ctx.stroke();
   } else {
-    ctx.fillStyle='#263743';ctx.fillRect(-10,-9,8,10);ctx.fillRect(2,-9,8,10);
+    const stride=moving ? Math.sin(time/210)*5 : 0;
+    ctx.strokeStyle='#263743';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,-12);ctx.lineTo(-7-stride,0);ctx.moveTo(6,-12);ctx.lineTo(7+stride,0);ctx.stroke();
+    ctx.fillStyle='#263743';ctx.fillRect(-11-stride,-2,7,4);ctx.fillRect(4+stride,-2,7,4);
     ctx.fillStyle='#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
     ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(Math.sin(time/2200)*2,-40,9,10,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
-    const look=Math.sin(time/2200)*2;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3+look,-41,2.6,0,Math.PI*2);ctx.arc(4+look,-41,2.6,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#243038';ctx.fillRect(-3+look,-42,1.3,2.5);ctx.fillRect(4+look,-42,1.3,2.5);ctx.strokeStyle='#6c4237';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2+look,-35);ctx.lineTo(3+look,-35);ctx.stroke();
+    if(direction!=='up'){
+      const look=(direction==='left'?-3:direction==='right'?3:0)+Math.sin(time/2200);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3+look,-41,2.6,0,Math.PI*2);ctx.arc(4+look,-41,2.6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#243038';ctx.fillRect(-3+look,-42,1.3,2.5);ctx.fillRect(4+look,-42,1.3,2.5);ctx.strokeStyle='#6c4237';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2+look,-35);ctx.lineTo(3+look,-35);ctx.stroke();
+    }
     ctx.fillStyle='#d5bd80';ctx.fillRect(-2,-28,4,5);
   }
   ctx.restore();
@@ -99,12 +119,12 @@ function drawHall(){
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
   }
-  const guard=OBJECTS.find(o=>o.id==='guard'); const ledger=OBJECTS.find(o=>o.id==='ledger');
+  const ledger=OBJECTS.find(o=>o.id==='ledger');
   const desk=hallPosition(ledger.x,ledger.y);ctx.fillStyle='#5b4633';ctx.beginPath();ctx.ellipse(desk.x,desk.y+3,45,12,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#b79c71';ctx.fillRect(desk.x-28,desk.y-14,56,16);ctx.fillStyle='#f0e2bc';ctx.fillRect(desk.x-10,desk.y-17,20,12);
-  const person=hallPosition(guard.x,guard.y);
-  // The guard shifts weight and looks around within his interaction tile.
-  drawPerson(person.x + Math.sin(animationTime/1500)*12,person.y,'guard','down',animationTime);
+  const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
+  const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
+  drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
   // Brass-edged barriers mark the walkable floor; leave a gap at the gallery doorway.
   ctx.lineWidth=3;ctx.strokeStyle='rgba(89,69,42,.75)';ctx.beginPath();
   ctx.moveTo(86,362);ctx.lineTo(86,554);ctx.moveTo(86,554);ctx.lineTo(864,554);
@@ -113,7 +133,7 @@ function drawHall(){
   // Indicate the connecting doorway, which is reached at the middle of the east wall.
   ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALERIE  →',782,385);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,Boolean(movementAnimation));
-  const target=nearbyObject(state); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
+  const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
 function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -165,7 +185,7 @@ function draw() {
   rect(px+8,py+26,6,5,'#654836');rect(px+18,py+26,6,5,'#654836');
   ctx.fillStyle='#f7e5b4';ctx.font='bold 13px sans-serif';
   ctx.fillText('EMPFANG',50,85);ctx.fillText('GALERIE',360,54);ctx.fillText('DEPOT',665,54);
-  const target=nearbyObject(state);if(target || (p.x===17&&p.y===9)){
+  const target=nearbyObject(state,currentGuard());if(target || (p.x===17&&p.y===9)){
     rect(px-14,py-29,120,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(`E  ${target?.label??'Depottür'}`,px-8,py-12);
   }
 }
@@ -199,7 +219,7 @@ function handleInteract(){
     const input=document.createElement('input');input.id='vault-code';input.inputMode='numeric';input.maxLength=4;input.placeholder='Vier Ziffern';input.setAttribute('aria-label','Vierstelliger Zahlencode');document.querySelector('#dialog-body').append(input);input.focus();
     return;
   }
-  const object=nearbyObject(state);if(!object){showDialog('Niemand in der Nähe','Geh an ein markiertes Objekt oder eine Person heran.');return;}
+  const object=nearbyObject(state,currentGuard());if(!object){showDialog('Niemand in der Nähe','Geh an ein markiertes Objekt oder eine Person heran.');return;}
   if (object.id === 'painting') {
     showDialog('Landschaftsgalerie · Station B', '');
     startLandscape(document.querySelector('#dialog-body'), {
@@ -212,7 +232,7 @@ function handleInteract(){
     });
     return;
   }
-  const result=interact(state,object.id);state=result.state;save();
+  const result=interact(state,object.id,currentGuard());state=result.state;save();
   if(result.choice){showDialog('Die letzte Entscheidung',result.text,[
     {label:'Original heimlich zurückbringen',action:()=>end('restore')},
     {label:'Fälschung öffentlich aufdecken',action:()=>end('expose'),secondary:true},
@@ -224,14 +244,15 @@ function end(choice){state=chooseEnding(state,choice);save();
   const expose='Du zeigst Protokoll, Firnis und Notiz der Öffentlichkeit. Die Fälschung wird aufgedeckt; das Museum muss Verantwortung übernehmen. ENDE B: Die Wahrheit ans Licht.';
   showDialog('Fall abgeschlossen',choice==='restore'?restore:expose,[{label:'Neues Spiel',action:reset}]);
 }
-function reset(){state=initialState();displayPlayer={...state.player};movementAnimation=null;heldKeys.clear();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
+function reset(){state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
 const heldKeys = new Map();
 function handleMove(dx,dy){
   facing = dx < 0 ? 'left' : dx > 0 ? 'right' : dy < 0 ? 'up' : 'down';
   if (!dialog.classList.contains('hidden') || movementAnimation) return;
-  const next = move(state,dx,dy);
+  const next = move(state,dx,dy,currentGuard());
   if(next === state) return;
+  if(guardMotion && [guardMotion.from,guardMotion.to].some(p=>p.x===next.player.x&&p.y===next.player.y)) return;
   const from = {...state.player}; state = next;
   const viewport=canvas.getBoundingClientRect();
   const duration=movementDuration(from,next.player,viewport,from.x<9?'hall':'gallery');
@@ -239,7 +260,22 @@ function handleMove(dx,dy){
   save();
 }
 function animate(now){
+  const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
+  if(state.player.x < 9 && dialog.classList.contains('hidden')) {
+    if(guardMotion) {
+      guardMotion.elapsed+=delta;
+      if(guardMotion.elapsed>=guardMotion.duration){guardLastFacing=guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down';guardPosition=guardMotion.to;guardDelay=guardMotion.pause;guardMotion=null;}
+    } else {
+      guardDelay-=delta;
+      if(guardDelay<=0){
+        const action=chooseGuardAction(state,guardPosition);
+        if(action.kind==='wait')guardDelay=action.duration;
+        else guardMotion={from:{...guardPosition},to:action.target,elapsed:0,duration:Math.max(250,movementDuration(guardPosition,action.target,canvas.getBoundingClientRect(),'hall')*4.4),pause:action.pause};
+      }
+    }
+  }
+
   if(movementAnimation){
     const t = Math.min(1, (now - movementAnimation.start) / movementAnimation.duration);
     displayPlayer = {x: movementAnimation.from.x + (movementAnimation.to.x - movementAnimation.from.x)*t,

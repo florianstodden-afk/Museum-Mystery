@@ -29,32 +29,36 @@ export function hasAllEvidence(state) {
   return EVIDENCE.every(id => state.clues.includes(id));
 }
 
-export function canEnter(state, x, y) {
+function objectsWithGuard(guardPosition) {
+  return guardPosition ? OBJECTS.map(object => object.id === "guard" ? {...object, ...guardPosition} : object) : OBJECTS;
+}
+
+export function canEnter(state, x, y, guardPosition) {
   if (x <= 0 || y <= 0 || x >= WIDTH - 1 || y >= HEIGHT - 1) return false;
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x === 9 && y !== 9) return false;
   if (x === 18 && y !== 9) return false;
   if (x === 18 && y === 9 && !state.vaultOpen) return false;
-  if (OBJECTS.some(object => object.x === x && object.y === y)) return false;
+  if (objectsWithGuard(guardPosition).some(object => object.x === x && object.y === y)) return false;
   return true;
 }
 
-export function move(state, dx, dy) {
+export function move(state, dx, dy, guardPosition) {
   if (state.ending || Math.abs(dx) + Math.abs(dy) !== 1) return state;
   const x = state.player.x + dx;
   const y = state.player.y + dy;
-  if (!canEnter(state, x, y)) return state;
+  if (!canEnter(state, x, y, guardPosition)) return state;
   return { ...state, player: { x, y }, steps: state.steps + 1 };
 }
 
-export function nearbyObject(state) {
-  return OBJECTS.find(object =>
+export function nearbyObject(state, guardPosition) {
+  return objectsWithGuard(guardPosition).find(object =>
     Math.abs(object.x - state.player.x) + Math.abs(object.y - state.player.y) === 1
   ) ?? null;
 }
 
-export function interact(state, id) {
-  const object = OBJECTS.find(item => item.id === id);
+export function interact(state, id, guardPosition) {
+  const object = objectsWithGuard(guardPosition).find(item => item.id === id);
   if (!object || Math.abs(object.x - state.player.x) + Math.abs(object.y - state.player.y) !== 1) {
     return { state, text: "Geh näher an das Objekt heran." };
   }

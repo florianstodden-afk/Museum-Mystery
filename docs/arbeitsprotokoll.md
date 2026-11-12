@@ -84,3 +84,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag, Codex und ImageGen; Teamreview steht aus.
 - **Umsetzung:** `web/assets/great-hall-nyc.png` ist eine neue, generierte Variante der bisherigen Halle mit New Yorker Skyline in den Fenstern; die abgelehnte Cartoon-Variante wurde nicht eingebaut. Die Spielfigur erhielt ausgeprägteres blaues Haar, größere Augen, ein blaues Hemd und einen offenen weißen Kittel.
 - **Prüfung:** Node `--test`: 10 Tests bestanden. Die Fenster, Bilderrahmen und Figuren wurden im Browser visuell überprüft.
+
+### 2026-11-12 – Wächter-Rundgang und Figurenreferenz
+
+- **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus. Figurenreferenz: https://cdna.artstation.com/p/assets/images/images/025/720/998/large/manellopgar-manuel-lopez-manellopgar-manuel-lopez-rick-turnarround.jpg?1586723290
+- **Umsetzung:** Die Spielfigur erhielt längere braune Hosenbeine, einen offenen Kittel und schmale Arme nach der Referenz. Der Wachmann wählt begehbare Nachbarfelder und unterschiedlich lange Pausen, läuft langsamer und blickt in seine Laufrichtung. Kollisionen und Interaktion berücksichtigen seine Position; beim Gespräch pausiert er.
+- **Prüfung:** Node `--test`: 12 Tests bestanden, einschließlich beweglicher Wächterposition und Wegauswahl. Browser: Wächterbewegung und Positionswechsel beobachtet. Eine längere manuelle Prüfung aller vier Laufrichtungen steht noch aus.
