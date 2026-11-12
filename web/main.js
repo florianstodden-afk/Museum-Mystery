@@ -1,6 +1,7 @@
-import { WIDTH, HEIGHT, OBJECTS, initialState, validState, hasAllEvidence,
-  canEnter, nearbyObject, interact, openVault, chooseEnding } from './engine.js';
-import { start as startLandscape, initialLandscape } from './minigames/landscape.js';
+import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
+import * as landscapeStation from './minigames/landscape.js';
+import { createStoryHost } from './story/host.js';
+import { journalModel, renderJournal } from './story/journal.js';
 import { movementDuration, advancePlayer } from './motion.js';
 import { chooseGuardAction } from './guard.js';
 
@@ -10,14 +11,26 @@ const ctx = canvas.getContext('2d');
 ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.max(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
-const storeKey = 'museum-mystery-walk-v1';
+const storeKey = 'museum-mystery-walk-v1';         // player position and steps
+const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
+
+// The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
+const story = createStoryHost({
+  openPanel(title) {
+    showDialog(title, '', []);
+    document.querySelector('.dialog-card').classList.add('story-dark-card');
+    return document.querySelector('#dialog-body');
+  },
+  closePanel: closeDialog,
+  onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
+  onReset: resetWorld,
+  stations: { landscape: landscapeStation }, // stations 2–4: add teammates' modules here
+  storageKey: 'museum-nocturne-story-v1',
+});
+
 let state;
-const landscapeKey = 'museum-nocturne-landscape-v1';
-let landscapeState;
-try { landscapeState = JSON.parse(localStorage.getItem(landscapeKey)) || initialLandscape(); }
-catch { landscapeState = initialLandscape(); }
-try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
-catch { state = initialState(); }
+try { state = restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
+catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
 let metArtwork = null;
@@ -54,16 +67,14 @@ fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
   .then(data => { if (!data.isPublicDomain || !data.primaryImageSmall) throw new Error('Image is not public'); metArtwork = data; metStatus = 'ready'; wallArtwork.src = data.primaryImageSmall; })
   .catch(() => { metStatus = 'offline'; });
 
-function save() { localStorage.setItem(storeKey, JSON.stringify(state)); updateSidebar(); draw(); }
+function save() { savePosition(); draw(); }
 function updateSidebar() {
   document.querySelector('#room').textContent = state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
-  document.querySelector('#progress').textContent = `${state.clues.length} / 3 clues`;
-  document.querySelector('#pass').textContent = state.pass ? 'Storage pass ✓' : 'No pass';
+  const model = journalModel(story.state);
+  document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
+  document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
   document.querySelector('#steps').textContent = `${state.steps} steps`;
-  const labels = { ledger: 'Visitor log', painting: 'Fresh varnish', note: 'Conservation note' };
-  const journal = Object.entries(labels).map(([id,label]) => `<div class="journal-item ${state.clues.includes(id) ? '' : 'missing'}"><b>${state.clues.includes(id) ? '✓' : '○'}</b>${label}</div>`).join('');
-  const next = !state.clues.includes('ledger') ? 'Find the visitor log in the entrance hall.' : !state.pass ? 'Speak to the security guard.' : !hasAllEvidence(state) ? 'Investigate the gallery and conservation room.' : !state.vaultOpen ? 'Solve the code at the orange storage door.' : state.ending ? 'Case closed.' : 'Find the original in storage.';
-  document.querySelector('#journal').innerHTML = journal + `<p><strong>Next step:</strong> ${next}</p>`;
+  renderJournal(document.querySelector('#journal'), model);
 }
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
@@ -173,15 +184,19 @@ function draw() {
   // A framed Met artwork hangs in the central arch.
   rect(122,21,34,27,'#876b3a');rect(125,23,28,23,'#344d48');
   if(artworkReady)ctx.drawImage(wallArtwork,125,23,28,23);
-  tile(9,9,'#b1986c');tile(18,9,state.vaultOpen?'#ab956d':'#ad683b');
-  if(!state.vaultOpen){rect(18*TILE+12,9*TILE+10,8,13,'#f6c56e');}
+  tile(9,9,'#b1986c');tile(18,9,state.doorOpen?'#ab956d':'#ad683b');
+  if(!state.doorOpen){rect(18*TILE+12,9*TILE+10,8,13,'#f6c56e');}
   for(const object of OBJECTS){
     const x=object.x*TILE,y=object.y*TILE;
     ctx.save();
-    if(object.id==='guard'||object.id==='restorer') ctx.translate(Math.sin(animationTime/1600 + object.x)*2,Math.sin(animationTime/800 + object.y));
-    if(object.id==='guard'||object.id==='restorer'){
-      rect(x+8,y+5,16,22,object.id==='guard'?'#294d68':'#694f71');rect(x+10,y+2,12,10,'#e3b88b');rect(x+8,y+26,6,5,'#26343c');rect(x+18,y+26,6,5,'#26343c');
+    const isPerson=['guard','restorer','curator'].includes(object.id);
+    if(isPerson) ctx.translate(Math.sin(animationTime/1600 + object.x)*2,Math.sin(animationTime/800 + object.y));
+    if(isPerson){
+      rect(x+8,y+5,16,22,{guard:'#294d68',restorer:'#694f71',curator:'#8a3f3a'}[object.id]);rect(x+10,y+2,12,10,'#e3b88b');rect(x+8,y+26,6,5,'#26343c');rect(x+18,y+26,6,5,'#26343c');
     }else if(object.id==='painting'){rect(x+3,y+3,26,26,'#d2a350');rect(x+6,y+6,20,20,'#648e86');rect(x+15,y+8,3,18,'#294e44');}
+    else if(object.id==='frames'){for(const dx of [3,10,17]){rect(x+dx,y+2,12,27,'#c99a45');rect(x+dx+3,y+5,6,21,'#3b2c1f');}}
+    else if(object.id==='monitors'){rect(x+2,y+4,28,22,'#1d252a');for(const [mx,my] of [[4,6],[13,6],[22,6],[4,15],[13,15],[22,15]])rect(x+mx,y+my,7,7,Math.sin(animationTime/300+mx+my)>0?'#7fb6d8':'#4c6f84');}
+    else if(object.id==='roster'){rect(x+3,y+3,26,24,'#5a4630');rect(x+6,y+6,9,12,'#e7dcc5');rect(x+17,y+8,9,10,'#e7dcc5');rect(x+9,y+20,14,5,'#e7dcc5');}
     else if(object.id==='vault'){rect(x+3,y+3,26,27,'#bb8e46');rect(x+6,y+6,20,21,'#547b7a');rect(x+14,y+9,3,16,'#2e5245');}
     else {rect(x+4,y+7,24,18,'#73543d');rect(x+8,y+3,16,16,'#e6d5a9');rect(x+10,y+7,12,2,'#947d5b');}
     ctx.restore();
@@ -196,13 +211,15 @@ function draw() {
   rect(px+8,py+26,6,5,'#654836');rect(px+18,py+26,6,5,'#654836');
   ctx.fillStyle='#f7e5b4';ctx.font='bold 13px sans-serif';
   ctx.fillText('ENTRANCE',50,85);ctx.fillText('GALLERY',360,54);ctx.fillText('STORAGE',665,54);
-  const target=nearbyObject(state,currentGuard());if(target || (Math.abs(p.x-17)<0.55&&Math.abs(p.y-9)<0.55)){
-    rect(px-14,py-29,120,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(`E  ${target?.label??'Storage door'}`,px-8,py-12);
+  const target=nearbyObject(state,currentGuard());if(target || atVaultDoor(state)){
+    const text=`E  ${target?.label??(state.doorOpen?'Vault door (open)':'Vault door · safe')}`;
+    rect(px-14,py-29,ctx.measureText(text).width+16,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(text,px-8,py-12);
   }
 }
 
 function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog}]){
   stopMovement();
+  document.querySelector('.dialog-card').classList.remove('story-dark-card');
   document.querySelector('#dialog-title').textContent=title;
   const body=document.querySelector('#dialog-body');body.replaceChildren();
   const p=document.createElement('p');p.textContent=text;body.append(p);
@@ -211,55 +228,34 @@ function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog
   dialog.classList.remove('hidden');
 }
 function closeDialog(){dialog.classList.add('hidden');}
-function showArtwork(){
-  if(!metArtwork){const p=document.createElement('p');p.textContent=metStatus==='offline'?'The Met API is currently unavailable. You can still continue the investigation.':'Artwork data is still loading …';document.querySelector('#dialog-body').append(p);return;}
-  const img=document.createElement('img');img.src=metArtwork.primaryImageSmall;img.alt=metArtwork.title;
-  const caption=document.createElement('p');caption.textContent=`Met artwork ${metArtwork.objectID}: ${metArtwork.title}, ${metArtwork.artistDisplayName}, ${metArtwork.objectDate}. The original is publicly accessible.`;
-  const link=document.createElement('a');link.href=metArtwork.objectURL;link.target='_blank';link.rel='noopener';link.textContent='View the original Met catalogue entry';
-  document.querySelector('#dialog-body').append(img,caption,link);
-}
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
-  if(Math.abs(state.player.x-17)<0.55&&Math.abs(state.player.y-9)<0.55){
-    if(!state.pass||!hasAllEvidence(state)){showDialog('Storage door',openVault(state,'').text);return;}
-    if(state.vaultOpen){showDialog('Storage door','The door is already open. Go through.');return;}
-    showDialog('Combination lock','The conservator hinted at the time of the suspicious entry. Enter four digits.',[
-      {label:'Check code',action:()=>{const code=document.querySelector('#vault-code').value.trim();const result=openVault(state,code);state=result.state;save();showDialog('Storage door',result.text);}},
-      {label:'Later',action:closeDialog,secondary:true},
-    ]);
-    const input=document.createElement('input');input.id='vault-code';input.inputMode='numeric';input.maxLength=4;input.placeholder='Four digits';input.setAttribute('aria-label','Four-digit code');document.querySelector('#dialog-body').append(input);input.focus();
+  if(atVaultDoor(state)){
+    if(state.doorOpen) showDialog('Vault door','The door is open. The original painting waits inside.');
+    else story.openVault();
     return;
   }
-  const object=nearbyObject(state,currentGuard());if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
-  if (object.id === 'painting') {
-    showDialog('Landscape Gallery · Station B', '');
-    startLandscape(document.querySelector('#dialog-body'), {
-      state: landscapeState,
-      onChange: next => { landscapeState = next; localStorage.setItem(landscapeKey, JSON.stringify(next)); }
-    }, result => {
-      const current = interact(state, 'painting'); state = current.state; save();
-      const notice = document.createElement('p'); notice.textContent = `Evidence in journal: ${result.evidence}`;
-      document.querySelector('#dialog-body').append(notice);
-    });
-    return;
-  }
-  const result=interact(state,object.id,currentGuard());state=result.state;save();
-  if(result.choice){showDialog('The final decision',result.text,[
-    {label:'Secretly return the original',action:()=>end('restore')},
-    {label:'Expose the forgery publicly',action:()=>end('expose'),secondary:true},
-  ]);return;}
-  showDialog(object.label,result.text);if(result.artwork)showArtwork();
+  const object=nearbyObject(state,currentGuard());
+  if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
+  runStoryAction(object.story);
 }
-function end(choice){state=chooseEnding(state,choice);save();
-  const restore='You quietly return the original painting. The museum is saved, but the courier and the cover-up remain unknown. ENDING A: A Quiet Rescue.';
-  const expose='You reveal the log, varnish and note to the public. The forgery is exposed, and the museum must answer for it. ENDING B: The Truth Comes Out.';
-  showDialog('Case closed',choice==='restore'?restore:expose,[{label:'New game',action:reset}]);
+// Each map object says in engine.js what it does in the story.
+function runStoryAction(action){
+  if(action.station) story.openStation(action.station);
+  else if(action.talk) story.talkTo(action.talk);
+  else if(action.examine) story.examine(action.examine);
+  else if(action.vault) story.openVault();
 }
-function reset(){state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
+// Called by the story host when the player confirms "New game".
+function resetWorld(){
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();
+  try{localStorage.removeItem(oldLandscapeKey);}catch{}
+  savePosition();
+}
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
 const heldKeys = new Map();
 let lastSavedAt=0;
-function savePosition(){localStorage.setItem(storeKey,JSON.stringify(state));updateSidebar();}
+function savePosition(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
 function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
@@ -318,5 +314,8 @@ document.querySelectorAll('[data-move]').forEach(button=>{
 });
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
 document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
-document.querySelector('#reset').addEventListener('click',()=>showDialog('New game?','Your progress in this case will be reset.',[{label:'Reset',action:reset},{label:'Cancel',action:closeDialog,secondary:true}]));
+document.querySelector('#reset').addEventListener('click',()=>story.confirmNewGame());
+document.querySelector('#hint').addEventListener('click',()=>story.showHint());
+document.querySelector('#mission').addEventListener('click',()=>story.showMission());
 save();
+story.start(); // M's message on the very first visit

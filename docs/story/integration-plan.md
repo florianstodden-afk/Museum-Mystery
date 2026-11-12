@@ -1,5 +1,7 @@
 # Integrationsplan: Story-Engine ins Hauptspiel
 
+> **Status 12.11.2026: umgesetzt** auf Branch `feature/story-integration` (nach Absprache mit Fabian), über den „Kurzen Weg“ mit `host.js`. Abweichungen vom Plan: Die Kartenobjekte tragen ihre Story-Aktion als Daten (`story`-Feld in `web/engine.js`), statt einer Tabelle in `main.js`. Die Depottür ist der Safe. Stationen 2–4 liegen vorerst an vorhandenen Kartenpunkten (Night-shift log in der Great Hall, Transport slip und neues Frame rack in der Galerie). Details im Arbeitsprotokoll.
+
 **Stand:** 12.11.2026, Branch `feature/story-logic`. **Wer:** Florian B. mit Fabian, **nach** Fabians Merge von Grafik und Räumen.
 **Ziel:** Das Hauptspiel (`web/index.html` + `web/main.js`) nutzt die neue Story aus `web/story/` statt der alten Prototyp-Story in `web/engine.js`.
 
