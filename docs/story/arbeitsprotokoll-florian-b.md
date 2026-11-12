@@ -79,3 +79,31 @@ Eigene Datei, damit es keinen Konflikt mit dem gemeinsamen `docs/arbeitsprotokol
 - **Dateien:** `docs/story/integration-plan.md`, `docs/story/README.md`, dieses Protokoll; kleiner Link von der Story-Vorschau zur Security-Office-Vorschau.
 - **Prüfung:** `node --test` → siehe Commit.
 - **Offene Punkte:** Node.js installieren; `security-office.png` erzeugen; Stationen 2–4 von den Teamkollegen; Integration nach Absprache mit Fabian.
+- **Commit:** `a63e050 Document story logic and integration plan` (`node --test` → 73 / 73 bestanden)
+
+## Stretch 1 – CI-Workflow
+
+- `.github/workflows/story-tests.yml`: führt bei jedem Pull Request `node --test` in `web/` aus (Node 22). YAML lokal mit Python geparst; auf GitHub selbst noch **nicht** gelaufen (wird beim ersten PR sichtbar).
+- **Commit:** `433500d Run node tests on every pull request`
+
+## Stretch 2 – Story-Check
+
+- Ergebnisse in `docs/story/story-check.md`. Zwei Lücken geschlossen: Warum ist „M“ Voss (*mécène*), warum lockt er die Spielerfigur zum Safe. Neuer Test für die Erklärung.
+- **Prüfung:** `node --test` → **74 / 74 bestanden**.
+- **Commit:** `061efd2 Close story gaps: explain M and the lure to the safe`
+
+## Stretch 3 – Barrierefreiheit
+
+- **Kontraste** (WCAG-Formel, per Skript berechnet): Text auf Panel 11.2:1, gedämpfter Text 6.7:1, Gold 9.3:1, Schrift auf Buttons 9.6:1 – alle über AA (4.5:1). Gesperrte Raumkarten von 72 % auf 85 % Deckkraft angehoben.
+- **Tastatur** (im Browser getestet): Tab erreicht alle Knöpfe, goldener Fokus-Rahmen sichtbar, Enter öffnet, Escape schließt (natives `<dialog>`, Fokus bleibt im Dialog).
+- **Gefundener Fehler:** Nach dem Schließen blieb der Fokus auf dem unsichtbaren ✕. Jetzt springt er zum auslösenden Knopf zurück (auch wenn der Knopf inzwischen neu gezeichnet wurde). Erneut getestet: Fokus kehrt zurück.
+- Bereits vorhanden: echte `<button>`/`<label>`, `aria-live` für Rückmeldungen, `aria-label` für Buchstabenplätze, Alt-Texte für Bilder, Security Office zusätzlich mit Knöpfen statt nur Canvas-Klicks.
+- **Commit:** `ffc889f Return keyboard focus after closing preview dialogs`
+
+## Merge-Check – 12.11.2026
+
+1. `git fetch origin`; `git log 9beaf57..origin/main` → **keine neuen Commits** auf `main` seit dem Start.
+2. `git merge origin/main` → „Already up to date.“ (kein Merge-Commit nötig, kein Konflikt).
+3. Tests nach dem Merge: `cd web && node --test` → **74 Tests, 74 bestanden** (17 alte + 57 neue). `uv run pytest` → **6 bestanden**.
+4. `git diff --name-status origin/main...HEAD`: ausschließlich **neue** Dateien (Status `A`), keine bestehende Datei geändert.
+5. Browser: `web/index.html` (Hauptspiel) und `web/dev/story.html` laden ohne fehlgeschlagene Ressourcen (Screenshots 13, 14).
