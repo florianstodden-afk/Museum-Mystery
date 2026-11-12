@@ -104,3 +104,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag und Codex; Teamreview steht aus.
 - **Umsetzung:** `E` schließt offene Dialoge, solange kein freies Textfeld bearbeitet wird. Numerische Codefelder können ebenfalls mit `E` geschlossen werden; `Escape` bleibt verfügbar. Der Hinweis in `web/index.html` erklärt beide Funktionen.
 - **Prüfung:** Node `--test`: 17 Tests bestanden. Im Browser wurde der Wachmann-Dialog mit `E` geöffnet und mit erneutem `E` geschlossen. Freitext- und Safe-Code-Fokus wurden nicht manuell geprüft.
+
+### 2026-11-12 – Spieltext auf Englisch umstellen
+
+- **Beteiligte:** Nutzerauftrag und Codex; Nutzer wünscht anschließend den Merge.
+- **Umsetzung:** Der vorhandene spielbare Handlungsstrang, die Hinweise, Enden, Bedienelemente und die Landschaftsgalerie wurden ins Englische übersetzt. Spiellogik und gespeicherte IDs bleiben unverändert. Dateien: `web/index.html`, `web/main.js`, `web/engine.js`, `web/minigames/landscape.js` und `web/guard.test.js`.
+- **Prüfung:** `node --test`: 17 Tests bestanden. `uv run pytest -q`: 6 Tests bestanden. Im Browser wurden Titel, Missionsbeschreibung, Journal, Steuerung und ein Dialog auf Englisch geprüft. Der gesamte Spielablauf wurde nach der Übersetzung nicht manuell durchgespielt.
+- **Grenze:** Übersetzt wurde die bestehende Handlung des Prototyps; das vollständige neuere Nocturne-Konzept ist noch nicht umgesetzt.

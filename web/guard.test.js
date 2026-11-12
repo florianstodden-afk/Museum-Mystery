@@ -6,7 +6,7 @@ test('moving guard collision and interaction use his current position',()=>{
   const s={...initialState(),player:{x:4,y:6}}; const guard={x:5,y:6};
   assert.equal(nearbyObject(s,guard).id,'guard');
   assert.equal(move(s,1,0,guard),s);
-  assert.match(interact(s,'guard',guard).text,/Wachmann/);
+  assert.match(interact(s,'guard',guard).text,/Security guard/);
   assert.notEqual(nearbyObject(s,{x:7,y:6})?.id,'guard');
 });
 test('patrol stays in room and avoids player and occupied tiles',()=>{

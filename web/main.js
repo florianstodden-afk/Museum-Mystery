@@ -47,23 +47,23 @@ function guardDisplay(){
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
   return {x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t, y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
 }
-let metStatus = 'lädt';
+let metStatus = 'loading';
 
 fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
-  .then(response => { if (!response.ok) throw new Error('API nicht erreichbar'); return response.json(); })
-  .then(data => { if (!data.isPublicDomain || !data.primaryImageSmall) throw new Error('Bild nicht öffentlich'); metArtwork = data; metStatus = 'bereit'; wallArtwork.src = data.primaryImageSmall; })
+  .then(response => { if (!response.ok) throw new Error('API unavailable'); return response.json(); })
+  .then(data => { if (!data.isPublicDomain || !data.primaryImageSmall) throw new Error('Image is not public'); metArtwork = data; metStatus = 'ready'; wallArtwork.src = data.primaryImageSmall; })
   .catch(() => { metStatus = 'offline'; });
 
 function save() { localStorage.setItem(storeKey, JSON.stringify(state)); updateSidebar(); draw(); }
 function updateSidebar() {
-  document.querySelector('#room').textContent = state.player.x < 9 ? 'Empfangshalle' : state.player.x < 18 ? 'Galerie & Restaurierung' : 'Depot';
-  document.querySelector('#progress').textContent = `${state.clues.length} / 3 Belege`;
-  document.querySelector('#pass').textContent = state.pass ? 'Depotausweis ✓' : 'Kein Ausweis';
-  document.querySelector('#steps').textContent = `${state.steps} Schritte`;
-  const labels = { ledger: 'Besucherprotokoll', painting: 'Frischer Firnis', note: 'Restaurierungsnotiz' };
+  document.querySelector('#room').textContent = state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
+  document.querySelector('#progress').textContent = `${state.clues.length} / 3 clues`;
+  document.querySelector('#pass').textContent = state.pass ? 'Storage pass ✓' : 'No pass';
+  document.querySelector('#steps').textContent = `${state.steps} steps`;
+  const labels = { ledger: 'Visitor log', painting: 'Fresh varnish', note: 'Conservation note' };
   const journal = Object.entries(labels).map(([id,label]) => `<div class="journal-item ${state.clues.includes(id) ? '' : 'missing'}"><b>${state.clues.includes(id) ? '✓' : '○'}</b>${label}</div>`).join('');
-  const next = !state.clues.includes('ledger') ? 'Suche das Protokoll im Empfang.' : !state.pass ? 'Sprich mit dem Wachmann.' : !hasAllEvidence(state) ? 'Untersuche Galerie und Restaurierung.' : !state.vaultOpen ? 'Löse den Code an der orangefarbenen Depottür.' : state.ending ? 'Fall abgeschlossen.' : 'Finde das Original im Depot.';
-  document.querySelector('#journal').innerHTML = journal + `<p><strong>Nächster Schritt:</strong> ${next}</p>`;
+  const next = !state.clues.includes('ledger') ? 'Find the visitor log in the entrance hall.' : !state.pass ? 'Speak to the security guard.' : !hasAllEvidence(state) ? 'Investigate the gallery and conservation room.' : !state.vaultOpen ? 'Solve the code at the orange storage door.' : state.ending ? 'Case closed.' : 'Find the original in storage.';
+  document.querySelector('#journal').innerHTML = journal + `<p><strong>Next step:</strong> ${next}</p>`;
 }
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
@@ -140,7 +140,7 @@ function drawHall(){
   ctx.moveTo(864,362);ctx.lineTo(864,430);ctx.moveTo(864,458);ctx.lineTo(864,554);ctx.stroke();
   ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
   // Indicate the connecting doorway, which is reached at the middle of the east wall.
-  ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALERIE  →',782,385);
+  ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALLERY  →',782,385);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
@@ -195,13 +195,13 @@ function draw() {
   if(facing !== 'up'){const eyeShift=facing==='left'?-2:facing==='right'?2:0;rect(px+10+eyeShift,py+8,3,2,'#33424a');rect(px+18+eyeShift,py+8,3,2,'#33424a');}
   rect(px+8,py+26,6,5,'#654836');rect(px+18,py+26,6,5,'#654836');
   ctx.fillStyle='#f7e5b4';ctx.font='bold 13px sans-serif';
-  ctx.fillText('EMPFANG',50,85);ctx.fillText('GALERIE',360,54);ctx.fillText('DEPOT',665,54);
+  ctx.fillText('ENTRANCE',50,85);ctx.fillText('GALLERY',360,54);ctx.fillText('STORAGE',665,54);
   const target=nearbyObject(state,currentGuard());if(target || (Math.abs(p.x-17)<0.55&&Math.abs(p.y-9)<0.55)){
-    rect(px-14,py-29,120,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(`E  ${target?.label??'Depottür'}`,px-8,py-12);
+    rect(px-14,py-29,120,24,'#1c303a');ctx.fillStyle='#fff0cc';ctx.fillText(`E  ${target?.label??'Storage door'}`,px-8,py-12);
   }
 }
 
-function showDialog(title,text,options=[{label:'Weiter (E)',action:closeDialog}]){
+function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog}]){
   stopMovement();
   document.querySelector('#dialog-title').textContent=title;
   const body=document.querySelector('#dialog-body');body.replaceChildren();
@@ -212,48 +212,48 @@ function showDialog(title,text,options=[{label:'Weiter (E)',action:closeDialog}]
 }
 function closeDialog(){dialog.classList.add('hidden');}
 function showArtwork(){
-  if(!metArtwork){const p=document.createElement('p');p.textContent=metStatus==='offline'?'Die Met-API ist gerade nicht erreichbar. Die Ermittlung bleibt spielbar.':'Kunstdaten werden noch geladen …';document.querySelector('#dialog-body').append(p);return;}
+  if(!metArtwork){const p=document.createElement('p');p.textContent=metStatus==='offline'?'The Met API is currently unavailable. You can still continue the investigation.':'Artwork data is still loading …';document.querySelector('#dialog-body').append(p);return;}
   const img=document.createElement('img');img.src=metArtwork.primaryImageSmall;img.alt=metArtwork.title;
-  const caption=document.createElement('p');caption.textContent=`Met-Werk ${metArtwork.objectID}: ${metArtwork.title}, ${metArtwork.artistDisplayName}, ${metArtwork.objectDate}. Das Original ist öffentlich zugänglich.`;
-  const link=document.createElement('a');link.href=metArtwork.objectURL;link.target='_blank';link.rel='noopener';link.textContent='Originaleintrag im Met ansehen';
+  const caption=document.createElement('p');caption.textContent=`Met artwork ${metArtwork.objectID}: ${metArtwork.title}, ${metArtwork.artistDisplayName}, ${metArtwork.objectDate}. The original is publicly accessible.`;
+  const link=document.createElement('a');link.href=metArtwork.objectURL;link.target='_blank';link.rel='noopener';link.textContent='View the original Met catalogue entry';
   document.querySelector('#dialog-body').append(img,caption,link);
 }
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
   if(Math.abs(state.player.x-17)<0.55&&Math.abs(state.player.y-9)<0.55){
-    if(!state.pass||!hasAllEvidence(state)){showDialog('Depottür',openVault(state,'').text);return;}
-    if(state.vaultOpen){showDialog('Depottür','Die Tür ist bereits offen. Geh hindurch.');return;}
-    showDialog('Zahlenschloss','Die Restauratorin deutete auf die Uhrzeit des verdächtigen Eintrags. Gib vier Ziffern ein.',[
-      {label:'Code prüfen',action:()=>{const code=document.querySelector('#vault-code').value.trim();const result=openVault(state,code);state=result.state;save();showDialog('Depottür',result.text);}},
-      {label:'Später',action:closeDialog,secondary:true},
+    if(!state.pass||!hasAllEvidence(state)){showDialog('Storage door',openVault(state,'').text);return;}
+    if(state.vaultOpen){showDialog('Storage door','The door is already open. Go through.');return;}
+    showDialog('Combination lock','The conservator hinted at the time of the suspicious entry. Enter four digits.',[
+      {label:'Check code',action:()=>{const code=document.querySelector('#vault-code').value.trim();const result=openVault(state,code);state=result.state;save();showDialog('Storage door',result.text);}},
+      {label:'Later',action:closeDialog,secondary:true},
     ]);
-    const input=document.createElement('input');input.id='vault-code';input.inputMode='numeric';input.maxLength=4;input.placeholder='Vier Ziffern';input.setAttribute('aria-label','Vierstelliger Zahlencode');document.querySelector('#dialog-body').append(input);input.focus();
+    const input=document.createElement('input');input.id='vault-code';input.inputMode='numeric';input.maxLength=4;input.placeholder='Four digits';input.setAttribute('aria-label','Four-digit code');document.querySelector('#dialog-body').append(input);input.focus();
     return;
   }
-  const object=nearbyObject(state,currentGuard());if(!object){showDialog('Niemand in der Nähe','Geh an ein markiertes Objekt oder eine Person heran.');return;}
+  const object=nearbyObject(state,currentGuard());if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
   if (object.id === 'painting') {
-    showDialog('Landschaftsgalerie · Station B', '');
+    showDialog('Landscape Gallery · Station B', '');
     startLandscape(document.querySelector('#dialog-body'), {
       state: landscapeState,
       onChange: next => { landscapeState = next; localStorage.setItem(landscapeKey, JSON.stringify(next)); }
     }, result => {
       const current = interact(state, 'painting'); state = current.state; save();
-      const notice = document.createElement('p'); notice.textContent = `Beweis im Journal: ${result.evidence}`;
+      const notice = document.createElement('p'); notice.textContent = `Evidence in journal: ${result.evidence}`;
       document.querySelector('#dialog-body').append(notice);
     });
     return;
   }
   const result=interact(state,object.id,currentGuard());state=result.state;save();
-  if(result.choice){showDialog('Die letzte Entscheidung',result.text,[
-    {label:'Original heimlich zurückbringen',action:()=>end('restore')},
-    {label:'Fälschung öffentlich aufdecken',action:()=>end('expose'),secondary:true},
+  if(result.choice){showDialog('The final decision',result.text,[
+    {label:'Secretly return the original',action:()=>end('restore')},
+    {label:'Expose the forgery publicly',action:()=>end('expose'),secondary:true},
   ]);return;}
   showDialog(object.label,result.text);if(result.artwork)showArtwork();
 }
 function end(choice){state=chooseEnding(state,choice);save();
-  const restore='Du bringst das echte Bild unbemerkt zurück. Das Museum ist gerettet, aber der Kurier und die Vertuschung bleiben unbekannt. ENDE A: Stille Rettung.';
-  const expose='Du zeigst Protokoll, Firnis und Notiz der Öffentlichkeit. Die Fälschung wird aufgedeckt; das Museum muss Verantwortung übernehmen. ENDE B: Die Wahrheit ans Licht.';
-  showDialog('Fall abgeschlossen',choice==='restore'?restore:expose,[{label:'Neues Spiel',action:reset}]);
+  const restore='You quietly return the original painting. The museum is saved, but the courier and the cover-up remain unknown. ENDING A: A Quiet Rescue.';
+  const expose='You reveal the log, varnish and note to the public. The forgery is exposed, and the museum must answer for it. ENDING B: The Truth Comes Out.';
+  showDialog('Case closed',choice==='restore'?restore:expose,[{label:'New game',action:reset}]);
 }
 function reset(){state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();landscapeState=initialLandscape();localStorage.removeItem(landscapeKey);save();closeDialog();}
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
@@ -318,5 +318,5 @@ document.querySelectorAll('[data-move]').forEach(button=>{
 });
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
 document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
-document.querySelector('#reset').addEventListener('click',()=>showDialog('Neues Spiel?','Der bisherige Fortschritt dieses Falls wird zurückgesetzt.',[{label:'Zurücksetzen',action:reset},{label:'Abbrechen',action:closeDialog,secondary:true}]));
+document.querySelector('#reset').addEventListener('click',()=>showDialog('New game?','Your progress in this case will be reset.',[{label:'Reset',action:reset},{label:'Cancel',action:closeDialog,secondary:true}]));
 save();

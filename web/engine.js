@@ -4,12 +4,12 @@ export const START = { x: 3, y: 9 };
 export const EVIDENCE = ["ledger", "painting", "note"];
 
 export const OBJECTS = [
-  { id: "guard", x: 5, y: 5, label: "Wachmann" },
-  { id: "ledger", x: 5, y: 12, label: "Besucherprotokoll" },
-  { id: "painting", x: 14, y: 4, label: "Ausgetauschtes Gemälde" },
-  { id: "restorer", x: 15, y: 12, label: "Restauratorin" },
-  { id: "note", x: 12, y: 13, label: "Restaurierungsnotiz" },
-  { id: "vault", x: 23, y: 5, label: "Verstecktes Original" },
+  { id: "guard", x: 5, y: 5, label: "Security guard" },
+  { id: "ledger", x: 5, y: 12, label: "Visitor log" },
+  { id: "painting", x: 14, y: 4, label: "Replaced painting" },
+  { id: "restorer", x: 15, y: 12, label: "Conservator" },
+  { id: "note", x: 12, y: 13, label: "Conservation note" },
+  { id: "vault", x: 23, y: 5, label: "Hidden original" },
 ];
 
 export function initialState() {
@@ -68,40 +68,40 @@ export function nearbyObject(state, guardPosition) {
 export function interact(state, id, guardPosition) {
   const object = objectsWithGuard(guardPosition).find(item => item.id === id);
   if (!object || !Number.isFinite(interactionDistance(state.player,object))) {
-    return { state, text: "Geh näher an das Objekt heran." };
+    return { state, text: "Move closer to the object." };
   }
-  if (state.ending) return { state, text: "Der Fall ist abgeschlossen. Starte ein neues Spiel." };
+  if (state.ending) return { state, text: "The case is closed. Start a new game." };
   if (EVIDENCE.includes(id)) {
-    if (state.clues.includes(id)) return { state, text: "Diesen Beleg hast du schon im Journal." };
+    if (state.clues.includes(id)) return { state, text: "This evidence is already in your journal." };
     const texts = {
-      ledger: "Besucherprotokoll: Ein fremder Kurier wurde um 21:14 am Seiteneingang registriert.",
-      painting: "Die Signatur passt, doch der Firnis glänzt ungewöhnlich frisch: Das Bild an der Wand ist eine Fälschung.",
-      note: "Restaurierungsnotiz: Das Original wurde vor der Gala heimlich ins Depot gebracht. Warum?",
+      ledger: "Visitor log: An unknown courier was recorded at the side entrance at 21:14.",
+      painting: "The signature matches, but the varnish looks unusually fresh: the painting on the wall is a forgery.",
+      note: "Conservation note: The original was secretly moved to storage before the gala. Why?",
     };
     return { state: { ...state, clues: [...state.clues, id] }, text: texts[id], artwork: id === "painting" };
   }
   if (id === "guard") {
-    if (!state.clues.includes("ledger")) return { state, text: "Wachmann: Finde zuerst das Besucherprotokoll am Empfang. Ohne Beleg kann ich nichts tun." };
-    if (state.pass) return { state, text: "Wachmann: Du hast meinen Depotausweis bereits. Such weiter nach Beweisen." };
-    return { state: { ...state, pass: true }, text: "Wachmann: 21:14? Das war nach Dienstschluss. Hier ist mein Depotausweis. Finde heraus, was dort liegt." };
+    if (!state.clues.includes("ledger")) return { state, text: "Security guard: First find the visitor log at reception. I need evidence before I can help." };
+    if (state.pass) return { state, text: "Security guard: You already have my storage pass. Keep looking for evidence." };
+    return { state: { ...state, pass: true }, text: "Security guard: 21:14? That was after closing. Here is my storage pass. Find out what is in there." };
   }
-  if (id === "restorer") return { state, text: "Restauratorin: Achte auf Firnis und die Notiz bei meinem Arbeitstisch. Das Depot öffnet nur mit Ausweis und drei Belegen." };
+  if (id === "restorer") return { state, text: "Conservator: Look at the varnish and the note by my workbench. The storage door needs a pass and three pieces of evidence." };
   if (id === "vault") {
-    if (!state.vaultOpen) return { state, text: "Das Depot ist noch verschlossen." };
-    return { state, text: "Im Depot steht das echte Gemälde. Die Museumsleitung verschwieg den Austausch. Was tust du?", choice: true };
+    if (!state.vaultOpen) return { state, text: "The storage room is still locked." };
+    return { state, text: "The original painting is in storage. Museum management covered up the swap. What will you do?", choice: true };
   }
-  return { state, text: "Hier gibt es nichts zu entdecken." };
+  return { state, text: "There is nothing to discover here." };
 }
 
 export function openVault(state, code) {
   if (state.ending || Math.abs(state.player.x - 17) > 0.55 || Math.abs(state.player.y - 9) > 0.55
       || !state.pass || !hasAllEvidence(state)) {
-    return { state, text: "Depot verschlossen: Du brauchst drei Belege und den Ausweis des Wachmanns." };
+    return { state, text: "Storage is locked: you need three clues and the security guard’s pass." };
   }
   if (code !== "2114") {
-    return { state, text: "Der Zahlencode ist falsch. Welche Uhrzeit stand im Besucherprotokoll?" };
+    return { state, text: "That code is wrong. What time was recorded in the visitor log?" };
   }
-  return { state: { ...state, vaultOpen: true }, text: "Der Ausweis klickt. Die Depottür ist offen!" };
+  return { state: { ...state, vaultOpen: true }, text: "The pass clicks into place. The storage door is open!" };
 }
 
 export function chooseEnding(state, ending) {
