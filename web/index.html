@@ -10,7 +10,7 @@
   <main class="shell">
     <header class="topbar">
       <div><p class="eyebrow">MUSEUM MYSTERY · KAPITEL 01</p><h1>Die Nacht der Fälschung</h1></div>
-      <button id="reset" class="plain">↻ Neues Spiel</button>
+      <div class="top-actions"><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ Neues Spiel</button></div>
     </header>
     <section class="game-layout">
       <div class="stage-wrap">
@@ -22,7 +22,7 @@
           <button data-move="down" aria-label="Nach unten">▼</button>
         </div>
       </div>
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar" hidden>
         <div class="panel case"><p class="eyebrow">DEIN AUFTRAG</p><h2>Ein Bild ist verschwunden.</h2><p>In der Galerie hängt eine Fälschung. Finde drei Belege, öffne das Depot und entscheide, was mit der Wahrheit geschieht.</p></div>
         <div class="panel"><p class="eyebrow">ERMITTLUNGSJOURNAL</p><div id="journal"></div></div>
         <div class="panel status"><span id="progress">0 / 3 Belege</span><span id="pass">Kein Ausweis</span><span id="steps">0 Schritte</span></div>

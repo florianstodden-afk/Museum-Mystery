@@ -15,6 +15,9 @@ catch { landscapeState = initialLandscape(); }
 try { const saved = JSON.parse(localStorage.getItem(storeKey)); state = validState(saved) ? saved : initialState(); }
 catch { state = initialState(); }
 let metArtwork = null;
+const hallBackdrop = new Image();
+hallBackdrop.onload = () => draw();
+hallBackdrop.src = './assets/great-hall.png';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
@@ -41,8 +44,43 @@ function updateSidebar() {
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
 function tile(x,y,color){rect(x*TILE,y*TILE,TILE,TILE,color);}
+function hallPosition(x,y){ return {x: (x + 0.5) * canvas.width / 9, y: 345 + (y - 2) * 14}; }
+function drawPerson(x,y,kind){
+  ctx.save(); ctx.translate(x,y);
+  ctx.fillStyle='rgba(25,20,15,.24)';ctx.beginPath();ctx.ellipse(0,2,17,5,0,0,Math.PI*2);ctx.fill();
+  if(kind==='rick'){
+    // An expressive, larger character with a white coat and blue spiky hair.
+    ctx.fillStyle='#52483d';ctx.fillRect(-11,-8,9,9);ctx.fillRect(3,-8,9,9);
+    ctx.fillStyle='#f5f0df';ctx.beginPath();ctx.moveTo(-14,-34);ctx.lineTo(14,-34);ctx.lineTo(17,-7);ctx.lineTo(-17,-7);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#77afbd';ctx.fillRect(-5,-32,10,22);ctx.fillStyle='#d4caba';ctx.fillRect(-1,-28,2,18);
+    ctx.fillStyle='#e8c4a9';ctx.beginPath();ctx.ellipse(0,-41,10,11,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#8ddcea';ctx.beginPath();ctx.moveTo(-10,-45);ctx.lineTo(-17,-51);ctx.lineTo(-9,-51);ctx.lineTo(-12,-59);ctx.lineTo(-4,-54);ctx.lineTo(0,-63);ctx.lineTo(4,-54);ctx.lineTo(12,-59);ctx.lineTo(10,-51);ctx.lineTo(17,-51);ctx.lineTo(9,-44);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#f8f8f2';ctx.beginPath();ctx.arc(-4,-42,3,0,Math.PI*2);ctx.arc(4,-42,3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#293037';ctx.fillRect(-4,-43,1,2);ctx.fillRect(4,-43,1,2);
+  } else {
+    ctx.fillStyle='#263743';ctx.fillRect(-10,-9,8,10);ctx.fillRect(2,-9,8,10);
+    ctx.fillStyle='#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
+    ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(0,-40,9,10,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);ctx.fillStyle='#d5bd80';ctx.fillRect(-2,-28,4,5);
+  }
+  ctx.restore();
+}
+function drawHall(){
+  if(hallBackdrop.complete && hallBackdrop.naturalWidth) ctx.drawImage(hallBackdrop,0,0,canvas.width,canvas.height);
+  else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,canvas.width,canvas.height);}
+  // Fill the central frame with the real Met artwork when the API succeeds.
+  if(artworkReady)ctx.drawImage(wallArtwork,410,244,77,55);
+  const guard=OBJECTS.find(o=>o.id==='guard'); const ledger=OBJECTS.find(o=>o.id==='ledger');
+  const desk=hallPosition(ledger.x,ledger.y);ctx.fillStyle='#5b4633';ctx.beginPath();ctx.ellipse(desk.x,desk.y+3,45,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#b79c71';ctx.fillRect(desk.x-28,desk.y-14,56,16);ctx.fillStyle='#f0e2bc';ctx.fillRect(desk.x-10,desk.y-17,20,12);
+  const person=hallPosition(guard.x,guard.y);drawPerson(person.x,person.y,'guard');
+  // Indicate the connecting doorway, which is reached at the middle of the east wall.
+  ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALERIE  →',782,385);
+  const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick');
+  const target=nearbyObject(state); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
+}
 function draw() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(state.player.x < 9){drawHall();return;}
   for(let y=0;y<HEIGHT;y++) for(let x=0;x<WIDTH;x++) {
     const base=x<9?'#d1c5ad':x<18?'#7e7768':'#596b6e';
     tile(x,y,(x+y)%2===0?base:(x<9?'#c5baa3':x<18?'#797363':'#56676a'));
@@ -183,5 +221,6 @@ window.addEventListener('blur',()=>heldKeys.clear());
 document.addEventListener('visibilitychange',()=>{if(document.hidden) heldKeys.clear();});
 document.querySelectorAll('[data-move]').forEach(button=>button.addEventListener('click',()=>{const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};handleMove(...d[button.dataset.move]);}));
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
+document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
 document.querySelector('#reset').addEventListener('click',()=>showDialog('Neues Spiel?','Der bisherige Fortschritt dieses Falls wird zurückgesetzt.',[{label:'Zurücksetzen',action:reset},{label:'Abbrechen',action:closeDialog,secondary:true}]));
 save();

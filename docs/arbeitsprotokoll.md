@@ -52,3 +52,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Entscheidung:** Der Rasterzustand und seine Kollisionsregeln bleiben erhalten; die Darstellung interpoliert zwischen Feldern. Gedrückte Tasten bewegen wiederholt, Loslassen, Fokusverlust und Dialoge stoppen die Bewegung. Die Eingangshalle verwendet helle Steinbögen, Säulen und einen Marmorboden; Architekturvorbild: https://www.metmuseum.org/press-releases/the-great-hall-of-the-metropolitan-museum-of-art-2010-general-information. Die Figur erhielt blaues Haar und einen weißen Kittel nach Nutzerwunsch.
 - **Umsetzung:** `web/main.js` zeichnet Halle, Met-Werk und Figur und steuert Bewegung; `web/engine.js` sperrt die sichtbare Rückwand.
 - **Prüfung:** Node `--test`: 9 Tests bestanden, darunter die Wandkollision. Browser: Raum visuell geprüft; eine 600 ms gehaltene Pfeiltaste bewegte vier Felder. Menschlicher Review und Touch-Langdruck stehen noch aus.
+
+### 2026-11-12 – Vollbild und detaillierte Eingangshalle
+
+- **Beteiligte:** Nutzerauftrag; Bild und Umsetzung mit Codex und ImageGen; Teamreview steht aus.
+- **Ziel und Entscheidung:** Eingangshalle bildschirmfüllend und detailreicher darstellen. Die generierte Illustration orientiert sich an der beschriebenen Great Hall der Met; sie ist keine maßstabsgetreue Darstellung. Der helle Boden orientiert sich am beschriebenen Marmoraggregat ohne Schachbrettmuster. Das Met-Werk wird weiterhin aus der API in den mittleren Rahmen geladen.
+- **Umsetzung:** `web/assets/great-hall.png` ist der generierte Hintergrund; `web/main.js` zeichnet größere Figuren und den Saal, `web/style.css` macht das Spielfeld bildschirmfüllend und das Journal aufklappbar. Andere Räume verwenden noch die frühere Darstellung.
+- **Prüfung:** Node `--test`: 9 Tests bestanden. Browser: Vollbildhalle, Laden des Kunstwerks, Journal und Bewegung überprüft. Ein manueller Durchlauf aller Räume und ein mobiler Gerätetest stehen noch aus.
