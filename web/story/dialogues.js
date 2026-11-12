@@ -93,6 +93,8 @@ function linesForVale(state) {
   if (state.accusation.solved) {
     return talk([
       'Voss. I suspected him for weeks, but I needed proof that was not mine.',
+      'He signs his private letters with “M” – for mécène, the old word for patron. Everyone here thinks it means Mara.',
+      'He could not open my safe, so he needed someone who would follow my clues. You.',
       'You hold the painting and the evidence. The choice is yours now.',
     ]);
   }

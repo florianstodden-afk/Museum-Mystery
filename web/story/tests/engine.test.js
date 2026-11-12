@@ -186,3 +186,10 @@ test('next step follows the story', () => {
   s = must(chooseEnding(s, 'heist'));
   assert.match(nextStep(s), /Case closed/);
 });
+
+test('the right answer explains who M is and why you were sent', () => {
+  const open = must(tryOpenSafe(withAllStations(), 'BILD'));
+  const result = accuse(open, 'voss');
+  assert.match(result.message, /mécène/);
+  assert.match(result.message, /sent you/);
+});
