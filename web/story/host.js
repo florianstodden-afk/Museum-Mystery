@@ -36,6 +36,7 @@ export function createStoryHost(options) {
     openPanel,
     closePanel,
     onChange = () => {},
+    onReset = () => {},       // optional: the page resets its own things (e.g. player position)
     stations = {},
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
@@ -225,6 +226,7 @@ export function createStoryHost(options) {
     progress = {};
     hintStep = null;
     save();
+    onReset();
     onChange(state, 'New game started.');
     showMission();
   }

@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="story/story.css">
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
       <div><p class="eyebrow">MUSEUM MYSTERY · CHAPTER 01</p><h1>The Night of the Forgery</h1></div>
-      <div class="top-actions"><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ New Game</button></div>
+      <div class="top-actions"><button id="hint" class="plain">💡 Hint</button><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ New Game</button></div>
     </header>
     <section class="game-layout">
       <div class="stage-wrap">
@@ -23,14 +24,14 @@
         </div>
       </div>
       <aside class="sidebar" id="sidebar" hidden>
-        <div class="panel case"><p class="eyebrow">YOUR MISSION</p><h2>A painting has disappeared.</h2><p>A forgery hangs in the gallery. Find three pieces of evidence, open the storage room and decide what to do with the truth.</p></div>
-        <div class="panel"><p class="eyebrow">INVESTIGATION JOURNAL</p><div id="journal"></div></div>
-        <div class="panel status"><span id="progress">0 / 3 clues</span><span id="pass">No pass</span><span id="steps">0 steps</span></div>
+        <div class="panel case"><p class="eyebrow">YOUR MISSION</p><h2>Bring the painting out before sunrise.</h2><p>M wants Van Gogh’s “Wheat Field with Cypresses” from the safe. Solve the four stations, read the word in your journal and decide who gets the painting.</p><button id="mission" class="plain" type="button">Read M’s message</button></div>
+        <div class="panel" id="journal"></div>
+        <div class="panel status"><span id="progress">0 / 4 letters</span><span id="pass">0 / 100 points</span><span id="steps">0 steps</span></div>
         <div class="panel"><p class="eyebrow">ART SOURCES</p><p>Artworks: <a href="https://www.metmuseum.org/art/collection/search/436121" target="_blank" rel="noopener">Degas</a> · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">Van Gogh</a> · <a href="https://www.metmuseum.org/art/collection/search/12127" target="_blank" rel="noopener">Sargent</a>. The Metropolitan Museum of Art, Open Access.</p></div>
-        <div class="panel help"><p class="eyebrow">HOW TO PLAY</p><p>Move next to a person or marked object and press <kbd>E</kbd>. The orange storage door requires three clues and a pass.</p></div>
+        <div class="panel help"><p class="eyebrow">HOW TO PLAY</p><p>Move next to a person or marked object and press <kbd>E</kbd>. The orange vault door is the safe: it opens with the word from your journal.</p></div>
       </aside>
     </section>
-    <p class="credit">Artwork data and image: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
+    <p class="credit">Fictional museum and characters. Artwork data and image: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
   </main>
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>

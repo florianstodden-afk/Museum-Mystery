@@ -154,8 +154,11 @@ test('new game asks first and then resets everything', () => {
   host.confirmNewGame();
   click(page, 'Cancel');
   assert.equal(host.state.missionRead, true);
-  host.confirmNewGame();
+  let pageReset = false;
+  const host2 = createStoryHost({ ...page.options, onReset: () => { pageReset = true; } });
+  host2.confirmNewGame();
   click(page, 'Reset');
-  assert.equal(host.state.missionRead, false);
+  assert.equal(host2.state.missionRead, false);
+  assert.equal(pageReset, true, 'the page can reset its own state');
   assert.equal(page.title, 'A message from M');
 });

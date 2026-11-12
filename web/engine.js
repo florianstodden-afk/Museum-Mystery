@@ -1,32 +1,48 @@
+// The walkable map: size, walls, objects, movement and "what is nearby".
+// The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
 export const WIDTH = 28;
 export const HEIGHT = 18;
 export const START = { x: 3, y: 9 };
-export const EVIDENCE = ["ledger", "painting", "note"];
 
+// Every object on the map. `story` says what pressing E there does:
+//   { station: id } opens a mini-game, { talk: id } a conversation,
+//   { examine: id } looks at something, { vault: true } continues at the safe.
+// Stations 2–4 use existing spots until their own rooms exist.
 export const OBJECTS = [
-  { id: "guard", x: 5, y: 5, label: "Security guard" },
-  { id: "ledger", x: 5, y: 12, label: "Visitor log" },
-  { id: "painting", x: 14, y: 4, label: "Replaced painting" },
-  { id: "restorer", x: 15, y: 12, label: "Conservator" },
-  { id: "note", x: 12, y: 13, label: "Conservation note" },
-  { id: "vault", x: 23, y: 5, label: "Hidden original" },
+  { id: "guard", x: 5, y: 5, label: "Leon (night guard)", story: { talk: "leon" } },
+  { id: "ledger", x: 5, y: 12, label: "Night-shift log · Station I", story: { station: "portraits" } },
+  { id: "painting", x: 14, y: 4, label: "Wall label · Station B", story: { station: "landscape" } },
+  { id: "frames", x: 16, y: 2, label: "Frame rack · Station D", story: { station: "archive" } },
+  { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },
+  { id: "note", x: 12, y: 13, label: "Transport slip · Station L", story: { station: "restoration" } },
+  { id: "monitors", x: 10, y: 15, label: "Security monitors", story: { examine: "monitor-wall" } },
+  { id: "roster", x: 11, y: 15, label: "Shift schedule", story: { examine: "shift-schedule" } },
+  { id: "vault", x: 23, y: 5, label: "The original painting", story: { vault: true } },
+  { id: "curator", x: 21, y: 12, label: "Dr. Vale (curator)", story: { talk: "vale" } },
 ];
 
+// The door between gallery and storage. It is the safe: it opens with the code word.
+export const VAULT_DOOR = { x: 18, y: 9 };
+
+// doorOpen mirrors the story: it is true once the safe has been opened.
 export function initialState() {
-  return { player: { ...START }, clues: [], pass: false, vaultOpen: false,
-    ending: null, steps: 0 };
+  return { player: { ...START }, steps: 0, doorOpen: false };
 }
 
+// Old saves contain more fields (clues, pass, …); only position and steps matter here.
 export function validState(value) {
-  return value && Number.isFinite(value.player?.x) && Number.isFinite(value.player?.y) && value.player.x >= 0.5 && value.player.x < WIDTH-1.5 && value.player.y >= 0.5 && value.player.y < HEIGHT-1.5
-    && Array.isArray(value.clues) && value.clues.every(c => EVIDENCE.includes(c))
-    && typeof value.pass === "boolean" && typeof value.vaultOpen === "boolean"
-    && (value.ending === null || ["restore", "expose"].includes(value.ending))
+  return Boolean(value) && Number.isFinite(value.player?.x) && Number.isFinite(value.player?.y)
+    && value.player.x >= 0.5 && value.player.x < WIDTH - 1.5 && value.player.y >= 0.5 && value.player.y < HEIGHT - 1.5
     && Number.isInteger(value.steps) && value.steps >= 0;
 }
 
-export function hasAllEvidence(state) {
-  return EVIDENCE.every(id => state.clues.includes(id));
+// Turns a saved value into a map state. The door is set from the story afterwards.
+export function restoreState(saved, doorOpen) {
+  if (!validState(saved)) return { ...initialState(), doorOpen };
+  const state = { player: { x: saved.player.x, y: saved.player.y }, steps: saved.steps, doorOpen };
+  // Someone saved inside the storage room but the safe is closed in the new story: start outside.
+  if (!doorOpen && state.player.x >= VAULT_DOOR.x) state.player = { ...START };
+  return state;
 }
 
 function objectsWithGuard(guardPosition) {
@@ -38,17 +54,22 @@ export function canEnter(state, x, y, guardPosition) {
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x === 9 && y !== 9) return false;
   if (x === 18 && y !== 9) return false;
-  if (x === 18 && y === 9 && !state.vaultOpen) return false;
+  if (x === VAULT_DOOR.x && y === VAULT_DOOR.y && !state.doorOpen) return false;
   if (objectsWithGuard(guardPosition).some(object => object.x === x && object.y === y)) return false;
   return true;
 }
 
 export function move(state, dx, dy, guardPosition) {
-  if (state.ending || Math.abs(dx) + Math.abs(dy) !== 1) return state;
+  if (Math.abs(dx) + Math.abs(dy) !== 1) return state;
   const x = state.player.x + dx;
   const y = state.player.y + dy;
   if (!canEnter(state, x, y, guardPosition)) return state;
   return { ...state, player: { x, y }, steps: state.steps + 1 };
+}
+
+// Standing on the tile in front of the vault door (gallery side).
+export function atVaultDoor(state) {
+  return Math.abs(state.player.x - (VAULT_DOOR.x - 1)) < 0.55 && Math.abs(state.player.y - VAULT_DOOR.y) < 0.55;
 }
 
 function interactionDistance(player, object) {
@@ -63,51 +84,4 @@ function interactionDistance(player, object) {
 export function nearbyObject(state, guardPosition) {
   return objectsWithGuard(guardPosition).map(object => ({object, distance:interactionDistance(state.player,object)}))
     .filter(item => Number.isFinite(item.distance)).sort((a,b)=>a.distance-b.distance)[0]?.object ?? null;
-}
-
-export function interact(state, id, guardPosition) {
-  const object = objectsWithGuard(guardPosition).find(item => item.id === id);
-  if (!object || !Number.isFinite(interactionDistance(state.player,object))) {
-    return { state, text: "Move closer to the object." };
-  }
-  if (state.ending) return { state, text: "The case is closed. Start a new game." };
-  if (EVIDENCE.includes(id)) {
-    if (state.clues.includes(id)) return { state, text: "This evidence is already in your journal." };
-    const texts = {
-      ledger: "Visitor log: An unknown courier was recorded at the side entrance at 21:14.",
-      painting: "The signature matches, but the varnish looks unusually fresh: the painting on the wall is a forgery.",
-      note: "Conservation note: The original was secretly moved to storage before the gala. Why?",
-    };
-    return { state: { ...state, clues: [...state.clues, id] }, text: texts[id], artwork: id === "painting" };
-  }
-  if (id === "guard") {
-    if (!state.clues.includes("ledger")) return { state, text: "Security guard: First find the visitor log at reception. I need evidence before I can help." };
-    if (state.pass) return { state, text: "Security guard: You already have my storage pass. Keep looking for evidence." };
-    return { state: { ...state, pass: true }, text: "Security guard: 21:14? That was after closing. Here is my storage pass. Find out what is in there." };
-  }
-  if (id === "restorer") return { state, text: "Conservator: Look at the varnish and the note by my workbench. The storage door needs a pass and three pieces of evidence." };
-  if (id === "vault") {
-    if (!state.vaultOpen) return { state, text: "The storage room is still locked." };
-    return { state, text: "The original painting is in storage. Museum management covered up the swap. What will you do?", choice: true };
-  }
-  return { state, text: "There is nothing to discover here." };
-}
-
-export function openVault(state, code) {
-  if (state.ending || Math.abs(state.player.x - 17) > 0.55 || Math.abs(state.player.y - 9) > 0.55
-      || !state.pass || !hasAllEvidence(state)) {
-    return { state, text: "Storage is locked: you need three clues and the security guard’s pass." };
-  }
-  if (code !== "2114") {
-    return { state, text: "That code is wrong. What time was recorded in the visitor log?" };
-  }
-  return { state: { ...state, vaultOpen: true }, text: "The pass clicks into place. The storage door is open!" };
-}
-
-export function chooseEnding(state, ending) {
-  if (!state.vaultOpen || !hasAllEvidence(state) || !["restore", "expose"].includes(ending)
-      || Math.abs(state.player.x - 23) + Math.abs(state.player.y - 5) > 1.15) {
-    return state;
-  }
-  return { ...state, ending };
 }

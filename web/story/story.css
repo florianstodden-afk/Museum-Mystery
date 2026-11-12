@@ -105,3 +105,19 @@ a.story-button { display: inline-block; text-decoration: none; }
 /* Scenes opened by host.js: content on top, a row of buttons below. */
 .story-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .story-actions:empty { display: none; }
+
+/* Story scenes inside the main game's dialog (web/index.html): the paper card turns into a night card.
+   main.js adds .story-dark-card while the story host shows a scene and removes it for normal dialogs. */
+.dialog-card.story-dark-card { max-width: 640px; background: linear-gradient(165deg, #22313a, #151f26); color: var(--story-ink); border-color: #866d42; }
+.dialog-card.story-dark-card h2 { color: #f8e9c9; }
+.dialog-card.story-dark-card .eyebrow { color: var(--story-gold); }
+.dialog-card.story-dark-card a { color: var(--story-gold); }
+.dialog-card.story-dark-card img { background: #0d151b; }
+.dialog-card.story-dark-card .story-ending-figure img { max-height: 320px; object-fit: cover; }
+.dialog-card.story-dark-card .story-input { background: #0d151b; color: var(--story-gold); border: 1px solid var(--story-gold-deep); letter-spacing: .35em; margin: 0; }
+.dialog-card.story-dark-card select { background: #0d151b; color: var(--story-ink); border: 1px solid var(--story-gold-deep); }
+.dialog-card.story-dark-card .story-button, .dialog-card.story-dark-card .story-choice { background: #29343a; border: 1px solid var(--story-gold-deep); margin: 0; }
+.dialog-card.story-dark-card .story-button:hover, .dialog-card.story-dark-card .story-choice:hover { background: #39474e; }
+.dialog-card.story-dark-card .story-choice { padding: 12px 14px; }
+/* The journal sits in the sidebar of the main game. */
+.panel .story-journal .story-heading { font-size: .95rem; }

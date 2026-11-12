@@ -111,3 +111,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Umsetzung:** Der vorhandene spielbare Handlungsstrang, die Hinweise, Enden, Bedienelemente und die Landschaftsgalerie wurden ins Englische übersetzt. Spiellogik und gespeicherte IDs bleiben unverändert. Dateien: `web/index.html`, `web/main.js`, `web/engine.js`, `web/minigames/landscape.js` und `web/guard.test.js`.
 - **Prüfung:** `node --test`: 17 Tests bestanden. `uv run pytest -q`: 6 Tests bestanden. Im Browser wurden Titel, Missionsbeschreibung, Journal, Steuerung und ein Dialog auf Englisch geprüft. Der gesamte Spielablauf wurde nach der Übersetzung nicht manuell durchgespielt.
 - **Grenze:** Übersetzt wurde die bestehende Handlung des Prototyps; das vollständige neuere Nocturne-Konzept ist noch nicht umgesetzt.
+
+### 2026-11-12 – Nocturne-Story ins Hauptspiel eingebunden
+
+- **Beteiligte:** Florian Baumgartl (Auftrag, Absprache mit Fabian), Claude Code (Umsetzung).
+- **Umsetzung:** `web/main.js` nutzt den Story-Host aus `web/story/host.js`. `web/engine.js` enthält nur noch Karte und Bewegung; jedes Kartenobjekt sagt als Daten, welche Story-Aktion es auslöst. Die Depottür ist der Safe (Codewort `BILD`). Alte Prototyp-Story samt Tests unverändert in `web/legacy/`. Details: `docs/story/arbeitsprotokoll-florian-b.md`.
+- **Prüfung:** `node --test`: 98 Tests bestanden. `uv run pytest -q`: 6 bestanden. Im Browser komplett gespielt (siehe Story-Protokoll).
+- **Grenze:** Stationen 2–4 sind Platzhalter an vorhandenen Kartenpunkten, bis eigene Räume und Minispiele existieren.
