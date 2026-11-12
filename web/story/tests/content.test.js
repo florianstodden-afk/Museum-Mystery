@@ -153,3 +153,16 @@ test('dialogue renders every line', () => {
   assert.match(container.textContent, /office is dark/);
   assert.equal(findAll(container, node => node.className === 'story-dialogue-line').length, 2);
 });
+
+test('the chain of evidence stays hidden after a wrong answer', () => {
+  installFakeDom();
+  let s = started();
+  for (const id of ALL) s = solveStation(s, id, {}).state;
+  s = tryOpenSafe(s, 'BILD').state;
+  s = accuse(s, 'leon').state;
+  const container = createContainer();
+  renderAccusation(container, { state: s, message: 'Not Leon.' }, () => {});
+  assert.doesNotMatch(container.textContent, /CHAIN OF EVIDENCE/);
+  renderAccusation(container, { state: accuse(s, 'voss').state }, () => {});
+  assert.match(container.textContent, /CHAIN OF EVIDENCE/);
+});

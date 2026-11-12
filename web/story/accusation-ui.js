@@ -26,8 +26,8 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
 
   parts.push(el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } }));
 
-  // The chain appears once the player has answered at least once.
-  if (state.accusation.solved || state.accusation.attempts > 0) {
+  // The chain appears only after the right answer – earlier it would give the answer away.
+  if (state.accusation.solved) {
     parts.push(renderChain(evidenceChain(state)));
   }
   container.replaceChildren(el('section', { className: 'story-accusation' }, parts));

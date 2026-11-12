@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Museum Nocturne – Story Preview</title>
+  <!-- Read-only use of the main game's style (colours, fonts, blurred hall backdrop). -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../story/story.css">
+  <link rel="stylesheet" href="story-preview.css">
+</head>
+<body class="story-page">
+  <header class="story-top">
+    <div>
+      <p class="story-eyebrow">MUSEUM NOCTURNE · STORY PREVIEW</p>
+      <h1 class="story-page-title">The Night of the Forgery</h1>
+      <p class="story-muted">Developer preview of the story logic, without the walkable map.</p>
+    </div>
+    <div class="story-top-actions">
+      <button id="talk-m" class="story-button" type="button">Message from M</button>
+      <button id="new-game" class="story-button" type="button">↻ New game</button>
+    </div>
+  </header>
+
+  <p id="toast" class="story-toast" role="status" aria-live="polite"></p>
+
+  <main class="story-layout">
+    <div class="story-main">
+      <section aria-labelledby="rooms-title">
+        <h2 id="rooms-title" class="story-section-title">The museum tonight</h2>
+        <div id="rooms" class="story-rooms"></div>
+      </section>
+      <section aria-labelledby="people-title">
+        <h2 id="people-title" class="story-section-title">People in the building</h2>
+        <div id="people" class="story-people"></div>
+      </section>
+    </div>
+    <aside id="journal" class="story-panel story-journal-panel" aria-label="Investigation journal"></aside>
+  </main>
+
+  <footer class="story-footer">
+    Fictional museum and characters · Artworks: <a href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access" target="_blank" rel="noopener noreferrer">The Met, Open Access</a>
+  </footer>
+
+  <dialog id="modal" class="story-modal" aria-labelledby="modal-title">
+    <div class="story-modal-head">
+      <h2 id="modal-title" class="story-modal-title"></h2>
+      <button id="modal-close" class="story-icon-button" type="button" aria-label="Close">✕</button>
+    </div>
+    <div id="modal-body" class="story-modal-body"></div>
+    <div id="modal-actions" class="story-modal-actions"></div>
+  </dialog>
+
+  <script type="module" src="story-preview.js"></script>
+</body>
+</html>

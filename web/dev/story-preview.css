@@ -1,0 +1,70 @@
+/* Layout of the story preview page only. web/style.css is the main game's sheet and is
+   loaded read-only; here we undo its full-screen game layout so this page can scroll. */
+html, body.story-page { overflow: auto; height: auto; min-height: 100%; }
+body.story-page { color: var(--story-ink); font-family: 'DM Sans', sans-serif; }
+body.story-page > :not(dialog) { position: relative; } /* paint above the blurred hall backdrop */
+
+.story-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; max-width: 1280px; margin: 0 auto; padding: 28px 24px 8px; }
+.story-page-title { font: 700 clamp(1.8rem, 4vw, 2.8rem)/1.1 Fraunces, Georgia, serif; color: #f8e9c9; margin: 0; }
+.story-top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.story-toast { max-width: 1232px; margin: 8px auto 0; padding: 0 24px; min-height: 1.5em; color: var(--story-gold); }
+
+.story-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 22px; max-width: 1280px; margin: 0 auto; padding: 8px 24px 24px; align-items: start; }
+.story-main { display: grid; gap: 26px; }
+.story-section-title { font: 600 1.15rem Fraunces, Georgia, serif; color: #f8e9c9; margin: 0 0 12px; }
+.story-panel { background: linear-gradient(160deg, #22313aee, #19252dee); border: 1px solid var(--story-line); border-radius: 14px; padding: 18px; box-shadow: 0 14px 34px #0710186b; }
+.story-journal-panel { position: sticky; top: 16px; border-color: #866d42; }
+
+/* Room cards */
+.story-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.story-room { display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(170deg, #22313aee, #172128ee); border: 1px solid var(--story-line); border-radius: 14px; box-shadow: 0 10px 26px #0710185c; }
+.story-room.is-solved { border-color: var(--story-gold-deep); }
+.story-room.is-locked { opacity: .72; }
+.story-room-art { position: relative; height: 128px; background: #0d151b center/cover no-repeat; }
+.story-room-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, #172128); }
+.story-room-art.is-plain { background: radial-gradient(circle at 50% 20%, #3c4b4f, #121b21 70%); }
+.story-room-badge { position: absolute; z-index: 1; right: 12px; top: 12px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; font: 700 1.25rem Fraunces, Georgia, serif; background: #0d151bcc; border: 1px dashed var(--story-muted); color: var(--story-muted); }
+.story-room.is-solved .story-room-badge { background: var(--story-gold); border: 0; color: #1d2931; box-shadow: 0 0 18px #f6c56e88; }
+.story-room-body { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 16px; flex: 1; }
+.story-room-body h3 { font: 600 1.1rem Fraunces, Georgia, serif; color: #f8e9c9; margin: 0; }
+.story-room-body p { margin: 0; font-size: .88rem; line-height: 1.45; color: var(--story-muted); }
+.story-room-actions { margin-top: auto; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* People */
+.story-people { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.story-person { display: flex; align-items: center; gap: 12px; text-align: left; }
+.story-avatar { flex: 0 0 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font: 700 1rem Fraunces, Georgia, serif; background: #34434a; color: var(--story-gold); border: 1px solid var(--story-gold-deep); }
+.story-person span:last-child { display: grid; }
+.story-person small { color: var(--story-muted); font-size: .76rem; }
+
+.story-footer { max-width: 1232px; margin: 0 auto; padding: 8px 24px 32px; font-size: .8rem; color: var(--story-muted); }
+.story-footer a { color: var(--story-gold); }
+
+/* Modal (native <dialog>) */
+.story-modal { width: min(680px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 0; border: 1px solid #866d42; border-radius: 16px; background: linear-gradient(165deg, #22313a, #151f26); color: var(--story-ink); box-shadow: 0 30px 90px #000c; }
+.story-modal::backdrop { background: #071117d9; backdrop-filter: blur(3px); }
+.story-modal-head { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; background: #1b262dF2; border-bottom: 1px solid #ffffff14; }
+.story-modal-title { font: 600 1.25rem Fraunces, Georgia, serif; color: #f8e9c9; margin: 0; }
+.story-icon-button { font: inherit; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--story-line); background: #29343a; color: var(--story-ink); }
+.story-icon-button:focus-visible { outline: 3px solid var(--story-gold); outline-offset: 2px; }
+.story-modal-body { padding: 18px 20px 4px; }
+.story-modal-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 20px; }
+.story-modal-actions:empty { padding: 0 0 12px; }
+
+/* The real landscape station brings plain form elements; give them the night look. */
+.story-modal-body .station-works { margin: 12px 0; }
+.story-modal-body .station-works img { width: 100%; object-fit: contain; background: #0d151b; border-radius: 6px; }
+.story-modal-body .station-works a, .story-modal-body p a { color: var(--story-gold); }
+.story-modal-body form label { display: inline-block; margin: 12px 10px 0 0; }
+.story-modal-body select { font: inherit; color: var(--story-ink); background: #0d151b; border: 1px solid var(--story-gold-deep); border-radius: 6px; padding: 6px; }
+.story-modal-body form button { font: inherit; cursor: pointer; margin: 12px 8px 0 0; padding: 9px 13px; border-radius: 8px; border: 1px solid var(--story-gold-deep); background: #29343a; color: var(--story-ink); }
+.story-modal-body form button:disabled { opacity: .5; cursor: default; }
+
+@media (max-width: 960px) {
+  .story-layout { grid-template-columns: 1fr; }
+  .story-journal-panel { position: static; order: -1; }
+}
+@media (max-width: 520px) {
+  .story-top, .story-layout, .story-footer { padding-left: 16px; padding-right: 16px; }
+  .story-toast { padding: 0 16px; }
+}
