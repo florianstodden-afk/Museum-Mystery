@@ -1,3 +1,4 @@
+import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
 import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
@@ -16,8 +17,6 @@ export const OBJECTS = [
   { id: "frames", x: 16, y: 3, label: "Frame rack · Station D", story: { station: "archive" } },
   { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },
   { id: "note", x: 12, y: 13, label: "Transport slip · Station L", story: { station: "restoration" } },
-  { id: "monitors", x: 11, y: 15, label: "Security monitors", story: { examine: "monitor-wall" } },
-  { id: "roster", x: 12, y: 15, label: "Shift schedule", story: { examine: "shift-schedule" } },
   { id: "vault", x: 23, y: 5, label: "The original painting", story: { vault: true } },
   { id: "curator", x: 21, y: 12, label: "Dr. Vale (curator)", story: { talk: "vale" } },
 ];
@@ -41,6 +40,11 @@ export function validState(value) {
 export function restoreState(saved, doorOpen) {
   if (!validState(saved)) return { ...initialState(), doorOpen };
   const state = { player: { x: saved.player.x, y: saved.player.y }, steps: saved.steps, doorOpen };
+  if(saved.room==='security'){
+    state.room='security';
+    if(!canEnterOffice(Math.round(state.player.x),Math.round(state.player.y))) state.player={...OFFICE_START};
+    return state;
+  }
   // Someone saved inside the storage room but the safe is closed in the new story: start outside.
   if (!doorOpen && state.player.x >= VAULT_DOOR.x) state.player = { ...START };
   // New furniture/walls must not trap a position from an older save.
@@ -56,6 +60,7 @@ function objectsWithGuard(guardPosition) {
 }
 
 export function canEnter(state, x, y, guardPosition) {
+  if(state.room === 'security') return canEnterOffice(x,y);
   if (x <= 0 || y <= 0 || x >= WIDTH - 1 || y >= HEIGHT - 1) return false;
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x > 9 && x < 18 && y < 3) return false;
@@ -92,6 +97,6 @@ function interactionDistance(player, object) {
     Math.abs(object.x-player.x)+Math.abs(object.y-player.y) : Infinity;
 }
 export function nearbyObject(state, guardPosition) {
-  return objectsWithGuard(guardPosition).map(object => ({object, distance:interactionDistance(state.player,object)}))
+  return (state.room==='security' ? SECURITY_OBJECTS : objectsWithGuard(guardPosition)).map(object => ({object, distance:interactionDistance(state.player,object)}))
     .filter(item => Number.isFinite(item.distance)).sort((a,b)=>a.distance-b.distance)[0]?.object ?? null;
 }

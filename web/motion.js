@@ -1,9 +1,10 @@
+import { officePortal, canEnterOffice } from './security-room.js';
 import { GALLERY, galleryFootprintFits, galleryDoorTransition } from './gallery-layout.js';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
 export function movementDuration(from, to, viewport, room) {
-  const horizontal = room === 'hall' ? 896 / 9 : room === 'gallery' ? GALLERY.stepX : 32;
-  const vertical = room === 'hall' ? 14 : room === 'gallery' ? GALLERY.stepY : 32;
+  const horizontal = room === 'hall' ? 896 / 9 : room === 'gallery' ? GALLERY.stepX : room === 'security' ? 100 : 32;
+  const vertical = room === 'hall' ? 14 : room === 'gallery' ? GALLERY.stepY : room === 'security' ? 20 : 32;
   const dx = (to.x - from.x) * horizontal * viewport.width / 896;
   const dy = (to.y - from.y) * vertical * viewport.height / 576;
   return Math.hypot(dx, dy) / PLAYER_SPEED * 1000;
@@ -12,15 +13,21 @@ export function movementDuration(from, to, viewport, room) {
 // Move in small increments so fast frames cannot skip through a wall or person.
 export function advancePlayer(state, direction, milliseconds, viewport, guards, canEnter) {
   if (!direction || state.ending || milliseconds <= 0) return state;
-  const room=state.player.x<9?'hall':state.player.x<18?'gallery':'storage';
-  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:32)*viewport.width/896;
-  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:32)*viewport.height/576;
+  const room=state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';
+  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:room==='security'?100:32)*viewport.width/896;
+  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:room==='security'?20:32)*viewport.height/576;
   const distance=PLAYER_SPEED*milliseconds/1000;
   const dx=direction[0]*distance/sx, dy=direction[1]*distance/sy;
   const count=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/0.04));
   let x=state.player.x,y=state.player.y;
   for(let i=0;i<count;i++){
     const nx=x+dx/count, ny=y+dy/count;
+    const officeLanding=officePortal(state,{x,y},{x:nx,y:ny});
+    if(officeLanding) return {...state,...officeLanding,steps:state.steps+1};
+    if(room==='security'){
+      if(!canEnterOffice(Math.round(nx),Math.round(ny))) break;
+      x=nx;y=ny;continue;
+    }
     const landing=galleryDoorTransition({x,y},{x:nx,y:ny});
     const crossedDoor=landing.x!==nx || landing.y!==ny;
     if(crossedDoor){

@@ -7,7 +7,6 @@ export const GALLERY_OBSTACLES = [
   { left: 530, right: 657, top: 334, bottom: 390 },
   { left: 139, right: 187, top: 240, bottom: 277 }, // back-wall plant
   { left: 42, right: 105, top: 454, bottom: 520 },
-  { left: 795, right: 853, top: 454, bottom: 520 },
 ];
 export const GALLERY_CAMERAS = [{ x: 179, y: 70, phase: 0 }, { x: 718, y: 70, phase: 360 }];
 export const GALLERY_HALL_ROW = 8;

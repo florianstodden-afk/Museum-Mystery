@@ -26,3 +26,5 @@ canvas{object-fit:contain;object-position:center}
 @media(max-width:650px){.topbar{flex-wrap:wrap;gap:6px}.topbar .eyebrow{font-size:.5rem}.topbar h1{font-size:.85rem}.top-actions{gap:5px}.stage-head{bottom:12px;left:8px}}
 
 body[data-room='gallery']:before{background:radial-gradient(ellipse at 50% 45%,#29444a,#08151d 80%);filter:none}
+
+body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,#2b4042,#09151a 80%);filter:none}
