@@ -154,17 +154,22 @@ function drawHall(){
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
   const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
-  // Sandstone plaques sit above the arches; offset highlights give the lettering depth.
+  // Use the hall's own stone texture so the inscriptions belong to the masonry.
   function stonePlaque(text,x,y,width){
-    const left=x-width/2, height=21;
+    const left=x-width/2, height=19;
     ctx.save();
-    ctx.fillStyle='rgba(47,32,20,.42)';ctx.fillRect(left+2,y+3,width,height);
-    ctx.fillStyle='#b99568';ctx.fillRect(left,y,width,height);
-    ctx.strokeStyle='#d6b88a';ctx.lineWidth=1;ctx.strokeRect(left+.5,y+.5,width-1,height-1);
-    ctx.strokeStyle='rgba(104,73,45,.5)';ctx.strokeRect(left+3.5,y+3.5,width-7,height-7);
+    if(hallBackdrop.complete && hallBackdrop.naturalWidth){
+      ctx.drawImage(hallBackdrop, 500,440,100,30, left,y,width,height);
+    } else { ctx.fillStyle='#b99870';ctx.fillRect(left,y,width,height); }
+    // A translucent wash and soft bevel make the stone read as an inset block.
+    ctx.fillStyle='rgba(199,165,121,.38)';ctx.fillRect(left,y,width,height);
+    ctx.strokeStyle='rgba(105,70,40,.38)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(left,y+height-.5);ctx.lineTo(left,y+.5);ctx.lineTo(left+width,y+.5);ctx.stroke();
+    ctx.strokeStyle='rgba(244,215,170,.48)';
+    ctx.beginPath();ctx.moveTo(left+width,y);ctx.lineTo(left+width,y+height);ctx.lineTo(left,y+height);ctx.stroke();
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 12px Georgia, serif';
-    ctx.fillStyle='#f0d9ad';ctx.fillText(text,x+.5,y+height/2+1);
-    ctx.fillStyle='#60452f';ctx.fillText(text,x,y+height/2);
+    ctx.fillStyle='rgba(255,226,183,.72)';ctx.fillText(text,x+.4,y+height/2+1);
+    ctx.fillStyle='rgba(83,52,30,.88)';ctx.fillText(text,x,y+height/2);
     ctx.restore();
   }
   stonePlaque('SECURITY',176,225,100);

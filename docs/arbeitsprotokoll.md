@@ -179,3 +179,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag und Codex; menschliches Review steht aus.
 - **Umsetzung:** Die schwarzen Schilder über den beiden Saalbögen wurden durch helle Sandsteinplatten ersetzt. `web/main.js` zeichnet die Raumnamen mit Schatten- und Lichtkante als eingemeißelte Schrift auf die steinfarbenen, mittig über den Durchgängen angebrachten Platten. Raumzugänge und Bewegung bleiben unverändert.
 - **Prüfung:** Die Spielansicht wurde im Browser geprüft; alle 115 vorhandenen automatisierten Tests bestehen.
+
+### 2026-11-13 – Raumschilder in die Architektur einpassen
+
+- **Beteiligte:** Nutzerauftrag und Codex; menschliches Review steht aus.
+- **Umsetzung:** Die mittig über den Durchgängen liegenden Schilder verwenden nun eine Steintextur aus dem Saalbild, dezente eingetiefte Kanten und lesbare Schrift. Die auffälligen dunklen Rahmen wurden entfernt.
+- **Prüfung:** Die Saalansicht wurde im Browser geprüft; die vorhandenen automatisierten Tests wurden ausgeführt.
