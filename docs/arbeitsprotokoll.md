@@ -177,5 +177,5 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 ### 2026-11-13 – Raumnamen in Steinoptik
 
 - **Beteiligte:** Nutzerauftrag und Codex; menschliches Review steht aus.
-- **Umsetzung:** Die schwarzen Schilder über den beiden Saalbögen wurden durch helle Sandsteinplatten ersetzt. `web/main.js` zeichnet die Raumnamen mit Schatten- und Lichtkante als eingemeißelte Schrift auf die Platten. Raumzugänge und Bewegung bleiben unverändert.
+- **Umsetzung:** Die schwarzen Schilder über den beiden Saalbögen wurden durch helle Sandsteinplatten ersetzt. `web/main.js` zeichnet die Raumnamen mit Schatten- und Lichtkante als eingemeißelte Schrift auf die steinfarbenen, mittig über den Durchgängen angebrachten Platten. Raumzugänge und Bewegung bleiben unverändert.
 - **Prüfung:** Die Spielansicht wurde im Browser geprüft; alle 115 vorhandenen automatisierten Tests bestehen.

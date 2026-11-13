@@ -156,19 +156,19 @@ function drawHall(){
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
   // Sandstone plaques sit above the arches; offset highlights give the lettering depth.
   function stonePlaque(text,x,y,width){
-    const left=x-width/2, height=24;
+    const left=x-width/2, height=21;
     ctx.save();
     ctx.fillStyle='rgba(47,32,20,.42)';ctx.fillRect(left+2,y+3,width,height);
-    ctx.fillStyle='#c9aa7b';ctx.fillRect(left,y,width,height);
-    ctx.strokeStyle='#e4cca1';ctx.lineWidth=1;ctx.strokeRect(left+.5,y+.5,width-1,height-1);
+    ctx.fillStyle='#b99568';ctx.fillRect(left,y,width,height);
+    ctx.strokeStyle='#d6b88a';ctx.lineWidth=1;ctx.strokeRect(left+.5,y+.5,width-1,height-1);
     ctx.strokeStyle='rgba(104,73,45,.5)';ctx.strokeRect(left+3.5,y+3.5,width-7,height-7);
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 13px Georgia, serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 12px Georgia, serif';
     ctx.fillStyle='#f0d9ad';ctx.fillText(text,x+.5,y+height/2+1);
     ctx.fillStyle='#60452f';ctx.fillText(text,x,y+height/2);
     ctx.restore();
   }
-  stonePlaque('SECURITY',164,193,114);
-  stonePlaque('GALLERY',843,164,90);
+  stonePlaque('SECURITY',176,225,100);
+  stonePlaque('GALLERY',800,201,100);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
