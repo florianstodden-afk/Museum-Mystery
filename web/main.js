@@ -154,12 +154,21 @@ function drawHall(){
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
   const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
-  // The security office is next to the entrance, clearly labelled over its arch.
-  ctx.fillStyle='#342e25';ctx.fillRect(112,195,104,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(112,195,104,20);
-  ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('SECURITY',140,209);
-  // A plaque above the visible arch, rather than a label lying on the floor.
-  ctx.fillStyle='#342e25';ctx.fillRect(800,166,86,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(800,166,86,20);
-  ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('GALLERY',817,180);
+  // Sandstone plaques sit above the arches; offset highlights give the lettering depth.
+  function stonePlaque(text,x,y,width){
+    const left=x-width/2, height=24;
+    ctx.save();
+    ctx.fillStyle='rgba(47,32,20,.42)';ctx.fillRect(left+2,y+3,width,height);
+    ctx.fillStyle='#c9aa7b';ctx.fillRect(left,y,width,height);
+    ctx.strokeStyle='#e4cca1';ctx.lineWidth=1;ctx.strokeRect(left+.5,y+.5,width-1,height-1);
+    ctx.strokeStyle='rgba(104,73,45,.5)';ctx.strokeRect(left+3.5,y+3.5,width-7,height-7);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 13px Georgia, serif';
+    ctx.fillStyle='#f0d9ad';ctx.fillText(text,x+.5,y+height/2+1);
+    ctx.fillStyle='#60452f';ctx.fillText(text,x,y+height/2);
+    ctx.restore();
+  }
+  stonePlaque('SECURITY',164,193,114);
+  stonePlaque('GALLERY',843,164,90);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
