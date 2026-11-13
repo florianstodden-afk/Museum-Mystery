@@ -6,7 +6,7 @@ export const SECURITY_OBJECTS = [
   {id:'office-keys',x:7,y:1,label:'Key cabinet',story:{examine:'key-cabinet'}},
 ];
 export const OFFICE_START = {x:4.5,y:8.8};
-export const GALLERY_RETURN = {x:16.35,y:14};
+export const HALL_RETURN = {x:1.25,y:5.5};
 export function officePosition(x,y){return {x:100+(x-1)*100,y:330+(y-1)*20};}
 export function canEnterOffice(x,y){
   return x>=1 && x<=8 && y>=2 && y<=10 && !SECURITY_OBJECTS.some(o=>o.x===x&&o.y===y);
@@ -14,8 +14,8 @@ export function canEnterOffice(x,y){
 export function officePortal(state,from,to){
   if(state.room==='security'){
     if(to.y>from.y && to.y>=9.7 && to.x>=4 && to.x<=5)
-      return {room:'museum',player:{...GALLERY_RETURN}};
-  } else if(from.x>=9 && from.x<18 && to.x>from.x && to.x>=16.9 && to.y>=12.5 && to.y<=15.5){
+      return {room:'museum',player:{...HALL_RETURN}};
+  } else if(from.x<9 && to.y<from.y && to.y<=4 && to.x>=1 && to.x<=1.8){
     return {room:'security',player:{...OFFICE_START}};
   }
   return null;
@@ -24,9 +24,9 @@ export function officePortal(state,from,to){
 // Images correspond to actual museum areas; the other channels show no signal.
 export function createSecurityRenderer(){
   const image = src=>{const i=new Image();i.src=src;return i;};
-  const background=image('./assets/security-office.png');
-  const hall=image('./assets/great-hall-gallery-door.png');
-  const gallery=image('./assets/gallery-security-door.png');
+  const background=image('./assets/security-office-hall-exit.png');
+  const hall=image('./assets/great-hall-security-door.png');
+  const gallery=image('./assets/gallery-nocturne-nyc.png');
   function screen(ctx, x,y,w,h,source,crop,label, time){
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
     ctx.fillStyle='#0b151b';ctx.fillRect(x,y,w,h);
@@ -61,6 +61,6 @@ export function createSecurityRenderer(){
       const x=Math.max(25,Math.min(871-width,p.x-width/2)),y=Math.max(200,p.y-92);
       ctx.fillStyle='#101c22ee';ctx.strokeStyle='#cba868';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,width,28,5);ctx.fill();ctx.stroke();ctx.fillStyle='#f4dfae';ctx.fillText(message,x+11,y+19);
     }
-    ctx.fillStyle='#f4dfae';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText('EXIT TO GALLERY',448,555);ctx.textAlign='left';
+    ctx.fillStyle='#f4dfae';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText('EXIT TO GREAT HALL',448,555);ctx.textAlign='left';
   };
 }

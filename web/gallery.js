@@ -2,7 +2,7 @@ import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } fr
 
 // Keep the approved concept as the actual room background, not an approximation.
 export function createGalleryRenderer() {
-  const artwork = new Image(); artwork.src = './assets/gallery-security-door.png';
+  const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.png';
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
   return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion }) {
     box(ctx,0,0,896,576,'#061218');
@@ -15,10 +15,6 @@ export function createGalleryRenderer() {
       ctx.save();ctx.fillStyle=on?'#ff4141':'#591d25';ctx.shadowColor='#ff2626';ctx.shadowBlur=on?8:0;
       ctx.beginPath();ctx.arc(camera.x,camera.y,1.8,0,Math.PI*2);ctx.fill();ctx.restore();
     }
-    // The new doorway is separate from the vault, and remains easy to find.
-    ctx.fillStyle='#13252ae8';ctx.fillRect(754,363,94,18);
-    ctx.strokeStyle='#cba868';ctx.lineWidth=1;ctx.strokeRect(754,363,94,18);
-    ctx.fillStyle='#f2d9a3';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('SECURITY',801,376);ctx.textAlign='left';
     // Tiny labels sit below the actual picture frames. The art remains unobstructed.
     for(const [id,x] of [['painting',448],['frames',676]]){
       const active=target?.id===id;ctx.fillStyle=active?'#ffe5a0':'#bd985c';

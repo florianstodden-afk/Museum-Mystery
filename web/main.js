@@ -44,7 +44,7 @@ const drawSecurityRoom = createSecurityRenderer();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall-gallery-door.png';
+hallBackdrop.src = './assets/great-hall-security-door.png';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
@@ -135,14 +135,15 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
 }
 function drawHall(){
   if(hallBackdrop.complete && hallBackdrop.naturalWidth){
-    // Crop the sides to the game aspect ratio instead of stretching the room.
-    const cropWidth=hallBackdrop.naturalHeight*896/576;
-    const cropLeft=Math.min(hallBackdrop.naturalWidth-cropWidth,(hallBackdrop.naturalWidth-cropWidth)/2+65);
-    ctx.drawImage(hallBackdrop,cropLeft,0,cropWidth,hallBackdrop.naturalHeight,0,0,896,576);
+    // Show both entrances without cropping or distorting the hall.
+    const height=896*hallBackdrop.naturalHeight/hallBackdrop.naturalWidth;
+    const top=(576-height)/2;
+    ctx.fillStyle='#1b2729';ctx.fillRect(0,0,896,576);
+    ctx.drawImage(hallBackdrop,0,top,896,height);
   }
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
   // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[0,78,247,40,59],[1,365,244,88,55],[2,647,247,40,59]]) {
+  for (const [index, x, y, width, height] of [[1,405,244,88,55],[2,650,247,40,59]]) {
     const image = hallPaintings[index];
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
@@ -155,9 +156,12 @@ function drawHall(){
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
   // Brass-edged barriers mark the walkable floor; leave a gap at the gallery doorway.
   ctx.lineWidth=3;ctx.strokeStyle='rgba(89,69,42,.75)';ctx.beginPath();
-  ctx.moveTo(86,362);ctx.lineTo(86,554);ctx.moveTo(86,554);ctx.lineTo(864,554);
-  ctx.moveTo(864,422);ctx.lineTo(864,554);ctx.stroke();
+  ctx.moveTo(86,362);ctx.lineTo(86,538);ctx.moveTo(86,538);ctx.lineTo(864,538);
+  ctx.moveTo(864,422);ctx.lineTo(864,538);ctx.stroke();
   ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
+  // The security office is next to the entrance, clearly labelled over its arch.
+  ctx.fillStyle='#342e25';ctx.fillRect(112,195,104,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(112,195,104,20);
+  ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('SECURITY',140,209);
   // A plaque above the visible arch, rather than a label lying on the floor.
   ctx.fillStyle='#342e25';ctx.fillRect(800,166,86,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(800,166,86,20);
   ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('GALLERY',817,180);

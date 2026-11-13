@@ -23,7 +23,10 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
   for(let i=0;i<count;i++){
     const nx=x+dx/count, ny=y+dy/count;
     const officeLanding=officePortal(state,{x,y},{x:nx,y:ny});
-    if(officeLanding) return {...state,...officeLanding,steps:state.steps+1};
+    if(officeLanding){
+      if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
+      return {...state,...officeLanding,steps:state.steps+1};
+    }
     if(room==='security'){
       if(!canEnterOffice(Math.round(nx),Math.round(ny))) break;
       x=nx;y=ny;continue;
@@ -35,6 +38,9 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
       x=landing.x;y=landing.y;break;
     }
+    // The visible brass rail, rather than the edge of the canvas, is the hall boundary.
+    const hallScreenX=(nx+0.5)*896/9;
+    if(room==='hall' && (hallScreenX-17<86 || hallScreenX+17>864)) break;
     const cx=Math.round(nx),cy=Math.round(ny);
     if(!canEnter(state,cx,cy,guards[0])) break;
     // Use the same gallery footprint on both sides of a doorway. A centre-only
