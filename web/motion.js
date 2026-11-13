@@ -38,7 +38,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
       x=landing.x;y=landing.y;break;
     }
-    // The visible brass rail, rather than the edge of the canvas, is the hall boundary.
+    // Keep the character inside the hall floor, without drawing a guide over the artwork.
     const hallScreenX=(nx+0.5)*896/9;
     if(room==='hall' && (hallScreenX-17<86 || hallScreenX+17>864)) break;
     const cx=Math.round(nx),cy=Math.round(ny);

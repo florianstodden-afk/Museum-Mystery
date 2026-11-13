@@ -165,3 +165,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Problem:** Der zusätzliche Eingang an der Galeriewand lag optisch über dem Boden und die Figur konnte sich mit dem gemalten Bogen überschneiden. Außerdem sollte die Sicherheitszentrale räumlich am Museumseingang liegen.
 - **Umsetzung:** Der Zugang ist jetzt ein beschrifteter, bodenbündiger Bogen links in der Eingangshalle. Dort wird der Raum durch Hineingehen nach oben betreten; unten im Sicherheitsraum geht es zurück in den Saal. Die frühere Galerieillustration und ihre Seitenwand samt Pflanzenkollision sind wiederhergestellt. Der Sicherheitsraum zeigt am Ausgang einen Blick auf den Saal. Die neue Saalillustration wird vollständig und ohne verzerrte Streckung gezeigt; die begehbaren Unter- und Seitenränder halten die Figur innerhalb der sichtbaren Begrenzung. Vorhandene Sicherheitsraum-Spielstände und Hinweise bleiben erhalten. `web/assets/great-hall-security-door.png` und `web/assets/security-office-hall-exit.png` wurden anhand der bestehenden Raumillustrationen mit dem eingebauten Bildwerkzeug bearbeitet.
 - **Prüfung:** Automatische Tests prüfen die Durchgänge, die Begrenzungen, den Wachmann, die gespeicherte Position und bestehende Story-Aktionen. Im Browser wurden beide Richtungen am neuen Eingang, die sichtbaren Saalränder und der bestehende Weg zur Galerie geprüft. Ein menschlicher Gesamtdurchlauf beider Enden und echter Mobilgerätetest stehen aus.
+
+
+### 2026-11-13 – Sichtbare Laufbegrenzung in der Eingangshalle entfernen
+
+- **Beteiligte:** Nutzerauftrag und Codex; menschliches Review steht aus.
+- **Umsetzung:** `web/main.js` zeichnet die zusätzliche rechteckige Laufmarkierung nicht mehr. Die Bewegungsgrenzen bleiben bestehen, damit die Figur nicht über den Saalrand läuft. Das Bild mit seinem eigenen Marmorboden wird nicht geändert. `web/motion.js` und `web/security-room.test.js` beschreiben diese unsichtbare Grenze entsprechend.
+- **Prüfung:** Die vorhandenen Bewegungstests prüfen weiterhin die Seiten und den unteren Rand des Saals sowie die Zugänge zu Galerie und Sicherheitsraum.

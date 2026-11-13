@@ -154,11 +154,6 @@ function drawHall(){
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
   const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
-  // Brass-edged barriers mark the walkable floor; leave a gap at the gallery doorway.
-  ctx.lineWidth=3;ctx.strokeStyle='rgba(89,69,42,.75)';ctx.beginPath();
-  ctx.moveTo(86,362);ctx.lineTo(86,538);ctx.moveTo(86,538);ctx.lineTo(864,538);
-  ctx.moveTo(864,422);ctx.lineTo(864,538);ctx.stroke();
-  ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
   // The security office is next to the entrance, clearly labelled over its arch.
   ctx.fillStyle='#342e25';ctx.fillRect(112,195,104,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(112,195,104,20);
   ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('SECURITY',140,209);
