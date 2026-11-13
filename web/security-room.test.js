@@ -42,7 +42,7 @@ test('hall floor border stops movement below the visible floor',()=>{
   assert.equal(canEnter(start,3,16),false);
 });
 
-test('the full character stays inside the visible hall side rails',()=>{
+test('the full character stays inside the hall side boundaries',()=>{
   const left=advancePlayer({...initialState(),player:{x:1,y:10}},[-1,0],5000,viewport,[],canEnter);
   const right=advancePlayer({...initialState(),player:{x:7,y:10}},[1,0],5000,viewport,[],canEnter);
   assert.ok((left.player.x+.5)*896/9-17>=86);
