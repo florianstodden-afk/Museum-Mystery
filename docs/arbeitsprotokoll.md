@@ -135,3 +135,10 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzer meldete den Fehler; Codex analysierte und korrigierte ihn. Menschliches Teamreview steht aus.
 - **Ursache und Umsetzung:** Der Galerieeingang ließ beim kontinuierlichen Laufen nur eine sehr schmale Position im Saal zu. `web/engine.js` und `web/motion.js` erlauben nun den Zugang über die Breite der sichtbaren Öffnung, einschließlich der Position direkt an der Rückwand. Die Grenze in `web/main.js` wurde an die Öffnung angepasst; die übrigen Wände und die verschlossene Tresortür bleiben gesperrt.
 - **Prüfung:** `node --test` in `web`, einschließlich neuer Tests für mehrere Zugangspositionen und eine gesperrte Wandposition. Im Browser wurde aus dem Saal bis an die Rückwand und dann nach rechts in die Galerie gelaufen.
+
+### 2026-11-13 – Raumwechsel an die sichtbaren Türen legen
+
+- **Beteiligte:** Nutzerfeedback; Codex. Menschliches Teamreview steht aus.
+- **Problem und Lösung:** Beim Wechsel musste die Figur zuvor über den Rand laufen und kam am Rand der nächsten Szene an. Der Raumwechsel beginnt jetzt im sichtbaren Durchgang; die Figur erscheint im Durchgang des Zielraums. Ein kurzer Übergang blendet zwischen den Ansichten. Der Saalausschnitt zeigt mehr vom Galeriebogen, und die drei Bilder wurden an den veränderten Ausschnitt angepasst.
+- **Technik:** `web/gallery-layout.js` enthält die Eintritts- und Austrittspositionen; `web/motion.js` verwendet sie beim Laufen, ohne die Kollision mit dem Wachmann zu überspringen. `web/main.js` steuert den kurzen Übergang. Die übrigen Kollisionen, der Tresor und bestehende Spielstände bleiben erhalten.
+- **Prüfung:** Im Browser beide Richtungen durch den Bogen und die Ankunft in der Galerie geprüft; automatisierte Tests prüfen die Positionen an beiden sichtbaren Türen, die freie Galerieankunft, den alten Spielfortschritt sowie Wände und Tresor. Ein vollständiger menschlicher Durchlauf beider Enden steht aus.
