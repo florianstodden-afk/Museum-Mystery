@@ -27,7 +27,7 @@ test('walls and the closed vault door block movement',()=>{
   const s=initialState();
   assert.equal(move(at(s,8,8),1,0).player.x,8);
   assert.equal(move(at(s,17,9),1,0).player.x,17);
-  assert.equal(canEnter(s,9,9),true);
+  assert.equal(canEnter(s,9,4),true);
   assert.equal(canEnter({...s,doorOpen:true},VAULT_DOOR.x,VAULT_DOOR.y),true);
 });
 
@@ -62,7 +62,7 @@ test('all gallery objects can be reached on foot; storage only with the door ope
 });
 
 test('the nearest object is found and labelled for the player',()=>{
-  const s=at(initialState(),14,5);
+  const s=at(initialState(),14,4);
   assert.equal(nearbyObject(s).id,'painting');
   assert.match(nearbyObject(s).label,/Station B/);
   assert.equal(nearbyObject(at(initialState(),3,9)),null);
@@ -74,9 +74,9 @@ test('standing in front of the vault door is detected',()=>{
 });
 
 test('old saves keep position and steps but nothing from the old story',()=>{
-  const old={player:{x:12,y:9},clues:['ledger'],pass:true,vaultOpen:true,ending:null,steps:40};
+  const old={player:{x:13,y:10},clues:['ledger'],pass:true,vaultOpen:true,ending:null,steps:40};
   assert.equal(validState(old),true);
-  assert.deepEqual(restoreState(old,false),{player:{x:12,y:9},steps:40,doorOpen:false});
+  assert.deepEqual(restoreState(old,false),{player:{x:13,y:10},steps:40,doorOpen:false});
 });
 
 test('a save inside the locked storage room starts outside again',()=>{

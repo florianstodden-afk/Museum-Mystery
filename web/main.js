@@ -1,3 +1,4 @@
+import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
 import { createStoryHost } from './story/host.js';
@@ -9,7 +10,7 @@ const TILE = 32;
 const canvas = document.querySelector('#game');
 const ctx = canvas.getContext('2d');
 ctx.setTransform(2,0,0,2,0,0);
-function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.max(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
+function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
 const storeKey = 'museum-mystery-walk-v1';         // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
@@ -37,9 +38,11 @@ let metArtwork = null;
 const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
 });
+const drawGallery = createGalleryRenderer();
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall-nyc.png';
+hallBackdrop.src = './assets/great-hall-gallery-door.png';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
@@ -69,6 +72,7 @@ fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
 
 function save() { savePosition(); draw(); }
 function updateSidebar() {
+  document.body.dataset.room = state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
   document.querySelector('#room').textContent = state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
   const model = journalModel(story.state);
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
@@ -114,10 +118,10 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false){
     const stride=moving ? Math.sin(time/210)*5 : 0;
     ctx.strokeStyle='#263743';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,-12);ctx.lineTo(-7-stride,0);ctx.moveTo(6,-12);ctx.lineTo(7+stride,0);ctx.stroke();
     ctx.fillStyle='#263743';ctx.fillRect(-11-stride,-2,7,4);ctx.fillRect(4+stride,-2,7,4);
-    ctx.fillStyle='#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
+    ctx.fillStyle=kind==='restorer'?'#765777':'#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
     const guardArm=moving?Math.sin(time/210)*3:0;ctx.strokeStyle='#263743';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-11,-30);ctx.lineTo(-16+guardArm,-13);ctx.moveTo(11,-30);ctx.lineTo(16-guardArm,-13);ctx.stroke();
     ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(Math.sin(time/2200)*2,-40,9,10,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
+    ctx.fillStyle=kind==='restorer'?'#543d32':'#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
     if(direction!=='up'){
       const look=(direction==='left'?-3:direction==='right'?3:0)+Math.sin(time/2200);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3+look,-41,2.6,0,Math.PI*2);ctx.arc(4+look,-41,2.6,0,Math.PI*2);ctx.fill();
       ctx.fillStyle='#243038';ctx.fillRect(-3+look,-42,1.3,2.5);ctx.fillRect(4+look,-42,1.3,2.5);ctx.strokeStyle='#6c4237';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2+look,-35);ctx.lineTo(3+look,-35);ctx.stroke();
@@ -134,7 +138,7 @@ function drawHall(){
   }
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
   // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[0,118,247,40,59],[1,405,244,88,55],[2,737,247,40,59]]) {
+  for (const [index, x, y, width, height] of [[0,118,247,40,59],[1,405,244,88,55],[2,687,247,40,59]]) {
     const image = hallPaintings[index];
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
@@ -148,18 +152,24 @@ function drawHall(){
   // Brass-edged barriers mark the walkable floor; leave a gap at the gallery doorway.
   ctx.lineWidth=3;ctx.strokeStyle='rgba(89,69,42,.75)';ctx.beginPath();
   ctx.moveTo(86,362);ctx.lineTo(86,554);ctx.moveTo(86,554);ctx.lineTo(864,554);
-  ctx.moveTo(864,362);ctx.lineTo(864,430);ctx.moveTo(864,458);ctx.lineTo(864,554);ctx.stroke();
+  ctx.moveTo(864,392);ctx.lineTo(864,554);ctx.stroke();
   ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
-  // Indicate the connecting doorway, which is reached at the middle of the east wall.
-  ctx.fillStyle='rgba(39,46,44,.84)';ctx.beginPath();ctx.roundRect(770,365,118,30,6);ctx.fill();ctx.fillStyle='#f7e8c7';ctx.font='bold 14px sans-serif';ctx.fillText('GALLERY  →',782,385);
+  // A plaque above the visible arch, rather than a label lying on the floor.
+  ctx.fillStyle='#342e25';ctx.fillRect(800,166,86,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(800,166,86,20);
+  ctx.fillStyle='#f4ddb0';ctx.font='bold 10px Georgia';ctx.fillText('GALLERY',817,180);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
 function draw() {
-  const cameraX=state.player.x<9?Math.max(0,Math.min(100,(displayPlayer.x-1)/7*100)):50;
-  canvas.style.objectPosition=`${cameraX}% 100%`;
+  canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
   if(state.player.x < 9){drawHall();return;}
+  if(state.player.x < 18){
+    drawGallery(ctx, { time: animationTime, state, player: displayPlayer, objects: OBJECTS,
+      target: nearbyObject(state,currentGuard()), facing, moving: heldKeys.size > 0, drawPerson,
+      vaultNearby: atVaultDoor(state), reducedMotion: reducedMotion.matches });
+    return;
+  }
   for(let y=0;y<HEIGHT;y++) for(let x=0;x<WIDTH;x++) {
     const base=x<9?'#d1c5ad':x<18?'#7e7768':'#596b6e';
     tile(x,y,(x+y)%2===0?base:(x<9?'#c5baa3':x<18?'#797363':'#56676a'));

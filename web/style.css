@@ -18,3 +18,11 @@ html,body{width:100%;height:100%;overflow:hidden}.shell{max-width:none;width:100
 body{background:#1a252b url('assets/great-hall-nyc.png') center/cover no-repeat}canvas{object-fit:cover;background:transparent}.controls button{touch-action:none;user-select:none;-webkit-user-select:none}
 body{background:#1b2729}body:before{content:'';position:fixed;inset:-24px;background:url('assets/great-hall-nyc.png') center/cover;filter:blur(20px) brightness(.38);pointer-events:none}
 @media (pointer:coarse){.controls{display:flex}}
+
+/* Keep every room edge visible: never crop borders or exits on narrow screens. */
+canvas{object-fit:contain;object-position:center}
+.topbar>div:first-child,.plain,.stage-head{border-color:#b18e55;box-shadow:2px 3px 0 #09151b}
+.plain:hover{background:#34484b}.controls button{border-color:#b18e55}
+@media(max-width:650px){.topbar{flex-wrap:wrap;gap:6px}.topbar .eyebrow{font-size:.5rem}.topbar h1{font-size:.85rem}.top-actions{gap:5px}.stage-head{bottom:12px;left:8px}}
+
+body[data-room='gallery']:before{background:radial-gradient(ellipse at 50% 45%,#29444a,#08151d 80%);filter:none}
