@@ -57,6 +57,7 @@ let guardMotion = null;
 let guardDelay = 1200;
 let guardLastFacing = 'down';
 let lastFrame = 0;
+let roomTransition = null;
 function currentGuard(){return guardDisplay();}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
@@ -134,11 +135,12 @@ function drawHall(){
   if(hallBackdrop.complete && hallBackdrop.naturalWidth){
     // Crop the sides to the game aspect ratio instead of stretching the room.
     const cropWidth=hallBackdrop.naturalHeight*896/576;
-    ctx.drawImage(hallBackdrop,(hallBackdrop.naturalWidth-cropWidth)/2,0,cropWidth,hallBackdrop.naturalHeight,0,0,896,576);
+    const cropLeft=Math.min(hallBackdrop.naturalWidth-cropWidth,(hallBackdrop.naturalWidth-cropWidth)/2+65);
+    ctx.drawImage(hallBackdrop,cropLeft,0,cropWidth,hallBackdrop.naturalHeight,0,0,896,576);
   }
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
   // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[0,118,247,40,59],[1,405,244,88,55],[2,687,247,40,59]]) {
+  for (const [index, x, y, width, height] of [[0,78,247,40,59],[1,365,244,88,55],[2,647,247,40,59]]) {
     const image = hallPaintings[index];
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
@@ -258,7 +260,7 @@ function runStoryAction(action){
 }
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
-  state=initialState();displayPlayer={...state.player};movementAnimation=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();
   try{localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
@@ -270,7 +272,7 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
-  if(state.player.x < 9 && dialog.classList.contains('hidden')) {
+  if(!roomTransition && state.player.x < 9 && dialog.classList.contains('hidden')) {
     if(guardMotion) {
       const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
       const t=nextElapsed/guardMotion.duration;
@@ -287,14 +289,28 @@ function animate(now){
     }
   }
 
-  if(heldKeys.size && dialog.classList.contains('hidden')){
+  if(roomTransition){
+    const progress=Math.min(1,(now-roomTransition.start)/320);
+    if(progress>=0.5 && !roomTransition.switched){
+      state=roomTransition.destination;displayPlayer={...state.player};
+      roomTransition.switched=true;savePosition();
+    }
+    if(progress>=1)roomTransition=null;
+  } else if(heldKeys.size && dialog.classList.contains('hidden')){
     const direction=[...heldKeys.values()].at(-1);
     facing=direction[0]<0?'left':direction[0]>0?'right':direction[1]<0?'up':'down';
     const guards=[guardDisplay()];
     const next=advancePlayer(state,direction,delta,viewportForGame(),guards,canEnter);
-    if(next!==state){state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
+    if(next!==state){
+      if((state.player.x<9)!==(next.player.x<9)) roomTransition={start:now,destination:next,switched:false};
+      else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
+    }
   }
   draw(); // Animate NPCs even while the player is idle.
+  if(roomTransition){
+    const progress=Math.min(1,(now-roomTransition.start)/320);
+    ctx.save();ctx.fillStyle=`rgba(5,12,16,${progress<0.5?progress*2:(1-progress)*2})`;ctx.fillRect(0,0,896,576);ctx.restore();
+  }
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);

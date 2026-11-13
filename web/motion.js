@@ -21,6 +21,13 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
   let x=state.player.x,y=state.player.y;
   for(let i=0;i<count;i++){
     const nx=x+dx/count, ny=y+dy/count;
+    const landing=galleryDoorTransition({x,y},{x:nx,y:ny});
+    const crossedDoor=landing.x!==nx || landing.y!==ny;
+    if(crossedDoor){
+      // The hall guard can still block the entrance; a portal never bypasses them.
+      if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
+      x=landing.x;y=landing.y;break;
+    }
     const cx=Math.round(nx),cy=Math.round(ny);
     if(!canEnter(state,cx,cy,guards[0])) break;
     // Use the same gallery footprint on both sides of a doorway. A centre-only
@@ -30,9 +37,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(corners.some(([ox,oy])=>!canEnter(state,Math.round(nx+ox),Math.round(ny+oy),guards[0]))) break;
     }
     if(guards.some(g=>Math.abs(g.x-nx)<(room==='hall'?0.45:0.56) && Math.abs(g.y-ny)<(room==='hall'?2.4:0.56))) break;
-    if(nx>=9&&nx<18&&!galleryFootprintFits(nx,x<9?6:ny)) break;
-    const crossedDoor=(x<9&&nx>=9)||(x>=9&&x<18&&nx<9);
-    if(crossedDoor){const landing=galleryDoorTransition({x,y},{x:nx,y:ny});x=landing.x;y=landing.y;break;}
+    if(nx>=9&&nx<18&&!galleryFootprintFits(nx,ny)) break;
     x=nx;y=ny;
   }
   if(x===state.player.x && y===state.player.y)return state;

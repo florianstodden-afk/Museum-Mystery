@@ -70,7 +70,20 @@ test('enter the gallery from the full hall doorway without pixel-perfect alignme
   for(const y of [3.5,3.65,4,4.3,5,6,7,7.45]){
     const entered=walk(at(8,y),[1,0],1200);
     assert.ok(entered.player.x>9, `blocked at hall y=${y}, x=${entered.player.x}`);
-    assert.equal(entered.player.y,6);
+    assert.equal(entered.player.y,7);
   }
   assert.ok(walk(at(8,8),[1,0],1200).player.x<9);
+});
+
+test('room changes start inside the illustrated doorways in both directions',()=>{
+  const viewport={width:896,height:576};
+  const entering=advancePlayer(at(7.79,4),[1,0],16,viewport,[],canEnter);
+  assert.deepEqual(entering.player,{x:10,y:7});
+  const arrival=galleryPosition(entering.player.x,entering.player.y);
+  assert.ok(arrival.x>=78 && arrival.x<=120 && arrival.y>=320 && arrival.y<=350);
+  assert.ok(galleryFootprintFits(entering.player.x,entering.player.y));
+  const returning=advancePlayer(entering,[-1,0],16,viewport,[],canEnter);
+  assert.deepEqual(returning.player,{x:7.8,y:4});
+  const hallX=(returning.player.x+.5)*896/9;
+  assert.ok(hallX>=790 && hallX<=850);
 });

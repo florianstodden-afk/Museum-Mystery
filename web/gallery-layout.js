@@ -10,7 +10,12 @@ export const GALLERY_OBSTACLES = [
   { left: 795, right: 853, top: 454, bottom: 520 },
 ];
 export const GALLERY_CAMERAS = [{ x: 179, y: 70, phase: 0 }, { x: 718, y: 70, phase: 360 }];
-export const GALLERY_HALL_ROW = 6;
+export const GALLERY_HALL_ROW = 7;
+// Portal positions are inside the visible doorways, not at the canvas edges.
+export const HALL_DOOR_X = 7.8;
+export const GALLERY_DOOR_X = 10;
+export const HALL_DOORWAY = { minY: 3.5, maxY: 7.5 };
+export const GALLERY_DOORWAY = { minY: 5.4, maxY: 7.4 };
 export function cameraLightOn(time, phase = 0) { return ((time + phase) % 1800) < 900; }
 
 // The perspective side walls taper toward the back. Test the real artwork floor,
@@ -30,9 +35,11 @@ export function galleryWalkable(x, y) {
 export function galleryFootprintFits(x, y) {
   return [[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]].every(([dx,dy])=>galleryWalkable(x+dx,y+dy));
 }
-// The hall's row 4 meets the gallery's visible west archway at row 6.
+// Separate room coordinates place each arrival just inside its own doorway.
 export function galleryDoorTransition(from, to) {
-  if(from.x<9&&to.x>=9&&to.x<18)return {...to,y:GALLERY_HALL_ROW};
-  if(from.x>=9&&from.x<18&&to.x<9)return {...to,y:4};
+  if(from.x<9 && to.x>=HALL_DOOR_X && to.x>from.x && to.y>=HALL_DOORWAY.minY && to.y<HALL_DOORWAY.maxY)
+    return {x:GALLERY_DOOR_X,y:GALLERY_HALL_ROW};
+  if(from.x>=9 && from.x<18 && to.x<=GALLERY_DOOR_X && to.x<from.x && to.y>=GALLERY_DOORWAY.minY && to.y<=GALLERY_DOORWAY.maxY)
+    return {x:HALL_DOOR_X,y:4};
   return to;
 }
