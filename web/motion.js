@@ -25,7 +25,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
     if(!canEnter(state,cx,cy,guards[0])) break;
     // Use the same gallery footprint on both sides of a doorway. A centre-only
     // check would let shoulders/feet cross walls before the next tile is entered.
-    if(nx >= 8.5 && nx <= 18.5) {
+    if(nx >= 8.5 && nx <= 18.5 && !(room === 'hall' && ny >= 3.5 && ny < 7.5)) {
       const corners=[[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]];
       if(corners.some(([ox,oy])=>!canEnter(state,Math.round(nx+ox),Math.round(ny+oy),guards[0]))) break;
     }
