@@ -152,7 +152,7 @@ function drawHall(){
   // Brass-edged barriers mark the walkable floor; leave a gap at the gallery doorway.
   ctx.lineWidth=3;ctx.strokeStyle='rgba(89,69,42,.75)';ctx.beginPath();
   ctx.moveTo(86,362);ctx.lineTo(86,554);ctx.moveTo(86,554);ctx.lineTo(864,554);
-  ctx.moveTo(864,392);ctx.lineTo(864,554);ctx.stroke();
+  ctx.moveTo(864,422);ctx.lineTo(864,554);ctx.stroke();
   ctx.lineWidth=1;ctx.strokeStyle='rgba(255,222,139,.8)';ctx.stroke();
   // A plaque above the visible arch, rather than a label lying on the floor.
   ctx.fillStyle='#342e25';ctx.fillRect(800,166,86,20);ctx.strokeStyle='#c8a46b';ctx.lineWidth=1;ctx.strokeRect(800,166,86,20);

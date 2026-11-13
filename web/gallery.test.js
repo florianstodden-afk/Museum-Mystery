@@ -63,3 +63,14 @@ test('camera status repeats slowly through both red-light states',()=>{
   assert.equal(cameraLightOn(900),false);assert.equal(cameraLightOn(1799),false);
   assert.equal(cameraLightOn(1800),true);assert.equal(cameraLightOn(600,360),false);
 });
+
+// Approaches that actually occur when a player holds a direction, including the
+// closest point to the back wall and positions across the visible doorway.
+test('enter the gallery from the full hall doorway without pixel-perfect alignment',()=>{
+  for(const y of [3.5,3.65,4,4.3,5,6,7,7.45]){
+    const entered=walk(at(8,y),[1,0],1200);
+    assert.ok(entered.player.x>9, `blocked at hall y=${y}, x=${entered.player.x}`);
+    assert.equal(entered.player.y,6);
+  }
+  assert.ok(walk(at(8,8),[1,0],1200).player.x<9);
+});

@@ -60,7 +60,7 @@ export function canEnter(state, x, y, guardPosition) {
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x > 9 && x < 18 && y < 3) return false;
   if (x > 9 && x < 18 && !galleryWalkable(x,y)) return false;
-  if (x === 9 && (state.player.x < 9 ? y !== 4 : Math.abs(y-GALLERY_HALL_ROW)>1)) return false;
+  if (x === 9 && (state.player.x < 9 ? (y < 4 || y > 7) : Math.abs(y-GALLERY_HALL_ROW)>1)) return false;
   if (x === 18 && y !== 9) return false;
   if (x === VAULT_DOOR.x && y === VAULT_DOOR.y && !state.doorOpen) return false;
   if (objectsWithGuard(guardPosition).some(object => object.x === x && object.y === y)) return false;

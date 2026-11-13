@@ -129,3 +129,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Grenzen:** Die Bildgenerierung wurde an das vorhandene Raster angepasst; die Dekoration ist kein exakter Met-Galerieplan. Menschliches Review und ein GitHub-Merge sind erst nach tatsächlicher Ausführung nachzuweisen.
 
 - **Ergänzung auf Nutzerwunsch:** Der Blick durch den linken Galeriebogen zeigt nun die helle Eingangshalle mit Steinbögen und Marmorboden. Das Bild wurde mit dem eingebauten Bildwerkzeug anhand der vorhandenen Halle überarbeitet; Kameras, New Yorker Fenster, Möbel und Raumgrenzen bleiben an ihren bisherigen Positionen.
+
+### 2026-11-13 – Galerieeingang leichter begehbar machen
+
+- **Beteiligte:** Nutzer meldete den Fehler; Codex analysierte und korrigierte ihn. Menschliches Teamreview steht aus.
+- **Ursache und Umsetzung:** Der Galerieeingang ließ beim kontinuierlichen Laufen nur eine sehr schmale Position im Saal zu. `web/engine.js` und `web/motion.js` erlauben nun den Zugang über die Breite der sichtbaren Öffnung, einschließlich der Position direkt an der Rückwand. Die Grenze in `web/main.js` wurde an die Öffnung angepasst; die übrigen Wände und die verschlossene Tresortür bleiben gesperrt.
+- **Prüfung:** `node --test` in `web`, einschließlich neuer Tests für mehrere Zugangspositionen und eine gesperrte Wandposition. Im Browser wurde aus dem Saal bis an die Rückwand und dann nach rechts in die Galerie gelaufen.
