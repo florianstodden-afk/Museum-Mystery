@@ -1,3 +1,4 @@
+import { createSecurityRenderer } from './security-room.js';
 import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
@@ -39,6 +40,7 @@ const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
 });
 const drawGallery = createGalleryRenderer();
+const drawSecurityRoom = createSecurityRenderer();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
@@ -73,8 +75,8 @@ fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
 
 function save() { savePosition(); draw(); }
 function updateSidebar() {
-  document.body.dataset.room = state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
-  document.querySelector('#room').textContent = state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
+  document.body.dataset.room = state.room==='security' ? 'security' : state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
+  document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
   const model = journalModel(story.state);
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
   document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
@@ -165,6 +167,9 @@ function drawHall(){
 function draw() {
   canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
+  if(state.room==='security'){
+    drawSecurityRoom(ctx,{time:animationTime,player:displayPlayer,target:nearbyObject(state),facing,moving:heldKeys.size>0,drawPerson});return;
+  }
   if(state.player.x < 9){drawHall();return;}
   if(state.player.x < 18){
     drawGallery(ctx, { time: animationTime, state, player: displayPlayer, objects: OBJECTS,
@@ -272,7 +277,7 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
-  if(!roomTransition && state.player.x < 9 && dialog.classList.contains('hidden')) {
+  if(!roomTransition && state.room!=='security' && state.player.x < 9 && dialog.classList.contains('hidden')) {
     if(guardMotion) {
       const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
       const t=nextElapsed/guardMotion.duration;
@@ -302,7 +307,7 @@ function animate(now){
     const guards=[guardDisplay()];
     const next=advancePlayer(state,direction,delta,viewportForGame(),guards,canEnter);
     if(next!==state){
-      if((state.player.x<9)!==(next.player.x<9)) roomTransition={start:now,destination:next,switched:false};
+      if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9))) roomTransition={start:now,destination:next,switched:false};
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
     }
   }
