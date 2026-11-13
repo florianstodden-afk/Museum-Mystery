@@ -46,7 +46,7 @@ test('hall doorway works in both directions, vault blocks until opened',()=>{
 });
 test('gallery archway accepts a slightly off-centre approach',()=>{
   const returned=walk(at(10,6.4),[-1,0],1200);
-  assert.ok(returned.player.x<9);assert.equal(returned.player.y,4);
+  assert.ok(returned.player.x<9);assert.equal(returned.player.y,5.5);
 });
 test('back-wall artwork remains reachable, old saves in new obstacles recover safely',()=>{
   assert.equal(nearbyObject(at(14,4)).id,'painting');
@@ -70,20 +70,25 @@ test('enter the gallery from the full hall doorway without pixel-perfect alignme
   for(const y of [3.5,3.65,4,4.3,5,6,7,7.45]){
     const entered=walk(at(8,y),[1,0],1200);
     assert.ok(entered.player.x>9, `blocked at hall y=${y}, x=${entered.player.x}`);
-    assert.equal(entered.player.y,7);
+    assert.equal(entered.player.y,8.2);
   }
   assert.ok(walk(at(8,8),[1,0],1200).player.x<9);
 });
 
-test('room changes start inside the illustrated doorways in both directions',()=>{
-  const viewport={width:896,height:576};
-  const entering=advancePlayer(at(7.79,4),[1,0],16,viewport,[],canEnter);
-  assert.deepEqual(entering.player,{x:10,y:7});
+test('walking toward the hall arch enters on the gallery floor',()=>{
+  const entering=advancePlayer(at(7.45,4.1),[0,-1],16,viewport,[],canEnter);
+  assert.deepEqual(entering.player,{x:10.6,y:8.2});
   const arrival=galleryPosition(entering.player.x,entering.player.y);
-  assert.ok(arrival.x>=78 && arrival.x<=120 && arrival.y>=320 && arrival.y<=350);
+  assert.ok(arrival.x>=140 && arrival.x<=180 && arrival.y>=350 && arrival.y<=390);
   assert.ok(galleryFootprintFits(entering.player.x,entering.player.y));
-  const returning=advancePlayer(entering,[-1,0],16,viewport,[],canEnter);
-  assert.deepEqual(returning.player,{x:7.8,y:4});
-  const hallX=(returning.player.x+.5)*896/9;
-  assert.ok(hallX>=790 && hallX<=850);
+});
+test('the gallery exit returns to the hall floor with room to move',()=>{
+  const returning=advancePlayer(at(10.11,8.2),[-1,0],16,viewport,[],canEnter);
+  assert.deepEqual(returning.player,{x:7.45,y:5.5});
+  assert.ok(canEnter(returning,7,6));
+});
+test('walking toward the back wall away from the arch stays in the hall',()=>{
+  const stopped=walk(at(6,5),[0,-1],500);
+  assert.ok(stopped.player.x<9);
+  assert.ok(stopped.player.y>=3.5);
 });

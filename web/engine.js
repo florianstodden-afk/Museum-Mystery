@@ -72,7 +72,9 @@ export function move(state, dx, dy, guardPosition) {
   const x = state.player.x + dx;
   const y = state.player.y + dy;
   if (!canEnter(state, x, y, guardPosition)) return state;
-  return { ...state, player: galleryDoorTransition(state.player, { x, y }), steps: state.steps + 1 };
+  const landing=galleryDoorTransition(state.player, { x, y });
+  // Tile-by-tile navigation uses integer positions; continuous movement keeps the exact landing.
+  return { ...state, player: {x:Math.round(landing.x),y:Math.round(landing.y)}, steps: state.steps + 1 };
 }
 
 // Standing on the tile in front of the vault door (gallery side).
