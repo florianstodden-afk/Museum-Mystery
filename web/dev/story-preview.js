@@ -8,6 +8,7 @@ import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
 import * as landscapeStation from '../minigames/landscape.js';
+import * as pictureStation from '../minigames/picture-puzzle.js';
 
 // ---------- The dialog this page offers to the host ----------
 
@@ -27,12 +28,14 @@ function openPanel(title) {
 }
 
 function closePanel() {
+  story.leaveStation();
   modal.close();
 }
 
 // The page is re-rendered after every action, so the old button may be gone.
 // We look for a button with the same label, otherwise the first room button.
 modal.addEventListener('close', () => {
+  story.leaveStation();
   const buttons = [...document.querySelectorAll('main button, header button')];
   const target = buttons.find(b => b.textContent === openerLabel) ?? document.querySelector('#rooms button');
   target?.focus();
@@ -50,7 +53,7 @@ const story = createStoryHost({
     document.querySelector('#toast').textContent = message;
   },
   // Teammates replace the placeholder by adding their module here, e.g. portraits: portraitsStation.
-  stations: { landscape: landscapeStation },
+  stations: { landscape: landscapeStation, restoration: pictureStation },
   storageKey: 'museum-nocturne-story-preview-v1',
 });
 
@@ -98,7 +101,7 @@ function renderRooms(state) {
       solved: progress.solved,
       locked: !state.missionRead,
       image: artworkImageUrl(workById(station.metIds[0])),
-      actions: [button(progress.solved ? `Solved · ${progress.points} pts` : 'Enter station', () => story.openStation(station.id))],
+      actions: [button(progress.solved ? `Solved · ${station.letter}` : 'Enter station', () => story.openStation(station.id))],
     }));
   }
   const vaultText = state.ending ? 'The case is closed.'
@@ -141,3 +144,5 @@ document.querySelector('#hint').addEventListener('click', () => story.showHint()
 
 renderPage();
 story.start();
+setInterval(() => story.tick(), 250);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });

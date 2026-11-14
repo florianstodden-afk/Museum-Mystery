@@ -41,9 +41,9 @@ test('Leon changes his story after the Portrait Hall', () => {
   assert.match(dialogueFor('leon', s).lines.join(' '), /log proves it/);
 });
 
-test('Imani reacts to the Conservation Studio', () => {
+test('Imani points to the Gallery puzzle and reacts to its hidden mark', () => {
   let s = started();
-  assert.match(dialogueFor('imani', s).lines.join(' '), /paper/);
+  assert.match(dialogueFor('imani', s).lines.join(' '), /left side of the Gallery/);
   s = solveStation(s, 'restoration', {}).state;
   assert.match(dialogueFor('imani', s).lines.join(' '), /“V”/);
 });
@@ -65,7 +65,7 @@ test('journal keeps letters in their fixed slots', () => {
   const model = journalModel(s);
   assert.deepEqual(model.slots.map(slot => slot.letter), ['B', '_', 'L', '_']);
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
-  assert.equal(model.score.total, 40);
+  assert.equal(model.score.total, 100);
   assert.match(model.nextStep, /Portrait Hall, Frame Archive/);
 });
 
@@ -93,7 +93,7 @@ test('ending model has no ending before the decision', () => {
 test('ending model gives the right breakdown for both endings', () => {
   const heist = endingModel(finished('heist', { wrongWord: true, stationResult: { landscape: { mistakes: 1, hints: 1 } } }));
   assert.equal(heist.title, 'The Heist');
-  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 20, 20, 20, 5, 10]);
+  assert.deepEqual(heist.breakdown.map(row => row.deduction), [8, 0, 0, 0, 0, 5, 0]);
   assert.equal(heist.total, 87);
   assert.match(heist.image.src, /assets\/met-436535\.jpg$/);
   assert.match(heist.disclaimer, /Fictional museum and characters/);

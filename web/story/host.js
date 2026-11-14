@@ -15,7 +15,7 @@
 //   story.openStation('landscape');
 //   story.openVault();          // safe → final question → decision → ending
 import {
-  newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding,
+  newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding, recordStationProgress,
 } from './engine.js';
 import { CASE } from './case-1.js';
 import { serialize, deserialize } from './save.js';
@@ -28,23 +28,43 @@ import { endingModel, renderEnding, renderEndingChoice } from './endings.js';
 import { hintFor } from './hints.js';
 import { examine as examineOffice } from './security-office/interactions.js';
 import { el, button } from './dom.js';
+import { synchronizeScore } from './scoring.js';
+import { validPuzzle } from '../minigames/picture-rules.js';
 
 export const DEFAULT_STORAGE_KEY = 'museum-nocturne-story-v1';
 
 export function createStoryHost(options) {
   const {
     openPanel,
-    closePanel,
+    closePanel: hidePanel,
     onChange = () => {},
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
     stations = {},
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
+    now = Date.now,
   } = options;
 
   let { state, progress } = load();
+  state = synchronizeScore(state, progress, now());
+  // Recover if the page closed between saving the final placement and awarding L.
+  if (validPuzzle(progress.restoration) && progress.restoration.solved && !state.stations.restoration.solved) {
+    state = solveStation(state, 'restoration', progress.restoration).state;
+  }
+  save();
   let hintLevel = 1;          // first hint is gentle, asking again gives a concrete one
   let hintStep = null;        // resets the level when the story moves on
+  let stationCleanup = null;
+
+  function leaveStation() {
+    stationCleanup?.();
+    stationCleanup = null;
+  }
+
+  function closePanel() {
+    leaveStation();
+    hidePanel();
+  }
 
   // ---------- Saving ----------
 
@@ -69,16 +89,25 @@ export function createStoryHost(options) {
 
   // Every engine action goes through here: keep the new state, save, tell the page.
   function act(result) {
-    state = result.state;
+    state = synchronizeScore(result.state, progress, now());
     save();
     onChange(state, result.message);
-    return result;
+    return { ...result, state };
+  }
+
+  // Both pages call this while open and when returning from the background.
+  // Only a new tier causes a save and a visible score update.
+  function tick() {
+    const next = synchronizeScore(state, progress, now());
+    if (next === state) return;
+    state = next; save(); onChange(state, 'Puzzle time deduction updated.');
   }
 
   // ---------- Panel helpers ----------
 
   // Opens the page's panel with a content area and a row of buttons below it.
   function scene(title) {
+    leaveStation();
     const container = openPanel(title);
     const content = el('div', { className: 'story-scene' });
     const actions = el('div', { className: 'story-actions' });
@@ -123,6 +152,7 @@ export function createStoryHost(options) {
   }
 
   function openStation(stationId) {
+    tick();
     const station = CASE.stations.find(s => s.id === stationId);
     if (!station) return;
     const { content, actions } = scene(`${station.room} · Station ${station.letter}`);
@@ -131,12 +161,19 @@ export function createStoryHost(options) {
       content.append(el('p', { className: 'story-text', text: 'Read the message from M first.' }));
       return;
     }
-    runStation(stations[stationId] ?? placeholderStation, content, {
+    if (state.stations[stationId].solved) {
+      content.append(el('p', { className: 'story-feedback', text: `Already solved · Letter ${station.letter}. ${station.evidence}` }));
+      return;
+    }
+    stationCleanup = runStation(stations[stationId] ?? placeholderStation, content, {
       stationId,
+      caseData: { now, getPuzzleDeduction: () => state.penalties.picture },
       savedProgress: progress[stationId] ?? null,
       onProgress(next) {
         progress = { ...progress, [stationId]: next };
+        state = synchronizeScore(recordStationProgress(state, stationId, next), progress, now());
         save();
+        onChange(state, 'Station progress saved.');
       },
       onSolved(result) {
         const outcome = act(solveStation(state, stationId, result));
@@ -222,6 +259,7 @@ export function createStoryHost(options) {
   }
 
   function reset() {
+    leaveStation();
     state = newGame();
     progress = {};
     hintStep = null;
@@ -234,6 +272,8 @@ export function createStoryHost(options) {
   // What the page can call.
   return {
     get state() { return state; },
+    leaveStation,
+    tick,
     start() { if (!state.missionRead) showMission(); },
     showMission,
     talkTo,

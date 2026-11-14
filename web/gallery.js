@@ -16,16 +16,20 @@ export function createGalleryRenderer() {
       ctx.beginPath();ctx.arc(camera.x,camera.y,1.8,0,Math.PI*2);ctx.fill();ctx.restore();
     }
     // Tiny labels sit below the actual picture frames. The art remains unobstructed.
-    for(const [id,x] of [['painting',448],['frames',676]]){
+    for(const [id,x] of [['note',296],['painting',448],['frames',676]]){
       const active=target?.id===id;ctx.fillStyle=active?'#ffe5a0':'#bd985c';
       ctx.fillRect(x-13,199,26,5);
       if(active){ctx.beginPath();ctx.moveTo(x,207);ctx.lineTo(x+4,211);ctx.lineTo(x,215);ctx.lineTo(x-4,211);ctx.fill();}
+      if(id==='note'){
+        ctx.fillStyle='#182a32';ctx.fillRect(x-38,177,76,19);
+        ctx.fillStyle='#f3dca4';ctx.font='bold 11px sans-serif';ctx.fillText('L · PUZZLE',x-31,190);
+      }
     }
     if(state.doorOpen){
       ctx.save();ctx.fillStyle='#07141bde';ctx.beginPath();ctx.moveTo(778,251);ctx.lineTo(819,272);ctx.lineTo(819,352);ctx.lineTo(778,322);ctx.closePath();ctx.fill();
       ctx.fillStyle='#c4db9a';ctx.beginPath();ctx.arc(772,305,2,0,Math.PI*2);ctx.fill();ctx.restore();
     }
-    const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
+    const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
     ctx.save();ctx.beginPath();ctx.rect(20,150,856,400);ctx.clip();
     for(const item of items){const p=galleryPosition(item.x,item.y);
       if(item.id==='player'){drawPerson(p.x,p.y,'rick',facing,time,moving);continue;}

@@ -36,7 +36,7 @@ test('the first hint points to M’s message', () => {
 test('station hints name the open rooms and become concrete on level 2', () => {
   let s = readMission(newGame()).state;
   s = solveStation(s, 'landscape', {}).state;
-  assert.match(hintFor(s, 1).text, /Portrait Hall, Conservation Studio, Frame Archive/);
+  assert.match(hintFor(s, 1).text, /Portrait Hall, Gallery Picture Puzzle, Frame Archive/);
   assert.match(hintFor(s, 2).text, /shift schedule/);
   s = addNote(s, 'duty-roster').state;
   assert.match(hintFor(s, 2).text, /Portrait Hall: Read the night-shift log/);
@@ -63,5 +63,5 @@ test('asking for a hint never changes state or score', () => {
   const before = structuredClone(s);
   hintFor(s, 2);
   assert.deepEqual(s, before);
-  assert.equal(totalScore(s), 80);
+  assert.equal(totalScore(s), 100);
 });

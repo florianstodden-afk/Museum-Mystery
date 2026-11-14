@@ -17,22 +17,28 @@ export function openStation(stationModule, container, options) {
 
   let progress = savedProgress;
   let finished = false;
+  let active = true;
 
   const stationCaseData = {
     ...caseData,
     stationId,
     state: savedProgress ?? undefined,   // landscape.js reads its saved progress from here
     onChange(next) {                      // landscape.js reports every change here
+      if (!active) return;
       progress = next;
       if (onProgress) onProgress(next);
     },
   };
 
-  stationModule.start(container, stationCaseData, report => {
-    if (finished) return;                 // a station may only finish once
+  const cleanup = stationModule.start(container, stationCaseData, report => {
+    if (!active || finished) return;      // a station may only finish once
     finished = true;
     onSolved(toEngineResult(report, progress));
   });
+  return () => {
+    active = false;
+    if (typeof cleanup === 'function') cleanup();
+  };
 }
 
 // Picks mistakes and hints from the report; falls back to the last progress; otherwise 0.

@@ -30,7 +30,7 @@ export const CASE = deepFreeze({
     text:
       'Tonight the Museum Nocturne is yours. Somewhere inside, a safe holds Van Gogh’s ' +
       '“Wheat Field with Cypresses”. Bring it to me before sunrise. The curator left four ' +
-      'clues behind – one in each wing. Follow them, and the safe will open. – M',
+      'clues behind – at four stations. Follow them, and the safe will open. – M',
   },
 
   stations: [
@@ -56,13 +56,13 @@ export const CASE = deepFreeze({
     },
     {
       id: 'restoration',
-      room: 'Conservation Studio',
+      room: 'Gallery Picture Puzzle',
       letter: 'L',
       evidenceId: 'hidden-mark',
       evidence: 'Hidden mark “V” on the fake transport slip.',
       pointsToVoss: 'Someone marked the fake slip with a hidden “V” to recognise their own paperwork.',
-      task: 'With Imani’s material notes, test the transport slip under the lamp and reveal what is hidden on it.',
-      metIds: [435882],
+      task: 'In the Gallery, find Station L to the left of the wall label (B) and frame rack (D). Restore Renoir’s eight-piece picture to reveal the hidden mark on the transport slip.',
+      metIds: [459111],
     },
     {
       id: 'archive',
@@ -160,11 +160,11 @@ export const CASE = deepFreeze({
       checked: '2026-11-10',
     },
     {
-      id: 435882, shortTitle: 'Still Life with Apples and a Pot of Primroses', title: 'Still Life with Apples and a Pot of Primroses',
-      artist: 'Paul Cézanne', date: 'ca. 1890', medium: 'Oil on canvas',
-      url: 'https://www.metmuseum.org/art/collection/search/435882',
-      image: 'https://images.metmuseum.org/CRDImages/ep/web-large/DT47.jpg',
-      checked: '2026-11-10',
+      id: 459111, shortTitle: 'Sea and Cliffs', title: 'Sea and Cliffs',
+      artist: 'Auguste Renoir', date: 'ca. 1885', medium: 'Oil on canvas',
+      url: 'https://www.metmuseum.org/art/collection/search/459111',
+      image: 'https://images.metmuseum.org/CRDImages/rl/web-large/DT3130.jpg',
+      checked: '2026-11-14',
     },
   ],
 });

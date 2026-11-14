@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createStoryHost, memoryStorage } from '../host.js';
 import { installFakeDom, createContainer, findAll, findButton } from './fake-dom.js';
+import { initialPuzzle, startPuzzle, placePiece } from '../../minigames/picture-rules.js';
+import { totalScore } from '../scoring.js';
+import { newGame, readMission, solveStation } from '../engine.js';
 
 // A fake page: one panel element, a log of what happened.
 function fakePage(storage = memoryStorage()) {
@@ -161,4 +164,85 @@ test('new game asks first and then resets everything', () => {
   assert.equal(host2.state.missionRead, false);
   assert.equal(pageReset, true, 'the page can reset its own state');
   assert.equal(page.title, 'A message from M');
+});
+
+test('a completed Station L stays completed and is never started again', () => {
+  const page = fakePage();
+  const host = createStoryHost({ ...page.options });
+  host.start(); click(page, 'Accept the mission');
+  host.openStation('restoration'); click(page, 'Solve station (placeholder)');
+  let starts = 0;
+  const restored = createStoryHost({ ...page.options, stations: { restoration: { start() { starts++; } } } });
+  restored.openStation('restoration');
+  assert.equal(starts, 0);
+  assert.match(page.panel.textContent, /hidden|Hidden/);
+  assert.deepEqual(restored.state.evidence, ['hidden-mark']);
+  assert.equal(restored.state.letters[2], 'L');
+});
+
+test('station cleanup runs on leaving and old callbacks cannot overwrite a new attempt', () => {
+  const page = fakePage();
+  let report, cleaned = 0;
+  const station = { start(container, data, solved) { report = () => { data.onChange({ mistakes: 10, hints: 1 }); solved({ mistakes: 10, hints: 1 }); }; return () => cleaned++; } };
+  const host = createStoryHost({ ...page.options, stations: { restoration: station } });
+  host.start(); click(page, 'Accept the mission'); host.openStation('restoration');
+  host.leaveStation(); report();
+  assert.equal(cleaned, 1);
+  assert.equal(host.state.stations.restoration.solved, false);
+});
+
+test('puzzle order, placements and wall clock survive closing and a fresh host', () => {
+  const page = fakePage();
+  let now = 1000, data, finish;
+  const station = { start(container, supplied, solved) { data = supplied; finish = solved; } };
+  const options = { ...page.options, now: () => now, stations: { restoration: station } };
+  const host = createStoryHost(options);
+  host.start(); click(page, 'Accept the mission'); host.openStation('restoration');
+  let puzzle = placePiece(startPuzzle(initialPuzzle(),now),3,6,now);
+  data.onChange(puzzle);
+  host.leaveStation();
+  now = 31001; host.tick();
+  assert.equal(totalScore(host.state),95);
+  now = 46001;
+  const again = createStoryHost(options);
+  assert.equal(totalScore(again.state),90,'time away is included before the station opens');
+  again.openStation('restoration');
+  assert.deepEqual(data.state,puzzle);
+  puzzle = placePiece(puzzle,3,null,now);
+  for (let i=0;i<8;i++) puzzle=placePiece(puzzle,i,i,now);
+  data.onChange(puzzle); finish({ mistakes: 0, hints: 0 }); finish({ mistakes: 10, hints: 1 });
+  now = 999999; again.tick();
+  assert.equal(totalScore(again.state),90,'the final placement freezes the time tier');
+  assert.deepEqual(again.state.evidence,['hidden-mark']);
+  assert.equal(again.state.letters[2],'L');
+  again.openStation('restoration');
+  assert.match(page.panel.textContent,/Already solved/);
+  again.reset();
+  assert.equal(totalScore(again.state),100);
+  assert.deepEqual(JSON.parse(page.storage.getItem('test-key')).progress,{});
+});
+
+test('old in-progress deductions migrate and a completed legacy L is not timed', () => {
+  const page = fakePage();
+  const old = solveStation(readMission(newGame()).state,'restoration',{ mistakes:1,hints:1 }).state;
+  delete old.penalties;
+  page.storage.setItem('test-key',JSON.stringify({ story:JSON.stringify(old), progress:{ landscape:{ mistakes:2,hints:1,solved:false }, restoration:{ solved:true,mistakes:1,hints:1 } } }));
+  const host=createStoryHost({...page.options,now:()=>99999999});
+  assert.equal(totalScore(host.state),81);
+  host.tick(); host.openStation('restoration');
+  assert.equal(totalScore(host.state),81);
+  assert.equal(host.state.penalties.picture,0);
+  assert.deepEqual(host.state.evidence,['hidden-mark']);
+});
+
+test('a saved final placement recovers completion once after interruption', () => {
+  const page=fakePage();
+  let puzzle=startPuzzle(initialPuzzle(),1000);
+  for(let i=0;i<8;i++) puzzle=placePiece(puzzle,i,i,31001);
+  page.storage.setItem('test-key',JSON.stringify({story:JSON.stringify(readMission(newGame()).state),progress:{restoration:puzzle}}));
+  for(let i=0;i<2;i++) {
+    const host=createStoryHost({...page.options,now:()=>999999});
+    assert.deepEqual(host.state.evidence,['hidden-mark']);
+    assert.equal(totalScore(host.state),95);
+  }
 });

@@ -2,6 +2,7 @@ import { createSecurityRenderer } from './security-room.js';
 import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
+import * as pictureStation from './minigames/picture-puzzle.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
 import { movementDuration, advancePlayer } from './motion.js';
@@ -13,6 +14,7 @@ const ctx = canvas.getContext('2d');
 ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
+let dialogOpener = null;
 const storeKey = 'museum-mystery-walk-v1';         // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
@@ -26,7 +28,7 @@ const story = createStoryHost({
   closePanel: closeDialog,
   onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
   onReset: resetWorld,
-  stations: { landscape: landscapeStation }, // stations 2–4: add teammates' modules here
+  stations: { landscape: landscapeStation, restoration: pictureStation },
   storageKey: 'museum-nocturne-story-v1',
 });
 
@@ -248,6 +250,7 @@ function draw() {
 }
 
 function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog}]){
+  if(dialog.classList.contains('hidden')) dialogOpener = document.activeElement;
   stopMovement();
   document.querySelector('.dialog-card').classList.remove('story-dark-card');
   document.querySelector('#dialog-title').textContent=title;
@@ -256,8 +259,17 @@ function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog
   const actions=document.querySelector('#dialog-actions');actions.replaceChildren();
   for(const option of options){const b=document.createElement('button');b.textContent=option.label;if(option.secondary)b.className='secondary';b.addEventListener('click',option.action);actions.append(b);}
   dialog.classList.remove('hidden');
+  document.querySelector('.shell').inert = true;
+  // The host adds its content synchronously after showDialog returns.
+  queueMicrotask(() => (dialog.querySelector('button:not(:disabled), input, select, a[href]') ?? document.querySelector('.dialog-card')).focus());
 }
-function closeDialog(){dialog.classList.add('hidden');}
+function closeDialog(){
+  story.leaveStation();
+  dialog.classList.add('hidden');
+  document.querySelector('.shell').inert = false;
+  const target = dialogOpener?.isConnected && dialogOpener !== document.body ? dialogOpener : canvas;
+  target.focus();
+}
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
   if(atVaultDoor(state)){
@@ -334,6 +346,13 @@ function animate(now){
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
   if (!dialog.classList.contains('hidden')) {
+    if(event.key === 'Tab') {
+      const focusable = [...dialog.querySelectorAll('button:not(:disabled), a[href], input, select, [tabindex="0"]')].filter(node => node.getClientRects().length);
+      const first = focusable[0], last = focusable.at(-1);
+      if (!first) { event.preventDefault(); return; }
+      if(event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+      else if(!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+    }
     const editing = event.target instanceof HTMLElement &&
       (event.target.matches('textarea, input:not([inputmode="numeric"]):not([type="number"])') || event.target.isContentEditable);
     if (event.key === 'Escape' || (!editing && !event.repeat && event.key.toLowerCase() === 'e')) {
@@ -363,3 +382,5 @@ document.querySelector('#hint').addEventListener('click',()=>story.showHint());
 document.querySelector('#mission').addEventListener('click',()=>story.showMission());
 save();
 story.start(); // M's message on the very first visit
+setInterval(() => story.tick(), 250);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });

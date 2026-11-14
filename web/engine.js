@@ -16,7 +16,7 @@ export const OBJECTS = [
   { id: "painting", x: 14, y: 3, label: "Wall label · Station B", story: { station: "landscape" } },
   { id: "frames", x: 16, y: 3, label: "Frame rack · Station D", story: { station: "archive" } },
   { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },
-  { id: "note", x: 12, y: 13, label: "Transport slip · Station L", story: { station: "restoration" } },
+  { id: "note", x: 12, y: 3, label: "Picture puzzle · Station L", story: { station: "restoration" } },
   { id: "vault", x: 23, y: 5, label: "The original painting", story: { vault: true } },
   { id: "curator", x: 21, y: 12, label: "Dr. Vale (curator)", story: { talk: "vale" } },
 ];
