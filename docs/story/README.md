@@ -1,6 +1,6 @@
 # Story-Logik „Museum Nocturne“ (`web/story/`)
 
-Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nicht** von der Karte ab und ändern keine bestehende Datei. Wie sie ins Hauptspiel kommen: [integration-plan.md](integration-plan.md).
+Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nicht** von der Karte ab. Seit dem 12.11.2026 sind sie im Hauptspiel eingebunden (`web/main.js` nutzt `createStoryHost`); wie das gemacht wurde: [integration-plan.md](integration-plan.md).
 
 ## Dateien
 
@@ -14,33 +14,42 @@ Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nich
 | `web/story/save.js` | `serialize` / `deserialize` mit Prüfung (kaputt, alte Version, unmögliche Zustände → `null`). |
 | `web/story/stations.js` | Adapter `openStation`: hängt jede Station gleich an, übersetzt die Rückmeldung in `{ mistakes, hints }`. |
 | `web/story/hints.js` | `hintFor(state, level)`: Hinweis passend zum Fortschritt (kostet keine Punkte, nach zwei Fehlversuchen konkret). |
-| `web/story/security-office/interactions.js` | Interaktionspunkte des Security Office und `examine(state, id)`. |
+| `web/story/security-office/interactions.js` | Texte und Notizen der Objekte im Sicherheitsraum, `examine(state, id)`. Wird von Fabians Raum im Spiel benutzt. |
 
 **Oberfläche (rendern in jeden Container)**
 
 | Datei | Inhalt |
 |---|---|
-| `web/story/host.js` | `createStoryHost(...)`: verbindet die Story mit jeder Seite (Speichern, Stationen, Gespräche, Safe bis Abspann, Hinweise). Die Vorschau benutzt ihn; das Hauptspiel soll ihn auch benutzen. |
+| `web/story/host.js` | `createStoryHost(...)`: verbindet die Story mit jeder Seite (Speichern, Stationen, Gespräche, Safe bis Abspann, Hinweise). Hauptspiel und Vorschau benutzen ihn. |
 | `web/story/dom.js` | Kleine Helfer `el()` und `button()`, Bild-URL der Met-Werke. |
-| `web/story/placeholder-station.js` | Platzhalter für noch nicht gebaute Stationen. |
+| `web/story/placeholder-station.js` | Platzhalter für noch nicht gebaute Stationen (zurzeit L und D). |
 | `web/story/dialogues.js` | `dialogueFor(characterId, state)` und `renderDialogue`. |
 | `web/story/journal.js` | `journalModel`, `renderJournal`, `evidenceChain`. |
 | `web/story/safe-ui.js` | Codewort-Eingabe für den Safe. |
 | `web/story/accusation-ui.js` | Schlussfrage mit drei Antworten und Beweiskette. |
 | `web/story/endings.js` | Entscheidung und Abspann der beiden Enden mit Punkte-Aufschlüsselung. |
 | `web/story/story.css` | Stil aller Bausteine (nur Klassen mit Präfix `story-`). |
-| `web/story/security-office/security-office.js` | Zeichnet das Security Office auf ein Canvas. |
+| `web/story/security-office/security-office.js` | **Prototyp:** zeichnet ein Security Office per Code. Im Spiel nicht benutzt, nur in der Vorschau (siehe [security-office.md](security-office.md)). |
+
+**Stationen (Minispiele, in `web/minigames/`)**
+
+| Station | Dateien | Stand |
+|---|---|---|
+| B · Landscape Gallery | `landscape.js` | fertig (Fabian) |
+| I · Portrait Hall | `portrait-rules.js`, `portrait-artwork.js`, `portrait-timeline.js`, `portrait-timeline.css`, `portrait-timeline.test.js` | fertig (Florian B.) |
+| L · Restoration | Leopolds Branch `feature/renoir-picture-puzzle` | noch nicht gemergt |
+| D · Frame Archive | – | Platzhalter |
 
 **Vorschau-Seiten (nur zum Ausprobieren)**
 
 | Datei | Inhalt |
 |---|---|
 | `web/dev/story.html` + `story-preview.js` + `story-preview.css` | Ganze Story spielbar, ohne Karte. |
-| `web/dev/security-office.html` + `security-office-preview.js` | Security Office mit Beispiel-Kameras. |
+| `web/dev/security-office.html` + `security-office-preview.js` | Prototyp-Zeichnung des Security Office mit Beispiel-Kameras. |
 
 **Tests:** `web/story/tests/*.test.js` (`fake-dom.js` ist ein Test-Helfer, kein Test).
 
-**Doku:** [minigame-contract.md](minigame-contract.md) (für Stationen 2–4), [security-office.md](security-office.md) (für Fabian), [integration-plan.md](integration-plan.md), [story-check.md](story-check.md), [arbeitsprotokoll-florian-b.md](arbeitsprotokoll-florian-b.md), Screenshots in `screenshots/`.
+**Doku:** [minigame-contract.md](minigame-contract.md) (Vertrag für Stationen), [security-office.md](security-office.md) (was vom Security Office im Spiel steckt), [integration-plan.md](integration-plan.md), [story-check.md](story-check.md), [arbeitsprotokoll-florian-b.md](arbeitsprotokoll-florian-b.md), Screenshots in `screenshots/`.
 
 ## Vorschau starten
 

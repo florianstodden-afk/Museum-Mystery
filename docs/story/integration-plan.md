@@ -1,5 +1,7 @@
 # Integrationsplan: Story-Engine ins Hauptspiel
 
+> **Stand 15.11.2026:** Integration ist auf `main` (PR #6). Seitdem hat Fabian einen begehbaren Sicherheitsraum und neue Positionen auf der Karte ergänzt; Station I ist als echtes Minispiel fertig (Branch `feature/portrait-timeline`). Die Kartenobjekte und ihre Story-Aktionen stehen in `web/engine.js` (Feld `story`). Der Plan unten ist das Protokoll, wie die Integration gemacht wurde.
+>
 > **Status 12.11.2026: umgesetzt** auf Branch `feature/story-integration` (nach Absprache mit Fabian), über den „Kurzen Weg“ mit `host.js`. Abweichungen vom Plan: Die Kartenobjekte tragen ihre Story-Aktion als Daten (`story`-Feld in `web/engine.js`), statt einer Tabelle in `main.js`. Die Depottür ist der Safe. Stationen 2–4 liegen vorerst an vorhandenen Kartenpunkten (Night-shift log in der Great Hall, Transport slip und neues Frame rack in der Galerie). Details im Arbeitsprotokoll.
 
 **Stand:** 12.11.2026, Branch `feature/story-logic`. **Wer:** Florian B. mit Fabian, **nach** Fabians Merge von Grafik und Räumen.
