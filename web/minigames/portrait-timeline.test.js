@@ -5,6 +5,8 @@ import {
   checkOrder, useHint, isSolved, logEntries,
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortrait, loadPortraits, verifiedImageUrl } from './portrait-artwork.js';
+import { start } from './portrait-timeline.js';
+import { installFakeDom, createContainer, findAll, findButton } from '../story/tests/fake-dom.js';
 
 const DEGAS = 436121;
 const SARGENT = 12127;
@@ -150,4 +152,87 @@ test('every portrait has a bundled offline copy and the loader returns all three
   const all = await loadPortraits({ fetchData: async () => { throw new Error('offline'); }, readImage: readAny });
   assert.deepEqual(all.map(item => item.id), PORTRAIT_IDS);
   assert.equal(all.every(item => item.offline), true);
+});
+
+// ---------- Station UI (small fake DOM, no browser) ----------
+
+function openStation(savedState) {
+  installFakeDom();
+  const container = createContainer();
+  const saved = [];
+  const solvedReports = [];
+  const cleanup = start(container, {
+    state: savedState,
+    onChange: state => saved.push(structuredClone(state)),
+    loadPortraits: async () => PORTRAIT_IDS.map(id => ({ id, src: `local-${id}.jpg`, offline: true })),
+  }, report => solvedReports.push(report));
+  const faces = () => findAll(container, node => node.className === 'portrait-face');
+  const faceFor = id => faces().find(face => face.getAttribute('aria-label').startsWith(PORTRAIT_ARTWORKS.find(a => a.id === id).artist));
+  return { container, saved, solvedReports, cleanup, faces, faceFor, last: () => saved[saved.length - 1] };
+}
+
+test('the station reports onSolved exactly once with mistakes and hints only', () => {
+  const station = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  findButton(station.container, 'Check order').click();
+  assert.match(station.container.textContent, /Not quite\. Check the catalogue dates again/);
+  assert.equal(station.last().mistakes, 1);
+  findButton(station.container, 'Hint').click();
+  assert.match(station.container.textContent, /Degas’s “A Woman Seated beside a Vase of Flowers” is the oldest/);
+  station.faceFor(SARGENT).click();   // pick up Sargent
+  station.faceFor(DEGAS).click();     // swap with Degas
+  assert.deepEqual(station.last().order, RIGHT);
+  findButton(station.container, 'Check order').click();
+  findButton(station.container, 'Check order').click(); // disabled after solving: no second report
+  assert.deepEqual(station.solvedReports, [{ mistakes: 1, hints: 1 }]);
+  assert.match(station.container.textContent, /Booked as: patron visit – A\. V\./);
+  assert.match(station.container.textContent, /The log clears Leon/);
+  station.cleanup();
+});
+
+test('keyboard: Enter picks a card up and the arrow keys move it', () => {
+  const station = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
+  station.faceFor(DEGAS).click(); // Enter/Space on a button triggers click
+  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' });
+  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' });
+  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
+  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' }); // already first: nothing happens
+  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
+  station.faceFor(DEGAS).click(); // put it down
+  station.faceFor(SARGENT).dispatch('keydown', { key: 'ArrowLeft' }); // not picked up: no move
+  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
+});
+
+test('dragging a card onto another place moves it there', () => {
+  const station = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
+  const cardsList = () => findAll(station.container, node => node.tagName === 'LI' && node.className.startsWith('portrait-card'));
+  cardsList()[2].dispatch('dragstart', { dataTransfer: { setData() {} } }); // Degas
+  cardsList()[0].dispatch('drop');
+  assert.deepEqual(station.last().order, [DEGAS, SARGENT, CEZANNE]);
+});
+
+test('progress survives closing and reopening the station', () => {
+  const first = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
+  findButton(first.container, 'Check order').click();
+  findButton(first.container, 'Hint').click();
+  first.cleanup();
+  const again = openStation(first.last());
+  assert.match(again.container.textContent, /Incorrect attempts: 1 · Hints: 1/);
+  assert.deepEqual(again.last().order, [CEZANNE, SARGENT, DEGAS]);
+  assert.equal(again.solvedReports.length, 0);
+});
+
+test('a broken saved state starts a fresh shuffle; an already solved one shows the log', () => {
+  const fresh = openStation({ order: [1, 2, 3], solved: true });
+  assert.equal(validTimeline(fresh.last()), true);
+  assert.equal(fresh.last().solved, false);
+  const done = openStation(timeline(RIGHT, { solved: true, mistakes: 2 }));
+  assert.match(done.container.textContent, /NIGHT-SHIFT LOG/);
+  assert.deepEqual(done.solvedReports, [{ mistakes: 2, hints: 0 }]);
+});
+
+test('years are hidden on the cards until a catalogue entry is opened', () => {
+  const station = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
+  assert.doesNotMatch(station.container.textContent, /1865|1883|1888/);
+  findButton(station.container, 'Catalogue entry').click();
+  assert.match(station.container.textContent, /Date: 1888–90/);
 });
