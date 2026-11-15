@@ -185,3 +185,25 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 - **Beteiligte:** Nutzerauftrag und Codex; menschliches Review steht aus.
 - **Umsetzung:** Die mittig über den Durchgängen liegenden Schilder verwenden nun eine Steintextur aus dem Saalbild, dezente eingetiefte Kanten und lesbare Schrift. Die auffälligen dunklen Rahmen wurden entfernt.
 - **Prüfung:** Die Saalansicht wurde im Browser geprüft; die vorhandenen automatisierten Tests wurden ausgeführt.
+
+### 2026-11-15 – Station I: Porträt-Zeitleiste (Branch `feature/portrait-timeline`)
+
+- **Beteiligte:** Florian Baumgartl (Auftrag, Konzept-Vorgaben), Claude Code (Umsetzung). Qualitätsmaßstab: Leopolds Station L (Branch `feature/renoir-picture-puzzle`, nur gelesen, nicht gemergt).
+- **Ziel:** Station I aus dem Team-Konzept bauen: drei echte Porträts der Met vom ältesten zum jüngsten Werk ordnen; bei richtiger Folge drehen sich die Karten um und ergeben das Nachtschichtprotokoll („Leon was elsewhere; booked as patron visit – A. V.“).
+- **Entscheidungen:**
+  - Drei Dateien wie Station L: `web/minigames/portrait-rules.js` (reine Regeln), `portrait-artwork.js` (Met-API mit Zeitlimit und Prüfung von ID, Gemeinfreiheit, Titel, Künstler und Bild-Host; sonst lokale Kopie), `portrait-timeline.js` (Oberfläche, Vertrag `start(container, caseData, onSolved)`, gibt eine Aufräumfunktion zurück).
+  - Richtige Reihenfolge aus dem eingefrorenen Snapshot `objectBeginDate`/`objectEndDate` in `web/story/case-1.js` (Prüfdatum 15.11.2026); bei einem Bereich zählt das Anfangsjahr. Live-Daten laden nur Bilder.
+  - Jahreszahlen stehen nicht auf der Karte, nicht im Alt-Text und nicht in der Quellenzeile, nur im aufklappbaren „Catalogue entry“. Die Rückseiten mit den Uhrzeiten existieren erst nach der Lösung im Dokument, damit sie die Reihenfolge nicht verraten.
+  - `revealed` im Zustand = Karten, deren Platz ein Hinweis verraten hat (1. Hinweis ältestes, 2. jüngstes Werk). Fehlermeldung nennt nicht, wie viele Karten richtig liegen. Keine Uhr (Konzept: keine Zeitwertung).
+  - Eigene CSS-Datei `portrait-timeline.css`, die die Station selbst einbindet, damit keine gemeinsame CSS-Datei geändert werden muss.
+  - Bedienung: Klick-Klick tauscht, Ziehen mit der Maus (natives Drag & Drop wie Station L), Tippen-Tippen auf Touch, Tastatur (Enter/Leertaste nehmen/ablegen, Pfeiltasten verschieben).
+  - Station D nutzt nun 435882 statt 436121 (Degas gehört zu Station I). Label in der Great Hall: „Portrait timeline · Station I“.
+- **Dateien:** neu `web/minigames/portrait-rules.js`, `portrait-artwork.js`, `portrait-timeline.js`, `portrait-timeline.css`, `portrait-timeline.test.js`, `web/assets/met-435876.jpg`, `web/assets/met-435876-source.md`, `met-436121-source.md`, `met-12127-source.md`, `docs/screenshots/station-i-*.png`; geändert `web/story/case-1.js` (Station I/D, Met-Daten), je ein Import und ein Eintrag in `web/main.js` und `web/dev/story-preview.js`, das Label in `web/engine.js`, datenabhängige Tests (`hints.test.js`, `stations.test.js`, `save-and-case.test.js`, `engine.test.js`), README, Minispiel-Vertrag.
+- **Prüfungen (tatsächlich ausgeführt):**
+  - Met-API für 436121, 12127, 435876, 435882 abgefragt: alle gemeinfrei, Daten 1865 / 1883–84 / 1888–90. Vorhandene `met-436121.jpg` und `met-12127.jpg` sind byte-gleich mit dem aktuellen `primaryImageSmall` (SHA-256 verglichen); `met-435876.jpg` unverändert heruntergeladen.
+  - `cd web && node --test`: Ausgangslage 115 bestanden; nach allen Meilensteinen **136 bestanden, 0 fehlgeschlagen** (18 neue Tests für Station I, dazu Daten- und Label-Tests). Hinweis: Regeln und Tests wurden zusammen geschrieben; eine sichtbare Rot-Phase gab es nicht.
+  - Hauptspiel im Browser: Figur am Pult in der Great Hall, `E` → Station I → einmal falsch („Not quite …“), ein Hinweis (Degas als „Oldest“ markiert), per Klick-Klick richtig geordnet → Karten drehen sich um, Protokoll erscheint, Journal zeigt I und 12 Punkte (20 − 3 − 5). Seite neu geladen: Stand erhalten. Bei 1440 × 900 passt der Dialog vor und nach der Lösung ohne inneres Scrollen.
+  - Vorschau `web/dev/story.html`: Station nur mit Tastatur gelöst (einzelne Tasten; beim ersten Versuch gingen schnell hintereinander gesendete Testtasten verloren). Escape schließt, Fokus auf der Seite.
+  - Handy 390 × 844: Karten untereinander, Tippen-Tippen tauscht, kein seitliches Scrollen. Met-API per blockiertem `fetch` simuliert: lokale Kopien + „Using the bundled Met images.“
+  - Ganzes Spiel in der Vorschau bis zum Abspann: Zeile „Portrait Hall (I) · 1 mistake(s), 1 hint(s) · 12 / 20“, gesamt 92 / 100. Konsole ohne Fehler.
+- **Offene Punkte:** Reduced Motion nur per CSS-Regel umgesetzt, nicht im Browser emuliert. Im Hauptspiel springt der Fokus nach dem Schließen des Dialogs nicht zurück (Fokus-Rückgabe ist in Leopolds noch offenem Branch für `main.js` vorgesehen). Station L (Leopold) ersetzt in seinem Branch das Werk 435882 → beim Merge 435882 in `works` behalten, sonst bricht Station D.

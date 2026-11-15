@@ -102,8 +102,12 @@ Ein zweiter Aufruf von `onSolved` wird ignoriert.
 
 | Station | id | Buchstabe | Beleg (vergibt die Engine) | Werke (Met-ID) |
 |---|---|---|---|---|
-| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 12127, 435876 |
+| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**fertig:** `web/minigames/portrait-timeline.js`) |
 | Conservation Studio | `restoration` | L | Hidden mark “V” on the fake transport slip. | 435882 |
-| Frame Archive | `archive` | D | Frame label: “Ordered by: A. Voss”. | 436121 |
+| Frame Archive | `archive` | D | Frame label: “Ordered by: A. Voss”. | 435882 (seit 15.11.2026; vorher 436121, das jetzt Station I nutzt) |
+
+Station I (Portrait Hall) erfüllt diesen Vertrag als zweites Beispiel nach Station B: drei Dateien (`portrait-rules.js` reine Regeln, `portrait-artwork.js` Met-API mit Prüfung und Offline-Kopie, `portrait-timeline.js` Oberfläche) plus `portrait-timeline.test.js`. Die richtige Reihenfolge kommt aus den eingefrorenen Feldern `objectBeginDate`/`objectEndDate` in `case-1.js`, nie aus Live-Daten.
+
+**Hinweis für Station L:** Station D nutzt jetzt 435882 (Cézanne, Still Life). Wenn Station L ein eigenes Werk bekommt, bitte das neue Werk in `works` **ergänzen** und 435882 dort stehen lassen. Sonst zeigt Station D ins Leere; der Test „every station artwork exists in the work list“ meldet das.
 
 Die Zuordnung der Werke zu den Stationen 2–4 ist eine Annahme der Story-Logik (das Konzept nennt nur die Werkliste). Wenn ihr andere Werke nehmt, bitte `metIds` in `web/story/case-1.js` anpassen.
