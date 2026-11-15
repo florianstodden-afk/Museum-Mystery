@@ -1,5 +1,6 @@
 import { officePortal, canEnterOffice } from './security-room.js';
 import { GALLERY, galleryFootprintFits, galleryDoorTransition } from './gallery-layout.js';
+import { STORAGE } from './storage-room.js';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
 export function movementDuration(from, to, viewport, room) {
@@ -14,8 +15,8 @@ export function movementDuration(from, to, viewport, room) {
 export function advancePlayer(state, direction, milliseconds, viewport, guards, canEnter) {
   if (!direction || state.ending || milliseconds <= 0) return state;
   const room=state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';
-  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:room==='security'?100:32)*viewport.width/896;
-  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:room==='security'?20:32)*viewport.height/576;
+  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:room==='security'?100:STORAGE.stepX)*viewport.width/896;
+  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:room==='security'?20:STORAGE.stepY)*viewport.height/576;
   const distance=PLAYER_SPEED*milliseconds/1000;
   const dx=direction[0]*distance/sx, dy=direction[1]*distance/sy;
   const count=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/0.04));
