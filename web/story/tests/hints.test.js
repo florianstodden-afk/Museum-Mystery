@@ -39,7 +39,7 @@ test('station hints name the open rooms and become concrete on level 2', () => {
   assert.match(hintFor(s, 1).text, /Portrait Hall, Conservation Studio, Frame Archive/);
   assert.match(hintFor(s, 2).text, /shift schedule/);
   s = addNote(s, 'duty-roster').state;
-  assert.match(hintFor(s, 2).text, /Portrait Hall: Read the night-shift log/);
+  assert.match(hintFor(s, 2).text, /Portrait Hall: Put the three portraits in the order they were painted/);
 });
 
 test('the safe hint gives the letters after two wrong words', () => {

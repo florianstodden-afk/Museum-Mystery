@@ -71,7 +71,7 @@ test('placeholder shows the station and reports zero mistakes and hints', () => 
   let result;
   openStation(placeholder, container, { stationId: 'portraits', onSolved: r => { result = r; } });
   assert.match(container.textContent, /PORTRAIT HALL/);
-  assert.equal(findAll(container, node => node.tagName === 'IMG').length, 2);
+  assert.equal(findAll(container, node => node.tagName === 'IMG').length, 3);
   findButton(container, 'Solve station (placeholder)').click();
   assert.deepEqual(result, { mistakes: 0, hints: 0 });
 });
