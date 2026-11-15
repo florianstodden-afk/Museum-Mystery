@@ -4,6 +4,7 @@ import {
   PORTRAIT_IDS, correctOrder, initialTimeline, validTimeline, moveCard, swapCards,
   checkOrder, useHint, isSolved, logEntries,
 } from './portrait-rules.js';
+import { PORTRAIT_ARTWORKS, loadPortrait, loadPortraits, verifiedImageUrl } from './portrait-artwork.js';
 
 const DEGAS = 436121;
 const SARGENT = 12127;
@@ -102,4 +103,51 @@ test('validTimeline rejects broken, foreign and impossible saved states', () => 
   ];
   for (const state of bad) assert.equal(validTimeline(state), false, JSON.stringify(state));
   assert.equal(validTimeline(timeline(RIGHT, { solved: true, mistakes: 2, hints: 1, revealed: [DEGAS] })), true);
+});
+
+// ---------- Artwork loader (fake fetch, never the live API) ----------
+
+function metAnswer(artwork, changes = {}) {
+  return {
+    objectID: artwork.id, isPublicDomain: true, title: artwork.title, artistDisplayName: artwork.artist,
+    primaryImageSmall: `https://images.metmuseum.org/CRDImages/test/${artwork.id}.jpg`, ...changes,
+  };
+}
+const okResponse = data => async () => ({ ok: true, json: async () => data });
+const readAny = async src => ({ src });
+
+test('the loader uses a checked Met image when the API answer is right', async () => {
+  const sargent = PORTRAIT_ARTWORKS.find(a => a.id === SARGENT);
+  const result = await loadPortrait(sargent, { fetchData: okResponse(metAnswer(sargent)), readImage: readAny });
+  assert.deepEqual(result, { id: SARGENT, src: 'https://images.metmuseum.org/CRDImages/test/12127.jpg', offline: false });
+});
+
+test('the loader falls back to the bundled copy on API error, wrong data or a foreign image host', async () => {
+  const degas = PORTRAIT_ARTWORKS.find(a => a.id === DEGAS);
+  const failures = [
+    async () => { throw new Error('network down'); },
+    async () => ({ ok: false, json: async () => ({}) }),
+    okResponse(metAnswer(degas, { isPublicDomain: false })),
+    okResponse(metAnswer(degas, { objectID: 12127 })),
+    okResponse(metAnswer(degas, { title: 'A different painting' })),
+    okResponse(metAnswer(degas, { primaryImageSmall: 'https://example.com/fake.jpg' })),
+    okResponse(metAnswer(degas, { primaryImageSmall: 'http://images.metmuseum.org/insecure.jpg' })),
+  ];
+  for (const fetchData of failures) {
+    const result = await loadPortrait(degas, { fetchData, readImage: readAny });
+    assert.equal(result.offline, true);
+    assert.match(result.src, /assets\/met-436121\.jpg$/);
+  }
+  assert.throws(() => verifiedImageUrl(metAnswer(degas, { primaryImageSmall: '' }), degas));
+});
+
+test('every portrait has a bundled offline copy and the loader returns all three', async () => {
+  const { existsSync } = await import('node:fs');
+  for (const artwork of PORTRAIT_ARTWORKS) {
+    assert.equal(existsSync(new URL(artwork.local)), true, artwork.local);
+    assert.equal(existsSync(new URL(artwork.local.replace('.jpg', '-source.md'))), true);
+  }
+  const all = await loadPortraits({ fetchData: async () => { throw new Error('offline'); }, readImage: readAny });
+  assert.deepEqual(all.map(item => item.id), PORTRAIT_IDS);
+  assert.equal(all.every(item => item.offline), true);
 });
