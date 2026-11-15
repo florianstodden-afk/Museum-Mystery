@@ -36,7 +36,6 @@ try { state = restoreState(JSON.parse(localStorage.getItem(storeKey)), story.sta
 catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
-let metArtwork = null;
 const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
 });
@@ -45,10 +44,11 @@ const drawSecurityRoom = createSecurityRenderer();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall-security-door.png';
+hallBackdrop.src = './assets/great-hall-security-door.jpg';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
+wallArtwork.src = './assets/met-436535.jpg'; // bundled copy, no API call needed
 let displayPlayer = { ...state.player };
 let movementAnimation = null;
 let facing = 'down';
@@ -67,21 +67,20 @@ function guardDisplay(){
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
   return {x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t, y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
 }
-let metStatus = 'loading';
 
-fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
-  .then(response => { if (!response.ok) throw new Error('API unavailable'); return response.json(); })
-  .then(data => { if (!data.isPublicDomain || !data.primaryImageSmall) throw new Error('Image is not public'); metArtwork = data; metStatus = 'ready'; wallArtwork.src = data.primaryImageSmall; })
-  .catch(() => { metStatus = 'offline'; });
-
+let renderedStory = null; // the story state the journal currently shows
 function save() { savePosition(); draw(); }
 function updateSidebar() {
   document.body.dataset.room = state.room==='security' ? 'security' : state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
   document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
+  document.querySelector('#steps').textContent = `${state.steps} steps`;
+  // Walking saves the position several times a second. The journal only changes with the story,
+  // so it is rebuilt only when the story state is a new object (every story action creates one).
+  if (story.state === renderedStory) return;
+  renderedStory = story.state;
   const model = journalModel(story.state);
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
   document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
-  document.querySelector('#steps').textContent = `${state.steps} steps`;
   renderJournal(document.querySelector('#journal'), model);
 }
 

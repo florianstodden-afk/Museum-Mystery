@@ -207,3 +207,11 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
   - Handy 390 × 844: Karten untereinander, Tippen-Tippen tauscht, kein seitliches Scrollen. Met-API per blockiertem `fetch` simuliert: lokale Kopien + „Using the bundled Met images.“
   - Ganzes Spiel in der Vorschau bis zum Abspann: Zeile „Portrait Hall (I) · 1 mistake(s), 1 hint(s) · 12 / 20“, gesamt 92 / 100. Konsole ohne Fehler.
 - **Offene Punkte:** Reduced Motion nur per CSS-Regel umgesetzt, nicht im Browser emuliert. Im Hauptspiel springt der Fokus nach dem Schließen des Dialogs nicht zurück (Fokus-Rückgabe ist in Leopolds noch offenem Branch für `main.js` vorgesehen). Station L (Leopold) ersetzt in seinem Branch das Werk 435882 → beim Merge 435882 in `works` behalten, sonst bricht Station D.
+
+### 2026-11-15 – Schneller laden und aufräumen (Branch `feature/faster-load-and-storage-room`)
+
+- **Beteiligte:** Florian Baumgartl (Auftrag), Claude Code (Umsetzung). Bilder und `main.js` sind Fabians Bereich; Absprache mit Fabian vor dem Merge.
+- **Bilder:** Die vier benutzten PNG-Hintergründe wurden als JPG gespeichert (Qualität 88, Galerie 93). Abweichung zum Original pixelweise gemessen: im Schnitt unter 3 von 255, PSNR 34,9–40,6 dB (mit bloßem Auge nicht sichtbar). Sieben nicht mehr benutzte PNGs entfernt (bleiben in der Git-Historie). Start-Download im Browser gemessen: **9,9 MB → 3,0 MB**. `web/assets`: rund 22 MB → 4,8 MB.
+- **`main.js`:** Das Journal wird nur noch neu aufgebaut, wenn sich der Story-Zustand ändert (vorher beim Laufen mehrmals pro Sekunde; gemessen: jetzt 1 Neuaufbau beim Annehmen des Auftrags, 0 beim Laufen). Die Abfrage der Met-API beim Start entfällt; das kleine Van-Gogh-Bild im Depot kommt aus der lokalen Kopie. Ungenutzte Variablen entfernt.
+- **Verworfen:** Ein per Code gezeichnetes Depot wurde gebaut, passte aber optisch nicht zu den gemalten Räumen und wurde wieder zurückgenommen. Besser: ein gemaltes Depot-Bild im Stil der anderen Räume.
+- **Prüfungen:** `cd web && node --test` und `uv run pytest` (Ergebnis siehe Commit); im Browser: Great Hall, Galerie und Sicherheitsraum sehen unverändert aus, Konsole ohne Fehler.
