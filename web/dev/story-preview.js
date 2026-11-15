@@ -8,6 +8,7 @@ import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
 import * as landscapeStation from '../minigames/landscape.js';
+import * as portraitStation from '../minigames/portrait-timeline.js';
 
 // ---------- The dialog this page offers to the host ----------
 
@@ -50,7 +51,7 @@ const story = createStoryHost({
     document.querySelector('#toast').textContent = message;
   },
   // Teammates replace the placeholder by adding their module here, e.g. portraits: portraitsStation.
-  stations: { landscape: landscapeStation },
+  stations: { landscape: landscapeStation, portraits: portraitStation },
   storageKey: 'museum-nocturne-story-preview-v1',
 });
 

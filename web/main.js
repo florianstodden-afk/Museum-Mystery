@@ -2,6 +2,7 @@ import { createSecurityRenderer } from './security-room.js';
 import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
+import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
 import { movementDuration, advancePlayer } from './motion.js';
@@ -26,7 +27,7 @@ const story = createStoryHost({
   closePanel: closeDialog,
   onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
   onReset: resetWorld,
-  stations: { landscape: landscapeStation }, // stations 2–4: add teammates' modules here
+  stations: { landscape: landscapeStation, portraits: portraitStation }, // stations 2–4: add teammates' modules here
   storageKey: 'museum-nocturne-story-v1',
 });
 

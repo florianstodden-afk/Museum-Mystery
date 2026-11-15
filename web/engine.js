@@ -12,7 +12,7 @@ export const START = { x: 3, y: 9 };
 // Stations 2–4 use existing spots until their own rooms exist.
 export const OBJECTS = [
   { id: "guard", x: 5, y: 5, label: "Leon (night guard)", story: { talk: "leon" } },
-  { id: "ledger", x: 5, y: 12, label: "Night-shift log · Station I", story: { station: "portraits" } },
+  { id: "ledger", x: 5, y: 12, label: "Portrait timeline · Station I", story: { station: "portraits" } },
   { id: "painting", x: 14, y: 3, label: "Wall label · Station B", story: { station: "landscape" } },
   { id: "frames", x: 16, y: 3, label: "Frame rack · Station D", story: { station: "archive" } },
   { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },
