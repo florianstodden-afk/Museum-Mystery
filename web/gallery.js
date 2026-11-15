@@ -2,7 +2,7 @@ import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } fr
 
 // Keep the approved concept as the actual room background, not an approximation.
 export function createGalleryRenderer() {
-  const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.png';
+  const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.jpg';
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
   return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion }) {
     box(ctx,0,0,896,576,'#061218');

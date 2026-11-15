@@ -15,8 +15,8 @@ html,body{width:100%;height:100%;overflow:hidden}.shell{max-width:none;width:100
 /* Bright comic-style controls, while the artwork and stone retain their detail. */
 .topbar>div:first-child{border:2px solid #99d0b0;box-shadow:3px 4px 0 #15242a}.plain,.stage-head{border:2px solid #7bad94;box-shadow:3px 4px 0 #16272a}.plain:hover{background:#426355}.controls button{border:2px solid #93c4a4;box-shadow:2px 3px 0 #15242a}.dialog-card{border-color:#5b856b;box-shadow:0 22px 80px #0009, 4px 5px 0 #1c3531}
 /* Preserve the scene's proportions at all screen sizes while keeping a full-window backdrop. */
-body{background:#1a252b url('assets/great-hall-nyc.png') center/cover no-repeat}canvas{object-fit:cover;background:transparent}.controls button{touch-action:none;user-select:none;-webkit-user-select:none}
-body{background:#1b2729}body:before{content:'';position:fixed;inset:-24px;background:url('assets/great-hall-nyc.png') center/cover;filter:blur(20px) brightness(.38);pointer-events:none}
+body{background:#1a252b url('assets/great-hall-nyc.jpg') center/cover no-repeat}canvas{object-fit:cover;background:transparent}.controls button{touch-action:none;user-select:none;-webkit-user-select:none}
+body{background:#1b2729}body:before{content:'';position:fixed;inset:-24px;background:url('assets/great-hall-nyc.jpg') center/cover;filter:blur(20px) brightness(.38);pointer-events:none}
 @media (pointer:coarse){.controls{display:flex}}
 
 /* Keep every room edge visible: never crop borders or exits on narrow screens. */

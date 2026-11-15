@@ -24,9 +24,9 @@ export function officePortal(state,from,to){
 // Images correspond to actual museum areas; the other channels show no signal.
 export function createSecurityRenderer(){
   const image = src=>{const i=new Image();i.src=src;return i;};
-  const background=image('./assets/security-office-hall-exit.png');
-  const hall=image('./assets/great-hall-security-door.png');
-  const gallery=image('./assets/gallery-nocturne-nyc.png');
+  const background=image('./assets/security-office-hall-exit.jpg');
+  const hall=image('./assets/great-hall-security-door.jpg');
+  const gallery=image('./assets/gallery-nocturne-nyc.jpg');
   function screen(ctx, x,y,w,h,source,crop,label, time){
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
     ctx.fillStyle='#0b151b';ctx.fillRect(x,y,w,h);

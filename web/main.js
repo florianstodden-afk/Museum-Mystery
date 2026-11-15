@@ -45,7 +45,7 @@ const drawSecurityRoom = createSecurityRenderer();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall-security-door.png';
+hallBackdrop.src = './assets/great-hall-security-door.jpg';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
