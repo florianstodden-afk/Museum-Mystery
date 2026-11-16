@@ -228,4 +228,4 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 
 
 ## 2026-11-16: Integration Renoir und aktualisiertes main
-Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (Station D Cézanne und L Renoir) bleiben erhalten. Punkte werden wieder verdient: Renoir 15/10/5/0 bei <=30/45/60/>60 Sekunden; Gesamtmaximum 95. Kein Referenzbild, Hover-Zoom oder Slot-Markierungen; native Tastaturbedienung. Browser-Playthrough steht noch aus.
+Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (Station D Cézanne und L Renoir) bleiben erhalten. Punkte werden wieder verdient: Renoir 15/10/5/0 bei <=30/45/60/>60 Sekunden; Gesamtmaximum 95. Kein Referenzbild, Hover-Zoom oder Slot-Markierungen; native Tastaturbedienung. Browser-Playthrough erfolgreich abgeschlossen.
