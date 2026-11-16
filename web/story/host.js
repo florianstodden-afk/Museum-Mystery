@@ -28,6 +28,7 @@ import { endingModel, renderEnding, renderEndingChoice } from './endings.js';
 import { hintFor } from './hints.js';
 import { examine as examineOffice } from './security-office/interactions.js';
 import { el, button } from './dom.js';
+import { soundFor } from './sound.js';
 
 export const DEFAULT_STORAGE_KEY = 'museum-nocturne-story-v1';
 
@@ -37,6 +38,7 @@ export function createStoryHost(options) {
     closePanel,
     onChange = () => {},
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
+    sound = null,             // optional: a player from sound.js; without it the story is silent
     stations = {},
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
@@ -68,8 +70,11 @@ export function createStoryHost(options) {
   }
 
   // Every engine action goes through here: keep the new state, save, tell the page.
-  function act(result) {
+  // `action` names the engine function, so the right sound can be chosen (see sound.js).
+  function act(result, action = null) {
+    const before = state;
     state = result.state;
+    sound?.play(soundFor(action, result, before));
     save();
     onChange(state, result.message);
     return result;
@@ -100,7 +105,7 @@ export function createStoryHost(options) {
       return;
     }
     actions.append(button('Accept the mission', () => {
-      act(readMission(state));
+      act(readMission(state), 'readMission');
       closePanel();
     }));
   }
@@ -114,7 +119,7 @@ export function createStoryHost(options) {
   }
 
   function examine(pointId) {
-    const result = act(examineOffice(state, pointId));
+    const result = act(examineOffice(state, pointId), 'examine');
     const { content, actions } = scene(result.title || 'Examine');
     content.append(el('p', { className: 'story-text', text: result.text }));
     if (result.message) content.append(el('p', { className: 'story-feedback', text: result.message }));
@@ -133,13 +138,14 @@ export function createStoryHost(options) {
     }
     runStation(stations[stationId] ?? placeholderStation, content, {
       stationId,
+      caseData: { playSound: id => sound?.play(id) }, // stations may play their own small sounds
       savedProgress: progress[stationId] ?? null,
       onProgress(next) {
         progress = { ...progress, [stationId]: next };
         save();
       },
       onSolved(result) {
-        const outcome = act(solveStation(state, stationId, result));
+        const outcome = act(solveStation(state, stationId, result), 'solveStation');
         if (outcome.ok) {
           content.append(el('p', { className: 'story-feedback', text: `Letter ${station.letter} is now in your journal.` }));
         }
@@ -158,7 +164,7 @@ export function createStoryHost(options) {
   function showSafe(message) {
     const { content, actions } = scene('The Vault');
     renderSafe(content, { state, message }, word => {
-      const result = act(tryOpenSafe(state, word));
+      const result = act(tryOpenSafe(state, word), 'tryOpenSafe');
       showSafe(result.message);
     });
     actions.append(state.safe.open
@@ -169,7 +175,7 @@ export function createStoryHost(options) {
   function showAccusation(message) {
     const { content, actions } = scene('The final question');
     renderAccusation(content, { state, message }, suspectId => {
-      const result = act(accuse(state, suspectId));
+      const result = act(accuse(state, suspectId), 'accuse');
       showAccusation(result.message);
     });
     actions.append(state.accusation.solved
@@ -180,7 +186,7 @@ export function createStoryHost(options) {
   function showEndingChoice() {
     const { content, actions } = scene('Before sunrise');
     renderEndingChoice(content, endingId => {
-      act(chooseEnding(state, endingId));
+      act(chooseEnding(state, endingId), 'chooseEnding');
       showEnding();
     });
     actions.append(closeButton('Not yet'));
@@ -197,6 +203,7 @@ export function createStoryHost(options) {
     const step = currentStep();
     if (step !== hintStep) { hintStep = step; hintLevel = 1; }
     const hint = hintFor(state, hintLevel);
+    sound?.play('hint');
     const { content, actions } = scene(`A hint from ${hint.from}`);
     content.append(
       el('p', { className: 'story-eyebrow', text: hintLevel === 1 ? 'HINT' : 'MORE CONCRETE HINT' }),
