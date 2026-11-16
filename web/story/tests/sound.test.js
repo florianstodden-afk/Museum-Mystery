@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY } from '../sound.js';
+import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY, MUSIC_KEY, stepSoundFor, nextMusicNote, musicPause, MUSIC_SCALE } from '../sound.js';
 import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../engine.js';
 import { memoryStorage } from '../host.js';
 
@@ -97,4 +97,48 @@ test('the mute choice is remembered, and broken storage does not break the game'
 test('without Web Audio (e.g. in Node) the player stays silent instead of crashing', () => {
   const player = createSoundPlayer({ AudioContextClass: null, storage: memoryStorage() });
   assert.equal(player.play('letter'), false);
+});
+
+test('every room has its own footstep sound', () => {
+  assert.equal(stepSoundFor('hall'), 'step-hall');
+  assert.equal(stepSoundFor('gallery'), 'step-gallery');
+  assert.equal(stepSoundFor('security'), 'step-office');
+  assert.equal(stepSoundFor('storage'), 'step-storage');
+  assert.equal(stepSoundFor('roof'), null);
+  const names = ['hall', 'gallery', 'security', 'storage'].map(stepSoundFor);
+  assert.equal(new Set(names).size, 4);
+});
+
+test('the melody moves in small steps and never leaves the scale', () => {
+  let index = 2;
+  for (const r of [0, 0.1, 0.99, 0.5, 0.2, 0.8, 0, 0, 0, 0.99, 0.99, 0.99]) {
+    const next = nextMusicNote(index, () => r);
+    assert.ok(next >= 0 && next < MUSIC_SCALE.length);
+    assert.ok(Math.abs(next - index) <= 2);
+    index = next;
+  }
+  assert.ok(musicPause(() => 0) >= 1.5 && musicPause(() => 0.999) <= 4);
+});
+
+test('music is off by default, plays notes when switched on and stops when switched off', () => {
+  const { FakeContext, log } = fakeAudio();
+  const timers = [];
+  const storage = memoryStorage();
+  const player = createSoundPlayer({
+    AudioContextClass: FakeContext, storage,
+    setTimeout: fn => { timers.push(fn); return timers.length; },
+    clearTimeout: () => { timers.length = 0; },
+  });
+  assert.equal(player.musicOn, false);
+  player.toggleMusic();
+  assert.equal(player.musicOn, true);
+  assert.equal(log.tones, 2, 'one note and the drone');
+  timers.shift()();                     // time passes: the next note
+  assert.equal(log.tones, 4);
+  player.toggleMusic();
+  assert.equal(timers.length, 0, 'no more notes are planned');
+  assert.equal(storage.getItem(MUSIC_KEY), 'off');
+  assert.equal(createSoundPlayer({ storage }).musicOn, false);
+  player.setMusic(true);
+  assert.equal(createSoundPlayer({ storage }).musicOn, true, 'the choice is remembered');
 });

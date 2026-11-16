@@ -4,7 +4,10 @@
 //   recipe(id)               – each sound described as data: a few tones (pure, tested)
 //   createSoundPlayer()      – plays a recipe and remembers "muted" (needs a browser)
 
-export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open'];
+export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open',
+  'step-hall', 'step-gallery', 'step-office', 'step-storage'];
+export const MUSIC_KEY = 'museum-nocturne-music-v1';
+export const STEP_INTERVAL_MS = 360; // one footstep sound per 0.36 s of walking
 export const STORAGE_KEY = 'museum-nocturne-sound-v1';
 const MASTER_VOLUME = 0.22; // quiet by default
 
@@ -57,11 +60,43 @@ export function recipe(id) {
       return [tone('noise', 3200, 0, 0.08, 0.3), tone('noise', 3200, 0.12, 0.08, 0.3), tone('noise', 3200, 0.24, 0.08, 0.3), tone('sine', 'G5', 0.4, 0.4, 0.25)];
     case 'ending-heist': // dark, minor
       return [tone('sine', 'D4', 0, 1.2, 0.35), tone('sine', 'F3', 0, 1.2, 0.3), tone('sine', 'A3', 0.3, 1.4, 0.25), tone('sine', 'D3', 0.6, 1.6, 0.3)];
+    // Footsteps: each floor sounds different.
+    case 'step-hall': // marble: short and bright
+      return [tone('noise', 3400, 0, 0.05, 0.22), tone('triangle', 520, 0, 0.04, 0.12)];
+    case 'step-gallery': // wooden floor: a low, warm knock
+      return [tone('triangle', 140, 0, 0.07, 0.3), tone('noise', 900, 0, 0.05, 0.14)];
+    case 'step-office': // carpet: just a soft brush
+      return [tone('noise', 600, 0, 0.07, 0.12)];
+    case 'step-storage': // stone: dull with a short echo
+      return [tone('noise', 1400, 0, 0.06, 0.2), tone('noise', 1400, 0.11, 0.05, 0.06)];
     case 'ending-open': // warm, major
       return [tone('sine', 'C4', 0, 1.2, 0.3), tone('sine', 'E4', 0.15, 1.2, 0.28), tone('sine', 'G4', 0.3, 1.2, 0.28), tone('sine', 'C5', 0.45, 1.5, 0.3)];
     default:
       return [];
   }
+}
+
+// Which footstep fits the room the player is in.
+export function stepSoundFor(room) {
+  return { hall: 'step-hall', gallery: 'step-gallery', security: 'step-office', storage: 'step-storage' }[room] ?? null;
+}
+
+// ---------- Night music: optional, off by default ----------
+// Real art museums are usually quiet; where music exists, visitors often choose it themselves.
+// So the music is a quiet, slow melody the browser invents note by note (no audio file).
+export const MUSIC_SCALE = ['D4', 'F4', 'G4', 'A4', 'C5', 'D5']; // D minor pentatonic: calm, a bit mysterious
+const MUSIC_FREQ = { D4: 293.66, F4: 349.23, G4: 392.0, A4: 440.0, C5: 523.25, D5: 587.33 };
+
+// The next note: a small step up or down from the last one, so it sounds like a melody, not noise.
+export function nextMusicNote(previousIndex, random = Math.random) {
+  const steps = [-2, -1, -1, 1, 1, 2];
+  const step = steps[Math.floor(random() * steps.length)];
+  return Math.min(MUSIC_SCALE.length - 1, Math.max(0, previousIndex + step));
+}
+
+// Seconds until the next note: slow and a little irregular.
+export function musicPause(random = Math.random) {
+  return 1.6 + random() * 2.2;
 }
 
 // Plays recipes. Works without a browser (in tests) – then it simply stays silent.
@@ -70,6 +105,11 @@ export function createSoundPlayer(options = {}) {
   const storage = options.storage ?? safeStorage();
   const AudioContextClass = options.AudioContextClass ?? globalThis.AudioContext ?? globalThis.webkitAudioContext;
   let muted = readMuted(storage);
+  let musicOn = readMusic(storage);
+  let musicTimer = null;
+  let noteIndex = 2;
+  const setTimer = options.setTimeout ?? globalThis.setTimeout;
+  const clearTimer = options.clearTimeout ?? globalThis.clearTimeout;
   let context = null;
 
   function audio() {
@@ -97,11 +137,40 @@ export function createSoundPlayer(options = {}) {
     return muted;
   }
 
+  // One soft note with a quiet low drone under it, then wait and play the next one.
+  function playMusicNote() {
+    musicTimer = null;
+    if (!musicOn) return;
+    const ctx = typeof document !== 'undefined' && document.hidden ? null : audio(); // silent in a hidden tab
+    if (ctx) {
+      noteIndex = nextMusicNote(noteIndex);
+      const master = ctx.createGain();
+      master.gain.value = MASTER_VOLUME * 0.6; // music sits below the sound effects
+      master.connect(ctx.destination);
+      playTone(ctx, master, { wave: 'sine', freq: MUSIC_FREQ[MUSIC_SCALE[noteIndex]], start: 0, duration: 2.2, volume: 0.3 });
+      playTone(ctx, master, { wave: 'sine', freq: 73.42, start: 0, duration: 3.0, volume: 0.12 }); // D2 drone
+    }
+    musicTimer = setTimer(playMusicNote, musicPause() * 1000);
+  }
+
+  function setMusic(value) {
+    musicOn = Boolean(value);
+    try { storage?.setItem(MUSIC_KEY, musicOn ? 'on' : 'off'); } catch { /* saving is optional */ }
+    if (musicOn && musicTimer === null && AudioContextClass) playMusicNote();
+    if (!musicOn && musicTimer !== null) { clearTimer(musicTimer); musicTimer = null; }
+    return musicOn;
+  }
+
   return {
     play,
     get muted() { return muted; },
     setMuted,
     toggle() { return setMuted(!muted); },
+    get musicOn() { return musicOn; },
+    setMusic,
+    toggleMusic() { return setMusic(!musicOn); },
+    // Call once after the first click or key press: browsers only allow sound after that.
+    resumeMusic() { if (musicOn && musicTimer === null && AudioContextClass) playMusicNote(); },
   };
 }
 
@@ -137,6 +206,10 @@ function playTone(ctx, destination, t) {
   }
   source.start(start);
   source.stop(end + 0.05);
+}
+
+function readMusic(storage) {
+  try { return storage?.getItem(MUSIC_KEY) === 'on'; } catch { return false; }
 }
 
 function readMuted(storage) {

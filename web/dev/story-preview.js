@@ -150,6 +150,14 @@ function showSoundState() {
 }
 soundButton.addEventListener('click', () => { sound.toggle(); showSoundState(); sound.play('click'); });
 showSoundState();
+const musicButton = document.querySelector('#music-toggle');
+function showMusicState() {
+  musicButton.textContent = sound.musicOn ? '♪ Music on' : '♪ Music';
+  musicButton.setAttribute('aria-pressed', String(sound.musicOn));
+}
+musicButton.addEventListener('click', () => { sound.toggleMusic(); showMusicState(); });
+showMusicState();
+for (const type of ['pointerdown', 'keydown']) document.addEventListener(type, () => sound.resumeMusic(), { once: true });
 
 renderPage();
 story.start();
