@@ -54,7 +54,7 @@ test('case data: every station artwork exists in the work list', () => {
   for (const station of CASE.stations) {
     for (const id of station.metIds) assert.ok(workById(id), `missing work ${id}`);
   }
-  assert.equal(CASE.works.length, 6);
+  assert.equal(CASE.works.length, 7);
   assert.equal(workById(436535).date, '1889');
 });
 

@@ -21,7 +21,7 @@ export function button(label, onClick, className = 'story-button') {
 }
 
 // Three artworks are already stored in web/assets. For the others we use the Met image URL.
-const LOCAL_IMAGES = [436535, 436121, 12127];
+const LOCAL_IMAGES = [436535, 436121, 12127, 459111];
 
 export function artworkImageUrl(work) {
   if (LOCAL_IMAGES.includes(work.id)) {

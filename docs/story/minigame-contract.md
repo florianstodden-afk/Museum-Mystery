@@ -111,3 +111,6 @@ Station I (Portrait Hall) erfüllt diesen Vertrag als zweites Beispiel nach Stat
 **Hinweis für Station L:** Station D nutzt jetzt 435882 (Cézanne, Still Life). Wenn Station L ein eigenes Werk bekommt, bitte das neue Werk in `works` **ergänzen** und 435882 dort stehen lassen. Sonst zeigt Station D ins Leere; der Test „every station artwork exists in the work list“ meldet das.
 
 Die Zuordnung der Werke zu den Stationen 2–4 ist eine Annahme der Story-Logik (das Konzept nennt nur die Werkliste). Wenn ihr andere Werke nehmt, bitte `metIds` in `web/story/case-1.js` anpassen.
+
+
+Station L integration: host preserves cleanup and saved progress. Renoir completion time awards 15 (<=30s), 10 (<=45s), 5 (<=60s), or 0 points. Other stations keep standard scoring; total maximum is 95. Saved completed legacy L rewards are capped at 15; unfinished puzzles award nothing.

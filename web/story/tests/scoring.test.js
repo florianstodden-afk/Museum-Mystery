@@ -33,9 +33,9 @@ test('safe and final question: 10 at first try, 5 after a mistake', () => {
   assert.equal(accusationPoints(2), 5);
 });
 
-test('a perfect game scores exactly 100', () => {
-  assert.equal(MAX_SCORE, 100);
-  assert.equal(totalScore(play()), 100);
+test('a perfect game scores exactly 95', () => {
+  assert.equal(MAX_SCORE, 95);
+  assert.equal(totalScore(play()), 95);
 });
 
 test('mistakes, hints and wrong answers are deducted correctly', () => {
@@ -45,10 +45,10 @@ test('mistakes, hints and wrong answers are deducted correctly', () => {
     wrongSuspects: ['leon'],
   });
   // 12 + 5 (minimum) + 20 + 20 + safe 5 + question 5 = 67
-  assert.equal(totalScore(s), 67);
+  assert.equal(totalScore(s), 62);
   const rows = scoreBreakdown(s);
-  assert.deepEqual(rows.map(row => row.points), [12, 5, 20, 20, 5, 5]);
-  assert.equal(rows.reduce((sum, row) => sum + row.max, 0), 100);
+  assert.deepEqual(rows.map(row => row.points), [12, 5, 15, 20, 5, 5]);
+  assert.equal(rows.reduce((sum, row) => sum + row.max, 0), 95);
 });
 
 test('unsolved parts give 0 points', () => {
@@ -56,4 +56,20 @@ test('unsolved parts give 0 points', () => {
   assert.equal(totalScore(s), 0);
   s = solveStation(s, 'restoration', { mistakes: 0, hints: 2 }).state;
   assert.equal(totalScore(s), 10);
+});
+
+import { pictureSpeedPoints, synchronizeScore } from '../scoring.js';
+import { initialPuzzle, startPuzzle, placePiece } from '../../minigames/picture-rules.js';
+test('Renoir speed boundaries award only completed puzzles and freeze after completion', () => {
+  for (const [ms, points] of [[0,15],[30000,15],[30001,10],[45000,10],[45001,5],[60000,5],[60001,0]]) {
+    assert.equal(pictureSpeedPoints(ms), points);
+    let puzzle = startPuzzle(initialPuzzle(), 1000);
+    let state = readMission(newGame()).state;
+    assert.equal(totalScore(synchronizeScore(state, {restoration:puzzle})), 0);
+    for(let i=0;i<8;i++) puzzle=placePiece(puzzle,i,i,1000+ms);
+    state=solveStation(state,'restoration',{mistakes:0,hints:0}).state;
+    state=synchronizeScore(state,{restoration:puzzle});
+    assert.equal(totalScore(state),points);
+    assert.equal(totalScore(synchronizeScore(state,{restoration:puzzle},99999999)),points);
+  }
 });

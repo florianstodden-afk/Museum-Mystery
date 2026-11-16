@@ -75,8 +75,8 @@ function linesForImani(state) {
     ]);
   }
   return talk([
-    'Bring me anything made of paper and I will tell you what it is made of.',
-    'Forgers forget the lamp. The right light shows what ordinary ink hides.',
+    'The picture puzzle is on the left side of the Gallery, beside the wall label and frame rack.',
+    'Restore Renoir’s Sea and Cliffs at Station L. I will then use the lamp to reveal the mark on the transport slip.',
   ]);
 }
 

@@ -8,7 +8,7 @@
 //   A WRONG ANSWER at the safe or the final question is allowed: it is counted as an
 //   attempt, so `state` changes (attempts + 1) and ok is false.
 import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById } from './case-1.js';
-import { stationPoints } from './scoring.js';
+import { stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
 
 export const ENDING_IDS = ['heist', 'open-file'];
 
@@ -22,6 +22,7 @@ export function newGame() {
   return {
     caseVersion: CASE_VERSION,
     missionRead: false,
+    penalties: emptyPenalties(),
     stations,
     letters: [null, null, null, null], // fixed slots: landscape, portraits, restoration, archive
     evidence: [],                      // evidence ids, in the order they were found
@@ -42,7 +43,7 @@ function reject(state, message) {
 }
 
 function accept(state, message) {
-  return { state, ok: true, message };
+  return { state: synchronizeScore(state), ok: true, message };
 }
 
 function isOver(state) {
@@ -66,13 +67,22 @@ export function solveStation(state, stationId, result = {}) {
   if (!state.missionRead) return reject(state, 'Read the message from M first.');
   if (state.stations[stationId].solved) return reject(state, `${station.room} is already solved.`);
 
-  const mistakes = toCount(result.mistakes);
-  const hints = toCount(result.hints);
+  const mistakes = Math.max(state.stations[stationId].mistakes, toCount(result.mistakes));
+  const hints = Math.max(state.stations[stationId].hints, toCount(result.hints));
   const next = copy(state);
   next.stations[stationId] = { solved: true, mistakes, hints, points: stationPoints(mistakes, hints) };
   next.letters[STATION_IDS.indexOf(stationId)] = station.letter;
   next.evidence.push(station.evidenceId);
   return accept(next, `${station.room} solved: letter ${station.letter}. Evidence: ${station.evidence}`);
+}
+
+// Save in-progress counts as well as final results, so closing cannot refund mistakes.
+export function recordStationProgress(state, stationId, progress) {
+  if (!stationById(stationId) || !state.missionRead || isOver(state) || state.stations[stationId].solved) return state;
+  const next = copy(state);
+  next.stations[stationId].mistakes = Math.max(next.stations[stationId].mistakes, toCount(progress?.mistakes));
+  next.stations[stationId].hints = Math.max(next.stations[stationId].hints, toCount(progress?.hints));
+  return synchronizeScore(next);
 }
 
 // Turns anything that is not a whole number ≥ 0 into 0, so a broken station cannot break the score.
@@ -115,7 +125,7 @@ export function tryOpenSafe(state, word) {
   const next = copy(state);
   if (guess !== CODEWORD) {
     next.safe.attempts += 1;
-    return { state: next, ok: false, message: 'The lock does not move. Check the order in your journal.' };
+    return { state: synchronizeScore(next), ok: false, message: 'The lock does not move. Check the order in your journal.' };
   }
   next.safe.open = true;
   return accept(next, 'The safe opens. Inside: the original painting and a folder of documents.');
@@ -131,7 +141,7 @@ export function accuse(state, suspectId) {
   const next = copy(state);
   if (suspectId !== CASE.culpritId) {
     next.accusation.attempts += 1;
-    return { state: next, ok: false, message: `Not ${suspect.name}. ${suspect.counterText} Try again.` };
+    return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. ${suspect.counterText} Try again.` };
   }
   next.accusation.solved = true;
   return accept(next, 'Adrien Voss. The false label, the patron visit, the “V” and the frame order all lead to him. ' +

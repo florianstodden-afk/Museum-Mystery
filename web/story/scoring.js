@@ -1,5 +1,6 @@
-// Points for "Museum Nocturne". Maximum: 4 stations × 20 + safe 10 + final question 10 = 100.
-// No time-based scoring. The endings give no extra points.
+// Points for "Museum Nocturne". Maximum: 3 stations × 20 + Renoir 15 + safe 10 + final question 10 = 95.
+// Renoir awards 15/10/5/0 by completion time; other stations retain their standard rules.
+import { elapsedMs, validPuzzle } from '../minigames/picture-rules.js';
 import { CASE, STATION_IDS } from './case-1.js';
 
 export const STATION_MAX = 20;
@@ -9,7 +10,7 @@ export const HINT_COST = 5;
 export const SAFE_MAX = 10;
 export const ACCUSATION_MAX = 10;
 export const POINTS_AFTER_MISTAKE = 5;
-export const MAX_SCORE = STATION_IDS.length * STATION_MAX + SAFE_MAX + ACCUSATION_MAX;
+export const MAX_SCORE = (STATION_IDS.length - 1) * STATION_MAX + 15 + SAFE_MAX + ACCUSATION_MAX;
 
 // Points for one solved station: 20 − 3 per mistake − 5 per hint, but never less than 5.
 export function stationPoints(mistakes, hints) {
@@ -34,8 +35,8 @@ export function scoreBreakdown(state) {
     return {
       id: station.id,
       label: `${station.room} (${station.letter})`,
-      points: progress.solved ? progress.points : 0,
-      max: STATION_MAX,
+      points: progress.solved ? Math.min(progress.points, station.id === 'restoration' ? 15 : STATION_MAX) : 0,
+      max: station.id === 'restoration' ? 15 : STATION_MAX,
       detail: progress.solved
         ? `${progress.mistakes} mistake(s), ${progress.hints} hint(s)`
         : 'not solved',
@@ -62,4 +63,15 @@ export function totalScore(state) {
   let total = 0;
   for (const row of scoreBreakdown(state)) total += row.points;
   return total;
+}
+
+// Compatibility with saves from the former deduction-based branch.
+export function emptyPenalties() { return Object.fromEntries([...STATION_IDS, 'safe', 'accusation', 'picture'].map(id => [id, 0])); }
+export function pictureSpeedPoints(ms) { return ms <= 30000 ? 15 : ms <= 45000 ? 10 : ms <= 60000 ? 5 : 0; }
+export function synchronizeScore(state, progress = {}) {
+  const puzzle = progress.restoration;
+  if (!state.stations.restoration.solved || !validPuzzle(puzzle) || puzzle.finishedAt === null) return state;
+  const points = pictureSpeedPoints(elapsedMs(puzzle, puzzle.finishedAt));
+  if (state.stations.restoration.points === points) return state;
+  return { ...state, stations: { ...state.stations, restoration: { ...state.stations.restoration, points } } };
 }

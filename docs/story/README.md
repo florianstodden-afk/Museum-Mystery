@@ -10,7 +10,7 @@ Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nich
 |---|---|
 | `web/story/case-1.js` | Falldaten (eingefroren): Auftrag, vier Stationen, Notizen, Verdächtige, sechs Met-Werke. |
 | `web/story/engine.js` | Spielregeln: `newGame`, `readMission`, `solveStation`, `addNote`, `canOpenSafe`, `tryOpenSafe`, `accuse`, `chooseEnding`, `nextStep`, `isComplete`. Jede Aktion gibt `{ state, ok, message }` zurück. |
-| `web/story/scoring.js` | Punkte: `stationPoints`, `safePoints`, `accusationPoints`, `scoreBreakdown`, `totalScore` (max. 100). |
+| `web/story/scoring.js` | Start bei 100, gespeicherte Abzüge und Puzzle-Zeitstufen: `synchronizeScore`, `scoreBreakdown`, `totalScore`. Alte Punktefunktionen bleiben für Spielstand-Kompatibilität. |
 | `web/story/save.js` | `serialize` / `deserialize` mit Prüfung (kaputt, alte Version, unmögliche Zustände → `null`). |
 | `web/story/stations.js` | Adapter `openStation`: hängt jede Station gleich an, übersetzt die Rückmeldung in `{ mistakes, hints }`. |
 | `web/story/hints.js` | `hintFor(state, level)`: Hinweis passend zum Fortschritt (kostet keine Punkte, nach zwei Fehlversuchen konkret). |
@@ -66,7 +66,7 @@ Dann im Browser öffnen:
 2. Security Office: Monitorwand und Schichtplan ansehen (Notizen im Journal).
 3. „Talk to Leon“ – dann Portrait Hall lösen – noch einmal mit Leon sprechen (er ist entlastet).
 4. Landscape Gallery: echte Station 1. Einmal falsch (1881 + Oil), dann richtig (1889 + Oil).
-5. Die drei anderen Stationen mit dem Platzhalter lösen. Im Journal stehen B‑I‑L‑D an festen Plätzen.
+5. Das Bilderpuzzle L lösen; I und D verwenden noch Platzhalter. Im Journal stehen B‑I‑L‑D an festen Plätzen.
 6. Safe: zweimal ein falsches Wort (z. B. `DLIB`, `LIBD`), dann „💡 Hint“ (nennt jetzt die Buchstaben), dann `bild`.
 7. „Look at the documents“: erst Leon oder Dr. Vale wählen (Feedback, welcher Beleg dagegen spricht), dann Adrien Voss.
 8. Ein Ende wählen, Punkte ansehen, „New game“ → bestätigen, zweites Ende spielen.

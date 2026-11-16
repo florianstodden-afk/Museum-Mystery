@@ -11,6 +11,7 @@ class FakeElement {
     this.ownText = '';
     this.disabled = false;
     this.value = '';
+    this.style = { setProperty(name, value) { this[name] = value; } };
   }
   set textContent(text) { this.ownText = String(text); this.children = []; }
   get textContent() { return this.ownText + this.children.map(child => child.textContent).join(''); }
@@ -25,7 +26,7 @@ class FakeElement {
     for (const listener of this.listeners[type] ?? []) listener(event);
   }
   click() { if (!this.disabled) this.dispatch('click'); }
-  focus() {}
+  focus() { document.activeElement = this; }
 }
 
 class FakeText {

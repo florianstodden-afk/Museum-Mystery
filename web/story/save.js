@@ -2,6 +2,7 @@
 // No localStorage here – the page that uses this decides where the text is stored.
 import { CASE, CASE_VERSION, STATION_IDS } from './case-1.js';
 import { ENDING_IDS } from './engine.js';
+import { synchronizeScore, emptyPenalties } from './scoring.js';
 
 export function serialize(state) {
   return JSON.stringify(state);
@@ -15,7 +16,7 @@ export function deserialize(text) {
   } catch {
     return null;
   }
-  return isValidState(value) ? value : null;
+  return isValidState(value) ? synchronizeScore(value) : null;
 }
 
 function isCount(value) {
@@ -32,6 +33,14 @@ export function isValidState(value) {
   if (value === null || typeof value !== 'object') return false;
   if (value.caseVersion !== CASE_VERSION) return false;
   if (typeof value.missionRead !== 'boolean') return false;
+  if (value.penalties !== undefined) {
+    if (!value.penalties || typeof value.penalties !== 'object') return false;
+    for (const id of Object.keys(emptyPenalties())) {
+      if (!isCount(value.penalties[id])) return false;
+      const cap = id === 'safe' || id === 'accusation' ? 5 : 15;
+      if (value.penalties[id] > cap) return false;
+    }
+  }
 
   if (value.stations === null || typeof value.stations !== 'object') return false;
   for (const id of STATION_IDS) {

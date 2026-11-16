@@ -49,6 +49,7 @@ test('gallery archway accepts a slightly off-centre approach',()=>{
   assert.ok(returned.player.x<9);assert.equal(returned.player.y,5.5);
 });
 test('back-wall artwork remains reachable, old saves in new obstacles recover safely',()=>{
+  assert.equal(nearbyObject(at(12,4)).id,'note');
   assert.equal(nearbyObject(at(14,4)).id,'painting');
   assert.equal(nearbyObject(at(16,4)).id,'frames');
   for(const p of [{x:16,y:2},...GALLERY_BENCHES,{x:10,y:14}]){
@@ -57,6 +58,15 @@ test('back-wall artwork remains reachable, old saves in new obstacles recover sa
     assert.deepEqual(restored.player,{x:11,y:6});assert.equal(restored.steps,42);
     assert.deepEqual(restoreState(JSON.parse(JSON.stringify(restored)),false),restored);
   }
+});
+
+test('Station L is left of B and D and each station has an independent walking approach',()=>{
+  // Start in the clear corridor above the benches and approach each wall marker.
+  for(const [x,id] of [[12,'note'],[14,'painting'],[16,'frames']]) {
+    const approached=walk(at(x,6),[0,-1],400);
+    assert.equal(nearbyObject(approached)?.id,id);
+  }
+  assert.equal(nearbyObject(at(12,13)),null,'the transport slip no longer opens Station L here');
 });
 test('camera status repeats slowly through both red-light states',()=>{
   assert.equal(cameraLightOn(0),true);assert.equal(cameraLightOn(899),true);

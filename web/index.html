@@ -16,7 +16,7 @@
     <section class="game-layout">
       <div class="stage-wrap">
         <div class="stage-head"><span id="room">Great Hall</span><span>WASD / arrows to move · E to interact / close</span></div>
-        <canvas id="game" width="1792" height="1152" aria-label="Walkable 2D museum map"></canvas>
+        <canvas id="game" width="1792" height="1152" tabindex="0" aria-label="Walkable 2D museum map"></canvas>
         <div class="controls" aria-label="Touch movement controls">
           <button data-move="up" aria-label="Move up">▲</button>
           <div><button data-move="left" aria-label="Move left">◀</button><button id="touch-interact">E · Interact</button><button data-move="right" aria-label="Move right">▶</button></div>
@@ -26,7 +26,7 @@
       <aside class="sidebar" id="sidebar" hidden>
         <div class="panel case"><p class="eyebrow">YOUR MISSION</p><h2>Bring the painting out before sunrise.</h2><p>M wants Van Gogh’s “Wheat Field with Cypresses” from the safe. Solve the four stations, read the word in your journal and decide who gets the painting.</p><button id="mission" class="plain" type="button">Read M’s message</button></div>
         <div class="panel" id="journal"></div>
-        <div class="panel status"><span id="progress">0 / 4 letters</span><span id="pass">0 / 100 points</span><span id="steps">0 steps</span></div>
+        <div class="panel status"><span id="progress">0 / 4 letters</span><span id="pass">100 / 100 points</span><span id="steps">0 steps</span></div>
         <div class="panel"><p class="eyebrow">ART SOURCES</p><p>Artworks: <a href="https://www.metmuseum.org/art/collection/search/436121" target="_blank" rel="noopener">Degas</a> · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">Van Gogh</a> · <a href="https://www.metmuseum.org/art/collection/search/12127" target="_blank" rel="noopener">Sargent</a>. The Metropolitan Museum of Art, Open Access.</p></div>
         <div class="panel help"><p class="eyebrow">HOW TO PLAY</p><p>Move next to a person or marked object and press <kbd>E</kbd>. The orange vault door is the safe: it opens with the word from your journal.</p></div>
       </aside>
@@ -34,7 +34,7 @@
     <p class="credit">Fictional museum and characters. Artwork data and image: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
   </main>
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-    <div class="dialog-card"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
+    <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
   <script type="module" src="main.js"></script>
 </body>
