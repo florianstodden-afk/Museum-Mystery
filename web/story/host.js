@@ -30,6 +30,7 @@ import { examine as examineOffice } from './security-office/interactions.js';
 import { el, button } from './dom.js';
 import { synchronizeScore } from './scoring.js';
 import { validPuzzle } from '../minigames/picture-rules.js';
+import { soundFor } from './sound.js';
 
 export const DEFAULT_STORAGE_KEY = 'museum-nocturne-story-v1';
 
@@ -39,6 +40,7 @@ export function createStoryHost(options) {
     closePanel: hidePanel,
     onChange = () => {},
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
+    sound = null,             // optional: a player from sound.js; without it the story is silent
     stations = {},
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
@@ -49,7 +51,7 @@ export function createStoryHost(options) {
   state = synchronizeScore(state, progress, now());
   // Recover if the page closed between saving the final placement and awarding L.
   if (validPuzzle(progress.restoration) && progress.restoration.solved && !state.stations.restoration.solved) {
-    state = solveStation(state, 'restoration', progress.restoration).state;
+    state = synchronizeScore(solveStation(state, 'restoration', progress.restoration).state, progress);
   }
   save();
   let hintLevel = 1;          // first hint is gentle, asking again gives a concrete one
@@ -88,8 +90,11 @@ export function createStoryHost(options) {
   }
 
   // Every engine action goes through here: keep the new state, save, tell the page.
-  function act(result) {
+  // `action` names the engine function, so the right sound can be chosen (see sound.js).
+  function act(result, action = null) {
+    const before = state;
     state = synchronizeScore(result.state, progress, now());
+    sound?.play(soundFor(action, result, before));
     save();
     onChange(state, result.message);
     return { ...result, state };
@@ -100,7 +105,7 @@ export function createStoryHost(options) {
   function tick() {
     const next = synchronizeScore(state, progress, now());
     if (next === state) return;
-    state = next; save(); onChange(state, 'Puzzle time deduction updated.');
+    state = next; save(); onChange(state, 'Puzzle score updated.');
   }
 
   // ---------- Panel helpers ----------
@@ -129,7 +134,7 @@ export function createStoryHost(options) {
       return;
     }
     actions.append(button('Accept the mission', () => {
-      act(readMission(state));
+      act(readMission(state), 'readMission');
       closePanel();
     }));
   }
@@ -143,7 +148,7 @@ export function createStoryHost(options) {
   }
 
   function examine(pointId) {
-    const result = act(examineOffice(state, pointId));
+    const result = act(examineOffice(state, pointId), 'examine');
     const { content, actions } = scene(result.title || 'Examine');
     content.append(el('p', { className: 'story-text', text: result.text }));
     if (result.message) content.append(el('p', { className: 'story-feedback', text: result.message }));
@@ -167,7 +172,7 @@ export function createStoryHost(options) {
     }
     stationCleanup = runStation(stations[stationId] ?? placeholderStation, content, {
       stationId,
-      caseData: { now, getPuzzleDeduction: () => state.penalties.picture },
+      caseData: { now, playSound: id => sound?.play(id) },
       savedProgress: progress[stationId] ?? null,
       onProgress(next) {
         progress = { ...progress, [stationId]: next };
@@ -176,7 +181,7 @@ export function createStoryHost(options) {
         onChange(state, 'Station progress saved.');
       },
       onSolved(result) {
-        const outcome = act(solveStation(state, stationId, result));
+        const outcome = act(solveStation(state, stationId, result), 'solveStation');
         if (outcome.ok) {
           content.append(el('p', { className: 'story-feedback', text: `Letter ${station.letter} is now in your journal.` }));
         }
@@ -195,7 +200,7 @@ export function createStoryHost(options) {
   function showSafe(message) {
     const { content, actions } = scene('The Vault');
     renderSafe(content, { state, message }, word => {
-      const result = act(tryOpenSafe(state, word));
+      const result = act(tryOpenSafe(state, word), 'tryOpenSafe');
       showSafe(result.message);
     });
     actions.append(state.safe.open
@@ -206,7 +211,7 @@ export function createStoryHost(options) {
   function showAccusation(message) {
     const { content, actions } = scene('The final question');
     renderAccusation(content, { state, message }, suspectId => {
-      const result = act(accuse(state, suspectId));
+      const result = act(accuse(state, suspectId), 'accuse');
       showAccusation(result.message);
     });
     actions.append(state.accusation.solved
@@ -217,7 +222,7 @@ export function createStoryHost(options) {
   function showEndingChoice() {
     const { content, actions } = scene('Before sunrise');
     renderEndingChoice(content, endingId => {
-      act(chooseEnding(state, endingId));
+      act(chooseEnding(state, endingId), 'chooseEnding');
       showEnding();
     });
     actions.append(closeButton('Not yet'));
@@ -234,6 +239,7 @@ export function createStoryHost(options) {
     const step = currentStep();
     if (step !== hintStep) { hintStep = step; hintLevel = 1; }
     const hint = hintFor(state, hintLevel);
+    sound?.play('hint');
     const { content, actions } = scene(`A hint from ${hint.from}`);
     content.append(
       el('p', { className: 'story-eyebrow', text: hintLevel === 1 ? 'HINT' : 'MORE CONCRETE HINT' }),

@@ -84,7 +84,7 @@ test('a whole game runs through the host, including wrong answers', () => {
   assert.equal(host.state.ending, 'open-file');
   assert.equal(page.title, 'Case closed');
   // 17 + 20 + 20 + 20 + safe 5 + question 5
-  assert.match(page.panel.textContent, /87 \/ 100/);
+  assert.match(page.panel.textContent, /82 \/ 95/);
 });
 
 test('the vault always opens the right step of the story', () => {
@@ -202,23 +202,23 @@ test('puzzle order, placements and wall clock survive closing and a fresh host',
   data.onChange(puzzle);
   host.leaveStation();
   now = 31001; host.tick();
-  assert.equal(totalScore(host.state),95);
+  assert.equal(totalScore(host.state),0);
   now = 46001;
   const again = createStoryHost(options);
-  assert.equal(totalScore(again.state),90,'time away is included before the station opens');
+  assert.equal(totalScore(again.state),0,'no points before completion');
   again.openStation('restoration');
   assert.deepEqual(data.state,puzzle);
   puzzle = placePiece(puzzle,3,null,now);
   for (let i=0;i<8;i++) puzzle=placePiece(puzzle,i,i,now);
   data.onChange(puzzle); finish({ mistakes: 0, hints: 0 }); finish({ mistakes: 10, hints: 1 });
   now = 999999; again.tick();
-  assert.equal(totalScore(again.state),90,'the final placement freezes the time tier');
+  assert.equal(totalScore(again.state),5,'the final placement freezes the time tier');
   assert.deepEqual(again.state.evidence,['hidden-mark']);
   assert.equal(again.state.letters[2],'L');
   again.openStation('restoration');
   assert.match(page.panel.textContent,/Already solved/);
   again.reset();
-  assert.equal(totalScore(again.state),100);
+  assert.equal(totalScore(again.state),0);
   assert.deepEqual(JSON.parse(page.storage.getItem('test-key')).progress,{});
 });
 
@@ -228,10 +228,10 @@ test('old in-progress deductions migrate and a completed legacy L is not timed',
   delete old.penalties;
   page.storage.setItem('test-key',JSON.stringify({ story:JSON.stringify(old), progress:{ landscape:{ mistakes:2,hints:1,solved:false }, restoration:{ solved:true,mistakes:1,hints:1 } } }));
   const host=createStoryHost({...page.options,now:()=>99999999});
-  assert.equal(totalScore(host.state),81);
+  assert.equal(totalScore(host.state),12);
   host.tick(); host.openStation('restoration');
-  assert.equal(totalScore(host.state),81);
-  assert.equal(host.state.penalties.picture,0);
+  assert.equal(totalScore(host.state),12);
+
   assert.deepEqual(host.state.evidence,['hidden-mark']);
 });
 
@@ -243,6 +243,31 @@ test('a saved final placement recovers completion once after interruption', () =
   for(let i=0;i<2;i++) {
     const host=createStoryHost({...page.options,now:()=>999999});
     assert.deepEqual(host.state.evidence,['hidden-mark']);
-    assert.equal(totalScore(host.state),95);
+    assert.equal(totalScore(host.state),10);
   }
+});
+test('the host plays a sound for each story moment and stays silent without a player', () => {
+  const page = fakePage();
+  const played = [];
+  const host = createStoryHost({ ...page.options, sound: { play: id => { if (id) played.push(id); } } });
+  host.start();
+  click(page, 'Accept the mission');
+  for (const id of ['landscape', 'portraits', 'restoration', 'archive']) {
+    host.openStation(id);
+    click(page, 'Solve station (placeholder)');
+  }
+  host.showHint();
+  host.openVault();
+  submitWord(page, '   ');   // rejected: silent
+  submitWord(page, 'DLIB');  // wrong
+  submitWord(page, 'bild');  // opens
+  click(page, 'Look at the documents');
+  click(page, 'Leon');       // wrong
+  click(page, 'Adrien Voss');
+  click(page, 'Decide what happens');
+  click(page, 'Hand the painting to Voss');
+  assert.deepEqual(played, ['page', 'letter', 'letter', 'letter', 'letter', 'hint', 'wrong', 'unlock', 'wrong', 'letter', 'ending-heist']);
+
+  const silent = createStoryHost({ ...fakePage().options });
+  assert.doesNotThrow(() => silent.showHint());
 });

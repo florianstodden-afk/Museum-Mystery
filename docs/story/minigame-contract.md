@@ -1,6 +1,6 @@
 # Vertrag für Stationen (Minispiele) – Museum Nocturne
 
-Dieser Vertrag gilt für die Stationen 2–4 (**Portrait Hall**, **Gallery Picture Puzzle**, **Frame Archive**) und beschreibt, wie jede Station an die Story-Engine in `web/story/` angeschlossen wird. Station 1 (`web/minigames/landscape.js`) erfüllt ihn bereits.
+Dieser Vertrag gilt für die Stationen 2–4 (**Portrait Hall**, **Conservation Studio**, **Frame Archive**) und beschreibt, wie jede Station an die Story-Engine in `web/story/` angeschlossen wird. Station 1 (`web/minigames/landscape.js`) erfüllt ihn bereits.
 
 ## Kurz gesagt
 
@@ -17,7 +17,7 @@ Dieser Vertrag gilt für die Stationen 2–4 (**Portrait Hall**, **Gallery Pictu
    onSolved({ mistakes, hints });
    ```
 
-   Das ist alles. **Buchstabe, Beleg und Punkteabzüge verwaltet die Engine**, nicht die Station. Wenn du zusätzlich `letter`, `evidence` oder `points` mitschickst, werden sie ignoriert.
+   Das ist alles. **Buchstabe, Beleg und Punkte vergibt die Engine**, nicht die Station. Wenn du zusätzlich `letter`, `evidence` oder `points` mitschickst, werden sie ignoriert.
 
 ## Was du bekommst
 
@@ -76,7 +76,7 @@ export function start(container, caseData, onSolved) {
 
 ## Ausprobieren ohne Hauptspiel
 
-In `web/dev/story.html` verwenden I und D den Platzhalter `web/story/placeholder-station.js`; L verwendet `web/minigames/picture-puzzle.js`, wie im Hauptspiel. Um deine Station dort zu testen, reicht eine Zeile in `web/dev/story-preview.js`: dein Modul importieren und bei `createStoryHost({ stations: { … } })` eintragen, z. B. `stations: { landscape: landscapeStation, archive: archiveStation }`. Stationen ohne Eintrag bekommen automatisch den Platzhalter.
+In `web/dev/story.html` werden Stationen 2–4 mit dem Platzhalter `web/story/placeholder-station.js` geöffnet. Um deine Station dort zu testen, reicht eine Zeile in `web/dev/story-preview.js`: dein Modul importieren und bei `createStoryHost({ stations: { … } })` eintragen, z. B. `stations: { landscape: landscapeStation, archive: archiveStation }`. Stationen ohne Eintrag bekommen automatisch den Platzhalter.
 
 Der Adapter `openStation` in `web/story/stations.js` übersetzt deine Rückmeldung. Er akzeptiert:
 
@@ -102,12 +102,15 @@ Ein zweiter Aufruf von `onSolved` wird ignoriert.
 
 | Station | id | Buchstabe | Beleg (vergibt die Engine) | Werke (Met-ID) |
 |---|---|---|---|---|
-| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 12127, 435876 |
-| Gallery Picture Puzzle | `restoration` | L | Hidden mark “V” on the fake transport slip. | 459111 |
-| Frame Archive | `archive` | D | Frame label: “Ordered by: A. Voss”. | 436121 |
+| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**fertig:** `web/minigames/portrait-timeline.js`) |
+| Conservation Studio | `restoration` | L | Hidden mark “V” on the fake transport slip. | 435882 |
+| Frame Archive | `archive` | D | Frame label: “Ordered by: A. Voss”. | 435882 (seit 15.11.2026; vorher 436121, das jetzt Station I nutzt) |
+
+Station I (Portrait Hall) erfüllt diesen Vertrag als zweites Beispiel nach Station B: drei Dateien (`portrait-rules.js` reine Regeln, `portrait-artwork.js` Met-API mit Prüfung und Offline-Kopie, `portrait-timeline.js` Oberfläche) plus `portrait-timeline.test.js`. Die richtige Reihenfolge kommt aus den eingefrorenen Feldern `objectBeginDate`/`objectEndDate` in `case-1.js`, nie aus Live-Daten.
+
+**Hinweis für Station L:** Station D nutzt jetzt 435882 (Cézanne, Still Life). Wenn Station L ein eigenes Werk bekommt, bitte das neue Werk in `works` **ergänzen** und 435882 dort stehen lassen. Sonst zeigt Station D ins Leere; der Test „every station artwork exists in the work list“ meldet das.
 
 Die Zuordnung der Werke zu den Stationen 2–4 ist eine Annahme der Story-Logik (das Konzept nennt nur die Werkliste). Wenn ihr andere Werke nehmt, bitte `metIds` in `web/story/case-1.js` anpassen.
 
-## Puzzle-Zustand und Aufräumen
 
-Station L speichert `order`, `slots`, `startedAt`, `finishedAt` und `solved` über `onChange`. `start` darf eine Aufräumfunktion zurückgeben, die der Host beim Schließen aufruft (z. B. zum Stoppen der Anzeige-Aktualisierung). Die gespeicherte Startzeit läuft dennoch weiter. `scoring.js` berechnet den höchsten Zeitabzug; beide Seiten rufen `host.tick()` auf. Ein bereits gelöstes altes L bleibt ohne nachträglichen Zeitabzug gelöst.
+Station L integration: host preserves cleanup and saved progress. Renoir completion time awards 15 (<=30s), 10 (<=45s), 5 (<=60s), or 0 points. Other stations keep standard scoring; total maximum is 95. Saved completed legacy L rewards are capped at 15; unfinished puzzles award nothing.

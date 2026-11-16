@@ -1,3 +1,6 @@
+// PROTOTYPE: the main game does not use this drawing. Fabian's room (web/security-room.js) uses a
+// painted background; only interactions.js is used in the game. This file runs in web/dev/security-office.html
+// and provides LAYOUT for interactions.js. See docs/story/security-office.md.
 // The Security Office: a story room drawn on a canvas.
 // drawSecurityOffice(ctx, { width, height, time, feeds, background })
 //

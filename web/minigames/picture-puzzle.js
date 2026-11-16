@@ -2,7 +2,7 @@
 import { el, button } from '../story/dom.js';
 import { initialPuzzle, validPuzzle, startPuzzle, placePiece, elapsedMs } from './picture-rules.js';
 import { ARTWORK, loadArtwork } from './picture-artwork.js';
-import { puzzleTimePenalty } from '../story/scoring.js';
+import { pictureSpeedPoints } from '../story/scoring.js';
 
 export function start(container, caseData, onSolved) {
   let state = validPuzzle(caseData.state) ? structuredClone(caseData.state) : initialPuzzle();
@@ -18,7 +18,7 @@ export function start(container, caseData, onSolved) {
   const tray = el('div', { className: 'puzzle-tray', attrs: { 'aria-label': 'Piece tray' } });
   const layout = el('div', { className: 'puzzle-layout' }, [board, tray]);
   area.append(el('p', { text: 'Restore Renoir’s picture to uncover the hidden mark on the transport slip. Select a piece, then an empty slot. Dragging works too. Use Tab to move between pieces and slots, and Enter or Space to select and place. Wrong placements are free.' }),
-    el('p', { text: 'The clock starts with Start puzzle and keeps running when you leave. Up to 30s: no deduction; over 30s: −5; over 45s: −10; over 60s: −15 total.' }),
+    el('p', { text: 'The clock starts with Start puzzle and keeps running when you leave. Finish within 30s: +15 points; within 45s: +10; within 60s: +5; over 60s: 0. Points are awarded on completion.' }),
     clock, status, controls, layout,
     el('p', { className: 'story-muted' }, [
       `${ARTWORK.artist}, ${ARTWORK.title}, ${ARTWORK.date}. Public domain · `,
@@ -31,8 +31,8 @@ export function start(container, caseData, onSolved) {
     if (disposed) return;
     const elapsed = elapsedMs(state, now());
     const seconds = Math.floor(elapsed / 1000);
-    const deduction = Math.max(puzzleTimePenalty(elapsed), caseData.getPuzzleDeduction?.() ?? 0);
-    clock.textContent = `Elapsed: ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} · Puzzle deduction: −${deduction} points${state.solved ? ' · finished' : ''}`;
+    const deduction = pictureSpeedPoints(elapsed);
+    clock.textContent = `Elapsed: ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} · Completion reward: +${deduction} points${state.solved ? ' · finished' : ''}`;
   }
 
   // Labels follow the shuffled tray, so letters do not reveal the correct slots.

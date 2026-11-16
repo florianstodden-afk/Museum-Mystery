@@ -3,8 +3,10 @@ import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
+import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
+import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
 import { movementDuration, advancePlayer } from './motion.js';
 import { chooseGuardAction } from './guard.js';
 
@@ -18,6 +20,9 @@ let dialogOpener = null;
 const storeKey = 'museum-mystery-walk-v1';         // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
+// Small synthesized sounds for story moments; the player remembers 'muted'.
+const sound = createSoundPlayer();
+
 // The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
 const story = createStoryHost({
   openPanel(title) {
@@ -28,7 +33,8 @@ const story = createStoryHost({
   closePanel: closeDialog,
   onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
   onReset: resetWorld,
-  stations: { landscape: landscapeStation, restoration: pictureStation },
+  sound,
+  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
   storageKey: 'museum-nocturne-story-v1',
 });
 
@@ -37,7 +43,6 @@ try { state = restoreState(JSON.parse(localStorage.getItem(storeKey)), story.sta
 catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
-let metArtwork = null;
 const hallPaintings = [436121, 436535, 12127].map(id => {
   const image = new Image(); image.onload = () => draw(); image.src = `./assets/met-${id}.jpg`; return image;
 });
@@ -46,10 +51,11 @@ const drawSecurityRoom = createSecurityRenderer();
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const hallBackdrop = new Image();
 hallBackdrop.onload = () => draw();
-hallBackdrop.src = './assets/great-hall-security-door.png';
+hallBackdrop.src = './assets/great-hall-security-door.jpg';
 const wallArtwork = new Image();
 let artworkReady = false;
 wallArtwork.onload = () => { artworkReady = true; draw(); };
+wallArtwork.src = './assets/met-436535.jpg'; // bundled copy, no API call needed
 let displayPlayer = { ...state.player };
 let movementAnimation = null;
 let facing = 'down';
@@ -68,21 +74,20 @@ function guardDisplay(){
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
   return {x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t, y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
 }
-let metStatus = 'loading';
 
-fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/436535')
-  .then(response => { if (!response.ok) throw new Error('API unavailable'); return response.json(); })
-  .then(data => { if (!data.isPublicDomain || !data.primaryImageSmall) throw new Error('Image is not public'); metArtwork = data; metStatus = 'ready'; wallArtwork.src = data.primaryImageSmall; })
-  .catch(() => { metStatus = 'offline'; });
-
+let renderedStory = null; // the story state the journal currently shows
 function save() { savePosition(); draw(); }
 function updateSidebar() {
   document.body.dataset.room = state.room==='security' ? 'security' : state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
   document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
+  document.querySelector('#steps').textContent = `${state.steps} steps`;
+  // Walking saves the position several times a second. The journal only changes with the story,
+  // so it is rebuilt only when the story state is a new object (every story action creates one).
+  if (story.state === renderedStory) return;
+  renderedStory = story.state;
   const model = journalModel(story.state);
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
   document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
-  document.querySelector('#steps').textContent = `${state.steps} steps`;
   renderJournal(document.querySelector('#journal'), model);
 }
 
@@ -297,6 +302,8 @@ function resetWorld(){
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
 const heldKeys = new Map();
 let lastSavedAt=0;
+let lastStepAt=0; // time of the last footstep sound
+function currentRoom(){return state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';}
 function savePosition(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
 function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
@@ -334,6 +341,8 @@ function animate(now){
     if(next!==state){
       if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9))) roomTransition={start:now,destination:next,switched:false};
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
+      // Footsteps while the player really moves; each floor sounds different (see story/sound.js).
+      if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
   draw(); // Animate NPCs even while the player is idle.
@@ -379,6 +388,16 @@ document.querySelector('#touch-interact').addEventListener('click',handleInterac
 document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
 document.querySelector('#reset').addEventListener('click',()=>story.confirmNewGame());
 document.querySelector('#hint').addEventListener('click',()=>story.showHint());
+const soundButton=document.querySelector('#sound-toggle');
+function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');}
+soundButton.addEventListener('click',()=>{sound.toggle();showSoundState();sound.play('click');});
+showSoundState();
+const musicButton=document.querySelector('#music-toggle');
+function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music';musicButton.setAttribute('aria-pressed',String(sound.musicOn));}
+musicButton.addEventListener('click',()=>{sound.toggleMusic();showMusicState();});
+showMusicState();
+// Browsers only allow sound after the first click or key press; music that was left on starts then.
+for(const type of ['pointerdown','keydown'])document.addEventListener(type,()=>sound.resumeMusic(),{once:true});
 document.querySelector('#mission').addEventListener('click',()=>story.showMission());
 save();
 story.start(); // M's message on the very first visit

@@ -4,11 +4,13 @@
 import { CASE, workById } from '../story/case-1.js';
 import { canOpenSafe } from '../story/engine.js';
 import { createStoryHost } from '../story/host.js';
+import { createSoundPlayer } from '../story/sound.js';
 import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
 import * as landscapeStation from '../minigames/landscape.js';
 import * as pictureStation from '../minigames/picture-puzzle.js';
+import * as portraitStation from '../minigames/portrait-timeline.js';
 
 // ---------- The dialog this page offers to the host ----------
 
@@ -45,15 +47,17 @@ modal.addEventListener('click', event => { if (event.target === modal) closePane
 
 // ---------- The host ----------
 
+const sound = createSoundPlayer();
 const story = createStoryHost({
   openPanel,
+  sound,
   closePanel,
   onChange(state, message) {
     renderPage();
     document.querySelector('#toast').textContent = message;
   },
   // Teammates replace the placeholder by adding their module here, e.g. portraits: portraitsStation.
-  stations: { landscape: landscapeStation, restoration: pictureStation },
+  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
   storageKey: 'museum-nocturne-story-preview-v1',
 });
 
@@ -79,7 +83,7 @@ function renderRooms(state) {
   const cards = [];
   cards.push(roomCard({
     title: 'Great Hall',
-    image: new URL('../assets/great-hall-nyc.png', import.meta.url).href,
+    image: new URL('../assets/great-hall-nyc.jpg', import.meta.url).href,
     text: state.missionRead ? 'M’s message is in your pocket. The wings are open.' : 'Your phone buzzes. A message from M.',
     actions: [button(state.missionRead ? 'Read M’s message again' : 'Read M’s message', () => story.showMission())],
   }));
@@ -141,6 +145,22 @@ function renderPage() {
 document.querySelector('#new-game').addEventListener('click', () => story.confirmNewGame());
 document.querySelector('#talk-m').addEventListener('click', () => story.showMission());
 document.querySelector('#hint').addEventListener('click', () => story.showHint());
+const soundButton = document.querySelector('#sound-toggle');
+function showSoundState() {
+  soundButton.textContent = sound.muted ? '🔇 Muted' : '🔊 Sound';
+  soundButton.setAttribute('aria-pressed', String(!sound.muted));
+  soundButton.setAttribute('aria-label', sound.muted ? 'Sound is off. Turn sound on' : 'Sound is on. Turn sound off');
+}
+soundButton.addEventListener('click', () => { sound.toggle(); showSoundState(); sound.play('click'); });
+showSoundState();
+const musicButton = document.querySelector('#music-toggle');
+function showMusicState() {
+  musicButton.textContent = sound.musicOn ? '♪ Music on' : '♪ Music';
+  musicButton.setAttribute('aria-pressed', String(sound.musicOn));
+}
+musicButton.addEventListener('click', () => { sound.toggleMusic(); showMusicState(); });
+showMusicState();
+for (const type of ['pointerdown', 'keydown']) document.addEventListener(type, () => sound.resumeMusic(), { once: true });
 
 renderPage();
 story.start();

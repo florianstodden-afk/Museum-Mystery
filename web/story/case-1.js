@@ -51,8 +51,8 @@ export const CASE = deepFreeze({
       evidenceId: 'shift-log',
       evidence: 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.',
       pointsToVoss: 'Leon was on his round; the cart was booked as a “patron visit” – and Voss is the patron.',
-      task: 'Read the night-shift log next to the portraits and find out where Leon really was at 21:14.',
-      metIds: [12127, 435876],
+      task: 'Put the three portraits in the order they were painted, oldest first – their backs hold the night-shift log.',
+      metIds: [436121, 12127, 435876],
     },
     {
       id: 'restoration',
@@ -72,7 +72,7 @@ export const CASE = deepFreeze({
       evidence: 'Frame label: “Ordered by: A. Voss”.',
       pointsToVoss: 'The frame for the forgery was ordered by A. Voss – so the “V” is his, not Vale’s.',
       task: 'Find the empty frame that matches the forgery and read who ordered it.',
-      metIds: [436121],
+      metIds: [435882],
     },
   ],
 
@@ -123,6 +123,8 @@ export const CASE = deepFreeze({
 
   // Checked against the Met Collection API (collectionapi.metmuseum.org).
   // `title` is the full Met title, `shortTitle` the name used in the game.
+  // objectBeginDate/objectEndDate: frozen snapshot of the Met fields. Station I sorts by
+  // objectBeginDate (for a range like 1883–84 the start year counts). Never use live data for the order.
   works: [
     {
       id: 436535, shortTitle: 'Wheat Field with Cypresses', title: 'Wheat Field with Cypresses',
@@ -142,6 +144,7 @@ export const CASE = deepFreeze({
       id: 436121, shortTitle: 'A Woman Seated beside a Vase of Flowers', title: 'A Woman Seated beside a Vase of Flowers (Madame Paul Valpinçon?)',
       artist: 'Edgar Degas', date: '1865', medium: 'Oil on canvas',
       url: 'https://www.metmuseum.org/art/collection/search/436121',
+      objectBeginDate: 1865, objectEndDate: 1865, datesChecked: '2026-11-15',
       image: 'https://images.metmuseum.org/CRDImages/ep/web-large/DP-25460-001.jpg',
       checked: '2026-11-10',
     },
@@ -149,6 +152,7 @@ export const CASE = deepFreeze({
       id: 12127, shortTitle: 'Madame X', title: 'Madame X (Virginie Amélie Avegno Gautreau)',
       artist: 'John Singer Sargent', date: '1883–84', medium: 'Oil on canvas',
       url: 'https://www.metmuseum.org/art/collection/search/12127',
+      objectBeginDate: 1883, objectEndDate: 1884, datesChecked: '2026-11-15',
       image: 'https://images.metmuseum.org/CRDImages/ad/web-large/DP-29006-001.jpg',
       checked: '2026-11-10',
     },
@@ -156,7 +160,15 @@ export const CASE = deepFreeze({
       id: 435876, shortTitle: 'Madame Cézanne in a Red Dress', title: 'Madame Cézanne (Hortense Fiquet, 1850–1922) in a Red Dress',
       artist: 'Paul Cézanne', date: '1888–90', medium: 'Oil on canvas',
       url: 'https://www.metmuseum.org/art/collection/search/435876',
+      objectBeginDate: 1888, objectEndDate: 1890, datesChecked: '2026-11-15',
       image: 'https://images.metmuseum.org/CRDImages/ep/web-large/DP320128.jpg',
+      checked: '2026-11-10',
+    },
+    {
+      id: 435882, shortTitle: 'Still Life with Apples and a Pot of Primroses', title: 'Still Life with Apples and a Pot of Primroses',
+      artist: 'Paul Cézanne', date: 'ca. 1890', medium: 'Oil on canvas',
+      url: 'https://www.metmuseum.org/art/collection/search/435882',
+      image: 'https://images.metmuseum.org/CRDImages/ep/web-large/DT47.jpg',
       checked: '2026-11-10',
     },
     {

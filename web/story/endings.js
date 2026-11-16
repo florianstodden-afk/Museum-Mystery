@@ -78,10 +78,10 @@ export function renderEnding(container, model, options = {}) {
   const rows = model.breakdown.map(row => el('tr', {}, [
     el('th', { text: row.label, attrs: { scope: 'row' } }),
     el('td', { text: row.detail }),
-    el('td', { className: 'story-num', text: `−${row.deduction}` }),
+    el('td', { className: 'story-num', text: `${row.points} / ${row.max}` }),
   ]));
   const table = el('table', { className: 'story-score-table' }, [
-    el('caption', { text: 'Deductions from the starting 100 points' }),
+    el('caption', { text: 'Points per part' }),
     el('tbody', {}, rows),
     el('tfoot', {}, [el('tr', {}, [
       el('th', { text: 'Total', attrs: { scope: 'row' } }),
