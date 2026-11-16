@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY, MUSIC_KEY, stepSoundFor, nextMusicNote, musicPause, MUSIC_SCALE, varyStep } from '../sound.js';
+import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY, MUSIC_KEY, stepSoundFor, nextMusicNote, musicPause, MUSIC_SCALE, varyStep, stepReverb } from '../sound.js';
 import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../engine.js';
 import { memoryStorage } from '../host.js';
 
@@ -143,15 +143,20 @@ test('music is off by default, plays notes when switched on and stops when switc
   assert.equal(createSoundPlayer({ storage }).musicOn, true, 'the choice is remembered');
 });
 
-test('footsteps sound like walking: a low heel thump, no bright clicks', () => {
-  for (const room of ['hall', 'gallery', 'security', 'storage']) {
-    const tones = recipe(stepSoundFor(room));
-    const heel = tones[0];
-    assert.equal(heel.wave, 'sine', room);
-    assert.ok(heel.freq < 130 && heel.glideTo < heel.freq, `${room}: heel is low and drops`);
-    assert.ok(tones.every(t => t.freq <= 1500), `${room}: nothing bright`);
-    assert.ok(tones.every(t => t.start + t.duration <= 0.25), `${room}: short`);
+test('footsteps sound like heeled shoes: a short hard clack, then the room echoes', () => {
+  for (const room of ['hall', 'gallery', 'storage']) {
+    const [clack, ring] = recipe(stepSoundFor(room));
+    assert.equal(clack.wave, 'noise', room);
+    assert.ok(clack.duration <= 0.02, `${room}: the clack is very short`);
+    assert.ok(clack.freq >= 1500, `${room}: the clack is bright`);
+    assert.ok(ring.freq >= 600 && ring.glideTo < ring.freq, `${room}: the heel rings and dies away`);
   }
+  // The carpet swallows the clack.
+  assert.ok(recipe('step-office').every(t => t.freq <= 600));
+  // The big stone hall echoes longest; the carpeted office hardly at all.
+  const seconds = room => stepReverb(room).seconds;
+  assert.ok(seconds('hall') > seconds('storage') && seconds('storage') > seconds('gallery') && seconds('gallery') > seconds('security'));
+  assert.deepEqual(stepReverb('roof'), { seconds: 0, mix: 0 });
 });
 
 test('no two steps are identical, but they only vary a little', () => {

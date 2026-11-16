@@ -8,7 +8,7 @@ export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 
   'step-hall', 'step-gallery', 'step-office', 'step-storage'];
 export const MUSIC_KEY = 'museum-nocturne-music-v1';
 export const STEP_INTERVAL_MS = 420; // one footstep sound per 0.42 s of walking: a calm pace
-const STEP_VOLUME = 0.35;            // footsteps play at about a third of the other sounds
+const STEP_VOLUME = 0.3;             // footsteps play at about a third of the other sounds
 export const STORAGE_KEY = 'museum-nocturne-sound-v1';
 const MASTER_VOLUME = 0.22; // quiet by default
 
@@ -39,8 +39,9 @@ export function soundFor(action, result, before) {
 const NOTES = { C4: 261.63, D4: 293.66, Eb4: 311.13, E4: 329.63, G4: 392.0, A4: 440.0, Bb4: 466.16, C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A3: 220.0, D3: 146.83, G3: 196.0, C3: 130.81, F3: 174.61 };
 
 // A tone: { wave, freq, start, duration, volume } (seconds, volume 0..1). wave 'noise' = a short hiss.
-function tone(wave, note, start, duration, volume, glideTo = null) {
-  return { wave, freq: typeof note === 'number' ? note : NOTES[note], start, duration, volume, glideTo };
+// filter (only for noise): 'bandpass' keeps a band around freq, 'highpass' keeps everything above it.
+function tone(wave, note, start, duration, volume, glideTo = null, filter = 'bandpass') {
+  return { wave, freq: typeof note === 'number' ? note : NOTES[note], start, duration, volume, glideTo, filter };
 }
 
 export function recipe(id) {
@@ -61,16 +62,16 @@ export function recipe(id) {
       return [tone('noise', 3200, 0, 0.08, 0.3), tone('noise', 3200, 0.12, 0.08, 0.3), tone('noise', 3200, 0.24, 0.08, 0.3), tone('sine', 'G5', 0.4, 0.4, 0.25)];
     case 'ending-heist': // dark, minor
       return [tone('sine', 'D4', 0, 1.2, 0.35), tone('sine', 'F3', 0, 1.2, 0.3), tone('sine', 'A3', 0.3, 1.4, 0.25), tone('sine', 'D3', 0.6, 1.6, 0.3)];
-    // Footsteps: a real step is a soft heel thump (low tone that quickly drops)
-    // followed by the sole rolling off (quiet, low hiss). Each floor changes the mix.
-    case 'step-hall': // marble: firm heel, a little hard tap of the sole
-      return [tone('sine', 115, 0, 0.09, 0.32, 70), tone('noise', 1300, 0.05, 0.05, 0.07)];
-    case 'step-gallery': // wooden floor: deeper, warmer, slightly longer
-      return [tone('sine', 95, 0, 0.12, 0.36, 58), tone('noise', 600, 0.06, 0.06, 0.08)];
-    case 'step-office': // carpet: muffled, almost only the thump
-      return [tone('sine', 80, 0, 0.1, 0.24, 52), tone('noise', 350, 0.04, 0.07, 0.04)];
-    case 'step-storage': // stone: firm, with a faint echo of the bare room
-      return [tone('sine', 105, 0, 0.1, 0.32, 64), tone('noise', 900, 0.05, 0.05, 0.07), tone('sine', 105, 0.16, 0.08, 0.06, 64)];
+    // Footsteps: heeled shoes. Each step is a very short hard "clack" (a burst of high hiss
+    // plus a bright tone that dies away fast). The room echo comes from stepReverb() below.
+    case 'step-hall': // heel on marble: hard and bright
+      return [tone('noise', 3200, 0, 0.012, 0.5, null, 'highpass'), tone('triangle', 1650, 0, 0.045, 0.22, 1350), tone('sine', 190, 0, 0.03, 0.08, 120)];
+    case 'step-gallery': // heel on a wooden floor: a hollower, lower "tock"
+      return [tone('noise', 1800, 0, 0.015, 0.38), tone('triangle', 820, 0, 0.06, 0.24, 650), tone('sine', 150, 0, 0.04, 0.1, 100)];
+    case 'step-office': // heel on carpet: almost swallowed
+      return [tone('noise', 500, 0, 0.03, 0.12), tone('sine', 110, 0, 0.05, 0.08, 80)];
+    case 'step-storage': // heel on bare stone: hard, a bit darker than marble
+      return [tone('noise', 2600, 0, 0.012, 0.45, null, 'highpass'), tone('triangle', 1350, 0, 0.05, 0.2, 1100), tone('sine', 170, 0, 0.03, 0.08, 110)];
     case 'ending-open': // warm, major
       return [tone('sine', 'C4', 0, 1.2, 0.3), tone('sine', 'E4', 0.15, 1.2, 0.28), tone('sine', 'G4', 0.3, 1.2, 0.28), tone('sine', 'C5', 0.45, 1.5, 0.3)];
     default:
@@ -81,6 +82,16 @@ export function recipe(id) {
 // Which footstep fits the room the player is in.
 export function stepSoundFor(room) {
   return { hall: 'step-hall', gallery: 'step-gallery', security: 'step-office', storage: 'step-storage' }[room] ?? null;
+}
+
+// How long each room echoes (seconds) and how strong the echo is. A big stone hall rings longest.
+export function stepReverb(room) {
+  return {
+    hall: { seconds: 1.6, mix: 0.45 },
+    storage: { seconds: 0.9, mix: 0.35 },
+    gallery: { seconds: 0.6, mix: 0.25 },
+    security: { seconds: 0.25, mix: 0.08 },
+  }[room] ?? { seconds: 0, mix: 0 };
 }
 
 // No two steps sound the same: pitch and volume vary a little, left and right foot differ slightly.
@@ -161,8 +172,36 @@ export function createSoundPlayer(options = {}) {
     const master = ctx.createGain();
     master.gain.value = MASTER_VOLUME * STEP_VOLUME;
     master.connect(ctx.destination);
-    for (const t of varyStep(recipe(id), footIndex++)) playTone(ctx, master, t);
+    // Dry sound plus the room's echo.
+    const { seconds, mix } = stepReverb(room);
+    const output = seconds > 0 ? withReverb(ctx, master, seconds, mix) : master;
+    for (const t of varyStep(recipe(id), footIndex++)) playTone(ctx, output, t);
     return true;
+  }
+
+  // A simple artificial room echo: a ConvolverNode with fading noise as the "room answer".
+  const echoes = new Map();
+  function withReverb(ctx, destination, seconds, mix) {
+    if (!ctx.createConvolver) return destination;
+    if (!echoes.has(seconds)) {
+      const length = Math.floor(ctx.sampleRate * seconds);
+      const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
+      for (let channel = 0; channel < 2; channel++) {
+        const data = impulse.getChannelData(channel);
+        for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / length) ** 3;
+      }
+      echoes.set(seconds, impulse);
+    }
+    const input = ctx.createGain();           // the step goes in here …
+    const convolver = ctx.createConvolver();
+    convolver.buffer = echoes.get(seconds);
+    const wet = ctx.createGain();
+    wet.gain.value = mix;
+    input.connect(destination);               // … once dry,
+    input.connect(convolver);                 // … once through the echo,
+    convolver.connect(wet);
+    wet.connect(destination);
+    return input;
   }
 
   // One soft note with a quiet low drone under it, then wait and play the next one.
@@ -222,7 +261,7 @@ function playTone(ctx, destination, t) {
     source = ctx.createBufferSource();
     source.buffer = buffer;
     const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
+    filter.type = t.filter ?? 'bandpass';
     filter.frequency.value = t.freq;
     source.connect(filter);
     filter.connect(gain);
