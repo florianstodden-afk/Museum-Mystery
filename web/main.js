@@ -5,6 +5,7 @@ import * as landscapeStation from './minigames/landscape.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
+import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
 import { movementDuration, advancePlayer } from './motion.js';
 import { chooseGuardAction } from './guard.js';
 
@@ -17,6 +18,9 @@ const dialog = document.querySelector('#dialog');
 const storeKey = 'museum-mystery-walk-v1';         // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
+// Small synthesized sounds for story moments; the player remembers 'muted'.
+const sound = createSoundPlayer();
+
 // The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
 const story = createStoryHost({
   openPanel(title) {
@@ -27,6 +31,7 @@ const story = createStoryHost({
   closePanel: closeDialog,
   onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
   onReset: resetWorld,
+  sound,
   stations: { landscape: landscapeStation, portraits: portraitStation }, // stations 2–4: add teammates' modules here
   storageKey: 'museum-nocturne-story-v1',
 });
@@ -285,6 +290,8 @@ function resetWorld(){
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
 const heldKeys = new Map();
 let lastSavedAt=0;
+let lastStepAt=0; // time of the last footstep sound
+function currentRoom(){return state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';}
 function savePosition(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
 function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
@@ -322,6 +329,8 @@ function animate(now){
     if(next!==state){
       if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9))) roomTransition={start:now,destination:next,switched:false};
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
+      // Footsteps while the player really moves; each floor sounds different (see story/sound.js).
+      if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
   draw(); // Animate NPCs even while the player is idle.
@@ -360,6 +369,16 @@ document.querySelector('#touch-interact').addEventListener('click',handleInterac
 document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
 document.querySelector('#reset').addEventListener('click',()=>story.confirmNewGame());
 document.querySelector('#hint').addEventListener('click',()=>story.showHint());
+const soundButton=document.querySelector('#sound-toggle');
+function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');}
+soundButton.addEventListener('click',()=>{sound.toggle();showSoundState();sound.play('click');});
+showSoundState();
+const musicButton=document.querySelector('#music-toggle');
+function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music';musicButton.setAttribute('aria-pressed',String(sound.musicOn));}
+musicButton.addEventListener('click',()=>{sound.toggleMusic();showMusicState();});
+showMusicState();
+// Browsers only allow sound after the first click or key press; music that was left on starts then.
+for(const type of ['pointerdown','keydown'])document.addEventListener(type,()=>sound.resumeMusic(),{once:true});
 document.querySelector('#mission').addEventListener('click',()=>story.showMission());
 save();
 story.start(); // M's message on the very first visit

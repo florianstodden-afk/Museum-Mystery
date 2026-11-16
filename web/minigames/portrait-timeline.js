@@ -44,6 +44,7 @@ export function start(container, caseData, onSolved) {
   let cardButtons = {};
 
   const save = () => caseData.onChange?.(state);
+  const playSound = id => caseData.playSound?.(id); // optional, given by the story host
   const cards = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, from oldest (left) to newest (right)' } });
   const status = el('p', { className: 'story-feedback portrait-status', attrs: { role: 'status', 'aria-live': 'polite', tabindex: '-1' } });
   const counter = el('p', { className: 'story-muted portrait-counter' });
@@ -101,6 +102,7 @@ export function start(container, caseData, onSolved) {
     if (state.solved) return;
     selected = null;
     const next = checkOrder(state);
+    playSound(next.solved ? 'flip' : 'wrong');
     update(next, next.solved ? SOLVED : WRONG);
   }
 
@@ -116,6 +118,7 @@ export function start(container, caseData, onSolved) {
   // Click or Enter/Space on a card: pick it up, put it down, or swap with the picked-up card.
   function choose(id) {
     if (state.solved) return;
+    playSound('click');
     if (selected === null) { selected = id; update(state, `${artworkFor(id).shortTitle} picked up. Choose another card to swap, or use the arrow keys.`, id); return; }
     if (selected === id) { selected = null; update(state, 'Card put down.', id); return; }
     const other = selected;

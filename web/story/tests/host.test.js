@@ -162,3 +162,29 @@ test('new game asks first and then resets everything', () => {
   assert.equal(pageReset, true, 'the page can reset its own state');
   assert.equal(page.title, 'A message from M');
 });
+
+test('the host plays a sound for each story moment and stays silent without a player', () => {
+  const page = fakePage();
+  const played = [];
+  const host = createStoryHost({ ...page.options, sound: { play: id => { if (id) played.push(id); } } });
+  host.start();
+  click(page, 'Accept the mission');
+  for (const id of ['landscape', 'portraits', 'restoration', 'archive']) {
+    host.openStation(id);
+    click(page, 'Solve station (placeholder)');
+  }
+  host.showHint();
+  host.openVault();
+  submitWord(page, '   ');   // rejected: silent
+  submitWord(page, 'DLIB');  // wrong
+  submitWord(page, 'bild');  // opens
+  click(page, 'Look at the documents');
+  click(page, 'Leon');       // wrong
+  click(page, 'Adrien Voss');
+  click(page, 'Decide what happens');
+  click(page, 'Hand the painting to Voss');
+  assert.deepEqual(played, ['page', 'letter', 'letter', 'letter', 'letter', 'hint', 'wrong', 'unlock', 'wrong', 'letter', 'ending-heist']);
+
+  const silent = createStoryHost({ ...fakePage().options });
+  assert.doesNotThrow(() => silent.showHint());
+});

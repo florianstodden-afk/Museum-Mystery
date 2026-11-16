@@ -236,3 +236,21 @@ test('years are hidden on the cards until a catalogue entry is opened', () => {
   findButton(station.container, 'Catalogue entry').click();
   assert.match(station.container.textContent, /Date: 1888–90/);
 });
+
+test('the station asks the host for small sounds: click, wrong, flip', () => {
+  installFakeDom();
+  const container = createContainer();
+  const played = [];
+  start(container, {
+    state: timeline([SARGENT, DEGAS, CEZANNE]),
+    onChange() {},
+    playSound: id => played.push(id),
+    loadPortraits: async () => [],
+  }, () => {});
+  findButton(container, 'Check order').click();
+  const faces = () => findAll(container, node => node.className === 'portrait-face');
+  faces()[0].click();
+  faces()[1].click();
+  findButton(container, 'Check order').click();
+  assert.deepEqual(played, ['wrong', 'click', 'click', 'flip']);
+});

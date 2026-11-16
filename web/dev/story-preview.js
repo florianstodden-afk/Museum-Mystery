@@ -4,6 +4,7 @@
 import { CASE, workById } from '../story/case-1.js';
 import { canOpenSafe } from '../story/engine.js';
 import { createStoryHost } from '../story/host.js';
+import { createSoundPlayer } from '../story/sound.js';
 import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
@@ -43,8 +44,10 @@ modal.addEventListener('click', event => { if (event.target === modal) closePane
 
 // ---------- The host ----------
 
+const sound = createSoundPlayer();
 const story = createStoryHost({
   openPanel,
+  sound,
   closePanel,
   onChange(state, message) {
     renderPage();
@@ -139,6 +142,22 @@ function renderPage() {
 document.querySelector('#new-game').addEventListener('click', () => story.confirmNewGame());
 document.querySelector('#talk-m').addEventListener('click', () => story.showMission());
 document.querySelector('#hint').addEventListener('click', () => story.showHint());
+const soundButton = document.querySelector('#sound-toggle');
+function showSoundState() {
+  soundButton.textContent = sound.muted ? '🔇 Muted' : '🔊 Sound';
+  soundButton.setAttribute('aria-pressed', String(!sound.muted));
+  soundButton.setAttribute('aria-label', sound.muted ? 'Sound is off. Turn sound on' : 'Sound is on. Turn sound off');
+}
+soundButton.addEventListener('click', () => { sound.toggle(); showSoundState(); sound.play('click'); });
+showSoundState();
+const musicButton = document.querySelector('#music-toggle');
+function showMusicState() {
+  musicButton.textContent = sound.musicOn ? '♪ Music on' : '♪ Music';
+  musicButton.setAttribute('aria-pressed', String(sound.musicOn));
+}
+musicButton.addEventListener('click', () => { sound.toggleMusic(); showMusicState(); });
+showMusicState();
+for (const type of ['pointerdown', 'keydown']) document.addEventListener(type, () => sound.resumeMusic(), { once: true });
 
 renderPage();
 story.start();
