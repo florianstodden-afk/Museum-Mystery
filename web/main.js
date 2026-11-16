@@ -5,7 +5,7 @@ import * as landscapeStation from './minigames/landscape.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
-import { createSoundPlayer, stepSoundFor, STEP_INTERVAL_MS } from './story/sound.js';
+import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
 import { movementDuration, advancePlayer } from './motion.js';
 import { chooseGuardAction } from './guard.js';
 
@@ -330,7 +330,7 @@ function animate(now){
       if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9))) roomTransition={start:now,destination:next,switched:false};
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
       // Footsteps while the player really moves; each floor sounds different (see story/sound.js).
-      if(now-lastStepAt>=STEP_INTERVAL_MS){sound.play(stepSoundFor(currentRoom()));lastStepAt=now;}
+      if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
   draw(); // Animate NPCs even while the player is idle.

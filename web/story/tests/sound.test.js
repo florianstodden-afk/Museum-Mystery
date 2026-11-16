@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY, MUSIC_KEY, stepSoundFor, nextMusicNote, musicPause, MUSIC_SCALE } from '../sound.js';
+import { soundFor, recipe, createSoundPlayer, SOUND_IDS, STORAGE_KEY, MUSIC_KEY, stepSoundFor, nextMusicNote, musicPause, MUSIC_SCALE, varyStep } from '../sound.js';
 import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../engine.js';
 import { memoryStorage } from '../host.js';
 
@@ -141,4 +141,48 @@ test('music is off by default, plays notes when switched on and stops when switc
   assert.equal(createSoundPlayer({ storage }).musicOn, false);
   player.setMusic(true);
   assert.equal(createSoundPlayer({ storage }).musicOn, true, 'the choice is remembered');
+});
+
+test('footsteps sound like walking: a low heel thump, no bright clicks', () => {
+  for (const room of ['hall', 'gallery', 'security', 'storage']) {
+    const tones = recipe(stepSoundFor(room));
+    const heel = tones[0];
+    assert.equal(heel.wave, 'sine', room);
+    assert.ok(heel.freq < 130 && heel.glideTo < heel.freq, `${room}: heel is low and drops`);
+    assert.ok(tones.every(t => t.freq <= 1500), `${room}: nothing bright`);
+    assert.ok(tones.every(t => t.start + t.duration <= 0.25), `${room}: short`);
+  }
+});
+
+test('no two steps are identical, but they only vary a little', () => {
+  const base = recipe('step-gallery');
+  const left = varyStep(base, 0, () => 0.5);
+  const right = varyStep(base, 1, () => 0.5);
+  assert.notEqual(left[0].freq, right[0].freq, 'left and right foot differ');
+  for (const r of [0, 0.999]) {
+    const varied = varyStep(base, 0, () => r);
+    varied.forEach((t, i) => {
+      assert.ok(Math.abs(t.freq / base[i].freq - 1) <= 0.07, 'pitch within ±7 %');
+      assert.ok(Math.abs(t.volume / base[i].volume - 1) <= 0.16, 'volume within ±16 %');
+    });
+  }
+});
+
+test('footsteps are much quieter than story sounds and silent when muted', () => {
+  const { FakeContext, log } = fakeAudio();
+  const gains = [];
+  const original = FakeContext.prototype.createGain;
+  FakeContext.prototype.createGain = function () { const g = original.call(this); gains.push(g); return g; };
+  const player = createSoundPlayer({ AudioContextClass: FakeContext, storage: memoryStorage() });
+  player.play('letter');
+  const storyMaster = gains[0].gain.value;
+  gains.length = 0;
+  assert.equal(player.playStep('gallery'), true);
+  const stepMaster = gains[0].gain.value;
+  assert.ok(stepMaster <= storyMaster * 0.4, `step master ${stepMaster} vs ${storyMaster}`);
+  assert.equal(player.playStep('roof'), false);
+  player.setMuted(true);
+  const before = log.tones;
+  assert.equal(player.playStep('hall'), false);
+  assert.equal(log.tones, before);
 });

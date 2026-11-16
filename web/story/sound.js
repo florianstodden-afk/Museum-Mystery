@@ -7,7 +7,8 @@
 export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open',
   'step-hall', 'step-gallery', 'step-office', 'step-storage'];
 export const MUSIC_KEY = 'museum-nocturne-music-v1';
-export const STEP_INTERVAL_MS = 360; // one footstep sound per 0.36 s of walking
+export const STEP_INTERVAL_MS = 420; // one footstep sound per 0.42 s of walking: a calm pace
+const STEP_VOLUME = 0.35;            // footsteps play at about a third of the other sounds
 export const STORAGE_KEY = 'museum-nocturne-sound-v1';
 const MASTER_VOLUME = 0.22; // quiet by default
 
@@ -60,15 +61,16 @@ export function recipe(id) {
       return [tone('noise', 3200, 0, 0.08, 0.3), tone('noise', 3200, 0.12, 0.08, 0.3), tone('noise', 3200, 0.24, 0.08, 0.3), tone('sine', 'G5', 0.4, 0.4, 0.25)];
     case 'ending-heist': // dark, minor
       return [tone('sine', 'D4', 0, 1.2, 0.35), tone('sine', 'F3', 0, 1.2, 0.3), tone('sine', 'A3', 0.3, 1.4, 0.25), tone('sine', 'D3', 0.6, 1.6, 0.3)];
-    // Footsteps: each floor sounds different.
-    case 'step-hall': // marble: short and bright
-      return [tone('noise', 3400, 0, 0.05, 0.22), tone('triangle', 520, 0, 0.04, 0.12)];
-    case 'step-gallery': // wooden floor: a low, warm knock
-      return [tone('triangle', 140, 0, 0.07, 0.3), tone('noise', 900, 0, 0.05, 0.14)];
-    case 'step-office': // carpet: just a soft brush
-      return [tone('noise', 600, 0, 0.07, 0.12)];
-    case 'step-storage': // stone: dull with a short echo
-      return [tone('noise', 1400, 0, 0.06, 0.2), tone('noise', 1400, 0.11, 0.05, 0.06)];
+    // Footsteps: a real step is a soft heel thump (low tone that quickly drops)
+    // followed by the sole rolling off (quiet, low hiss). Each floor changes the mix.
+    case 'step-hall': // marble: firm heel, a little hard tap of the sole
+      return [tone('sine', 115, 0, 0.09, 0.32, 70), tone('noise', 1300, 0.05, 0.05, 0.07)];
+    case 'step-gallery': // wooden floor: deeper, warmer, slightly longer
+      return [tone('sine', 95, 0, 0.12, 0.36, 58), tone('noise', 600, 0.06, 0.06, 0.08)];
+    case 'step-office': // carpet: muffled, almost only the thump
+      return [tone('sine', 80, 0, 0.1, 0.24, 52), tone('noise', 350, 0.04, 0.07, 0.04)];
+    case 'step-storage': // stone: firm, with a faint echo of the bare room
+      return [tone('sine', 105, 0, 0.1, 0.32, 64), tone('noise', 900, 0.05, 0.05, 0.07), tone('sine', 105, 0.16, 0.08, 0.06, 64)];
     case 'ending-open': // warm, major
       return [tone('sine', 'C4', 0, 1.2, 0.3), tone('sine', 'E4', 0.15, 1.2, 0.28), tone('sine', 'G4', 0.3, 1.2, 0.28), tone('sine', 'C5', 0.45, 1.5, 0.3)];
     default:
@@ -79,6 +81,18 @@ export function recipe(id) {
 // Which footstep fits the room the player is in.
 export function stepSoundFor(room) {
   return { hall: 'step-hall', gallery: 'step-gallery', security: 'step-office', storage: 'step-storage' }[room] ?? null;
+}
+
+// No two steps sound the same: pitch and volume vary a little, left and right foot differ slightly.
+export function varyStep(tones, footIndex, random = Math.random) {
+  const pitch = (footIndex % 2 === 0 ? 1 : 0.94) * (0.94 + random() * 0.12); // ±6 %, right foot a bit lower
+  const loudness = 0.85 + random() * 0.3;                                       // ±15 %
+  return tones.map(t => ({
+    ...t,
+    freq: t.freq * pitch,
+    glideTo: t.glideTo ? t.glideTo * pitch : null,
+    volume: Math.min(0.5, t.volume * loudness),
+  }));
 }
 
 // ---------- Night music: optional, off by default ----------
@@ -137,6 +151,20 @@ export function createSoundPlayer(options = {}) {
     return muted;
   }
 
+  // A footstep in the given room: quieter than other sounds and slightly different every time.
+  let footIndex = 0;
+  function playStep(room) {
+    const id = stepSoundFor(room);
+    if (muted || !id) return false;
+    const ctx = audio();
+    if (!ctx) return false;
+    const master = ctx.createGain();
+    master.gain.value = MASTER_VOLUME * STEP_VOLUME;
+    master.connect(ctx.destination);
+    for (const t of varyStep(recipe(id), footIndex++)) playTone(ctx, master, t);
+    return true;
+  }
+
   // One soft note with a quiet low drone under it, then wait and play the next one.
   function playMusicNote() {
     musicTimer = null;
@@ -163,6 +191,7 @@ export function createSoundPlayer(options = {}) {
 
   return {
     play,
+    playStep,
     get muted() { return muted; },
     setMuted,
     toggle() { return setMuted(!muted); },
