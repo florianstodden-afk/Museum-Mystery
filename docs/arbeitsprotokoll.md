@@ -8,7 +8,7 @@
 - **Umsetzung:** `web/main.js` lässt Tastatureingaben in geöffneten Dialogen beim Dialog, statt sie für die Spielfigur abzufangen.
 - **Prüfung:** Der vorhandene Testlauf mit Node `--test` meldete 6 bestandene Tests. Ein manueller Browsertest dieser Änderung steht aus.
 
-Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](../README.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
+Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](project-history.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
 
 ### 2026-11-09 – Erster lokaler Museum-Mystery-Fall
 
