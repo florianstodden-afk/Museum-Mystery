@@ -125,3 +125,15 @@ test('walking toward the open vault from the front enters while the locked door 
   const side = walk(at(15.7,8,true),[1,0],800);
   assert.ok(side.player.x < 15.95);
 });
+
+
+test('vault exit works along the visible arch, including a forward approach', () => {
+  for(const y of [5.5,6.5,7.5,8.5,9.3]) {
+    const exited=walk(at(19.3,y,true),[-1,0],500);
+    assert.ok(exited.player.x<18, `left exit at row ${y}`);
+  }
+  const forward=walk(at(19.4,6,true),[0,-1],64);
+  assert.ok(forward.player.x<18, 'walk forward through the arch');
+  const closed=walk(at(19.3,7,false),[-1,0],500);
+  assert.ok(closed.player.x>=18, 'locked vault does not bypass the door');
+});
