@@ -49,7 +49,7 @@ export function createGalleryRenderer() {
       }
     }
     ctx.restore();
-    if(target||vaultNearby){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??(state.doorOpen?'Vault door (open)':'Unlock vault')}`;
+    if(target||vaultNearby){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??(state.doorOpen?'Vault door (open)':'Enter vault code')}`;
       ctx.font='12px sans-serif';const width=Math.min(800,ctx.measureText(text).width+26),x=Math.max(48,Math.min(846-width,p.x-width/2)),y=Math.max(215,p.y-88);
       ctx.fillStyle='#101c22ed';ctx.strokeStyle='#cba868';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,width,29,5);ctx.fill();ctx.stroke();ctx.fillStyle='#f4dfae';ctx.fillText(text,x+13,y+19);
     }

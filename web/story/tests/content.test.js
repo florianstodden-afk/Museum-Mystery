@@ -114,11 +114,12 @@ test('ending renders the score table and a new-game button', () => {
   assert.equal(restarted, true);
 });
 
-test('safe UI only shows the input when all proofs are there', () => {
+test('safe UI offers code entry and explains missing proofs', () => {
   installFakeDom();
   const container = createContainer();
   renderSafe(container, { state: started() }, () => {});
-  assert.equal(findAll(container, node => node.tagName === 'INPUT').length, 0);
+  assert.equal(findAll(container, node => node.tagName === 'INPUT').length, 1);
+  assert.match(container.textContent, /Collect proof from all four stations/);
   assert.match(container.textContent, /0 \/ 4/);
 
   let s = started();

@@ -25,9 +25,8 @@ export function renderSafe(container, { state, message = '' }, onTry) {
 
   if (model.open) {
     parts.push(el('p', { className: 'story-text', text: 'The safe stands open. The original painting and a folder of documents are inside.' }));
-  } else if (!model.ready) {
-    parts.push(el('p', { className: 'story-text', text: 'A brass dial with four letters. It will not turn until you hold proof from all four stations.' }));
   } else {
+    if (!model.ready) parts.push(el('p', { className: 'story-text', text: 'Collect proof from all four stations before the code can unlock the door.' }));
     input = el('input', {
       className: 'story-input',
       attrs: { id: 'story-safe-word', name: 'word', autocomplete: 'off', maxlength: '12', spellcheck: 'false' },
