@@ -120,3 +120,65 @@ function syncPortraits(state, progress) {
   const timeMs = portraitElapsedMs(timeline);
   return withStation(state, 'portraits', { points: portraitSpeedPoints(timeMs), timeMs });
 }
+
+// ---------- Scoreboard on the home screen ----------
+// It only reads the existing numbers (scoreBreakdown, saved times); no second points logic.
+
+/** One row per station (B, I, L, D) with status, time and points, plus the run's totals. */
+export function scoreboard(state, progress = {}) {
+  const points = Object.fromEntries(scoreBreakdown(state).map(row => [row.id, row]));
+  const stations = CASE.stations.map(station => ({
+    letter: station.letter,
+    room: station.room,
+    solved: state.stations[station.id].solved,
+    timeMs: state.stations[station.id].solved ? stationTime(state, progress, station.id) : null,
+    points: points[station.id].points,
+    max: points[station.id].max,
+  }));
+  const times = stations.map(row => row.timeMs).filter(ms => ms !== null);
+  return {
+    stations,
+    points: totalScore(state),
+    max: MAX_SCORE,
+    timeMs: times.length ? times.reduce((sum, ms) => sum + ms, 0) : null,   // only timed stations count
+    finished: state.ending !== null,
+  };
+}
+
+// Only the speedrun stations have a clock; the others show no time.
+function stationTime(state, progress, id) {
+  if (id === 'portraits') return state.stations.portraits.timeMs ?? null;
+  if (id === 'restoration' && validPuzzle(progress.restoration) && progress.restoration.finishedAt !== null) {
+    return elapsedMs(progress.restoration, progress.restoration.finishedAt);
+  }
+  return null;
+}
+
+/** The better of two finished runs: more points wins, at equal points the shorter time. */
+export function betterRun(best, run) {
+  if (!validRun(run)) return validRun(best) ? best : null;
+  if (!validRun(best)) return run;
+  if (run.points !== best.points) return run.points > best.points ? run : best;
+  return (run.timeMs ?? Infinity) < (best.timeMs ?? Infinity) ? run : best;
+}
+
+/** A saved best run: whole points 0…MAX_SCORE and a time in ms (or null). Anything else is ignored. */
+export function validRun(run) {
+  return run !== null && typeof run === 'object'
+    && Number.isInteger(run.points) && run.points >= 0 && run.points <= MAX_SCORE
+    && (run.timeMs === null || (Number.isFinite(run.timeMs) && run.timeMs >= 0));
+}
+
+/** Reads and writes the best run in storage. Broken or blocked storage just means "no best run yet". */
+export function bestRunStore(storage, key = 'museum-nocturne-best-run-v1') {
+  return {
+    get() {
+      try { const run = JSON.parse(storage?.getItem(key)); return validRun(run) ? run : null; } catch { return null; }
+    },
+    record(run) {
+      const best = betterRun(this.get(), run);
+      if (best === run) { try { storage?.setItem(key, JSON.stringify(run)); } catch { /* no saving, still fine */ } }
+      return best;
+    },
+  };
+}

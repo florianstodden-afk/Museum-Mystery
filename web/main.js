@@ -12,7 +12,8 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js?v=speech-box-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
-import { totalScore, MAX_SCORE } from './story/scoring.js';
+import { scoreboard, bestRunStore } from './story/scoring.js';
+import { renderScoreboard } from './story/scoreboard-view.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { interactionFor, nudgeOffset } from './interaction.js';
@@ -669,7 +670,7 @@ function showSaveNotice(){
   const notice=document.querySelector('#home-notice');
   notice.hidden=saveNoticeShown || !story.discardedSave;
   if(!notice.hidden)notice.textContent='Game updated. Your run starts fresh.';
-  saveNoticeShown=true;
+  if(entryScreen.hidden)saveNoticeShown=true;   // only counts once the player can see the home screen
 }
 function showHome(){
   closeJournal(false);
@@ -682,8 +683,11 @@ function showHome(){
   document.querySelector('.shell').inert=true;
   homeStart.disabled=!story.state.missionRead;
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
-  document.querySelector('#home-scoreboard-result').textContent=
-    `${story.state.ending?'Finished run':'Current run'}: ${totalScore(story.state)} / ${MAX_SCORE} points.`;
+  const board=scoreboard(story.state,story.progress);
+  const bestRun=bestRunStore((()=>{try{return localStorage;}catch{return null;}})());
+  // A finished run may become the best run (stored on this device only).
+  const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs}):bestRun.get();
+  renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
   showSaveNotice();
   closeHomePanels();
   (homeStart.disabled?homeNew:homeStart).focus();

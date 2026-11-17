@@ -297,6 +297,7 @@ export function createStoryHost(options) {
   return {
     get state() { return state; },
     get discardedSave() { return discardedSave; },
+    get progress() { return progress; },   // saved station progress (read-only use: scoreboard times)
     leaveStation,
     tick,
     start() { if (!state.missionRead) showMission(); },
