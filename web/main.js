@@ -1,8 +1,9 @@
 import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
+import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
-import { createSecurityRenderer } from './security-room.js';
-import { createGalleryRenderer } from './gallery.js';
+import { createSecurityRenderer } from './security-room.js?v=camera-lights-1';
+import { createGalleryRenderer } from './gallery.js?v=camera-lights-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
@@ -201,7 +202,10 @@ function drawHall(){
 // The vault is a separate view behind the gallery's existing door.
 function drawTreasureRoom(){
   ctx.fillStyle='#061218';ctx.fillRect(0,0,896,576);
-  if(vaultBackdrop.complete && vaultBackdrop.naturalWidth) ctx.drawImage(vaultBackdrop,16,0,864,576);
+  if(vaultBackdrop.complete && vaultBackdrop.naturalWidth) {
+    ctx.drawImage(vaultBackdrop,16,0,864,576);
+    drawCameraLights(ctx,VAULT_CAMERAS,animationTime,reducedMotion.matches);
+  }
   else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the vault…',350,288);}
   // The genuine artwork is part of the case, displayed in the central frame.
   if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)ctx.drawImage(hallPaintings[1],438,169,47,43);
@@ -218,7 +222,7 @@ function draw() {
   canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
   if(state.room==='security'){
-    drawSecurityRoom(ctx,{time:animationTime,player:displayPlayer,target:nearbyObject(state),facing,moving:heldKeys.size>0,drawPerson});return;
+    drawSecurityRoom(ctx,{time:animationTime,player:displayPlayer,target:nearbyObject(state),facing,moving:heldKeys.size>0,drawPerson,reducedMotion:reducedMotion.matches});return;
   }
   if(state.player.x < 9){drawHall();return;}
   if(state.player.x < 18){

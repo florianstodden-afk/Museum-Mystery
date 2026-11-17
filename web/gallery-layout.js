@@ -18,7 +18,7 @@ export const GALLERY_ARRIVAL = {x:10.6, y:8.2};
 export const HALL_ARRIVAL = {x:7.45, y:5.5};
 export const HALL_DOORWAY = { minY: 3.5, maxY: 7.5 };
 export const GALLERY_DOORWAY = { minY: 5.4, maxY: 9.2 };
-export function cameraLightOn(time, phase = 0) { return ((time + phase) % 1800) < 900; }
+export { cameraLightOn } from './camera-lights.js';
 
 // The perspective side walls taper toward the back. Test the real artwork floor,
 // not just a rectangular map, and leave narrow corridors for both actual doors.

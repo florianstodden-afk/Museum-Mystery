@@ -197,3 +197,7 @@ Kopiere als Auftrag: „Lies zuerst die README und den aktuellen Stand des Repos
 **Regel für KI und Team:** Behauptungen über erledigte Arbeit nur mit Datei, Commit, PR oder tatsächlichem Prüfergebnis belegen. Wenn eine Quelle nicht zugänglich ist, die Lücke nennen. Keine Funktion als fertig bezeichnen, nur weil sie in dieser README als Idee steht.
 
 Renoir: bis einschließlich 30 Sekunden 15 Punkte, bis 45 Sekunden 10, bis 60 Sekunden 5, danach 0. Die Zeit läuft beim Verlassen weiter und stoppt beim Lösen. Das Spiel startet bei 0 Punkten.
+
+### Aktive Überwachungskameras
+
+Aktive Kameras zeigen ein blinkendes rotes Statuslicht. Neue Räume und Kameraansichten sollen dafür die gemeinsame Darstellung in `web/camera-lights.js` verwenden. Bei aktivierter Betriebssystem-Einstellung für reduzierte Bewegung leuchtet das Licht dauerhaft, statt zu blinken.
