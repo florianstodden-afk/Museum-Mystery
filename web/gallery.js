@@ -61,12 +61,14 @@ export function createGalleryRenderer() {
       {left:787,top:420,right:860,bottom:520,cx:824,cy:463,rx:34,ry:40},
     ];
     const backdrop=state.doorOpen && openVault.complete && openVault.naturalWidth ? openVault : artwork;
+    // Hand-traced outline of foliage and pot, in proportions of each plant image.
+    const plantOutline=[[.34,.05],[.48,.04],[.52,.13],[.57,.05],[.73,.05],[.69,.12],[.75,.16],[.67,.20],[.73,.23],[.85,.22],[.98,.29],[.88,.31],[.82,.29],[.78,.34],[.87,.38],[.97,.46],[.95,.52],[.84,.49],[.85,.56],[.76,.56],[.74,.63],[.66,.65],[.70,.69],[.73,.74],[.71,.82],[.66,.84],[.64,.92],[.67,.96],[.62,.99],[.35,.99],[.30,.96],[.34,.92],[.30,.84],[.26,.82],[.25,.74],[.28,.69],[.35,.65],[.30,.60],[.25,.63],[.21,.60],[.13,.63],[.12,.57],[.15,.51],[.07,.49],[.04,.45],[.05,.40],[.12,.34],[.19,.33],[.12,.30],[.07,.28],[.10,.23],[.22,.22],[.30,.27],[.35,.22],[.32,.18],[.37,.16],[.32,.12],[.36,.10]];
     for(const plant of plants){
       const behind=items.filter(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;});
       if(!behind.length)continue;
       ctx.save();ctx.beginPath();
-      ctx.ellipse(plant.cx,plant.cy,plant.rx,plant.ry,0,0,Math.PI*2);
-      ctx.rect(plant.cx-14,plant.cy+25,28,plant.bottom-plant.cy-25);
+      plantOutline.forEach(([x,y],i)=>{const px=plant.left+x*(plant.right-plant.left),py=plant.top+y*(plant.bottom-plant.top);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});
+      ctx.closePath();
       ctx.clip();
       ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
       ctx.restore();
