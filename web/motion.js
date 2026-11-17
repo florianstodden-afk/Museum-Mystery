@@ -32,10 +32,10 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       x=nx;y=ny;continue;
     }
     // Cross at the painted vault doorway only after the story code unlocks it.
-    if(state.doorOpen && room==='gallery' && direction[0]>0 && nx>=16.72 && ny>=8.6 && ny<=9.4)
+    if(state.doorOpen && room==='gallery' && ((direction[0]>0 && nx>=16.58 && ny>=8.6 && ny<=9.4) || (direction[1]<0 && nx>=16.35 && nx<=16.8 && ny<=8.8)))
       return {...state,player:{x:19.3,y:9},steps:state.steps+1};
     if(state.doorOpen && room==='storage' && direction[0]<0 && nx<=19.1 && ny>=8.6 && ny<=9.4)
-      return {...state,player:{x:16.8,y:9},steps:state.steps+1};
+      return {...state,player:{x:16.4,y:9.2},steps:state.steps+1};
     const landing=galleryDoorTransition({x,y},{x:nx,y:ny});
     const crossedDoor=landing.x!==nx || landing.y!==ny;
     if(crossedDoor){
@@ -43,8 +43,9 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
       x=landing.x;y=landing.y;break;
     }
-    // A locked vault door is a solid wall for the player's whole body.
-    if(room==='gallery' && !state.doorOpen && nx>16.58 && ny>=7.5 && ny<=10.5) break;
+    // The painted door and its frame remain solid from the front and sides.
+    if(room==='gallery' && nx>=15.95 && ny>=7.4 && ny<8.75) break;
+    if(room==='gallery' && nx>16.58 && ny>=7.5 && ny<=10.5) break;
     // Keep the character inside the hall floor, without drawing a guide over the artwork.
     const hallScreenX=(nx+0.5)*896/9;
     if(room==='hall' && (hallScreenX-17<86 || hallScreenX+17>864)) break;

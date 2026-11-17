@@ -113,3 +113,15 @@ test('vault doorway keeps a locked player outside and allows walking both ways a
   const returned = walk(entered,[-1,0],1200);
   assert.ok(returned.player.x < 18);
 });
+
+test('walking toward the open vault from the front enters while the locked door blocks', () => {
+  const locked = walk(at(16.5,9),[0,-1],800);
+  assert.ok(locked.player.y >= 8.75);
+  assert.ok(locked.player.x < 18);
+  const entered = walk(at(16.5,9,true),[0,-1],800);
+  assert.ok(entered.player.x >= 19);
+  const besideDoor = walk(at(16.1,9,true),[0,-1],800);
+  assert.ok(besideDoor.player.y >= 8.75);
+  const side = walk(at(15.7,8,true),[1,0],800);
+  assert.ok(side.player.x < 15.95);
+});
