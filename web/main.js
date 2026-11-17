@@ -12,6 +12,7 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js?v=speech-box-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
+import { totalScore, MAX_SCORE } from './story/scoring.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { createSpeechBox } from './story/speech-box.js';
@@ -523,16 +524,25 @@ const homeStart=document.querySelector('#home-start');
 const homeNew=document.querySelector('#home-new');
 const homeSettings=document.querySelector('#home-settings');
 const homeSettingsPanel=document.querySelector('#home-settings-panel');
+const homeScoreboard=document.querySelector('#home-scoreboard');
+const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
 const homeConfirm=document.querySelector('#home-confirm');
+function closeHomePanels(){
+  homeSettingsPanel.hidden=true;homeScoreboardPanel.hidden=true;homeConfirm.hidden=true;
+  homeSettings.setAttribute('aria-expanded','false');
+  homeScoreboard.setAttribute('aria-expanded','false');
+}
 function showHome(){
   stopMovement();speech.close();
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
   document.querySelector('.shell').inert=true;
-  homeStart.textContent=story.state.ending?'View ending':story.state.missionRead?'Continue game':'Start game';
-  homeNew.hidden=!story.state.missionRead;
-  homeConfirm.hidden=true;
-  homeStart.focus();
+  homeStart.disabled=!story.state.missionRead;
+  homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
+  document.querySelector('#home-scoreboard-result').textContent=
+    `${story.state.ending?'Finished run':'Current run'}: ${totalScore(story.state)} / ${MAX_SCORE} points.`;
+  closeHomePanels();
+  (homeStart.disabled?homeNew:homeStart).focus();
 }
 function enterGame(){
   homeScreen.hidden=true;
@@ -542,15 +552,36 @@ function enterGame(){
   else story.start();
 }
 homeStart.addEventListener('click',enterGame);
-homeNew.addEventListener('click',()=>{homeConfirm.hidden=false;document.querySelector('#home-confirm-new').focus();});
+homeNew.addEventListener('click',()=>{
+  if(!story.state.missionRead){enterGame();return;}
+  closeHomePanels();homeConfirm.hidden=false;document.querySelector('#home-confirm-new').focus();
+});
 document.querySelector('#home-confirm-new').addEventListener('click',()=>{
   homeConfirm.hidden=true;
   homeScreen.hidden=true;
   document.querySelector('.shell').inert=false;
   story.reset();
 });
-document.querySelector('#home-cancel-new').addEventListener('click',()=>{homeConfirm.hidden=true;homeNew.focus();});
-homeSettings.addEventListener('click',()=>{homeSettingsPanel.hidden=!homeSettingsPanel.hidden;homeSettings.setAttribute('aria-expanded',String(!homeSettingsPanel.hidden));});
+document.querySelector('#home-cancel-new').addEventListener('click',()=>{closeHomePanels();homeNew.focus();});
+homeSettings.addEventListener('click',()=>{
+  const opening=homeSettingsPanel.hidden;closeHomePanels();homeSettingsPanel.hidden=!opening;
+  homeSettings.setAttribute('aria-expanded',String(opening));
+  if(opening)document.querySelector('#home-sound').focus();
+});
+homeScoreboard.addEventListener('click',()=>{
+  const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
+  homeScoreboard.setAttribute('aria-expanded',String(opening));
+  if(opening)homeScoreboardPanel.querySelector('button').focus();
+});
+homeScreen.querySelectorAll('[data-close-home-panel]').forEach(button=>button.addEventListener('click',()=>{
+  const opener=button.closest('#home-settings-panel')?homeSettings:homeScoreboard;
+  closeHomePanels();opener.focus();
+}));
+homeScreen.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && (!homeSettingsPanel.hidden || !homeScoreboardPanel.hidden || !homeConfirm.hidden)){
+    closeHomePanels();homeNew.focus();event.preventDefault();
+  }
+});
 document.querySelector('#home-button').addEventListener('click',showHome);
 save();
 showHome(); // The mission starts only after the player chooses Start game.

@@ -4,37 +4,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="story/story.css?v=speech-box-1">
+  <link rel="stylesheet" href="style.css?v=home-reference-1">
+  <link rel="stylesheet" href="story/story.css?v=ending-screen-1">
 </head>
 <body>
   <section id="home-screen" class="home-screen" aria-labelledby="home-title">
-    <div class="home-card">
-      <div class="home-copy">
-        <p class="eyebrow">MUSEUM MYSTERY · CHAPTER 01</p>
-        <h1 id="home-title">The Night of the Forgery</h1>
-        <p class="home-line">Four artworks. One vault. Your choice.</p>
-        <div class="home-actions">
-          <button id="home-start" class="home-primary" type="button">Start game</button>
-          <button id="home-new" type="button" hidden>New game</button>
-          <button id="home-settings" type="button" aria-expanded="false" aria-controls="home-settings-panel">Settings</button>
-        </div>
-        <div id="home-settings-panel" class="home-settings" hidden>
-          <h2>Settings</h2>
-          <button id="home-sound" type="button" aria-pressed="true">Sounds on</button>
-          <button id="home-music" type="button" aria-pressed="false">Music off</button>
-          <p>Move with WASD or arrow keys. Press E to inspect.</p>
-        </div>
-        <div id="home-confirm" class="home-confirm" hidden>
-          <p>Start over? Your current case progress will be erased.</p>
-          <button id="home-confirm-new" type="button">Start new game</button>
-          <button id="home-cancel-new" type="button">Cancel</button>
-        </div>
+    <div class="home-artboard">
+      <img class="home-backdrop" src="assets/home-screen-reference.jpg" alt="" aria-hidden="true">
+      <h1 id="home-title" class="home-mobile-title">The Night of the Forgery</h1>
+      <div class="home-actions">
+        <button id="home-start" type="button" aria-label="Resume Game"><span>Resume Game</span></button>
+        <button id="home-new" type="button" aria-label="Start New Game"><span>Start New Game</span></button>
+        <button id="home-settings" type="button" aria-expanded="false" aria-controls="home-settings-panel"><span>Settings</span></button>
+        <button id="home-scoreboard" type="button" aria-expanded="false" aria-controls="home-scoreboard-panel"><span>Scoreboard</span></button>
       </div>
-      <figure class="home-art">
-        <img src="assets/met-436535.jpg" alt="Wheat Field with Cypresses by Vincent van Gogh">
-        <figcaption>Vincent van Gogh · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener noreferrer">The Met, Open Access</a></figcaption>
-      </figure>
+      <div id="home-settings-panel" class="home-panel" hidden>
+        <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close settings">×</button>
+        <h2>Settings</h2>
+        <button id="home-sound" type="button" aria-pressed="true">Sounds on</button>
+        <button id="home-music" type="button" aria-pressed="false">Music off</button>
+        <p>Move with WASD or arrow keys. Press E to inspect.</p>
+      </div>
+      <div id="home-scoreboard-panel" class="home-panel" hidden>
+        <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close scoreboard">×</button>
+        <h2>Scoreboard</h2>
+        <p id="home-scoreboard-result"></p>
+        <p class="home-panel-note">This device only. Online leaderboard is coming later.</p>
+      </div>
+      <div id="home-confirm" class="home-panel" hidden>
+        <h2>Start a new game?</h2>
+        <p>Your current case progress will be erased.</p>
+        <button id="home-confirm-new" type="button">Start new game</button>
+        <button id="home-cancel-new" type="button">Cancel</button>
+      </div>
     </div>
   </section>
   <main class="shell" inert>
@@ -65,6 +67,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=gallery-foliage-2"></script>
+  <script type="module" src="main.js?v=home-reference-1"></script>
 </body>
 </html>
