@@ -2,7 +2,9 @@
 
 Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/27)**. Diese README ist unser Einstiegspunkt für Teammitglieder und neue KI-Chats. **Vor jeder Aufgabe zuerst diese Datei und den aktuellen Code lesen.** Danach den Stand auf GitHub prüfen. Ein Chat kennt spätere Änderungen nicht automatisch.
 
-**Stand: 17. November 2026.** Die Gruppe verbessert nach positivem Feedback des Professors das bestehende begehbare 2D-Spiel, statt den früheren Ideenbaukasten umzusetzen. Im Fokus stehen klare Räume und Interaktionen, kurze Texte, ein aufgeräumtes Journal, vier saubere Minispiele, ein Home Screen und zwei verständliche Enden. Ein gemeinsames Online-Leaderboard mit Login ist gewünscht, aber noch nicht implementiert. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
+**Stand: 17. November 2026.** Die Gruppe verbessert nach positivem Feedback des Professors das bestehende begehbare 2D-Spiel, statt den früheren Ideenbaukasten umzusetzen. Im Fokus stehen klare Räume und Interaktionen, kurze Texte, ein aufgeräumtes Journal, vier saubere Minispiele, ein Home Screen und zwei verständliche Enden. **Aktuelle Entscheidung: vorerst ohne Login.** Das öffentliche Spiel startet direkt mit dem Home Screen; ein gemeinsames Online-Leaderboard ist nicht implementiert. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
+
+**Login-Idee pausiert:** Am 17.11. wurden erst Benutzername/Passwort, dann GitHub-Anmeldung besprochen und auf dem separaten Branch [`codex/login-signup`](https://github.com/florianstodden-afk/Museum-Mystery/tree/codex/login-signup) vorbereitet. Florian entschied danach ausdrücklich: kein Clerk und vorerst **gar kein Login**. Dieser Branch ist ein pausierter Entwurf, wurde **nicht** in `main` übernommen und ist nicht Teil des öffentlichen Spiels. Es wurden keine Spielerkonten angelegt. [Warum Passwörter nicht im GitHub-Repository gespeichert werden können](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
 
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 
@@ -187,8 +189,8 @@ Die `.gitignore` schließt `.venv/`, Python-Caches, lokale SQLite-Dateien und Ge
 ## Nächste gemeinsame Entscheidungen
 
 1. Das begehbare Spiel gemeinsam vollständig durchspielen, beide Enden testen und Bewegung, Dialoge und Rätselspaß bewerten.
-2. Teamgröße, Zeitplan und genaue Anforderungen der Lehrperson bestätigen; insbesondere klären, ob Login und API-Integration Pflicht sind oder aus unserem eigenen Ideenkonzept stammen. Die öffentlich erreichbare Bewertungsseite nennt diese beiden Punkte nicht ausdrücklich.
-3. Technische Lösung für getrennte Konten, gemeinsame gespeicherte Ergebnisse und öffentliche Demo-URL wählen und verständlich begründen.
+2. Teamgröße, Zeitplan und genaue Anforderungen der Lehrperson bestätigen; insbesondere klären, ob API-Integration Pflicht ist oder aus unserem eigenen Ideenkonzept stammt. Die öffentlich erreichbare Bewertungsseite nennt Login und API nicht ausdrücklich. Die Gruppe hat Login derzeit pausiert.
+3. Das bestehende Spiel und seine öffentliche Demo-URL prüfen. Eine spätere gemeinsame Bestenliste würde erneut eine Entscheidung über Online-Speicherung und Anmeldung erfordern.
 4. Nach Review der Quest Karte, Figuren, Hinweise und weitere Fälle verbessern; erst danach zusätzliche Systeme erwägen.
 5. Nach **jeder** Aufgabe Protokoll, README und PR-Erklärung aktualisieren. Vor der Präsentation lässt jedes Mitglied eine fremde Funktion und den gesamten Spielweg erklären.
 
