@@ -527,6 +527,35 @@ const homeSettingsPanel=document.querySelector('#home-settings-panel');
 const homeScoreboard=document.querySelector('#home-scoreboard');
 const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
 const homeConfirm=document.querySelector('#home-confirm');
+const entryScreen=document.querySelector('#entry-screen');
+const entryChoices=document.querySelector('#entry-choices');
+const entryPanel=document.querySelector('#entry-panel');
+const entryLogin=document.querySelector('#entry-login');
+const entrySignup=document.querySelector('#entry-signup');
+let entryOpener=entryLogin;
+function openEntryPanel(label, opener){
+  entryOpener=opener;
+  document.querySelector('#entry-panel-title').textContent=label;
+  entryChoices.hidden=true;
+  entryPanel.hidden=false;
+  document.querySelector('#entry-continue').focus();
+}
+function closeEntryPanel(){
+  entryPanel.hidden=true;
+  entryChoices.hidden=false;
+  entryOpener.focus();
+}
+entryLogin.addEventListener('click',()=>openEntryPanel('Log In',entryLogin));
+entrySignup.addEventListener('click',()=>openEntryPanel('Sign Up',entrySignup));
+document.querySelector('#entry-back').addEventListener('click',closeEntryPanel);
+document.querySelector('#entry-continue').addEventListener('click',()=>{
+  entryScreen.hidden=true;
+  homeScreen.inert=false;
+  showHome();
+});
+entryScreen.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && !entryPanel.hidden){closeEntryPanel();event.preventDefault();}
+});
 function closeHomePanels(){
   homeSettingsPanel.hidden=true;homeScoreboardPanel.hidden=true;homeConfirm.hidden=true;
   homeSettings.setAttribute('aria-expanded','false');
@@ -585,5 +614,6 @@ homeScreen.addEventListener('keydown',event=>{
 document.querySelector('#home-button').addEventListener('click',showHome);
 save();
 showHome(); // The mission starts only after the player chooses Start game.
+entryLogin.focus(); // The guest entry screen is always first, even when a local save exists.
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });
