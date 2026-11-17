@@ -258,3 +258,9 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Tests:** `cd web && node --test`: **206 bestanden** (vorher 198). Angepasst mit Begründung: Punktetests (Station I max 15, Summe 90), alte UI-Tests ersetzt (Hinweis-Knopf und Katalog-Einträge gibt es nicht mehr).
 - **Nicht geprüft / offen:** Das Playwright-Skript `web/dev/e2e-station-i.mjs` ist geschrieben, aber nicht ausgeführt (Playwright und Node sind auf diesem Rechner nicht installiert); dieselben Schritte liefen per Skript im eingebauten Browser. Dialog im Hauptspiel nicht direkt gemessen (Spielschleife im ausgeblendeten Browserfenster angehalten); Platz dort 688 px, Station braucht 539 px. Keine Hervorhebung des Belegs im Journal (würde `journal.js` ändern, außerhalb des Auftrags). Barrierefreiheit von Hand geprüft (Rollen `timer`/`status`, `aria-live`, Labels an Karten, Peek und Links, sichtbarer Fokus, dunkle Schrift auf Gold); kein Lighthouse/axe-Lauf.
 - **Nachtrag (Rückmeldung von Florian):** Sprechblase öffnet wieder etwas früher (unter 1,0 statt 0,8 Schritten, schließt über 1,5). Station I: Lag ein alter Spielstand schon in der richtigen Reihenfolge, mischt „Start“ die Karten neu. Tests: 207 bestanden.
+
+### 2026-11-17 – Galeriegrenzen und Tresortür
+
+- **Auftrag:** Die im Video gezeigten Galeriegrenzen verbessern und die unterschiedlichen Positionen der geschlossenen und geöffneten Tresortür berücksichtigen. Figuren dürfen hinter Pflanzen und Möbeln teilweise verdeckt sein.
+- **Umsetzung:** Die Türgrenze folgt nun abhängig vom Türzustand dem geschlossenen Türblatt beziehungsweise dem in den Raum geschwenkten Türblatt. Der Abstand zur Rückwand wurde angepasst; Pflanzenbasen bleiben Hindernisse und die Blätter werden bei Figuren dahinter im Vordergrund gezeichnet.
+- **Prüfung:** Geschlossene Tür und Durchgang zum geöffneten Tresor im Browser geprüft; 209 Node-Tests bestanden, darunter Türzustände, Durchgänge und Pflanzen-Vordergrund.

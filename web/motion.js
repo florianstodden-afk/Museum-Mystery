@@ -1,6 +1,6 @@
 import { VAULT_STEP_X, VAULT_STEP_Y, vaultFloorContains } from './vault-layout.js';
 import { officePortal, canEnterOffice } from './security-room.js';
-import { GALLERY, galleryFootprintFits, galleryDoorTransition } from './gallery-layout.js';
+import { GALLERY, galleryFootprintFits, galleryDoorTransition, galleryVaultDoorBlocks } from './gallery-layout.js?v=gallery-border-5';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
 export function movementDuration(from, to, viewport, room) {
@@ -48,9 +48,8 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(room==='hall' && guards.some(g=>Math.abs(g.x-nx)<0.45 && Math.abs(g.y-ny)<2.4)) break;
       x=landing.x;y=landing.y;break;
     }
-    // The painted door and its frame remain solid from the front and sides.
-    if(room==='gallery' && nx>=15.95 && ny>=7.4 && ny<8.75) break;
-    if(room==='gallery' && nx>16.58 && ny>=7.5 && ny<=10.5) break;
+    // The closed door and the swung-open panel occupy different floor areas.
+    if(room==='gallery' && galleryVaultDoorBlocks(nx,ny,state.doorOpen)) break;
     // Keep the character inside the hall floor, without drawing a guide over the artwork.
     const hallScreenX=(nx+0.5)*896/9;
     if(room==='hall' && (hallScreenX-17<86 || hallScreenX+17>864)) break;
@@ -64,7 +63,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       if(corners.some(([ox,oy])=>!canEnter(state,Math.round(nx+ox),Math.round(ny+oy),guards[0]))) break;
     }
     if(guards.some(g=>Math.abs(g.x-nx)<(room==='hall'?0.45:0.56) && Math.abs(g.y-ny)<(room==='hall'?2.4:0.56))) break;
-    if(nx>=9&&nx<18&&!galleryFootprintFits(nx,ny)) break;
+    if(nx>=9&&nx<18&&!galleryFootprintFits(nx,ny,state.doorOpen)) break;
     x=nx;y=ny;
   }
   if(x===state.player.x && y===state.player.y)return state;

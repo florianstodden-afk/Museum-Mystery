@@ -22,20 +22,20 @@ export { cameraLightOn } from './camera-lights.js';
 
 // The perspective side walls taper toward the back. Test the real artwork floor,
 // not just a rectangular map, and leave narrow corridors for both actual doors.
-export function galleryFloorContains(x, y) {
-  if (y < GALLERY.top || y > GALLERY.bottom) return false;
+export function galleryFloorContains(x, y, doorOpen = false) {
+  if (y < 258 || y > GALLERY.bottom) return false;
   if (x < 150 && y >= 287 && y <= 341) return true; // west archway
-  if (x > 780 && y >= 373 && y <= 395) return true; // east vault
+  if (doorOpen && x > 780 && y >= 373 && y <= 395) return true; // east vault
   const left = y < 333 ? 150 - (y - 241) * 80 / 92 : 70 - (y - 333) * 36 / 216;
   const right = y < 378 ? 747 + (y - 241) * 83 / 137 : 830 + (y - 378) * 32 / 171;
   return x >= left && x <= right;
 }
-export function galleryWalkable(x, y) {
+export function galleryWalkable(x, y, doorOpen = false) {
   const p = galleryPosition(x,y);
-  return galleryFloorContains(p.x,p.y) && !GALLERY_OBSTACLES.some(o=>p.x>=o.left&&p.x<=o.right&&p.y>=o.top&&p.y<=o.bottom);
+  return galleryFloorContains(p.x,p.y,doorOpen) && !GALLERY_OBSTACLES.some(o=>p.x>=o.left&&p.x<=o.right&&p.y>=o.top&&p.y<=o.bottom);
 }
-export function galleryFootprintFits(x, y) {
-  return [[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]].every(([dx,dy])=>galleryWalkable(x+dx,y+dy));
+export function galleryFootprintFits(x, y, doorOpen = false) {
+  return [[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]].every(([dx,dy])=>galleryWalkable(x+dx,y+dy,doorOpen));
 }
 // Approaching the north-facing hall arch or the gallery's west-facing arch
 // leads to a point on the destination floor, clear of the doorway and walls.
@@ -48,4 +48,12 @@ export function galleryDoorTransition(from, to) {
   if(from.x>=9 && from.x<18 && to.x<=GALLERY_DOOR_X && to.x<from.x && to.y>=GALLERY_DOORWAY.minY && to.y<=GALLERY_DOORWAY.maxY)
     return {...HALL_ARRIVAL};
   return to;
+}
+
+// Door collision follows the visible door face. When open, the swung panel
+// occupies floor to the left; when closed, only the doorway itself is solid.
+export function galleryVaultDoorBlocks(x,y,doorOpen) {
+  const p=galleryPosition(x,y);
+  if(doorOpen) return p.x>=696 && p.x<=780 && p.y>=320 && p.y<360;
+  return p.x>=758 && p.y>=320 && p.y<=402;
 }
