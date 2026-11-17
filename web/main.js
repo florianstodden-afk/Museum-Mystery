@@ -2,6 +2,7 @@ import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
+import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=camera-lights-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
@@ -14,7 +15,7 @@ import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wh
 import { movementDuration, advancePlayer } from './motion.js?v=vault-exit-4';
 import { chooseGuardAction } from './guard.js';
 import { createSpeechBox } from './story/speech-box.js';
-import { shouldOpenTalk, distanceBetween } from './story/proximity.js';
+import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proximity.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -34,13 +35,13 @@ const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, n
 // Small synthesized sounds for story moments; the player remembers 'muted'.
 const sound = createSoundPlayer();
 
-// Leon starts talking by himself when the player comes close (see story/proximity.js).
-// Later more characters can join: ['leon', 'imani'] (see docs/story/speech-box.md).
-const AUTO_TALK = ['leon'];
-let talkWasNear = false;          // stays true until the player walks away from Leon
-let talkClosedAt = -Infinity;     // when the speech box closed last time
+// Every person starts talking by themselves when the player comes close,
+// and stops when the player walks away (see story/proximity.js). No E needed.
+const PEOPLE = {guard:'leon', restorer:'imani', curator:'vale'}; // map object id → story character
+const talkWasNear = {};           // per character: true until the player walks away
+let talkingTo = null;             // the character in the speech box right now
 const speech = createSpeechBox(document.body, {
-  onClose: () => { talkClosedAt = performance.now(); },
+  onClose: () => { talkingTo = null; },
   playSound: id => sound.play(id),
 });
 
@@ -99,10 +100,12 @@ let vaultOpenedAt = null;
 function currentGuard(){return guardDisplay();}
 // While Leon talks he stands still and looks at the player.
 function guardFacingNow(){
-  if(speech.isOpen){const g=guardDisplay(),dx=state.player.x-g.x,dy=state.player.y-g.y;return Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');}
+  if(talkingTo==='leon'){const g=guardDisplay(),dx=state.player.x-g.x,dy=state.player.y-g.y;return Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');}
   return guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
 }
-function guardWalking(){return Boolean(guardMotion) && !speech.isOpen;}
+function guardWalking(){return Boolean(guardMotion) && talkingTo!=='leon';}
+// The thing E works on. People are left out: they talk by themselves.
+function interactTarget(){const target=nearbyObject(state,currentGuard());return target && PEOPLE[target.id] ? null : target;}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
@@ -216,7 +219,7 @@ function drawHall(){
   stonePlaque('SECURITY',176,225,100);
   stonePlaque('GALLERY',800,201,100);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
-  const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
+  const target=interactTarget(); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
 // The vault is a separate view behind the gallery's existing door.
 function drawTreasureRoom(){
@@ -235,7 +238,7 @@ function drawTreasureRoom(){
     drawPerson(point.x,point.y,figure.kind,figure.kind==='rick'?facing:'down',animationTime,figure.kind==='rick'&&heldKeys.size>0);
   }
   const {x:px,y:py}=vaultPosition(displayPlayer.x,displayPlayer.y);
-  const target=nearbyObject(state,currentGuard());if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
+  const target=interactTarget();if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
 }
 // The monitor wall uses the same actors and positions as the walkable rooms.
 function cameraPeople(){
@@ -259,7 +262,7 @@ function draw() {
   if(state.player.x < 9){drawHall();return;}
   if(state.player.x < 18){
     drawGallery(ctx, { time: animationTime, state, player: displayPlayer, objects: OBJECTS,
-      target: nearbyObject(state,currentGuard()), facing, moving: heldKeys.size > 0, drawPerson,
+      target: interactTarget(), facing, moving: heldKeys.size > 0, drawPerson,
       vaultNearby: atVaultDoor(state), reducedMotion: reducedMotion.matches, doorProgress: state.doorOpen ? (vaultOpenedAt === null || reducedMotion.matches ? 1 : Math.min(1, Math.max(0,(performance.now()-vaultOpenedAt)/1600))) : 0 });
     return;
   }
@@ -350,8 +353,8 @@ function handleInteract(){
     else story.openVault();
     return;
   }
-  const object=nearbyObject(state,currentGuard());
-  if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
+  const object=interactTarget();
+  if(!object){showDialog('Nothing nearby','Move closer to a marked object. People talk to you by themselves.');return;}
   runStoryAction(object.story);
 }
 // Each map object says in engine.js what it does in the story.
@@ -363,7 +366,7 @@ function runStoryAction(action){
 }
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
-  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();talkWasNear=false;talkClosedAt=-Infinity;
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();for(const id in talkWasNear)delete talkWasNear[id];
   try{if(!vaultPreview)localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
@@ -378,7 +381,7 @@ function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
   const playerInHall=state.room!=='security' && state.player.x<9;
-  if(!roomTransition && !speech.isOpen) { // Leon stands still while he talks
+  if(!roomTransition && talkingTo!=='leon') { // Leon stands still while he talks
     if(guardMotion) {
       const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
       const t=nextElapsed/guardMotion.duration;
@@ -403,7 +406,7 @@ function animate(now){
       roomTransition.switched=true;savePosition();
     }
     if(progress>=1)roomTransition=null;
-  } else if(heldKeys.size && dialog.classList.contains('hidden') && !speech.isOpen){
+  } else if(heldKeys.size && dialog.classList.contains('hidden')){ // the player may walk away while someone talks
     const direction=[...heldKeys.values()].at(-1);
     facing=direction[0]<0?'left':direction[0]>0?'right':direction[1]<0?'up':'down';
     const guards=[guardDisplay()];
@@ -419,7 +422,7 @@ function animate(now){
       if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
-  checkAutoTalk(now,playerInHall);
+  checkAutoTalk();
   draw(); // Animate NPCs even while the player is idle.
   if(roomTransition){
     const progress=Math.min(1,(now-roomTransition.start)/320);
@@ -427,29 +430,39 @@ function animate(now){
   }
   requestAnimationFrame(animate);
 }
-// Opens the talk with Leon when the player comes close – but not again and again.
-function checkAutoTalk(now,playerInHall){
-  if(!AUTO_TALK.includes('leon'))return;
-  if(speech.isOpen){talkWasNear=true;speech.setPlacement(playerLow()?'top':'bottom');return;} // also when opened with E
-  const blocked=!dialog.classList.contains('hidden') || Boolean(roomTransition);
-  const distance=playerInHall ? distanceBetween(state.player,guardDisplay()) : Infinity;
-  const talk=shouldOpenTalk({distance,wasNear:talkWasNear,lastClosedAt:talkClosedAt,now,blocked});
-  talkWasNear=talk.wasNear;
-  if(!talk.open)return;
-  heldKeys.clear();savePosition();
-  story.talkTo('leon');
+// Opens a person's speech box when the player comes close, and closes it when they walk away.
+function personPosition(objectId){return objectId==='guard' ? guardDisplay() : OBJECTS.find(o=>o.id===objectId);}
+function personDistance(objectId){
+  const room=state.room==='security' ? 'security' : state.player.x<9 ? 'guard' : state.player.x<18 ? 'restorer' : 'curator';
+  if(room!==objectId) return Infinity; // people in other rooms are far away
+  // Measure on the screen, not in tiles: the floor is drawn in perspective, so one tile
+  // "down" is much shorter than one tile "right". 100 pixels count as one step.
+  const onScreen={guard:hallPosition,restorer:galleryPosition,curator:vaultPosition}[objectId];
+  const person=personPosition(objectId);
+  return distanceBetween(onScreen(state.player.x,state.player.y),onScreen(person.x,person.y))/100;
+}
+function checkAutoTalk(){
+  if(talkingTo){
+    const objectId=Object.keys(PEOPLE).find(id=>PEOPLE[id]===talkingTo);
+    if(shouldCloseTalk(personDistance(objectId))) speech.close();
+    else speech.setPlacement(playerLow()?'top':'bottom');
+  }
+  const blocked=!dialog.classList.contains('hidden') || Boolean(roomTransition) || speech.isOpen;
+  for(const [objectId,character] of Object.entries(PEOPLE)){
+    const talk=shouldOpenTalk({distance:personDistance(objectId),wasNear:talkWasNear[character]??false,blocked});
+    talkWasNear[character]=talk.wasNear || talkingTo===character;
+    if(talk.open){
+      talkingTo=character;
+      speech.setPlacement(playerLow()?'top':'bottom');
+      story.talkTo(character);
+    }
+  }
 }
 // Show the box at the top when the player stands low on the screen, so it never hides them.
 function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.78;}
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
-  if(speech.isOpen){
-    if(speech.handleKey(event))event.preventDefault();
-    // A walking key closes the box and starts walking right away.
-    const key=event.key.toLowerCase();
-    if(!speech.isOpen && directions[key])heldKeys.set(key,directions[key]);
-    return;
-  }
+  if(speech.isOpen && speech.handleKey(event)){event.preventDefault();return;} // walking keys go on below
   if (!dialog.classList.contains('hidden')) {
     if(event.key === 'Tab') {
       const focusable = [...dialog.querySelectorAll('button:not(:disabled), a[href], input, select, [tabindex="0"]')].filter(node => node.getClientRects().length);

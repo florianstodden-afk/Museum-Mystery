@@ -1,35 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldOpenTalk, distanceBetween, NEAR, FAR, COOLDOWN_MS } from '../proximity.js';
+import { shouldOpenTalk, shouldCloseTalk, distanceBetween, NEAR, FAR } from '../proximity.js';
 
-const fresh = { wasNear: false, lastClosedAt: -Infinity, now: 1000, blocked: false };
-
-test('opens when the player comes close', () => {
-  assert.deepEqual(shouldOpenTalk({ ...fresh, distance: 1.0 }), { open: true, wasNear: true });
-  assert.equal(shouldOpenTalk({ ...fresh, distance: NEAR + 0.1 }).open, false);
+test('opens as soon as the player comes close', () => {
+  assert.deepEqual(shouldOpenTalk({ distance: 1.0, wasNear: false }), { open: true, wasNear: true });
+  assert.equal(shouldOpenTalk({ distance: NEAR + 0.1, wasNear: false }).open, false);
   assert.equal(distanceBetween({ x: 0, y: 0 }, { x: 3, y: 4 }), 5);
 });
 
-test('does not open again while the player stays close', () => {
-  const after = { ...fresh, wasNear: true, lastClosedAt: 0, now: 60000 };
-  assert.equal(shouldOpenTalk({ ...after, distance: 0.5 }).open, false);
-  assert.equal(shouldOpenTalk({ ...after, distance: 2.0 }).wasNear, true, 'between NEAR and FAR counts as still near');
+test('closes as soon as the player walks away', () => {
+  assert.equal(shouldCloseTalk(FAR + 0.1), true);
+  assert.equal(shouldCloseTalk(1.5), false, 'a small step does not close it (no flicker)');
 });
 
-test('opens again only after walking away AND the cooldown', () => {
-  let s = { ...fresh, wasNear: true, lastClosedAt: 10000, now: 11000 };
-  // walks away, but too early
-  s.wasNear = shouldOpenTalk({ ...s, distance: FAR + 0.5 }).wasNear;
-  assert.equal(s.wasNear, false);
-  assert.equal(shouldOpenTalk({ ...s, distance: 0.8 }).open, false, 'cooldown not over yet');
-  // cooldown over, but never walked away
-  const stayed = { ...fresh, wasNear: true, lastClosedAt: 10000, now: 10000 + COOLDOWN_MS + 1 };
-  assert.equal(shouldOpenTalk({ ...stayed, distance: 0.8 }).open, false);
-  // both
-  assert.equal(shouldOpenTalk({ ...s, now: 10000 + COOLDOWN_MS, distance: 0.8 }).open, true);
+test('after goodbye it stays closed while near, and opens again after walking away and back', () => {
+  assert.equal(shouldOpenTalk({ distance: 0.5, wasNear: true }).open, false);
+  const away = shouldOpenTalk({ distance: FAR + 0.5, wasNear: true });
+  assert.equal(away.wasNear, false);
+  assert.equal(shouldOpenTalk({ distance: 0.8, wasNear: away.wasNear }).open, true, 'no waiting time');
 });
 
 test('never opens while something else is open', () => {
-  const r = shouldOpenTalk({ ...fresh, distance: 0.3, blocked: true });
-  assert.deepEqual(r, { open: false, wasNear: false }, 'it can still open once the window is closed');
+  assert.deepEqual(shouldOpenTalk({ distance: 0.3, wasNear: false, blocked: true }), { open: false, wasNear: false });
 });

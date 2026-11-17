@@ -31,7 +31,10 @@ test('Leon offers two small-talk questions and a goodbye', () => {
   assert.equal(talk.goodbye.label, 'I’ll let you get back to it.');
   assert.deepEqual(talk.goodbye.lines, ['Mind the cameras.']);
   assert.equal(conversationFor('nobody', states().start), null);
-  assert.deepEqual(questionsFor('imani', states().start), [], 'only Leon has a conversation for now');
+  const imani = conversationFor('imani', states().start);
+  assert.deepEqual(questionsFor('imani', states().start), [], 'Imani just says her lines');
+  assert.deepEqual(imani.greeting, dialogueFor('imani', states().start).lines);
+  assert.equal(conversationFor('m', states().start), null, 'M only writes letters');
 });
 
 test('the greeting follows the story', () => {

@@ -104,28 +104,26 @@ export function createSpeechBox(parent, options = {}) {
 
   function choose(choice) {
     playSound('click');
+    if (!choice.lines.length) { close(); return; }
     say(choice.lines, choice.isGoodbye ? 'close' : 'choices');
   }
 
   function choiceButtons() { return [...choices.children]; }
 
-  // Keyboard: 1/2/3 pick, arrows move between choices, Enter presses, Space/E go on, Escape or walking closes.
+  // Keyboard: 1/2/3 pick, Enter presses, Space/E go on, Escape closes.
+  // Walking keys are NOT used here: the player walks away and the page closes the box.
   function handleKey(event) {
     if (!conversation) return false;
     const key = event.key.toLowerCase();
+    if (key === 'escape') { close(); return true; }
     const buttons = choiceButtons();
-    if (key === 'escape' || ['w', 'a', 's', 'd'].includes(key)) { close(); return true; }
     if (buttons.length) {
-      const index = buttons.indexOf(document.activeElement);
       if (/^[1-9]$/.test(key) && buttons[Number(key) - 1]) { buttons[Number(key) - 1].click(); return true; }
-      if (['arrowright', 'arrowdown'].includes(key)) { buttons[(index + 1) % buttons.length].focus(); return true; }
-      if (['arrowleft', 'arrowup'].includes(key)) { buttons[(index - 1 + buttons.length) % buttons.length].focus(); return true; }
-      if (key === 'enter' || key === ' ') { (buttons[index] ?? buttons[0]).click(); return true; }
-      return true;
+      if (key === 'enter' || key === ' ') { (buttons.includes(document.activeElement) ? document.activeElement : buttons[0]).click(); return true; }
+      return false;
     }
-    if (key.startsWith('arrow')) { close(); return true; }
-    if ([' ', 'e', 'enter'].includes(key) && !event.repeat) advance();
-    return true;
+    if ([' ', 'e', 'enter'].includes(key)) { if (!event.repeat) advance(); return true; }
+    return false;
   }
 
   // 'top' when the player stands low on the screen, so the box never hides them.

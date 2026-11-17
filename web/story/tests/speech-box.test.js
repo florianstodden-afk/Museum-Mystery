@@ -84,25 +84,32 @@ test('goodbye says one line and the next key closes the box', () => {
   assert.equal(box.handleKey(key(' ')), false, 'a closed box ignores keys');
 });
 
-test('Escape or walking away closes the box', () => {
-  for (const k of ['Escape', 'w', 'd']) {
-    const { box, log } = setup({ reduced: true });
-    box.show(conversation);
-    box.handleKey(key(k));
-    assert.equal(box.isOpen, false, k);
-    assert.equal(log.closed, 1);
-  }
+test('Escape closes the box; walking keys are left to the game', () => {
+  const { box, log } = setup({ reduced: true });
+  box.show(conversation);
+  for (const k of ['w', 'ArrowLeft', 'd']) assert.equal(box.handleKey(key(k)), false, k);
+  assert.equal(box.isOpen, true);
+  box.handleKey(key('Escape'));
+  assert.equal(box.isOpen, false);
+  assert.equal(log.closed, 1);
 });
 
-test('arrow keys move between the choices and Enter picks one', () => {
+test('Enter picks the focused choice', () => {
   const { box, parts } = setup({ reduced: true });
   box.show(conversation);
   const [first, second] = parts().choices;
   assert.equal(document.activeElement, first, 'focus starts on the first question');
-  box.handleKey(key('ArrowRight'));
-  assert.equal(document.activeElement, second);
+  second.focus();
   box.handleKey(key('Enter'));
   assert.equal(parts().text, conversation.questions[1].lines[0]);
+});
+
+test('a goodbye without words closes at once', () => {
+  const { box, parts } = setup({ reduced: true });
+  box.show({ name: 'Imani', role: 'Conservator', greeting: ['Hi.'], questions: [], goodbye: { label: 'Goodbye.', lines: [] } });
+  assert.equal(parts().choices.length, 1);
+  box.handleKey(key('1'));
+  assert.equal(box.isOpen, false);
 });
 
 test('the box can move to the top so it never hides the player', () => {
@@ -125,6 +132,8 @@ test('the host lets Leon talk in the speech box; others still use the panel', ()
   story.talkTo('leon');
   assert.deepEqual(shown, ['Leon'], 'not opened twice');
   assert.equal(panels, 0);
+  speech.isOpen = false;
   story.talkTo('imani');
-  assert.equal(panels, 1);
+  assert.deepEqual(shown, ['Leon', 'Imani'], 'every character talks in the box');
+  assert.equal(panels, 0);
 });

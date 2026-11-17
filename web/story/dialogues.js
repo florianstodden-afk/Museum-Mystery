@@ -128,13 +128,22 @@ export function renderDialogue(container, dialogue) {
 
 export function conversationFor(characterId, state) {
   const character = CHARACTERS.find(c => c.id === characterId);
-  const build = { leon: leonConversation }[characterId];
-  if (!character || !build) return null;
+  if (!character || characterId === 'm') return null;
+  const build = { leon: leonConversation }[characterId] ?? simpleConversation(characterId);
   return { ...character, ...build(state) };
 }
 
 export function questionsFor(characterId, state) {
   return conversationFor(characterId, state)?.questions ?? [];
+}
+
+// Characters without their own questions just say their usual lines, then the player can leave.
+function simpleConversation(characterId) {
+  return state => ({
+    greeting: dialogueFor(characterId, state).lines,
+    questions: [],
+    goodbye: { id: 'bye', label: 'Goodbye.', lines: [] },
+  });
 }
 
 function leonConversation(state) {
