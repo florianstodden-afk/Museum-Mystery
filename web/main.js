@@ -79,7 +79,7 @@ let renderedStory = null; // the story state the journal currently shows
 function save() { savePosition(); draw(); }
 function updateSidebar() {
   document.body.dataset.room = state.room==='security' ? 'security' : state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
-  document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Storage';
+  document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Treasure Room';
   document.querySelector('#steps').textContent = `${state.steps} steps`;
   // Walking saves the position several times a second. The journal only changes with the story,
   // so it is rebuilt only when the story state is a new object (every story action creates one).
@@ -184,6 +184,23 @@ function drawHall(){
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=nearbyObject(state,currentGuard()); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
+// The vault is a separate view behind the gallery's existing door.
+function drawTreasureRoom(){
+  const bg=ctx.createLinearGradient(0,0,0,576);bg.addColorStop(0,'#171c22');bg.addColorStop(.58,'#3c3630');bg.addColorStop(1,'#171719');ctx.fillStyle=bg;ctx.fillRect(0,0,896,576);
+  ctx.fillStyle='#6c5b47';ctx.fillRect(100,65,696,300);ctx.fillStyle='#40392f';ctx.fillRect(114,78,668,274);
+  for(let y=82;y<350;y+=42){ctx.strokeStyle='#776550';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(114,y);ctx.lineTo(782,y);ctx.stroke();for(let x=130+(y%84?0:55);x<782;x+=110){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+42);ctx.stroke();}}
+  ctx.fillStyle='#b59a69';ctx.fillRect(100,345,696,13);ctx.fillStyle='#221e1b';ctx.beginPath();ctx.moveTo(114,358);ctx.lineTo(782,358);ctx.lineTo(896,576);ctx.lineTo(0,576);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#5d4e3c';ctx.lineWidth=2;for(let i=0;i<9;i++){ctx.beginPath();ctx.moveTo(114+i*84,358);ctx.lineTo((i-1)*150,576);ctx.stroke();}for(const y of [390,430,480,545]){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(896,y);ctx.stroke();}
+  // Recessed entrance on the left and the protected painting at the back.
+  ctx.fillStyle='#141b1e';ctx.fillRect(40,205,110,185);ctx.strokeStyle='#9c8055';ctx.lineWidth=8;ctx.strokeRect(40,205,110,185);ctx.fillStyle='#d2bc89';ctx.font='bold 13px Georgia';ctx.fillText('GALLERY',57,198);
+  ctx.fillStyle='#c8a359';ctx.fillRect(340,105,216,145);ctx.fillStyle='#322920';ctx.fillRect(349,114,198,127);if(hallPaintings[1].complete&&hallPaintings[1].naturalWidth)ctx.drawImage(hallPaintings[1],355,120,186,115);
+  ctx.fillStyle='#b89b6a';ctx.fillRect(416,258,64,10);ctx.fillStyle='#322e2a';ctx.fillRect(385,318,126,60);ctx.fillStyle='#ae9365';ctx.fillRect(377,313,142,9);
+  for(const x of [220,650]){ctx.fillStyle='#ba995e';ctx.fillRect(x-2,133,4,43);ctx.beginPath();ctx.arc(x,132,7,0,Math.PI*2);ctx.fill();}
+  const px=110+(displayPlayer.x-18)*75, py=330+(displayPlayer.y-5)*18;
+  drawPerson(px,py,'rick',facing,animationTime,heldKeys.size>0);
+  const target=nearbyObject(state,currentGuard());if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
+  if(state.player.x<20.2){ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · Return to gallery',35,421);}
+}
 function draw() {
   canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
@@ -197,6 +214,7 @@ function draw() {
       vaultNearby: atVaultDoor(state), reducedMotion: reducedMotion.matches });
     return;
   }
+  drawTreasureRoom();return;
   for(let y=0;y<HEIGHT;y++) for(let x=0;x<WIDTH;x++) {
     const base=x<9?'#d1c5ad':x<18?'#7e7768':'#596b6e';
     tile(x,y,(x+y)%2===0?base:(x<9?'#c5baa3':x<18?'#797363':'#56676a'));
@@ -278,10 +296,11 @@ function closeDialog(){
 function handleInteract(){
   if(!dialog.classList.contains('hidden'))return;
   if(atVaultDoor(state)){
-    if(state.doorOpen) showDialog('Vault door','The door is open. The original painting waits inside.');
+    if(state.doorOpen){state={...state,player:{x:19.3,y:9}};displayPlayer={...state.player};savePosition();draw();}
     else story.openVault();
     return;
   }
+  if(state.player.x>=18 && state.player.x<20.2){state={...state,player:{x:17,y:9}};displayPlayer={...state.player};savePosition();draw();return;}
   const object=nearbyObject(state,currentGuard());
   if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
   runStoryAction(object.story);
