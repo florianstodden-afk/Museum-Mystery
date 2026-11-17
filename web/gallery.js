@@ -1,4 +1,5 @@
 import { drawCameraLights } from './camera-lights.js';
+import { foliageOpacity } from './plant-mask.js?v=1';
 import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition } from './gallery-layout.js';
 
 // Keep the approved concept as the actual room background, not an approximation.
@@ -6,6 +7,23 @@ export function createGalleryRenderer() {
   const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.jpg';
   const openVault = new Image(); openVault.src = './assets/gallery-vault-open.jpg';
   const vaultInterior = new Image(); vaultInterior.src = './assets/treasure-vault.jpg';
+  const plantMasks = new WeakMap();
+  const maskFor=(image,plant)=>{
+    let masks=plantMasks.get(image);
+    if(!masks){masks=new Map();plantMasks.set(image,masks);}
+    const key=`${plant.left},${plant.top}`;
+    if(masks.has(key))return masks.get(key);
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil((plant.right-plant.left)/.5625);
+    canvas.height=Math.ceil((plant.bottom-plant.top)/.5625);
+    const mask=canvas.getContext('2d',{willReadFrequently:true});
+    mask.drawImage(image,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,0,0,canvas.width,canvas.height);
+    const pixels=mask.getImageData(0,0,canvas.width,canvas.height);
+    for(let i=0;i<pixels.data.length;i+=4)pixels.data[i+3]=foliageOpacity(pixels.data[i],pixels.data[i+1],pixels.data[i+2]);
+    mask.putImageData(pixels,0,0);
+    masks.set(key,canvas);
+    return canvas;
+  };
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
   return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion, doorProgress = state.doorOpen ? 1 : 0 }) {
     box(ctx,0,0,896,576,'#061218');
@@ -54,24 +72,16 @@ export function createGalleryRenderer() {
         ctx.drawImage(artwork,(b.left-16)/.5625,b.top/.5625,(b.right-b.left)/.5625,(b.bottom-b.top)/.5625,b.left,b.top,b.right-b.left,b.bottom-b.top);
       }
     }
-    // Clip the foreground to the plants, so background floor never hides a rectangular part of a figure.
+    // Redraw only leaf-colored pixels, leaving the floor between leaves transparent.
     const plants=[
-      {left:133,top:185,right:193,bottom:277,cx:163,cy:226,rx:28,ry:39},
-      {left:36,top:420,right:110,bottom:520,cx:73,cy:463,rx:34,ry:40},
-      {left:787,top:420,right:860,bottom:520,cx:824,cy:463,rx:34,ry:40},
+      {left:133,top:185,right:193,bottom:277},
+      {left:36,top:420,right:110,bottom:520},
+      {left:787,top:420,right:860,bottom:520},
     ];
     const backdrop=state.doorOpen && openVault.complete && openVault.naturalWidth ? openVault : artwork;
-    // Hand-traced outline of foliage and pot, in proportions of each plant image.
-    const plantOutline=[[.34,.05],[.48,.04],[.52,.13],[.57,.05],[.73,.05],[.69,.12],[.75,.16],[.67,.20],[.73,.23],[.85,.22],[.98,.29],[.88,.31],[.82,.29],[.78,.34],[.87,.38],[.97,.46],[.95,.52],[.84,.49],[.85,.56],[.76,.56],[.74,.63],[.66,.65],[.70,.69],[.73,.74],[.71,.82],[.66,.84],[.64,.92],[.67,.96],[.62,.99],[.35,.99],[.30,.96],[.34,.92],[.30,.84],[.26,.82],[.25,.74],[.28,.69],[.35,.65],[.30,.60],[.25,.63],[.21,.60],[.13,.63],[.12,.57],[.15,.51],[.07,.49],[.04,.45],[.05,.40],[.12,.34],[.19,.33],[.12,.30],[.07,.28],[.10,.23],[.22,.22],[.30,.27],[.35,.22],[.32,.18],[.37,.16],[.32,.12],[.36,.10]];
     for(const plant of plants){
-      const behind=items.filter(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;});
-      if(!behind.length)continue;
-      ctx.save();ctx.beginPath();
-      plantOutline.forEach(([x,y],i)=>{const px=plant.left+x*(plant.right-plant.left),py=plant.top+y*(plant.bottom-plant.top);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
-      ctx.restore();
+      const behind=items.some(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;});
+      if(behind)ctx.drawImage(maskFor(backdrop,plant),plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
     }
     ctx.restore();
     if(target||(vaultNearby&&!state.doorOpen)){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??'Enter vault code'}`;
