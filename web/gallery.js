@@ -26,8 +26,14 @@ export function createGalleryRenderer() {
       }
     }
     if(state.doorOpen){
-      ctx.save();ctx.globalAlpha=doorProgress;ctx.fillStyle='#07141bde';ctx.beginPath();ctx.moveTo(778,251);ctx.lineTo(819,272);ctx.lineTo(819,352);ctx.lineTo(778,322);ctx.closePath();ctx.fill();
-      ctx.fillStyle='#c4db9a';ctx.beginPath();ctx.arc(772,305,2,0,Math.PI*2);ctx.fill();ctx.restore();
+      // The door swings inward: reveal the opening, then narrow the hinged slab.
+      const progress=Math.min(1,Math.max(0,doorProgress));
+      ctx.save();ctx.beginPath();ctx.moveTo(770,200);ctx.lineTo(819,216);ctx.lineTo(819,362);ctx.lineTo(770,329);ctx.closePath();ctx.clip();
+      ctx.fillStyle='#111d20';ctx.fillRect(768,198,54,166);
+      const glow=ctx.createLinearGradient(770,210,819,350);glow.addColorStop(0,'#2d3532');glow.addColorStop(1,'#8c6844');ctx.fillStyle=glow;ctx.fillRect(770,205,50,155);
+      const remaining=1-progress*.86;
+      if(remaining>0){ctx.drawImage(artwork,1340,340,100,290,770,191,52*remaining,164);}
+      ctx.restore();
     }
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
     ctx.save();ctx.beginPath();ctx.rect(20,150,856,400);ctx.clip();
@@ -49,7 +55,7 @@ export function createGalleryRenderer() {
       }
     }
     ctx.restore();
-    if(target||vaultNearby){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??(state.doorOpen?'Vault door (open)':'Enter vault code')}`;
+    if(target||vaultNearby){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??(state.doorOpen?'Walk into vault':'Enter vault code')}`;
       ctx.font='12px sans-serif';const width=Math.min(800,ctx.measureText(text).width+26),x=Math.max(48,Math.min(846-width,p.x-width/2)),y=Math.max(215,p.y-88);
       ctx.fillStyle='#101c22ed';ctx.strokeStyle='#cba868';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,width,29,5);ctx.fill();ctx.stroke();ctx.fillStyle='#f4dfae';ctx.fillText(text,x+13,y+19);
     }

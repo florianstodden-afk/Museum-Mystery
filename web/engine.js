@@ -87,7 +87,7 @@ export function move(state, dx, dy, guardPosition) {
 
 // Standing on the tile in front of the vault door (gallery side).
 export function atVaultDoor(state) {
-  return Math.abs(state.player.x - (VAULT_DOOR.x - 1)) < 0.55 && Math.abs(state.player.y - VAULT_DOOR.y) < 0.55;
+  return state.room !== 'security' && state.player.x >= 16.4 && state.player.x <= 17.3 && Math.abs(state.player.y - VAULT_DOOR.y) < 0.65;
 }
 
 function interactionDistance(player, object) {

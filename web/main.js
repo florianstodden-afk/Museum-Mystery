@@ -38,6 +38,7 @@ const story = createStoryHost({
     return document.querySelector('#dialog-body');
   },
   closePanel: closeDialog,
+  onVaultUnlocked: closeDialog,
   onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
   sound,
@@ -47,7 +48,7 @@ const story = createStoryHost({
 });
 
 let state;
-try { state = vaultPreview ? {...initialState(), player: {x:17,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
+try { state = vaultPreview ? {...initialState(), player: {x:16.6,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
 catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
@@ -204,11 +205,10 @@ function drawTreasureRoom(){
   // The genuine artwork is part of the case, displayed in the central frame.
   if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)ctx.drawImage(hallPaintings[1],438,169,47,43);
   const curator=OBJECTS.find(o=>o.id==='curator');
-  drawPerson(110+(curator.x-18)*75,330+(curator.y-5)*18,'restorer','down',animationTime,false);
-  const px=110+(displayPlayer.x-18)*75, py=330+(displayPlayer.y-5)*18;
+  drawPerson(45+(curator.x-18)*75,330+(curator.y-5)*18,'restorer','down',animationTime,false);
+  const px=45+(displayPlayer.x-18)*75, py=330+(displayPlayer.y-5)*18;
   drawPerson(px,py,'rick',facing,animationTime,heldKeys.size>0);
   const target=nearbyObject(state,currentGuard());if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
-  if(state.player.x<20.2){ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · Return to gallery',35,421);}
 }
 function draw() {
   canvas.style.objectPosition='50% 50%';
@@ -305,11 +305,10 @@ function closeDialog(){
 function handleInteract(){
   if(!dialog.classList.contains('hidden') || roomTransition)return;
   if(atVaultDoor(state)){
-    if(state.doorOpen){heldKeys.clear();roomTransition={start:performance.now(),destination:{...state,player:{x:19.3,y:9}},switched:false};}
+    if(state.doorOpen) showDialog('Vault unlocked','Walk right through the open doorway.');
     else story.openVault();
     return;
   }
-  if(state.player.x>=18 && state.player.x<20.2){heldKeys.clear();roomTransition={start:performance.now(),destination:{...state,player:{x:17,y:9}},switched:false};return;}
   const object=nearbyObject(state,currentGuard());
   if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
   runStoryAction(object.story);
