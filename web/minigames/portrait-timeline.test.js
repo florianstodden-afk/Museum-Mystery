@@ -115,13 +115,13 @@ test('"?" opens the instructions popup; Enter closes it again', () => {
   s.cleanup();
 });
 
-test('Enter starts; the dates flash for 3 s, then vanish; a wrong check adds 5 s on the bar', async () => {
+test('Enter starts; the dates flash for 8 s, then vanish; a wrong check adds 5 s on the bar', async () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   assert.equal(s.last().startedAt, T0);
   assert.deepEqual(s.chips(), ['1883–84', '1865', '1888–90']);
   assert.match(s.text(), /\+15 points\+10 points\+5 points\+0 points/);
-  assert.match(s.text(), /Dates vanish in 3 s/);
+  assert.match(s.text(), /Dates vanish in 8 s/);
   s.clock.ms = T0 + FLASH_MS;
   await tick();
   assert.deepEqual(s.chips(), []);
@@ -159,7 +159,7 @@ test('Escape goes back to the museum, like L', () => {
 test('Peek shows one date for a moment and costs 5 s', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
-  s.clock.ms = T0 + 4000;
+  s.clock.ms = T0 + FLASH_MS + 1000;
   findButton(s.container, 'Peek').click();     // first card: Sargent
   assert.deepEqual(s.chips(), ['1883–84']);
   assert.equal(s.last().penaltyMs, PENALTY_MS);

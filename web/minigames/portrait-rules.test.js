@@ -41,7 +41,7 @@ test('a shuffle is never already solved and the clock has not started', () => {
   }
 });
 
-test('the clock starts only with Start, and Start shows all dates for 3 seconds', () => {
+test('the clock starts only with Start, and Start shows all dates for 8 seconds', () => {
   const before = timeline([CEZANNE, DEGAS, SARGENT], {}, false);
   assert.equal(moveCard(before, DEGAS, 0), before, 'cards stay put before Start');
   assert.equal(checkOrder(before, T0), before);
@@ -62,21 +62,22 @@ test('a save with a running flash continues where it was', () => {
   const s = timeline([CEZANNE, DEGAS, SARGENT]);
   const reloaded = JSON.parse(JSON.stringify(s));
   assert.equal(validTimeline(reloaded), true);
-  assert.deepEqual(revealedDates(reloaded, T0 + 2000), PORTRAIT_IDS, 'still 1 s left');
-  assert.deepEqual(revealedDates(reloaded, T0 + 3500), []);
+  assert.deepEqual(revealedDates(reloaded, T0 + FLASH_MS - 1000), PORTRAIT_IDS, 'still 1 s left');
+  assert.deepEqual(revealedDates(reloaded, T0 + FLASH_MS + 500), []);
 });
 
 test('peek shows one date for 1.5 s and adds 5 s; two penalties add 10 s', () => {
+  const AFTER = T0 + FLASH_MS + 1000;   // one second after the flash
   let s = timeline([CEZANNE, DEGAS, SARGENT]);
   assert.equal(peekDate(s, DEGAS, T0 + 1000), s, 'no peek during the flash');
-  s = peekDate(s, DEGAS, T0 + 4000);
-  assert.deepEqual(revealedDates(s, T0 + 4000 + PEEK_MS - 1), [DEGAS]);
-  assert.deepEqual(revealedDates(s, T0 + 4000 + PEEK_MS), []);
+  s = peekDate(s, DEGAS, AFTER);
+  assert.deepEqual(revealedDates(s, AFTER + PEEK_MS - 1), [DEGAS]);
+  assert.deepEqual(revealedDates(s, AFTER + PEEK_MS), []);
   assert.equal(s.hints, 1);
-  assert.equal(elapsedMs(s, T0 + 4000), 4000 + PENALTY_MS);
-  s = checkOrder(s, T0 + 5000);            // wrong
+  assert.equal(elapsedMs(s, AFTER), AFTER - T0 + PENALTY_MS);
+  s = checkOrder(s, AFTER + 1000);            // wrong
   assert.equal(s.mistakes, 1);
-  assert.equal(elapsedMs(s, T0 + 5000), 5000 + 2 * PENALTY_MS);
+  assert.equal(elapsedMs(s, AFTER + 1000), AFTER + 1000 - T0 + 2 * PENALTY_MS);
 });
 
 test('moving and swapping change only the order', () => {

@@ -81,7 +81,7 @@ import { initialTimeline, startTimeline, checkOrder, correctOrder, peekDate } fr
 function portraitRun(ms, { wrong = 0, peeks = 0 } = {}) {
   let t = startTimeline({ ...initialTimeline(), order: [...correctOrder()].reverse() }, 1000);
   for (let i = 0; i < wrong; i++) t = checkOrder(t, 1000);
-  for (let i = 0; i < peeks; i++) t = peekDate(t, correctOrder()[0], 5000);
+  for (let i = 0; i < peeks; i++) t = peekDate(t, correctOrder()[0], 9500) // after the 8 s flash;
   return checkOrder({ ...t, order: correctOrder() }, 1000 + ms);
 }
 function solvedWith(timeline) {

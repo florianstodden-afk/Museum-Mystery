@@ -325,3 +325,4 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/index.html` enthält den Zahnradknopf und das Menü, `web/style.css` gestaltet beides, `web/main.js` steuert Öffnen, Schließen, Pause, Tastaturfokus und Übergänge. [Details und Klickfolge](in-game-menu.md).
 - **Prüfung:** 217 Node-Tests bestanden. Im lokalen Browser wurden Gast-Einstieg, Missionsstart, Zahnrad, Sound/Music, Hint, Journal, Resume und Exit zum Home Screen durchgeklickt. Syntax- und Diff-Prüfung ohne Fehler.
 - **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
+- **Nachtrag (Rückmeldung von Florian):** Lesephase von 3 auf 8 Sekunden verlängert, damit man auch die Aufgabe lesen kann. Die Uhr läuft dabei weiter. Tests: 226 bestanden.
