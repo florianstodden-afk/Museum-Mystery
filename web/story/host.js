@@ -22,7 +22,7 @@ import { serialize, deserialize } from './save.js';
 import { openStation as runStation } from './stations.js';
 import * as placeholderStation from './placeholder-station.js';
 import { dialogueFor, renderDialogue } from './dialogues.js';
-import { renderSafe } from './safe-ui.js?v=vault-wheel-4';
+import { renderSafe } from './safe-ui.js?v=vault-wheel-7';
 import { renderAccusation } from './accusation-ui.js';
 import { endingModel, renderEnding, renderEndingChoice } from './endings.js';
 import { hintFor } from './hints.js';
@@ -200,7 +200,7 @@ export function createStoryHost(options) {
 
   function showSafe(message) {
     const { content, actions } = scene('The Vault');
-    renderSafe(content, { state, message }, word => {
+    renderSafe(content, { state, message, playSound: id => sound?.play(id) }, word => {
       const result = act(tryOpenSafe(state, word), 'tryOpenSafe');
       if (result.ok && onVaultUnlocked) onVaultUnlocked();
       else showSafe(result.message);

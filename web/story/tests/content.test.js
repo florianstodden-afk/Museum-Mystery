@@ -201,3 +201,18 @@ test('dragging the wheel rotates the selected letter and snaps on release', () =
   hub.click();
   assert.equal(input.value,'B');
 });
+
+test('vault wheel uses distinct clicks for turning, a correct letter, and a different letter', () => {
+  installFakeDom();
+  const container=createContainer(), sounds=[];
+  renderSafe(container,{state:started(),playSound:id=>sounds.push(id)},()=>{});
+  const dial=findAll(container,node=>node.className==='vault-wheel')[0];
+  const hub=findAll(container,node=>node.className==='vault-wheel-hub')[0];
+  hub.click(); // A is not the first letter.
+  assert.equal(sounds.at(-1),'vault-set');
+  findButton(container,'Remove last letter').click();
+  dial.dispatch('keydown',{key:'ArrowRight'}); // B
+  assert.equal(sounds.at(-1),'vault-tick');
+  hub.click();
+  assert.equal(sounds.at(-1),'vault-correct');
+});
