@@ -132,8 +132,8 @@ a.story-button { display: inline-block; text-decoration: none; }
 .picture-puzzle .puzzle-piece { aspect-ratio: var(--piece-ratio); }
 /* Override the generic dialog hover shorthand without changing the image crop. */
 .picture-puzzle .puzzle-slot:hover, .picture-puzzle .puzzle-piece:hover { background-size: 400% 200%; background-repeat: no-repeat; }
-.picture-puzzle button[aria-pressed='true'] { outline: 4px solid #ffdc78; outline-offset: -4px; box-shadow: inset 0 0 0 6px #213e4d; }
-.picture-puzzle button:focus-visible { outline: 3px solid #8ce6ff; outline-offset: 3px; z-index: 1; }
+.picture-puzzle button[aria-pressed='true'],
+.picture-puzzle button:focus-visible { outline: 3px solid var(--story-gold); outline-offset: 3px; z-index: 1; }
 .puzzle-piece span { position: absolute; bottom: 2px; left: 2px; background: #0d1a24dc; padding: 1px 5px; font-size: .75rem; }
 .puzzle-slot:disabled { opacity: 1; cursor: default; }
 @media (max-width: 560px) {
@@ -201,4 +201,85 @@ a.story-button { display: inline-block; text-decoration: none; }
   .speech-box { padding: 14px 16px 16px; border-radius: 18px; }
   .speech-text { font-size: 16px; }
   .speech-choice { font-size: 14px; padding: 8px 13px; }
+}
+
+/* Renoir: quiet introduction, visible time tiers, and focused result/help dialogs. */
+.picture-puzzle { position: relative; }
+.puzzle-intro { position: relative; padding-right: 48px; }
+.puzzle-intro p { margin: 0 0 10px; }
+.puzzle-intro p:nth-child(2) { color: #c9b585; font-size: .9rem; }
+.picture-puzzle .puzzle-help { position: absolute; right: 0; top: 0; width: 34px; height: 34px; min-height: 34px; padding: 0; border-radius: 50%; }
+.puzzle-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.puzzle-key {
+  display: inline-block;
+  margin-inline-start: .45em;
+  padding: .05em .4em;
+  border: 1px solid #82908b;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: #18262d;
+  color: var(--story-ink);
+  font: inherit;
+  font-size: .78em;
+}
+.puzzle-layout { position: relative; }
+.puzzle-status:empty { display: none; }
+.puzzle-clock { margin: 24px 0 28px; }
+.puzzle-time-rewards { display: grid; grid-template-columns: 6fr 3fr 3fr 2fr; font-size: .8rem; text-align: center; color: #ecd8a4; margin-bottom: 8px; }
+.puzzle-time-track { height: 12px; border: 1px solid #9c875a; border-radius: 8px; background: #172831; position: relative; overflow: hidden; }
+.puzzle-time-track::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, transparent 42.6%, #ead7a3 42.6% 43.1%, transparent 43.1% 64%, #ead7a3 64% 64.5%, transparent 64.5% 85.45%, #ead7a3 85.45% 85.95%, transparent 85.95%); }
+.puzzle-time-fill { height: 100%; width: 0; background: linear-gradient(90deg, #8caa8c, #d8b86b); transition: width .25s linear; }
+.puzzle-time-marks { position: relative; height: 20px; font-size: .75rem; color: #c3c7c5; margin-top: 5px; }
+.puzzle-time-marks span { position: absolute; transform: translateX(-50%); }
+.puzzle-time-marks span:first-child { left: 0; transform: none; }
+.puzzle-time-marks span:nth-child(2) { left: 42.857%; }
+.puzzle-time-marks span:nth-child(3) { left: 64.286%; }
+.puzzle-time-marks span:last-child { left: 85.714%; }
+.picture-puzzle .puzzle-tray-empty { border-style: dashed; background-color: #102029; }
+.puzzle-board.is-restored { box-shadow: 0 0 24px #e3c47188; border-color: #ecd8a4; transition: box-shadow .6s; }
+.puzzle-drag-demo {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  color: #fff2cc;
+  font-size: 30px;
+  line-height: 1;
+  text-shadow: 0 2px 5px #000;
+  opacity: 0;
+  animation: puzzle-drag 2.8s ease-in-out infinite;
+}
+.puzzle-drag-demo[hidden] { display: none; }
+@keyframes puzzle-drag {
+  0%, 30% { transform: translate(var(--drag-start-x), var(--drag-start-y)); }
+  75%, 100% { transform: translate(var(--drag-end-x), var(--drag-end-y)); }
+  0%, 100% { opacity: 0; }
+  12%, 90% { opacity: 1; }
+}
+.puzzle-overlay { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: #071117b8; }
+.puzzle-popup { max-width: 480px; max-height: 85vh; overflow: auto; padding: 28px; background: #142630; color: #eee7d8; border: 1px solid #c3a76a; border-radius: 12px; box-shadow: 0 16px 60px #0008; }
+.puzzle-popup h3 { line-height: 1.5; margin-top: 0; }
+.puzzle-popup p { line-height: 1.6; }
+.puzzle-letter { max-width: 200px; margin: 20px auto; text-align: center; }
+.puzzle-earned { text-align: center; font-size: 1.3rem; color: #ecd8a4; }
+.puzzle-popup .story-button { width: 100%; }
+@media (prefers-reduced-motion: reduce) { .puzzle-drag-demo { animation: none; } .puzzle-time-fill, .puzzle-board.is-restored { transition: none; } }
+.dialog-card:has(.picture-puzzle) #dialog-title { display: none; }
+.puzzle-letter .story-slot-room { display: block; font-size: .85rem; }
+.dialog-card:has(.picture-puzzle) > .eyebrow { display: none; }
+
+/* The final, unlabelled stretch represents time beyond the last reward tier. */
+.puzzle-time-track { -webkit-mask-image: linear-gradient(to right, #000 90%, transparent); mask-image: linear-gradient(to right, #000 90%, transparent); }
+/* Equal 4-by-2 grids keep every loose piece visible beside the full painting. */
+.dialog-card.story-dark-card:has(.picture-puzzle) { max-width: min(1000px, max(600px, calc(235dvh - 650px))); }
+.picture-puzzle .puzzle-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 2vw, 18px); margin: 12px 0; align-items: start; }
+.picture-puzzle .puzzle-tray { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, auto); gap: 4px; padding: 4px; min-height: 0; }
+.picture-puzzle .puzzle-clock { margin: 18px 0 12px; }
+.picture-puzzle .puzzle-credit { margin: 8px 0; font-size: .78rem; }
+.picture-puzzle .puzzle-intro p { margin: 0 0 6px; }
+@media (max-width: 560px) {
+ .picture-puzzle { font-size: .85rem; }
+ .puzzle-time-rewards { font-size: .7rem; }
+ .picture-puzzle .puzzle-slot, .picture-puzzle .puzzle-piece { min-height: 0; }
 }

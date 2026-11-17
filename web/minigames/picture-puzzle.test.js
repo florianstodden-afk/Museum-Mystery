@@ -148,3 +148,108 @@ test('both image sources failing gives Retry; retry does not start the clock', a
   assert.ok(findButton(root, 'Start puzzle'));
   assert.equal(saves.at(-1).startedAt, null);
 });
+
+test('opening screen keeps details behind help and has no board, timer or credit', async t => {
+  const { root, saves } = await puzzlePage(t);
+  assert.match(root.textContent, /Points are given based on speed/);
+  assert.equal(slots(root).length, 0);
+  assert.equal(findAll(root, n => n.getAttribute('role') === 'progressbar').length, 0);
+  assert.doesNotMatch(root.textContent, /Public domain|Wrong placements/);
+  findButton(root, '?').click();
+  assert.match(root.textContent, /Wrong placements are free/);
+  assert.equal(findAll(root, n => n.getAttribute('role') === 'dialog').length, 1);
+  findButton(root, 'Back to puzzle').click();
+  assert.equal(saves.at(-1).startedAt, null);
+  assert.equal(findAll(root, n => n.getAttribute('role') === 'dialog').length, 0);
+});
+
+test('eight persistent tray slots allow returning a board piece to any empty tray slot', async t => {
+  const { root, saves } = await puzzlePage(t);
+  findButton(root, 'Start puzzle').click();
+  const first = Number(pieces(root)[0].getAttribute('data-piece'));
+  pieces(root)[0].click(); slots(root)[0].click();
+  const second = Number(pieces(root)[0].getAttribute('data-piece'));
+  pieces(root)[0].click(); slots(root)[1].click();
+  const tray = () => findAll(root, n => n.className === 'puzzle-tray')[0];
+  assert.equal(tray().children.length, 8);
+  const destination = saves.at(-1).order.indexOf(second);
+  slots(root)[0].click(); tray().children[destination].click();
+  assert.equal(saves.at(-1).slots[0], null);
+  assert.equal(tray().children[destination].getAttribute('data-piece'), String(first));
+  assert.equal(findButton(root, 'Return selected piece to tray'), undefined);
+  assert.equal(findAll(root, n => n.className === 'puzzle-drag-demo')[0].hidden, true);
+});
+
+test('Enter starts, help traps Escape, and completion Enter closes with a frozen reward', async t => {
+  installFakeDom();
+  let handler, removed = false, closed = 0, time = 1000;
+  document.addEventListener = (type, listener) => { handler = listener; };
+  document.removeEventListener = (type, listener) => { removed = listener === handler; };
+  const root = createContainer();
+  const cleanup = start(root, { now: () => time, onChange() {}, onClose: () => closed++, loadArtwork: () => image(remote) }, () => {});
+  t.after(cleanup); await flush();
+  const key = key => handler({ key, target: root, preventDefault() {}, stopImmediatePropagation() {} });
+  key('Enter');
+  assert.equal(slots(root).length, 8);
+  findButton(root, '?').click(); key('Escape');
+  assert.equal(closed, 0);
+  time = 46000;
+  for (let i=0;i<8;i++) { pieces(root).find(n => n.getAttribute('data-piece') === String(i)).click(); slots(root)[i].click(); }
+  assert.match(root.textContent, /\+10 points earned/);
+  assert.equal(findAll(root, n => n.getAttribute('role') === 'dialog').length, 1);
+  assert.match(document.activeElement.textContent, /Return to museum/);
+  time = 999999;
+  assert.match(root.textContent, /\+10 points earned/);
+  key('Enter'); assert.equal(closed, 1);
+  cleanup(); assert.equal(removed, true);
+});
+
+test('time bar includes an unlabelled zero-point tail beyond 60 seconds', async t => {
+  const { root } = await puzzlePage(t, { state: startPuzzle(initialPuzzle(), 1000), now: () => 66000 });
+  const meter = findAll(root, n => n.getAttribute('role') === 'progressbar')[0];
+  assert.equal(meter.getAttribute('aria-valuemax'), '70');
+  assert.equal(meter.getAttribute('aria-valuenow'), '65');
+  assert.match(meter.getAttribute('aria-valuetext'), /0 points on completion/);
+  assert.equal(findAll(root, n => n.className === 'puzzle-time-fill')[0].style.width, `${65 / 70 * 100}%`);
+  const marks = findAll(root, n => n.className === 'puzzle-time-marks')[0];
+  assert.equal(marks.textContent, '0s30s45s60s');
+  assert.match(root.textContent, /\+0 points/);
+});
+
+test('drag guide follows tray and empty board slot centers when the layout resizes', async t => {
+  const doc = installFakeDom();
+  const createElement = doc.createElement;
+  let trayLeft = 560;
+  let resize;
+  doc.createElement = tag => {
+    const node = createElement(tag);
+    node.getBoundingClientRect = () => ({
+      'puzzle-layout': { left: 100, top: 150 },
+      'puzzle-piece': { left: trayLeft, top: 160, width: 90, height: 130 },
+      'puzzle-slot': { left: 105, top: 153, width: 100, height: 140 },
+    }[node.className]);
+    return node;
+  };
+  const OriginalResizeObserver = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    constructor(callback) { resize = callback; }
+    observe() {}
+    disconnect() {}
+  };
+  t.after(() => { globalThis.ResizeObserver = OriginalResizeObserver; });
+  const root = createContainer();
+  const cleanup = start(root, { onChange() {}, loadArtwork: () => image(remote) }, () => {});
+  t.after(cleanup);
+  await flush();
+  findButton(root, 'Start puzzle').click();
+  const guide = findAll(root, n => n.className === 'puzzle-drag-demo')[0];
+  assert.equal(guide.style['--drag-start-x'], '505px');
+  assert.equal(guide.style['--drag-start-y'], '75px');
+  assert.equal(guide.style['--drag-end-x'], '55px');
+  assert.equal(guide.style['--drag-end-y'], '73px');
+  trayLeft = 290;
+  resize();
+  assert.equal(guide.style['--drag-start-x'], '235px');
+  pieces(root)[0].click();
+  assert.equal(guide.hidden, true);
+});
