@@ -298,6 +298,18 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **GitHub-Stand:** `codex/login-signup` bleibt als getrennte, pausierte Entwurfshistorie auf GitHub. Dieser Dokumentations-Eintrag beschreibt die aktuelle Entscheidung in `main`. Es wurden keine Clerk- oder GitHub-OAuth-App und keine Spielerkonten angelegt. Die bisherige Spielimplementierung wird durch diesen Eintrag nicht geändert.
 - **Quelle für die technische Entscheidung:** [GitHub Pages ist statisches Hosting](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages); [Passwörter im Repository können in der Git-Historie verbleiben](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
 
+### 2026-11-17 – Station I im Look & Feel von Station L (Branch `feature/station-i-look-like-l`)
+
+- **Auftrag:** `claude-code-station-I-wie-L-auftrag.md`. Station I soll sich wie Leopolds Station L anfühlen; die Mechanik „Catalogue Flash“ bleibt.
+- **Umsetzung:** Neue gemeinsame Bausteine `web/minigames/station-ui.js` (`introPopup`, `speedBar`, `showPopup`, `successPopup`, `creditLine`, `shortcutButton`) mit L’s CSS-Klassen. Die Wurzel von Station I trägt zusätzlich die Klasse `picture-puzzle`, damit L’s vorhandene Regeln greifen; nur drei Zusatzregeln in `station-ui.css` (eigene Strichmarken der Punkte-Leiste). `picture-puzzle.js` und L’s CSS sind unverändert.
+- **Ablauf wie L:** Intro (Aufgabe, goldene Zeile „Points are given based on speed“, runder „?“) → „Start ↵“ → Flash 3 s → Sortieren mit Punkte-Leiste +15/+10/+5/+0 bei 0/20/35/50 s → Erfolgs-Popup mit Buchstabe I „added to journal“ und „+X points earned“ → „Return to museum ↵ Esc“. Esc geht jederzeit zurück ins Museum. Strafen (+5 s) und `portraitSpeedPoints` unverändert.
+- **Karten:** drei gleich große Karten im 3-px-Goldrahmen wie das L-Brett, Bild mit `object-fit: cover`; die schwarzen Ränder der Met-Fotos werden durch leichtes Vergrößern abgeschnitten, bei Degas bleibt das Gesicht rechts im Bild. Zieh-Pfeil wie L (`puzzle-drag-demo`): nach dem Flash einmal von der letzten Karte zu Platz 1, verschwindet beim ersten Klick/Ziehen, kommt beim Neuöffnen nicht wieder; bei reduzierter Bewegung kurz ohne Animation.
+- **Entscheidung:** Die Credit-Zeile von I zeigt keine Jahreszahlen (anders als L), weil die Jahre die Lösung sind. Der Pfeil startet an der letzten statt an der ersten Karte, weil die erste Karte schon auf Platz 1 liegt.
+- **Messwerte (Story-Vorschau, Inhalt/Platz des Dialogs):** 1280×720 Intro 207/207, Spiel 677/677, gelöst 640/640; 1440×900 Intro 207/207, Spiel 745/745, gelöst 707/707 (vor der letzten Kartenverkleinerung gemessen); 390×844 Intro 221/221, Spiel 686/686, gelöst 653/653. Sichtbare Wörter: Intro 15, Spiel 21–25.
+- **Tests:** `cd web && node --test`: **226 bestanden** (6 neue in `station-ui.test.js`, UI-Tests von Station I auf den neuen Ablauf umgeschrieben).
+- **Vergleich:** `web/dev/station-compare.html` zeigt L und I nebeneinander im Spieldialog; Bilder in `web/dev/shots/` (Übersicht `index.html`), aufgenommen im eingebauten Browser statt mit Playwright.
+- **Offen:** Playwright ist auf diesem Rechner nicht installiert; `web/dev/e2e-station-i.mjs` ist auf den neuen Ablauf angepasst, aber nicht ausgeführt. Hauptspiel-Dialog nicht direkt gemessen.
+
 ### 2026-11-17 - Gast-Einstieg als Vorbereitung auf späteren Login
 
 - **Auftrag:** Florian möchte bereits jetzt die Bildvorlage als ersten Bildschirm, dann einen Klick durch eine vorläufige Anmeldeansicht zum Home Screen und erst danach ins Spiel mit Ms Missionsnachricht. Die echte Anmeldung soll später entstehen; er möchte einen fertigen Pull Request zum Mergen.
@@ -313,3 +325,5 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/index.html` enthält den Zahnradknopf und das Menü, `web/style.css` gestaltet beides, `web/main.js` steuert Öffnen, Schließen, Pause, Tastaturfokus und Übergänge. [Details und Klickfolge](in-game-menu.md).
 - **Prüfung:** 217 Node-Tests bestanden. Im lokalen Browser wurden Gast-Einstieg, Missionsstart, Zahnrad, Sound/Music, Hint, Journal, Resume und Exit zum Home Screen durchgeklickt. Syntax- und Diff-Prüfung ohne Fehler.
 - **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
+- **Nachtrag (Rückmeldung von Florian):** Lesephase von 3 auf 8 Sekunden verlängert, damit man auch die Aufgabe lesen kann. Die Uhr läuft dabei weiter. Tests: 226 bestanden.
+- **Nachtrag:** 10 Sekunden Lesezeit nach „Start“ (Aufgabe und Jahreszahlen sichtbar); die Uhr startet erst danach. Damit das kein Schlupfloch wird, sind Sortieren und Prüfen in der Lesezeit gesperrt. Tests: 227 bestanden.

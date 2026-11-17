@@ -6,7 +6,7 @@ import { CASE, workById } from '../story/case-1.js';
 
 export const PORTRAIT_IDS = Object.freeze([...CASE.stations.find(station => station.id === 'portraits').metIds]);
 
-export const FLASH_MS = 3000;     // how long all dates show after Start
+export const FLASH_MS = 10000;    // reading time after Start: task and dates show, the clock waits
 export const PEEK_MS = 1500;      // how long one date shows after Peek
 export const PENALTY_MS = 5000;   // added to the clock for a peek or a wrong check
 
@@ -68,7 +68,7 @@ export function validTimeline(saved) {
   return !solved || sameOrder(order, correctOrder());
 }
 
-/** Start: the clock runs and all dates show for FLASH_MS. Pressing it again (or reopening) changes nothing. */
+/** Start: all dates show for FLASH_MS (reading time), then the clock runs. Pressing it again (or reopening) changes nothing. */
 export function startTimeline(state, now = Date.now()) {
   if (state.startedAt !== null || state.solved) return state;
   // An old save may already hold the right order; then the cards are mixed again, so there is always something to sort.
@@ -113,17 +113,18 @@ export function swapCards(state, a, b) {
   return { ...state, order };
 }
 
-/** "Check order": right stops the clock; wrong counts a mistake and adds PENALTY_MS. */
+/** "Check order" (after the reading time): right stops the clock; wrong counts a mistake and adds PENALTY_MS. */
 export function checkOrder(state, now = Date.now(), correct = correctOrder()) {
-  if (!playing(state)) return state;
+  if (!playing(state) || now < state.flashUntil) return state;   // no checking during the reading time
   if (sameOrder(state.order, correct)) return { ...state, solved: true, finishedAt: Math.max(now, state.startedAt), peek: null };
   return { ...state, mistakes: state.mistakes + 1, penaltyMs: state.penaltyMs + PENALTY_MS };
 }
 
-/** Time on the clock: real time since Start plus all penalties. Stops when solved. */
+/** Time on the clock: from the end of the reading time (flash) until now, plus all penalties. Stops when solved. */
 export function elapsedMs(state, now = Date.now()) {
   if (!state || state.startedAt == null) return 0;
-  return Math.max(0, (state.finishedAt ?? now) - state.startedAt) + (state.penaltyMs ?? 0);
+  const clockStart = state.flashUntil ?? state.startedAt;   // the reading time does not count
+  return Math.max(0, (state.finishedAt ?? now) - clockStart) + (state.penaltyMs ?? 0);
 }
 
 /** True once the right order was checked. */

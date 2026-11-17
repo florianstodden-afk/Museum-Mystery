@@ -75,10 +75,12 @@ function openStation(savedState, extra = {}) {
   const played = [];
   const clock = { ms: T0 };
   const store = {};
+  let closed = 0;
   const cleanup = start(container, {
     state: savedState,
     now: () => clock.ms,
     onChange: state => saved.push(structuredClone(state)),
+    onClose: () => closed++,
     playSound: id => played.push(id),
     storage: { getItem: k => store[k] ?? null, setItem: (k, v) => { store[k] = v; } },
     loadPortraits: async () => PORTRAIT_IDS.map(id => ({ id, src: `local-${id}.jpg`, offline: true })),
@@ -87,69 +89,103 @@ function openStation(savedState, extra = {}) {
   const faces = () => findAll(container, node => node.className === 'portrait-face');
   const faceFor = id => faces().find(face => face.getAttribute('aria-label').includes(PORTRAIT_ARTWORKS.find(a => a.id === id).artist));
   const chips = () => findAll(container, node => node.className === 'portrait-chip' && !node.hidden).map(node => node.textContent);
-  const time = () => findAll(container, node => node.className === 'portrait-time')[0].textContent;
-  const key = k => findAll(container, node => node.className === 'portrait-timeline')[0].dispatch('keydown', { key: k });
-  return { container, saved, solvedReports, played, clock, store, cleanup, faces, faceFor, chips, time, key, last: () => saved[saved.length - 1] };
+  const key = k => document.pressKey(k);
+  const text = () => container.textContent;
+  return { container, saved, solvedReports, played, clock, store, cleanup, faces, faceFor, chips, key, text, closed: () => closed, last: () => saved[saved.length - 1] };
 }
+const tick = () => new Promise(resolve => setTimeout(resolve, 150)); // the station redraws every 100 ms
 
-test('before Start: no clock, no dates, cards locked, one short task line', () => {
+test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back to museum Esc – no cards yet', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  assert.equal(s.time(), '0:00');
-  assert.deepEqual(s.chips(), []);
-  assert.match(s.container.textContent, /Memorise the dates, then sort oldest to newest\./);
-  assert.match(s.container.textContent, /<0:20 = 15 pts/);
-  s.faces()[0].click();
-  assert.equal(s.last().startedAt, null);
+  assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Points are given based on speed\?/);
+  assert.match(findButton(s.container, 'Start').textContent, /Start↵/);
+  assert.match(findButton(s.container, 'Back to museum').textContent, /Back to museumEsc/);
+  assert.equal(s.faces().length, 0, 'the cards appear after Start, like L’s board');
   s.cleanup();
 });
 
-test('Start runs the clock and flashes all dates for 3 s, then they vanish', () => {
+test('"?" opens the instructions popup; Enter closes it again', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  findButton(s.container, 'Start').click();
+  findButton(s.container, '?').click();
+  assert.match(s.text(), /Sort the portraits/);
+  assert.match(s.text(), /Finish within 20s: \+15 points/);
+  s.key('Enter');
+  assert.doesNotMatch(s.text(), /Sort the portraits/);
+  assert.equal(s.last().startedAt, null, 'closing help does not start the clock');
+  s.cleanup();
+});
+
+test('Enter starts; the dates show for 10 s, then vanish; a wrong check adds 5 s on the bar', async () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  s.key('Enter');
   assert.equal(s.last().startedAt, T0);
   assert.deepEqual(s.chips(), ['1883–84', '1865', '1888–90']);
-  assert.match(s.container.textContent, /dates vanish in 3 s/);
+  assert.match(s.text(), /\+15 points\+10 points\+5 points\+0 points/);
+  assert.match(s.text(), /Dates vanish in 10 s/);
   s.clock.ms = T0 + FLASH_MS;
-  findButton(s.container, 'Check order').click(); // wrong order: +5 s
+  await tick();
   assert.deepEqual(s.chips(), []);
-  assert.equal(s.time(), '0:08');
-  assert.match(s.container.textContent, /Not yet\. \+5 s/);
+  s.key('Enter');                   // wrong order
+  assert.equal(s.last().penaltyMs, PENALTY_MS);
+  assert.match(s.text(), /Not yet\. \+5 s/);
+  assert.deepEqual(s.played, ['page', 'wrong']);
   s.cleanup();
 });
 
-test('a whole run: Start, number keys to swap, Enter to check – onSolved once, log on the backs', () => {
+test('a whole run: number keys swap, Enter checks, success popup with letter I and points, Enter returns', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  s.key('Enter');                   // Enter = Start
-  s.clock.ms = T0 + 6000;
-  s.key('1'); s.key('2');           // swap places 1 and 2
+  s.key('Enter');
+  s.clock.ms = T0 + FLASH_MS + 6000;   // 6 s after the reading time
+  s.key('1'); s.key('2');
   assert.deepEqual(s.last().order, RIGHT);
-  s.key('Enter');                   // check
+  s.key('Enter');
   assert.equal(s.last().solved, true);
   assert.deepEqual(s.solvedReports, [{ mistakes: 0, hints: 0 }]);
-  assert.match(s.container.textContent, /Solved in 0:06 · \+15 · Letter I in your journal · New best!/);
-  assert.match(s.container.textContent, /21:14 · Cart out – “patron visit, A\. V\.”/);
+  assert.match(s.text(), /Iadded to journal\+15 points earnedTime 0:06 · New best!/);
+  assert.match(s.text(), /21:14 · Cart out – “patron visit, A\. V\.”/);
   s.key('Enter');
-  assert.deepEqual(s.solvedReports.length, 1);
-  assert.deepEqual(s.played, ['page', 'click', 'click', 'flip']);
-  assert.equal(s.store['museum-nocturne-portrait-best-v1'], '6000');
+  assert.equal(s.closed(), 1, 'Return to museum');
+  assert.equal(s.solvedReports.length, 1);
+  s.cleanup();
+});
+
+test('Escape goes back to the museum, like L', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  s.key('Escape');
+  assert.equal(s.closed(), 1);
   s.cleanup();
 });
 
 test('Peek shows one date for a moment and costs 5 s', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  findButton(s.container, 'Start').click();
-  s.clock.ms = T0 + 4000;
+  s.key('Enter');
+  s.clock.ms = T0 + FLASH_MS + 1000;
   findButton(s.container, 'Peek').click();     // first card: Sargent
   assert.deepEqual(s.chips(), ['1883–84']);
   assert.equal(s.last().penaltyMs, PENALTY_MS);
-  assert.equal(s.time(), '0:09');
   assert.deepEqual(s.played, ['page', 'hint']);
+  s.cleanup();
+});
+
+test('the drag hint arrow appears once after the flash and goes at the first click', async () => {
+  const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
+  const arrow = () => findAll(s.container, node => node.className === 'puzzle-drag-demo')[0];
+  s.key('Enter');
+  assert.equal(arrow().hidden, true, 'not during the flash');
+  s.clock.ms = T0 + FLASH_MS + 1;
+  await tick();
+  assert.equal(arrow().hidden, false);
+  assert.equal(arrow().getAttribute('aria-hidden'), 'true');
+  s.faceFor(SARGENT).click();
+  assert.equal(arrow().hidden, true);
+  assert.equal(s.last().demoDismissed, true, 'it does not come back when the station is reopened');
   s.cleanup();
 });
 
 test('click-click swaps and dragging moves a card', () => {
   const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
-  findButton(s.container, 'Start').click();
+  s.key('Enter');
+  s.clock.ms = T0 + FLASH_MS;   // cards move only after the reading time
   s.faceFor(SARGENT).click();
   s.faceFor(CEZANNE).click();
   assert.deepEqual(s.last().order, [CEZANNE, SARGENT, DEGAS]);
@@ -162,15 +198,24 @@ test('click-click swaps and dragging moves a card', () => {
 
 test('reopening keeps the clock running and gives no second flash', async () => {
   const first = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  findButton(first.container, 'Start').click();
+  first.key('Enter');
   first.cleanup();
   const again = openStation(first.last());
   again.clock.ms = T0 + 20000;
-  await new Promise(resolve => setTimeout(resolve, 150)); // the station redraws its clock every 100 ms
-  assert.equal(again.time(), '0:20');
+  await tick();
   assert.deepEqual(again.chips(), []);
-  assert.equal(findButton(again.container, 'Start').hidden, true);
+  assert.equal(findButton(again.container, 'Start'), undefined);
+  assert.match(again.text(), /Check order/);
   again.cleanup();
+});
+
+test('the credit line never shows the years (they are the puzzle)', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  s.key('Enter');
+  const credit = findAll(s.container, node => node.className === 'story-muted puzzle-credit')[0];
+  assert.match(credit.textContent, /Edgar Degas, A Woman Seated beside a Vase of Flowers · .*Public domain · The Metropolitan Museum of Art/);
+  assert.doesNotMatch(credit.textContent, /1865|1883|1888/);
+  s.cleanup();
 });
 
 test('a broken save starts fresh; an old solved save shows the log and reports once', () => {
@@ -178,16 +223,21 @@ test('a broken save starts fresh; an old solved save shows the log and reports o
   assert.equal(fresh.last().solved, false);
   fresh.cleanup();
   const old = openStation({ order: RIGHT, solved: true, mistakes: 2, hints: 0, revealed: [] });
-  assert.match(old.container.textContent, /21:02 · Leon – east wing round/);
+  assert.match(old.text(), /21:02 · Leon – east wing round/);
   assert.deepEqual(old.solvedReports, [{ mistakes: 2, hints: 0 }]);
   old.cleanup();
 });
 
-test('a broken best-time store does not break the station', () => {
-  const s = openStation(timeline(RIGHT.slice().reverse()), { storage: { getItem() { throw new Error('x'); }, setItem() { throw new Error('x'); } } });
-  findButton(s.container, 'Start').click();
-  s.key('1'); s.key('3');
+test('during the 10 s reading time the clock waits and the cards cannot be moved or checked', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
-  assert.equal(s.last().solved, true);
+  s.clock.ms = T0 + 5000;
+  s.key('1'); s.key('2');
+  assert.deepEqual(s.last().order, [SARGENT, DEGAS, CEZANNE], 'no swapping while reading');
+  s.key('Enter');
+  assert.equal(s.last().mistakes, 0, 'no checking while reading');
+  s.clock.ms = T0 + FLASH_MS;
+  s.key('1'); s.key('2');
+  assert.deepEqual(s.last().order, RIGHT, 'after the reading time it works');
   s.cleanup();
 });

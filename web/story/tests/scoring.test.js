@@ -75,14 +75,15 @@ test('Renoir speed boundaries award only completed puzzles and freeze after comp
 });
 
 import { portraitSpeedPoints, PORTRAIT_UNTIMED_POINTS, formatClock } from '../scoring.js';
-import { initialTimeline, startTimeline, checkOrder, correctOrder, peekDate } from '../../minigames/portrait-rules.js';
+import { initialTimeline, startTimeline, checkOrder, correctOrder, peekDate, FLASH_MS } from '../../minigames/portrait-rules.js';
 
 // Station I solved after `ms` (plus penalties), as the station saves it.
 function portraitRun(ms, { wrong = 0, peeks = 0 } = {}) {
   let t = startTimeline({ ...initialTimeline(), order: [...correctOrder()].reverse() }, 1000);
-  for (let i = 0; i < wrong; i++) t = checkOrder(t, 1000);
-  for (let i = 0; i < peeks; i++) t = peekDate(t, correctOrder()[0], 5000);
-  return checkOrder({ ...t, order: correctOrder() }, 1000 + ms);
+  const clockStart = 1000 + FLASH_MS;   // the clock starts after the reading time
+  for (let i = 0; i < wrong; i++) t = checkOrder(t, clockStart);
+  for (let i = 0; i < peeks; i++) t = peekDate(t, correctOrder()[0], clockStart);
+  return checkOrder({ ...t, order: correctOrder() }, clockStart + ms);
 }
 function solvedWith(timeline) {
   const state = solveStation(readMission(newGame()).state, 'portraits', { mistakes: 0, hints: 0 }).state;

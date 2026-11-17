@@ -45,7 +45,17 @@ function toNode(node) {
 }
 
 export function installFakeDom() {
-  globalThis.document = { createElement: tag => new FakeElement(tag) };
+  const listeners = [];
+  globalThis.document = {
+    createElement: tag => new FakeElement(tag),
+    addEventListener: (type, listener) => listeners.push({ type, listener }),
+    removeEventListener: (type, listener) => listeners.splice(listeners.findIndex(l => l.listener === listener), 1),
+    // Test helper: a key press as the page would see it (target = the focused element).
+    pressKey(key, target = globalThis.document.activeElement) {
+      const event = { type: 'keydown', key, target, repeat: false, preventDefault() {}, stopImmediatePropagation() {} };
+      for (const l of [...listeners]) if (l.type === 'keydown') l.listener(event);
+    },
+  };
   return globalThis.document;
 }
 

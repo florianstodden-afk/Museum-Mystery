@@ -1,50 +1,38 @@
-/* Station I – Portrait Hall speedrun. Loaded by portrait-timeline.js itself.
-   One accent colour: gold. Colours and fonts come from web/story/story.css (--story-* variables). */
+/* Station I – Portrait Hall. Loaded by portrait-timeline.js itself.
+   The root also has the class "picture-puzzle", so intro, buttons, points bar, popups and credit
+   come from Station L's rules in web/story/story.css. Only the cards and the timeline are styled here. */
 
-/* A little more room in the dark story dialog while this station is open. */
-.dialog-card.story-dark-card:has(.portrait-timeline),
+/* The story preview's dialog gets the same width as L in the game. */
 .story-modal:has(.portrait-timeline) { max-width: 860px; width: min(860px, calc(100vw - 24px)); }
-/* The clock sits in the dialog's top corner. A modal <dialog> is already positioned; the game's card needs this. */
-.dialog-card.story-dark-card:has(.portrait-timeline) { position: relative; }
-/* Continue, × and Escape close the station, so the host's extra close row and note are not needed here. */
+/* Station I brings its own "Back to museum", like L – the host's extra close row and note are not needed. */
 .story-scene:has(.portrait-timeline) + .story-actions,
 .story-scene:has(.portrait-timeline) > .story-feedback { display: none; }
 
-.portrait-timeline { --gold: var(--story-gold, #e0b660); font-size: .95rem; color: var(--story-ink, #ece6d8); }
+.portrait-timeline { --gold: var(--story-gold, #e0b660); }
 .portrait-timeline [hidden] { display: none !important; }
+.portrait-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-/* Clock: top right, next to the dialog's × */
-.portrait-clock { position: absolute; z-index: 3; top: 14px; right: 74px; display: grid; justify-items: end; line-height: 1; }
-.portrait-time { font: 600 2.1rem/1 Georgia, serif; color: var(--gold); font-variant-numeric: tabular-nums; transition: color .3s; }
-.portrait-clock-sub { margin-top: 4px; font-size: .74rem; color: var(--story-muted, #a9b3b8); }
-.portrait-clock.is-penalty .portrait-time { color: #e0645a; }
-
-/* Task line with the "?" */
-.portrait-task { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
-.portrait-help { display: inline-grid; place-items: center; width: 20px; height: 20px; border: 1px solid #8a8f8f; border-radius: 50%; font-size: .75rem; color: var(--story-muted, #a9b3b8); cursor: help; }
-.portrait-help:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.portrait-help-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-
-/* Three equal cards */
-.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; position: relative; }
+/* Board: three equal cards, the timeline and the hint arrow */
+.portrait-board { position: relative; margin: 12px 0; }
+.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 2vw, 18px); position: relative; }
 .portrait-card { min-width: 0; perspective: 1200px; }
 .portrait-inner { position: relative; transition: transform .6s ease; transform-style: preserve-3d; }
 .portrait-front { display: grid; gap: 2px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-.dialog-card .portrait-face, .portrait-face { display: block; width: 100%; margin: 0 0 6px; padding: 0; background: #0b1217; border: 2px solid #b8965c; border-radius: 3px; cursor: grab; transition: transform .18s, box-shadow .18s; }
-.dialog-card .portrait-timeline .portrait-face:hover, .portrait-timeline .portrait-face:hover { background: #0b1217; }
-.portrait-face img { display: block; width: 100%; height: clamp(110px, 26vh, 210px); object-fit: contain; }
-.portrait-face:disabled { cursor: default; opacity: 1; }
-.portrait-face:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
-.portrait-card.is-selected .portrait-face { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold); transform: translateY(-3px); }
-.portrait-card.is-target .portrait-face { box-shadow: 0 0 0 3px #f3d48b; }
-.portrait-artist { font: 600 1rem/1.25 Georgia, serif; color: #f8e9c9; }
-.portrait-title { font-size: .85rem; color: var(--story-muted, #a9b3b8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Gold frame like L's board: one 3px border, no inner mat, the picture fills it (face stays visible). */
+.picture-puzzle .portrait-face { display: block; width: 100%; aspect-ratio: 4 / 5; max-height: clamp(110px, 24vh, 240px); margin: 0 0 6px; padding: 0; overflow: hidden; background: #101c23; border: 3px solid #b8965c; border-radius: 0; cursor: grab; transition: transform .18s; }
+.picture-puzzle .portrait-face:hover { background: #101c23; }
+/* The Met photos have a thin black edge; scaling a little lets the frame cut it off. */
+.portrait-face img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, top); transform: scale(1.12); transform-origin: center; }
+.picture-puzzle .portrait-face:disabled { cursor: default; opacity: 1; }
+.portrait-card.is-selected .portrait-face { border-color: #ecd8a4; transform: translateY(-3px); }
+.portrait-card.is-target .portrait-face { box-shadow: 0 0 0 3px #ecd8a4; }
+.portrait-artist { font: 600 .95rem/1.25 Fraunces, Georgia, serif; color: #f8e9c9; }
+.portrait-title { font-size: .8rem; color: var(--story-muted, #a9b3b8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .portrait-meta { display: flex; align-items: center; gap: 8px; min-height: 26px; margin-top: 4px; }
 .portrait-chip { padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #1d2931; font-weight: 700; font-size: .85rem; animation: portrait-fade-in .2s; }
-.dialog-card .portrait-peek, .portrait-peek { padding: 2px 10px; border: 1px dashed #8a7a55; border-radius: 99px; background: transparent; color: var(--story-muted, #a9b3b8); font-size: .8rem; cursor: pointer; }
-.portrait-peek:hover, .portrait-peek:focus-visible { color: var(--gold); border-color: var(--gold); }
-.portrait-link { margin-left: auto; color: var(--story-muted, #a9b3b8); text-decoration: none; font-size: .85rem; }
-.portrait-link:hover, .portrait-link:focus-visible { color: var(--gold); }
+.picture-puzzle .portrait-peek { min-height: 0; margin: 0; padding: 2px 10px; border: 1px dashed #9c875a; border-radius: 99px; background: transparent; color: #c3c7c5; font-size: .78rem; }
+.picture-puzzle .portrait-peek:hover, .picture-puzzle .portrait-peek:focus-visible { color: #ecd8a4; border-color: #ecd8a4; }
 @keyframes portrait-fade-in { from { opacity: 0; } }
 
 /* Catalogue scan: a thin gold line runs over the cards while the dates show */
@@ -52,48 +40,36 @@
 @keyframes portrait-scan { from { left: 0; } to { left: calc(100% - 3px); } }
 
 /* Back: one log line, shown after the right order */
-.portrait-back { position: absolute; inset: 0 0 auto; height: clamp(110px, 26vh, 210px); display: grid; place-items: center; margin: 0; padding: 12px; text-align: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border: 2px solid #b8965c; border-radius: 3px; font: .9rem/1.4 ui-monospace, Menlo, monospace; }
+.portrait-back { position: absolute; inset: 0 0 auto; aspect-ratio: 4 / 5; max-height: clamp(110px, 24vh, 240px); width: 100%; display: grid; place-items: center; margin: 0; padding: 12px; text-align: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border: 3px solid #b8965c; font: .85rem/1.4 ui-monospace, Menlo, monospace; }
 .portrait-cards.is-flipped .portrait-inner { transform: rotateY(180deg); }
 .portrait-cards.is-flipped .portrait-front > :not(.portrait-face) { visibility: hidden; }
 
-/* Timeline with three numbered places and the flash progress bar */
-.portrait-axis { margin: 14px 0 0; }
+/* Timeline with three numbered places and the scan progress */
+.portrait-axis { margin: 10px 0 0; }
 .portrait-axis-row { display: flex; align-items: center; gap: 8px; }
-.portrait-slot { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #8a8f8f; border-radius: 50%; font-size: .75rem; color: var(--story-muted, #a9b3b8); }
+.portrait-slot { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #9c875a; border-radius: 50%; font-size: .75rem; color: #c3c7c5; }
 .portrait-line { flex: 1; height: 1px; background: #5d6668; }
-.portrait-axis-label { margin-left: 10px; font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--story-muted, #a9b3b8); }
-.portrait-flashbar { display: block; height: 3px; margin-top: 10px; border-radius: 2px; background: linear-gradient(90deg, #b8965c, #f3d48b) left / calc(var(--flash, 0) * 100%) 100% no-repeat; }
+.portrait-axis-label { margin-left: 10px; font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: #c3c7c5; }
+.portrait-flashbar { display: block; height: 3px; margin-top: 8px; border-radius: 2px; background: linear-gradient(90deg, #b8965c, #f3d48b) left / calc(var(--flash, 0) * 100%) 100% no-repeat; }
 
-/* One action row */
-.portrait-actions { display: flex; align-items: center; gap: 14px; margin-top: 12px; min-height: 44px; }
-.dialog-card .portrait-primary, .portrait-primary { margin: 0; padding: 9px 18px; background: var(--gold); color: #1d2931; border: 0; font-weight: 700; }
-.portrait-primary.is-ready { animation: portrait-pulse .8s ease-out 1; }
-@keyframes portrait-pulse { 50% { box-shadow: 0 0 0 6px #e0b66055; } }
-.portrait-scan-note { margin-left: auto; font-size: .85rem; color: var(--story-muted, #a9b3b8); }
-.portrait-status { margin: 0 0 0 auto; font-size: .85rem; color: var(--story-muted, #a9b3b8); text-align: right; }
+/* A penalty makes L's bar blink red for a moment. */
+.portrait-timeline .puzzle-clock.is-penalty .puzzle-time-fill { background: #e0645a; }
+.portrait-timeline .puzzle-clock.is-penalty .puzzle-time-track { border-color: #e0645a; }
 
-/* Footer: one small line */
-.portrait-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: .74rem; color: var(--story-muted, #a9b3b8); }
-.dialog-card .portrait-info, .portrait-info { display: inline-grid; place-items: center; width: 20px; height: 20px; margin: 0; padding: 0; border: 1px solid #8a8f8f; border-radius: 50%; background: transparent; color: inherit; font-size: .72rem; }
-.portrait-sources { flex-basis: 100%; margin: 2px 0 0; }
-.portrait-sources a { color: var(--gold); }
-
-/* Phones: three small cards side by side, smaller text, no scrolling */
+/* Phones: three small cards side by side */
 @media (max-width: 600px) {
-  .portrait-clock { position: static; justify-items: start; margin-bottom: 8px; }
-  .portrait-time { font-size: 1.6rem; }
-  .portrait-cards { gap: 8px; }
-  .portrait-face img, .portrait-back { height: 120px; }
-  .portrait-artist { font-size: .8rem; }
-  .portrait-title { font-size: .72rem; }
+  .picture-puzzle .portrait-face, .portrait-back { max-height: 130px; }
+  .portrait-artist { font-size: .78rem; }
+  .portrait-title { font-size: .7rem; }
   .portrait-meta { flex-wrap: wrap; gap: 4px; }
-  .portrait-chip, .portrait-peek { font-size: .7rem; padding: 1px 6px; }
-  .portrait-back { font-size: .7rem; padding: 6px; }
+  .portrait-chip, .picture-puzzle .portrait-peek { font-size: .7rem; padding: 1px 6px; }
+  .portrait-back { font-size: .68rem; padding: 6px; }
   .portrait-axis-label { display: none; }
-  .portrait-actions { flex-wrap: wrap; }
 }
 
+/* Reduced motion: no scan, no turning; the hint arrow shows still at its target for a moment. */
 @media (prefers-reduced-motion: reduce) {
-  .portrait-inner, .portrait-face, .portrait-time { transition: none; }
-  .portrait-cards.is-flashing::after, .portrait-chip, .portrait-primary.is-ready { animation: none; }
+  .portrait-inner, .picture-puzzle .portrait-face { transition: none; }
+  .portrait-cards.is-flashing::after, .portrait-chip { animation: none; }
+  .portrait-timeline .puzzle-drag-demo { opacity: 1; transform: translate(var(--drag-end-x), var(--drag-end-y)); }
 }

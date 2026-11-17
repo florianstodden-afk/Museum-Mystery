@@ -5,8 +5,9 @@
 //   python3 -m http.server 8000 --directory web     (in a second terminal)
 //   node web/dev/e2e-station-i.mjs
 //
-// It opens the story preview, solves Station I once with one wrong check, and checks:
-// letter I in the journal, points by time, no scrolling at 1280×720, 1440×900 and 390×844,
+// It plays the flow of Station I (same as Station L): intro → Start ↵ → catalogue flash → sorting with the
+// points bar (one wrong check) → success popup with letter I → Return to museum. It checks: no scrolling at
+// 1280×720, 1440×900 and 390×844, the drag hint arrow, points by time, letter I in the journal,
 // no console errors, and that all three images show when the Met API is blocked (offline copies).
 import { chromium } from 'playwright';
 
@@ -31,15 +32,20 @@ for (const [width, height] of SIZES) {
 
   const fits = () => page.evaluate(() => { const d = document.querySelector('dialog[open]'); return [d.scrollHeight, d.clientHeight]; });
   const report = async label => { const [s, c] = await fits(); ok(`${width}×${height} ${label}: no scrolling`, s <= c, `${s}/${c}`); };
-  await report('start');
+
+  // Intro like L: task, gold speed line, "?", Start ↵, Back to museum Esc – no cards yet.
+  ok(`${width}×${height} intro`, await page.getByText('Points are given based on speed').isVisible() && (await page.locator('.portrait-face').count()) === 0);
+  await report('intro');
 
   const started = Date.now();
-  await page.keyboard.press('Enter');                       // focus starts on Start
+  await page.keyboard.press('Enter');                                   // Start ↵
   const years = await page.locator('.portrait-chip').allTextContents();
+  ok(`${width}×${height} flash shows three dates`, years.length === 3, years.join(', '));
   await report('flash');
-  await page.waitForTimeout(3100);                          // dates vanish
-  await page.getByRole('button', { name: /Check order/ }).click(); // still shuffled → wrong, +5 s
-  ok(`${width}×${height} wrong check says "Not yet"`, (await page.locator('.portrait-status').textContent()).includes('Not yet'));
+  await page.waitForTimeout(3100);                                      // the dates vanish, the arrow appears
+  ok(`${width}×${height} drag hint arrow`, await page.locator('.portrait-timeline .puzzle-drag-demo').isVisible());
+  await page.keyboard.press('Enter');                                   // still shuffled → wrong, +5 s
+  ok(`${width}×${height} wrong check says "Not yet"`, (await page.locator('.puzzle-status').textContent()).includes('Not yet'));
   await report('after a mistake');
 
   // Sort with the number keys by the remembered years (selection sort).
@@ -53,14 +59,15 @@ for (const [width, height] of SIZES) {
     [order[i], order[min]] = [order[min], order[i]];
   }
   await page.keyboard.press('Enter');
-  const status = await page.locator('.portrait-status').textContent();
-  ok(`${width}×${height} solved`, /Solved in 0:\d\d · \+(15|10)/.test(status), `${status} (wall clock ${((Date.now() - started) / 1000).toFixed(1)} s)`);
+  const popup = await page.locator('.puzzle-popup').innerText();
+  ok(`${width}×${height} success popup`, /I\s*added to journal/.test(popup) && /\+(15|10) points earned/.test(popup), `${popup.replace(/\s+/g, ' ')} (wall clock ${((Date.now() - started) / 1000).toFixed(1)} s)`);
   await report('solved');
 
   const images = await page.locator('.portrait-face img').evaluateAll(list => list.map(img => img.complete && img.naturalWidth > 0));
   ok(`${width}×${height} offline images`, images.length === 3 && images.every(Boolean));
-  await page.getByRole('button', { name: 'Continue' }).click();
-  ok(`${width}×${height} letter I in the journal`, (await page.locator('body').innerText()).includes('Score: 15 / 90') || (await page.locator('body').innerText()).includes('Score: 10 / 90'));
+  await page.keyboard.press('Enter');                                   // Return to museum ↵
+  const body = await page.locator('body').innerText();
+  ok(`${width}×${height} back in the museum with letter I`, !(await page.locator('dialog[open]').count()) && /Score: (15|10) \/ 90/.test(body));
   ok(`${width}×${height} no console errors`, errors.length === 0, errors.join(' | '));
   await page.close();
 }
