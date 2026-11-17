@@ -40,8 +40,7 @@ const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, n
 // Small synthesized sounds for story moments; the player remembers 'muted'.
 const sound = createSoundPlayer();
 
-// Every person starts talking by themselves when the player comes close,
-// and stops when the player walks away (see story/proximity.js). No E needed.
+// Imani and Vale start talking nearby; Leon waits for an E interaction.
 const PEOPLE = {guard:'leon', restorer:'imani', curator:'vale'}; // map object id → story character
 let nudgedAt = -Infinity;        // when the player last shook "nothing here" (interaction.js)
 const talkWasNear = {};           // per character: true until the player walks away
@@ -111,8 +110,8 @@ function guardFacingNow(){
   return guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
 }
 function guardWalking(){return Boolean(guardMotion) && talkingTo!=='leon';}
-// The thing E works on. People are left out: they talk by themselves.
-function interactTarget(){const target=nearbyObject(state,currentGuard());return target && PEOPLE[target.id] ? null : target;}
+// E opens Leon's conversation; Imani and Vale continue to speak nearby.
+function interactTarget(){const target=nearbyObject(state,currentGuard());return target && target.id!=='guard' && PEOPLE[target.id] ? null : target;}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
@@ -131,7 +130,7 @@ function updateSidebar() {
   const model = journalModel(story.state);
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
   document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
-  renderJournal(document.querySelector('#journal'), model);
+  renderJournal(document.querySelector('#journal'), model, document.querySelector('#journal-evidence'));
 }
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
@@ -348,6 +347,8 @@ function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog
   for(const option of options){const b=document.createElement('button');b.textContent=option.label;if(option.secondary)b.className='secondary';b.addEventListener('click',option.action);actions.append(b);}
   dialog.classList.remove('hidden');
   gameMenuToggle.hidden = true;
+  document.querySelector('#game-journal-toggle').hidden = true;
+  homeScreen.inert = true;
   document.querySelector('.shell').inert = true;
   // The host adds its content synchronously after showDialog returns.
   queueMicrotask(() => (dialog.querySelector('button:not(:disabled), input, select, a[href]') ?? document.querySelector('.dialog-card')).focus());
@@ -355,9 +356,11 @@ function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog
 function closeDialog(){
   story.leaveStation();
   dialog.classList.add('hidden');
-  document.querySelector('.shell').inert = false;
+  document.querySelector('.shell').inert = !homeScreen.hidden;
+  homeScreen.inert = false;
   gameMenuToggle.hidden = !homeScreen.hidden || !entryScreen.hidden;
-  const target = dialogOpener?.isConnected && dialogOpener !== document.body ? dialogOpener : canvas;
+  document.querySelector('#game-journal-toggle').hidden = !homeScreen.hidden || !entryScreen.hidden;
+  const target = dialogOpener?.isConnected && dialogOpener !== document.body && !dialogOpener.closest('[hidden]') ? dialogOpener : homeScreen.hidden ? canvas : document.querySelector('#home-journal');
   target.focus();
 }
 function handleInteract(){
@@ -373,6 +376,12 @@ function handleInteract(){
   }
   // No object near: no popup, just a short shake and a quiet tap sound (see interaction.js).
   if(action==='nudge'){nudgedAt=performance.now();sound.play('nudge');return;}
+  if(object.id==='guard'){
+    talkingTo='leon';
+    speech.setPlacement(playerLow()?'top':'bottom');
+    story.talkTo('leon');
+    return;
+  }
   runStoryAction(object.story);
 }
 // Each map object says in engine.js what it does in the story.
@@ -398,7 +407,7 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
-  if(!homeScreen.hidden || !gameMenu.hidden){requestAnimationFrame(animate);return;}
+  if(!homeScreen.hidden || !gameMenu.hidden || !document.querySelector('#sidebar').hidden){requestAnimationFrame(animate);return;}
   const playerInHall=state.room!=='security' && state.player.x<9;
   if(!roomTransition && talkingTo!=='leon') { // Leon stands still while he talks
     if(guardMotion) {
@@ -449,7 +458,7 @@ function animate(now){
   }
   requestAnimationFrame(animate);
 }
-// Opens a person's speech box when the player comes close, and closes it when they walk away.
+// Imani and Vale open nearby; Leon is started by E. Open speech closes when walking away.
 function personPosition(objectId){return objectId==='guard' ? guardDisplay() : OBJECTS.find(o=>o.id===objectId);}
 function personDistance(objectId){
   const room=state.room==='security' ? 'security' : state.player.x<9 ? 'guard' : state.player.x<18 ? 'restorer' : 'curator';
@@ -468,6 +477,7 @@ function checkAutoTalk(){
   }
   const blocked=!dialog.classList.contains('hidden') || Boolean(roomTransition) || speech.isOpen;
   for(const [objectId,character] of Object.entries(PEOPLE)){
+    if(objectId==='guard')continue;
     const talk=shouldOpenTalk({distance:personDistance(objectId),wasNear:talkWasNear[character]??false,blocked});
     talkWasNear[character]=talk.wasNear || talkingTo===character;
     if(talk.open){
@@ -481,9 +491,18 @@ function checkAutoTalk(){
 function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.78;}
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
-  if(!homeScreen.hidden)return;
+  if(!entryScreen.hidden)return;
+  if(!document.querySelector('#sidebar').hidden){
+    if(event.key==='Escape' || event.key.toLowerCase()==='j'){event.preventDefault();closeJournal();}
+    return;
+  }
+  if(!homeScreen.hidden){
+    if(event.key.toLowerCase()==='j' && !event.repeat){event.preventDefault();openJournal(document.querySelector('#home-journal'));}
+    return;
+  }
   if(!gameMenu.hidden){
     if(event.key==='Escape'){event.preventDefault();closeGameMenu();return;}
+    if(event.key.toLowerCase()==='j' && !event.repeat){event.preventDefault();closeGameMenu(false);openJournal(document.querySelector('#journal-toggle'));return;}
     if(event.key==='Tab'){
       const focusable=[...gameMenu.querySelectorAll('button:not(:disabled)')];
       const first=focusable[0],last=focusable.at(-1);
@@ -509,6 +528,8 @@ document.addEventListener('keydown',event=>{
     }
     return;
   }
+  if(event.key==='Escape'){event.preventDefault();openGameMenu();return;}
+  if(event.key.toLowerCase()==='j' && !event.repeat){event.preventDefault();openJournal(document.querySelector('#game-journal-toggle'));return;}
   const key=event.key.toLowerCase();
   if(directions[key]){ event.preventDefault(); heldKeys.set(key,directions[key]); }
   else if((key==='e'||key==='enter') && !event.repeat){event.preventDefault();handleInteract();}
@@ -524,25 +545,27 @@ document.querySelectorAll('[data-move]').forEach(button=>{
   button.addEventListener('keyup',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();event.stopPropagation();heldKeys.delete(key);if(!heldKeys.size)savePosition();}});
 });
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
-document.querySelector('#journal-toggle').addEventListener('click', event=>{closeGameMenu(false);const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));canvas.focus();});
+document.querySelector('#journal-toggle').addEventListener('click', event=>{closeGameMenu(false);openJournal(event.currentTarget);});
+document.querySelector('#game-journal-toggle').addEventListener('click',event=>openJournal(event.currentTarget));
+document.querySelector('#home-journal').addEventListener('click',event=>openJournal(event.currentTarget));
 document.querySelector('#hint').addEventListener('click',()=>{closeGameMenu(false);canvas.focus();story.showHint();});
 const soundButton=document.querySelector('#sound-toggle');
 const homeSoundButton=document.querySelector('#home-sound');
-function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');homeSoundButton.textContent=sound.muted?'Sounds off':'Sounds on';homeSoundButton.setAttribute('aria-pressed',String(!sound.muted));}
+function showSoundState(){soundButton.textContent=sound.muted?'🔇 Sound off':'🔊 Sound on';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound off. Turn sound on':'Sound on. Turn sound off');homeSoundButton.textContent=sound.muted?'Sound off':'Sound on';homeSoundButton.setAttribute('aria-pressed',String(!sound.muted));}
 function toggleSound(){sound.toggle();showSoundState();sound.play('click');}
 soundButton.addEventListener('click',toggleSound);
 homeSoundButton.addEventListener('click',toggleSound);
 showSoundState();
 const musicButton=document.querySelector('#music-toggle');
 const homeMusicButton=document.querySelector('#home-music');
-function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music';musicButton.setAttribute('aria-pressed',String(sound.musicOn));homeMusicButton.textContent=sound.musicOn?'Music on':'Music off';homeMusicButton.setAttribute('aria-pressed',String(sound.musicOn));}
+function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music off';musicButton.setAttribute('aria-pressed',String(sound.musicOn));homeMusicButton.textContent=sound.musicOn?'Music on':'Music off';homeMusicButton.setAttribute('aria-pressed',String(sound.musicOn));}
 function toggleMusic(){sound.toggleMusic();showMusicState();}
 musicButton.addEventListener('click',toggleMusic);
 homeMusicButton.addEventListener('click',toggleMusic);
 showMusicState();
 // Browsers only allow sound after the first click or key press; music that was left on starts then.
 for(const type of ['pointerdown','keydown'])document.addEventListener(type,()=>sound.resumeMusic(),{once:true});
-document.querySelector('#mission').addEventListener('click',()=>story.showMission());
+document.querySelector('#mission').addEventListener('click',()=>{closeJournal(false);(homeScreen.hidden?canvas:document.querySelector('#home-journal')).focus();story.showMission();});
 const homeStart=document.querySelector('#home-start');
 const homeNew=document.querySelector('#home-new');
 const homeSettings=document.querySelector('#home-settings');
@@ -550,6 +573,9 @@ const homeSettingsPanel=document.querySelector('#home-settings-panel');
 const homeScoreboard=document.querySelector('#home-scoreboard');
 const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
 const homeConfirm=document.querySelector('#home-confirm');
+const journalOverlay=document.querySelector('#sidebar');
+const gameJournalToggle=document.querySelector('#game-journal-toggle');
+let journalOpener=null;
 const entryScreen=document.querySelector('#entry-screen');
 const entryChoices=document.querySelector('#entry-choices');
 const entryPanel=document.querySelector('#entry-panel');
@@ -584,14 +610,42 @@ function closeHomePanels(){
   homeSettings.setAttribute('aria-expanded','false');
   homeScoreboard.setAttribute('aria-expanded','false');
 }
-function openGameMenu(){
-  if(!homeScreen.hidden || !dialog.classList.contains('hidden'))return;
+function openJournal(opener){
+  if(!entryScreen.hidden || !dialog.classList.contains('hidden') || !journalOverlay.hidden)return;
+  journalOpener=opener;
   stopMovement();
   speech.close();
-  const sidebar=document.querySelector('#sidebar');
-  sidebar.hidden=true;
-  document.querySelector('#journal-toggle').setAttribute('aria-expanded','false');
+  journalOverlay.hidden=false;
+  document.querySelector('.shell').inert=true;
+  homeScreen.inert=true;
+  gameMenuToggle.hidden=true;
+  gameJournalToggle.hidden=true;
+  document.querySelector('#journal-close').focus();
+}
+function closeJournal(restoreFocus=true){
+  if(journalOverlay.hidden)return;
+  journalOverlay.hidden=true;
+  homeScreen.inert=false;
+  document.querySelector('.shell').inert=!homeScreen.hidden;
+  gameMenuToggle.hidden=!homeScreen.hidden || !entryScreen.hidden;
+  gameJournalToggle.hidden=!homeScreen.hidden || !entryScreen.hidden;
+  if(restoreFocus)(journalOpener?.isConnected && !journalOpener.closest('[hidden]')?journalOpener:homeScreen.hidden?canvas:document.querySelector('#home-journal')).focus();
+}
+document.querySelector('#journal-close').addEventListener('click',()=>closeJournal());
+journalOverlay.addEventListener('click',event=>{if(event.target===journalOverlay)closeJournal();});
+journalOverlay.addEventListener('keydown',event=>{
+  if(event.key!=='Tab')return;
+  const focusable=[...journalOverlay.querySelectorAll('button:not(:disabled),a[href]')];
+  const first=focusable[0],last=focusable.at(-1);
+  if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+});
+function openGameMenu(){
+  if(!homeScreen.hidden || !dialog.classList.contains('hidden') || !journalOverlay.hidden)return;
+  stopMovement();
+  speech.close();
   gameMenu.hidden=false;
+  gameJournalToggle.hidden=true;
   gameMenuToggle.setAttribute('aria-expanded','true');
   gameMenuToggle.setAttribute('aria-label','Close in-game menu');
   document.querySelector('.shell').inert=true;
@@ -600,6 +654,7 @@ function openGameMenu(){
 function closeGameMenu(restoreFocus=true){
   if(gameMenu.hidden)return;
   gameMenu.hidden=true;
+  gameJournalToggle.hidden=false;
   gameMenuToggle.setAttribute('aria-expanded','false');
   gameMenuToggle.setAttribute('aria-label','Open in-game menu');
   document.querySelector('.shell').inert=!dialog.classList.contains('hidden') || !homeScreen.hidden;
@@ -609,11 +664,13 @@ gameMenuToggle.addEventListener('click',()=>gameMenu.hidden?openGameMenu():close
 gameMenu.addEventListener('click',event=>{if(event.target===gameMenu)closeGameMenu();});
 document.querySelector('#game-menu-resume').addEventListener('click',()=>closeGameMenu());
 function showHome(){
+  closeJournal(false);
   closeGameMenu(false);
   stopMovement();speech.close();
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
   gameMenuToggle.hidden=true;
+  gameJournalToggle.hidden=true;
   document.querySelector('.shell').inert=true;
   homeStart.disabled=!story.state.missionRead;
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
@@ -625,6 +682,7 @@ function showHome(){
 function enterGame(){
   homeScreen.hidden=true;
   gameMenuToggle.hidden=false;
+  gameJournalToggle.hidden=false;
   document.querySelector('.shell').inert=false;
   canvas.focus();
   if(story.state.ending)story.openVault();
@@ -639,6 +697,7 @@ document.querySelector('#home-confirm-new').addEventListener('click',()=>{
   homeConfirm.hidden=true;
   homeScreen.hidden=true;
   gameMenuToggle.hidden=false;
+  gameJournalToggle.hidden=false;
   document.querySelector('.shell').inert=false;
   story.reset();
 });

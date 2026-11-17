@@ -36,7 +36,7 @@ export function journalModel(state) {
   };
 }
 
-export function renderJournal(container, model) {
+export function renderJournal(container, model, evidenceContainer = null) {
   const slots = el('ol', { className: 'story-slots', attrs: { 'aria-label': 'Letters in fixed order' } });
   for (const slot of model.slots) {
     const label = slot.solved ? `${slot.room}: letter ${slot.letter}` : `${slot.room}: not found yet`;
@@ -55,6 +55,22 @@ export function renderJournal(container, model) {
     ? el('ul', { className: 'story-list' }, model.notes.map(note =>
       el('li', {}, [el('strong', { text: `${note.title}: ` }), note.text])))
     : el('p', { className: 'story-muted', text: 'No notes yet.' });
+
+  if (evidenceContainer) {
+    evidenceContainer.replaceChildren(
+      el('div', { className: 'journal-evidence-grid' }, [
+        el('section', {}, [el('h4', { text: 'Evidence' }), evidence]),
+        el('section', {}, [el('h4', { text: 'Notes' }), notes]),
+      ]),
+    );
+    container.replaceChildren(
+      el('section', { className: 'story-journal' }, [
+        el('div', { className: 'story-next' }, [el('strong', { text: 'Next: ' }), model.nextStep]),
+        slots,
+      ]),
+    );
+    return;
+  }
 
   container.replaceChildren(
     el('section', { className: 'story-journal' }, [

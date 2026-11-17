@@ -10,6 +10,8 @@ Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/
 
 **Aktuelle Arbeit am Spielmenü:** Während des Spielens bleibt die Museumsszene frei von Titel, Tastaturhinweisen und den bisherigen Knöpfen am oberen Rand. Das Zahnrad oben rechts öffnet ein Menü mit Sound, Music, Hint, Journal, Resume Game und Exit to Main Menu. Die genaue Umsetzung und Prüfung stehen in [docs/in-game-menu.md](docs/in-game-menu.md). Ein neues Spiel beginnt weiterhin nur über den Home Screen.
 
+**Nächste Überarbeitung:** Das Menü lässt sich mit `Esc` öffnen und schließen. Das Journal ist mit einem Knopf oben im Spiel und mit `J` erreichbar; vom Home Screen öffnet es sich ebenfalls, ohne das Spiel zu starten. Beide Fenster verwenden jetzt eine aufgeräumte Gestaltung nach Florians Bildvorlagen. Leon beginnt sein Gespräch erst bei `E` in seiner Nähe; seine Sprechbox lässt die Museumsszene durchscheinen. [Ablauf und Prüfung](docs/menu-journal-leon.md).
+
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 
 Öffentliches Spiel (Stand von `main`): <https://florianstodden-afk.github.io/Museum-Mystery/>

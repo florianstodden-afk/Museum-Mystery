@@ -207,6 +207,12 @@ a.story-button { display: inline-block; text-decoration: none; }
 .speech-more[hidden], .speech.is-typing .speech-more { display: none; }
 @keyframes speech-bob { 50% { transform: translateY(3px); } }
 @media (prefers-reduced-motion: reduce) { .speech-more { animation: none; } }
+/* Leon's conversation leaves the museum visible behind the words. */
+.speech-tag{background:#12262bc7;backdrop-filter:blur(7px)}
+.speech-box{background:#10252abd;backdrop-filter:blur(9px);color:#f8ecd5;border-color:#d4b173;box-shadow:0 14px 40px #0009}
+.speech-choice{background:#203a3ed9;color:#f7e8cb;border-color:#c49b58}
+.speech-choice:first-child{background:#345458e8;color:#fff3d9;border-color:#d3ae69}
+.speech-choice.is-goodbye{color:#ead9bb}
 @media (max-width: 650px) {
   .speech { bottom: 64px; }
   .speech.is-top { top: 70px; }

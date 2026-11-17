@@ -119,3 +119,37 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .game-menu-card{padding:20px;max-height:calc(100dvh - 80px)}
   .game-menu-grid{gap:9px}.game-menu button:not(.game-menu-toggle){font-size:1rem}
 }
+
+/* Brass-framed pause menu, following the supplied reference without baking labels into an image. */
+.game-menu{padding:24px;background:#061016b5}
+.game-menu-card{position:relative;width:min(760px,100%);max-height:calc(100dvh - 48px);padding:clamp(22px,4vw,46px);border:3px double #dfbd78;border-radius:24px;background:radial-gradient(circle at 50% 10%,#294049,#101e25 72%);box-shadow:0 25px 80px #000d,inset 0 0 0 5px #283d3d,inset 0 0 0 8px #a5864d;color:#f6e8cb}
+.game-menu-card::before,.game-menu-card::after{position:absolute;color:#d7b46f;font:2.2rem Georgia,serif;line-height:1;pointer-events:none;text-shadow:0 2px 4px #000}
+.game-menu-card::before{content:'❦';top:8px;left:16px}.game-menu-card::after{content:'❦';right:16px;bottom:8px;transform:rotate(180deg)}
+.game-menu-heading{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid #b9965e;text-align:center}
+.game-menu-heading h2{font-size:clamp(1.65rem,4vw,3.1rem);color:#f6ddb0;text-shadow:0 2px 4px #000}
+.game-menu-heading p{font-size:.85rem;letter-spacing:.21em}
+.game-menu-grid{gap:16px}
+.game-menu button:not(.game-menu-toggle){min-height:76px;border:3px double #d9b676;border-radius:14px;background:linear-gradient(#3b5654,#1b3033);box-shadow:inset 0 0 0 3px #1b2828,0 5px 9px #0009;color:#f8e4bc;font-size:clamp(1.1rem,2.4vw,1.55rem);text-shadow:0 2px 3px #000}
+.game-menu button:hover,.game-menu button[aria-pressed="true"]{background:linear-gradient(#4b6661,#253b3b)}
+.game-menu-actions{margin-top:28px;gap:14px}.game-menu-actions button{min-height:72px}
+.game-menu #game-menu-resume{background:linear-gradient(#61573f,#2a2e2d)}
+.game-journal-toggle[hidden],.home-journal[hidden]{display:none}
+.game-journal-toggle{position:fixed;z-index:12;top:max(16px,env(safe-area-inset-top));right:78px;min-height:46px;padding:8px 15px;border:2px solid #d6ae68;border-radius:11px;background:#14252be8;color:#f5d99b;font:700 1rem Fraunces,Georgia,serif;box-shadow:0 4px 18px #0009}
+.game-journal-toggle kbd{margin-left:5px;background:#33494a;color:#f7dfb5}
+.home-journal{position:absolute;z-index:3;right:3%;top:4%;padding:9px 17px;border:2px solid #d6ae68;border-radius:10px;background:#14252bf0;color:#f5d99b;font:700 1.1rem Fraunces,Georgia,serif;box-shadow:0 4px 16px #0009}
+.game-journal-toggle:hover,.home-journal:hover{background:#345052}
+.sidebar[hidden]{display:none}
+.sidebar:not([hidden]){position:fixed;z-index:40;inset:0;display:grid;place-items:center;width:auto;max-height:none;padding:18px;background:#061016c7;backdrop-filter:blur(6px);overflow:auto}
+.journal-book{position:relative;width:min(1120px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:28px 34px;border:4px double #ddbb78;border-radius:22px;background:linear-gradient(90deg,#172d32 0 49.8%,#09191e 50%,#172d32 50.2%);box-shadow:0 25px 90px #000d,inset 0 0 0 6px #284349,inset 0 0 0 9px #987646;color:#f1e5cd}
+.journal-book::before,.journal-book::after{position:absolute;color:#d9b46f;font:2.4rem Georgia,serif;pointer-events:none}.journal-book::before{content:'❦';top:10px;left:20px}.journal-book::after{content:'❦';right:20px;bottom:8px;transform:rotate(180deg)}
+.journal-book>h2{text-align:center;color:#f4d69d;font-size:clamp(1.7rem,4vw,2.8rem);text-transform:uppercase;letter-spacing:.04em;margin:8px 45px 20px;padding-bottom:14px;border-bottom:1px solid #a88c58}
+.journal-close{position:absolute;z-index:2;top:16px;right:18px;width:46px;height:46px;border:2px solid #d5b477;border-radius:10px;background:#14262a;color:#f5d99b;font-size:2rem;line-height:1}
+.journal-pages{display:grid;grid-template-columns:1fr 1fr;gap:34px}.journal-page{min-width:0;padding:10px 18px}.journal-page h3{text-align:center;margin:0 0 18px;color:#e8c789;font:700 1.2rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em}.journal-page h3:not(:first-child){margin-top:32px;padding-top:24px;border-top:1px solid #a88c5866}
+.journal-mission-title{max-width:330px;margin:8px auto 19px;text-align:center;color:#f6d591;font:700 clamp(1.4rem,3vw,2.2rem)/1.15 Fraunces,Georgia,serif}.journal-mission>button{display:block;margin:auto;padding:10px 22px;border:2px solid #bb995f;border-radius:10px;background:#21363a;color:#f7e2bd}
+.journal-evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.journal-evidence-grid h4{margin:0 0 10px;font-size:1rem}.journal-evidence-grid p,.journal-evidence-grid ul{min-height:120px;margin:0;padding:15px;border-radius:12px;background:#ffffff13;line-height:1.45}.journal-evidence-grid ul{padding-left:30px;overflow:auto}
+.journal-progress .story-next{margin-bottom:22px;background:#ffffff16;color:#f4e7ce;border-left:4px solid #d7b46f;padding:14px;font-size:1rem}
+.journal-progress .story-slots{gap:10px}.journal-progress .story-slot{min-height:120px;align-content:center;background:#0d1b21;border-color:#84765b}.journal-progress .story-slot-letter{font-size:2rem}.journal-progress .story-slot-room{font-size:.78rem;color:#e3d8bf}
+.journal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.journal-stats span{display:grid;place-items:center;min-height:70px;padding:8px;border:1px solid #9a8b6e;border-radius:40px;background:#ffffff14;text-align:center;font-size:.9rem}
+.journal-sources{margin:25px 0 0;text-align:center;color:#cbbda5;font-size:.78rem}.journal-sources a{color:#edcf93}
+.sidebar button:focus-visible,.sidebar a:focus-visible,.game-journal-toggle:focus-visible,.home-journal:focus-visible{outline:3px solid #f7d38e;outline-offset:3px}
+@media(max-width:700px){.game-menu{padding:12px}.game-menu-card{max-height:calc(100dvh - 24px)}.game-menu button:not(.game-menu-toggle){min-height:56px}.game-menu-grid{gap:9px}.game-menu-actions{margin-top:16px}.game-journal-toggle{right:68px;font-size:.85rem}.game-journal-toggle kbd{display:none}.sidebar:not([hidden]){padding:8px}.journal-book{max-height:calc(100dvh - 16px);padding:20px 12px}.journal-book>h2{font-size:1.5rem;margin:8px 40px 15px}.journal-pages{grid-template-columns:1fr;gap:12px}.journal-page{padding:8px}.journal-page h3:not(:first-child){margin-top:22px;padding-top:18px}.journal-evidence-grid p,.journal-evidence-grid ul{min-height:80px}.journal-progress .story-slot{min-height:95px}.journal-progress .story-slot-room{font-size:.64rem}}
