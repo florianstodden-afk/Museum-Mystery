@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GALLERY, GALLERY_BENCHES, GALLERY_OBSTACLES, galleryFootprintFits, galleryPosition, cameraLightOn } from './gallery-layout.js';
-import { initialState, canEnter, restoreState, nearbyObject } from './engine.js';
+import { initialState, atVaultDoor, canEnter, restoreState, nearbyObject } from './engine.js';
 import { advancePlayer } from './motion.js';
 const viewport={width:896,height:576};
 const at=(x,y,doorOpen=false)=>({...initialState(),player:{x,y},doorOpen});
@@ -101,4 +101,15 @@ test('walking toward the back wall away from the arch stays in the hall',()=>{
   const stopped=walk(at(6,5),[0,-1],500);
   assert.ok(stopped.player.x<9);
   assert.ok(stopped.player.y>=3.5);
+});
+
+
+test('vault doorway keeps a locked player outside and allows walking both ways after unlocking', () => {
+  const locked = walk(at(16.6,9),[1,0],1200);
+  assert.ok(locked.player.x <= 16.68);
+  assert.equal(atVaultDoor(locked), true);
+  const entered = walk(at(16.6,9,true),[1,0],1200);
+  assert.ok(entered.player.x >= 19);
+  const returned = walk(entered,[-1,0],1200);
+  assert.ok(returned.player.x < 18);
 });

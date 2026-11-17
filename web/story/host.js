@@ -39,6 +39,7 @@ export function createStoryHost(options) {
     openPanel,
     closePanel: hidePanel,
     onChange = () => {},
+    onVaultUnlocked = null,
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
     sound = null,             // optional: a player from sound.js; without it the story is silent
     stations = {},
@@ -201,7 +202,8 @@ export function createStoryHost(options) {
     const { content, actions } = scene('The Vault');
     renderSafe(content, { state, message }, word => {
       const result = act(tryOpenSafe(state, word), 'tryOpenSafe');
-      showSafe(result.message);
+      if (result.ok && onVaultUnlocked) onVaultUnlocked();
+      else showSafe(result.message);
     });
     if (state.safe.open) actions.append(button('Return to the gallery', () => closePanel()));
     actions.append(state.safe.open

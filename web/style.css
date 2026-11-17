@@ -28,3 +28,7 @@ canvas{object-fit:contain;object-position:center}
 body[data-room='gallery']:before{background:radial-gradient(ellipse at 50% 45%,#29444a,#08151d 80%);filter:none}
 
 body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,#2b4042,#09151a 80%);filter:none}
+
+/* Keep dialogs visible above mobile controls and the on-screen keyboard. */
+.overlay { align-items: start; overflow-y: auto; padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+.dialog-card { margin: clamp(8px, 5vh, 48px) auto 16px; max-height: calc(100dvh - 48px); overflow-y: auto; overscroll-behavior: contain; }
