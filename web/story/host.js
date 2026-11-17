@@ -21,7 +21,7 @@ import { CASE } from './case-1.js';
 import { serialize, deserialize } from './save.js';
 import { openStation as runStation } from './stations.js';
 import * as placeholderStation from './placeholder-station.js';
-import { dialogueFor, renderDialogue } from './dialogues.js';
+import { dialogueFor, renderDialogue, conversationFor } from './dialogues.js';
 import { renderSafe } from './safe-ui.js?v=vault-wheel-7';
 import { renderAccusation } from './accusation-ui.js';
 import { endingModel, renderEnding, renderEndingChoice } from './endings.js';
@@ -42,6 +42,7 @@ export function createStoryHost(options) {
     onVaultUnlocked = null,
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
     sound = null,             // optional: a player from sound.js; without it the story is silent
+    speech = null,            // optional: a box from speech-box.js; then Leon talks in it instead of the panel
     stations = {},
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
@@ -141,6 +142,12 @@ export function createStoryHost(options) {
   }
 
   function talkTo(characterId) {
+    // Characters with a short conversation talk in the speech box (if the page has one).
+    const conversation = speech && conversationFor(characterId, state);
+    if (conversation) {
+      if (!speech.isOpen) speech.show(conversation);
+      return;
+    }
     const dialogue = dialogueFor(characterId, state);
     if (!dialogue) return;
     const { content, actions } = scene('Conversation');

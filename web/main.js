@@ -8,11 +8,13 @@ import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObj
 import * as landscapeStation from './minigames/landscape.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
-import { createStoryHost } from './story/host.js?v=vault-wheel-7';
+import { createStoryHost } from './story/host.js?v=speech-box-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { movementDuration, advancePlayer } from './motion.js?v=vault-exit-4';
 import { chooseGuardAction } from './guard.js';
+import { createSpeechBox } from './story/speech-box.js';
+import { shouldOpenTalk, distanceBetween } from './story/proximity.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -32,6 +34,16 @@ const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, n
 // Small synthesized sounds for story moments; the player remembers 'muted'.
 const sound = createSoundPlayer();
 
+// Leon starts talking by himself when the player comes close (see story/proximity.js).
+// Later more characters can join: ['leon', 'imani'] (see docs/story/speech-box.md).
+const AUTO_TALK = ['leon'];
+let talkWasNear = false;          // stays true until the player walks away from Leon
+let talkClosedAt = -Infinity;     // when the speech box closed last time
+const speech = createSpeechBox(document.body, {
+  onClose: () => { talkClosedAt = performance.now(); },
+  playSound: id => sound.play(id),
+});
+
 // The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
 const story = createStoryHost({
   openPanel(title) {
@@ -44,6 +56,7 @@ const story = createStoryHost({
   onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
   sound,
+  speech,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
   storageKey: 'museum-nocturne-story-v1',
   ...(vaultPreview ? {storage: previewStorage} : {}),
@@ -84,6 +97,12 @@ let lastFrame = 0;
 let roomTransition = null;
 let vaultOpenedAt = null;
 function currentGuard(){return guardDisplay();}
+// While Leon talks he stands still and looks at the player.
+function guardFacingNow(){
+  if(speech.isOpen){const g=guardDisplay(),dx=state.player.x-g.x,dy=state.player.y-g.y;return Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');}
+  return guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
+}
+function guardWalking(){return Boolean(guardMotion) && !speech.isOpen;}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
@@ -174,8 +193,8 @@ function drawHall(){
   const desk=hallPosition(ledger.x,ledger.y);ctx.fillStyle='#5b4633';ctx.beginPath();ctx.ellipse(desk.x,desk.y+3,45,12,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#b79c71';ctx.fillRect(desk.x-28,desk.y-14,56,16);ctx.fillStyle='#f0e2bc';ctx.fillRect(desk.x-10,desk.y-17,20,12);
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
-  const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
-  drawPerson(person.x,person.y,'guard',guardFacing,animationTime,Boolean(guardMotion));
+  const guardFacing=guardFacingNow();
+  drawPerson(person.x,person.y,'guard',guardFacing,animationTime,guardWalking());
   // Use the hall's own stone texture so the inscriptions belong to the masonry.
   function stonePlaque(text,x,y,width){
     const left=x-width/2, height=19;
@@ -221,10 +240,10 @@ function drawTreasureRoom(){
 // The monitor wall uses the same actors and positions as the walkable rooms.
 function cameraPeople(){
   const guard=guardDisplay();
-  const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
+  const guardFacing=guardFacingNow();
   const restorer=OBJECTS.find(object=>object.id==='restorer');
   const curator=OBJECTS.find(object=>object.id==='curator');
-  const rooms={hall:[{...guard,kind:'guard',facing:guardFacing,moving:Boolean(guardMotion)}],gallery:[{...restorer,kind:'restorer'}],vault:[{...curator,kind:'restorer'}]};
+  const rooms={hall:[{...guard,kind:'guard',facing:guardFacing,moving:guardWalking()}],gallery:[{...restorer,kind:'restorer'}],vault:[{...curator,kind:'restorer'}]};
   if(state.room!=='security'){
     const room=state.player.x<9?'hall':state.player.x<18?'gallery':'vault';
     rooms[room].push({...displayPlayer,kind:'rick',facing,moving:heldKeys.size>0});
@@ -324,6 +343,7 @@ function closeDialog(){
   target.focus();
 }
 function handleInteract(){
+  if(speech.isOpen){speech.advance();return;}
   if(!dialog.classList.contains('hidden') || roomTransition)return;
   if(atVaultDoor(state)){
     if(state.doorOpen) showDialog('Vault unlocked','Walk right through the open doorway.');
@@ -343,7 +363,7 @@ function runStoryAction(action){
 }
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
-  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();talkWasNear=false;talkClosedAt=-Infinity;
   try{if(!vaultPreview)localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
@@ -358,7 +378,7 @@ function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
   const playerInHall=state.room!=='security' && state.player.x<9;
-  if(!roomTransition) {
+  if(!roomTransition && !speech.isOpen) { // Leon stands still while he talks
     if(guardMotion) {
       const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
       const t=nextElapsed/guardMotion.duration;
@@ -383,7 +403,7 @@ function animate(now){
       roomTransition.switched=true;savePosition();
     }
     if(progress>=1)roomTransition=null;
-  } else if(heldKeys.size && dialog.classList.contains('hidden')){
+  } else if(heldKeys.size && dialog.classList.contains('hidden') && !speech.isOpen){
     const direction=[...heldKeys.values()].at(-1);
     facing=direction[0]<0?'left':direction[0]>0?'right':direction[1]<0?'up':'down';
     const guards=[guardDisplay()];
@@ -399,6 +419,7 @@ function animate(now){
       if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
+  checkAutoTalk(now,playerInHall);
   draw(); // Animate NPCs even while the player is idle.
   if(roomTransition){
     const progress=Math.min(1,(now-roomTransition.start)/320);
@@ -406,8 +427,29 @@ function animate(now){
   }
   requestAnimationFrame(animate);
 }
+// Opens the talk with Leon when the player comes close – but not again and again.
+function checkAutoTalk(now,playerInHall){
+  if(!AUTO_TALK.includes('leon'))return;
+  if(speech.isOpen){talkWasNear=true;speech.setPlacement(playerLow()?'top':'bottom');return;} // also when opened with E
+  const blocked=!dialog.classList.contains('hidden') || Boolean(roomTransition);
+  const distance=playerInHall ? distanceBetween(state.player,guardDisplay()) : Infinity;
+  const talk=shouldOpenTalk({distance,wasNear:talkWasNear,lastClosedAt:talkClosedAt,now,blocked});
+  talkWasNear=talk.wasNear;
+  if(!talk.open)return;
+  heldKeys.clear();savePosition();
+  story.talkTo('leon');
+}
+// Show the box at the top when the player stands low on the screen, so it never hides them.
+function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.78;}
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
+  if(speech.isOpen){
+    if(speech.handleKey(event))event.preventDefault();
+    // A walking key closes the box and starts walking right away.
+    const key=event.key.toLowerCase();
+    if(!speech.isOpen && directions[key])heldKeys.set(key,directions[key]);
+    return;
+  }
   if (!dialog.classList.contains('hidden')) {
     if(event.key === 'Tab') {
       const focusable = [...dialog.querySelectorAll('button:not(:disabled), a[href], input, select, [tabindex="0"]')].filter(node => node.getClientRects().length);
