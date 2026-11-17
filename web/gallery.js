@@ -54,13 +54,25 @@ export function createGalleryRenderer() {
         ctx.drawImage(artwork,(b.left-16)/.5625,b.top/.5625,(b.right-b.left)/.5625,(b.bottom-b.top)/.5625,b.left,b.top,b.right-b.left,b.bottom-b.top);
       }
     }
-    // Foliage is foreground when someone walks behind a plant; its base remains solid.
-    const foregroundPlants=[{left:133,top:185,right:193,bottom:277},{left:36,top:420,right:110,bottom:520},{left:787,top:420,right:860,bottom:520}];
+    // Clip the foreground to the plants, so background floor never hides a rectangular part of a figure.
+    const plants=[
+      {left:133,top:185,right:193,bottom:277,cx:163,cy:226,rx:28,ry:39},
+      {left:36,top:420,right:110,bottom:520,cx:73,cy:463,rx:34,ry:40},
+      {left:787,top:420,right:860,bottom:520,cx:824,cy:463,rx:34,ry:40},
+    ];
     const backdrop=state.doorOpen && openVault.complete && openVault.naturalWidth ? openVault : artwork;
-    for(const plant of foregroundPlants){
-      if(items.some(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;})){
-        ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
-      }
+    for(const plant of plants){
+      const behind=items.filter(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;});
+      if(!behind.length)continue;
+      ctx.save();ctx.beginPath();
+      ctx.ellipse(plant.cx,plant.cy,plant.rx,plant.ry,0,0,Math.PI*2);
+      ctx.rect(plant.cx-14,plant.cy+25,28,plant.bottom-plant.cy-25);
+      ctx.clip();
+      ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
+      // A faint silhouette keeps the person readable through the leaves.
+      ctx.globalAlpha=.32;
+      for(const item of behind){const p=galleryPosition(item.x,item.y);if(item.id==='player')drawPerson(p.x,p.y,'rick',facing,time,moving);else if(item.id==='restorer')drawPerson(p.x,p.y,'restorer','down',time,false);}
+      ctx.restore();
     }
     ctx.restore();
     if(target||(vaultNearby&&!state.doorOpen)){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??'Enter vault code'}`;

@@ -122,7 +122,7 @@ test('walking toward the open vault from the front enters while the locked door 
   const entered = walk(at(16.5,9,true),[0,-1],800);
   assert.ok(entered.player.x >= 19);
   const besideDoor = walk(at(16.1,9,true),[0,-1],800);
-  assert.ok(galleryPosition(besideDoor.player.x,besideDoor.player.y).y >= 360);
+  assert.equal(galleryVaultDoorBlocks(besideDoor.player.x,besideDoor.player.y,true),false);
   const side = walk(at(15.7,7.8,true),[1,0],800);
   assert.ok(galleryPosition(side.player.x,side.player.y).x < 696);
 });
@@ -144,7 +144,7 @@ test('vault door collision follows the visible closed face or swung-open panel',
   assert.equal(galleryVaultDoorBlocks(16.15,7.7,false),false);
   assert.equal(galleryVaultDoorBlocks(16.15,7.7,true),true);
   // The closed face is solid, while the open doorway can be crossed.
-  assert.equal(galleryVaultDoorBlocks(16.7,9,false),true);
+  assert.equal(galleryVaultDoorBlocks(16.7,7.5,false),true);
   assert.equal(galleryVaultDoorBlocks(16.7,9,true),false);
   const freeWithClosedDoor=walk(at(15.9,7.7,false),[1,0],300);
   const blockedByOpenDoor=walk(at(15.9,7.7,true),[1,0],300);

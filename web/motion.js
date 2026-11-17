@@ -1,6 +1,6 @@
 import { VAULT_STEP_X, VAULT_STEP_Y, vaultFloorContains } from './vault-layout.js';
 import { officePortal, canEnterOffice } from './security-room.js';
-import { GALLERY, galleryFootprintFits, galleryDoorTransition, galleryVaultDoorBlocks } from './gallery-layout.js?v=gallery-border-5';
+import { GALLERY, galleryFootprintFits, galleryDoorTransition, galleryVaultDoorBlocks } from './gallery-layout.js?v=gallery-border-6';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
 export function movementDuration(from, to, viewport, room) {

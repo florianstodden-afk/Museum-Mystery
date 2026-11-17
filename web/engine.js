@@ -1,5 +1,5 @@
 import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
-import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-border-5';
+import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-border-6';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
 export const WIDTH = 28;
