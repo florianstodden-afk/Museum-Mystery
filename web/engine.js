@@ -1,5 +1,5 @@
 import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
-import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-border-6';
+import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-plants-7';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
 export const WIDTH = 28;
@@ -67,7 +67,7 @@ export function canEnter(state, x, y, guardPosition) {
   if (x < 9 && y >= 16) return false; // Keep feet above the hall floor border.
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.
   if (x > 9 && x < 18 && y < 3) return false;
-  if (x > 9 && x < 18 && !galleryWalkable(x,y,state.doorOpen)) return false;
+  if (x > 9 && x < 18 && !galleryWalkable(x,y,state.doorOpen,true)) return false;
   if (x === 9 && (state.player.x < 9 ? (y < 4 || y > 7) : Math.abs(y-GALLERY_HALL_ROW)>1)) return false;
   if (x === 18 && y !== 9) return false;
   if (x === VAULT_DOOR.x && y === VAULT_DOOR.y && !state.doorOpen) return false;

@@ -6,8 +6,8 @@ export const GALLERY_OBSTACLES = [
   { left: 242, right: 367, top: 334, bottom: 390 },
   { left: 530, right: 657, top: 334, bottom: 390 },
   { left: 139, right: 187, top: 240, bottom: 277 }, // back-wall plant
-  { left: 42, right: 105, top: 454, bottom: 520 },
-  { left: 795, right: 853, top: 454, bottom: 520 },
+  { left: 61, right: 84, top: 491, bottom: 520 },
+  { left: 812, right: 836, top: 491, bottom: 520 },
 ];
 export const GALLERY_CAMERAS = [{ x: 179, y: 70, phase: 0 }, { x: 718, y: 70, phase: 360 }];
 export const GALLERY_HALL_ROW = 8;
@@ -30,12 +30,15 @@ export function galleryFloorContains(x, y, doorOpen = false) {
   const right = y < 378 ? 747 + (y - 241) * 83 / 137 : 830 + (y - 378) * 32 / 171;
   return x >= left && x <= right;
 }
-export function galleryWalkable(x, y, doorOpen = false) {
+export function galleryWalkable(x, y, doorOpen = false, skipBottomPlants = false) {
   const p = galleryPosition(x,y);
-  return galleryFloorContains(p.x,p.y,doorOpen) && !GALLERY_OBSTACLES.some(o=>p.x>=o.left&&p.x<=o.right&&p.y>=o.top&&p.y<=o.bottom);
+  return galleryFloorContains(p.x,p.y,doorOpen) && !GALLERY_OBSTACLES.some((o,i)=>(!skipBottomPlants || i<3) && p.x>=o.left&&p.x<=o.right&&p.y>=o.top&&p.y<=o.bottom);
 }
 export function galleryFootprintFits(x, y, doorOpen = false) {
-  return [[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]].every(([dx,dy])=>galleryWalkable(x+dx,y+dy,doorOpen));
+  const corners=[[-.18,-.32],[.18,-.32],[-.18,.32],[.18,.32]];
+  if(!corners.every(([dx,dy])=>galleryWalkable(x+dx,y+dy,doorOpen))) return false;
+  const p=galleryPosition(x,y);
+  return !GALLERY_OBSTACLES.some(o=>p.x+18>=o.left && p.x-18<=o.right && p.y+7.04>=o.top && p.y-7.04<=o.bottom);
 }
 // Approaching the north-facing hall arch or the gallery's west-facing arch
 // leads to a point on the destination floor, clear of the doorway and walls.
