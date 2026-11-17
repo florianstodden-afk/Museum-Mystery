@@ -2,7 +2,7 @@ import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
-import { createSecurityRenderer } from './security-room.js?v=camera-lights-1';
+import { createSecurityRenderer } from './security-room.js?v=camera-lights-2';
 import { createGalleryRenderer } from './gallery.js?v=camera-lights-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';

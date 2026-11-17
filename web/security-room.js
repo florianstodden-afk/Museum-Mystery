@@ -55,7 +55,9 @@ export function createSecurityRenderer(){
       [hall,[.14,.2,.73,.6],'01 HALL'],
       [gallery,[0,0,1,1],'02 GALLERY',GALLERY_CAMERAS],
       [gallery,[.82,.25,.16,.45],'03 DOOR',GALLERY_CAMERAS],
-      [vault,[0,0,1,1],'04 VAULT',VAULT_CAMERAS],[null,[],'05'],[null,[],'06'],
+      [vault,[0,0,1,1],'04 VAULT',VAULT_CAMERAS],
+      [vault,[.34,.12,.62,.74],'05 VAULT R',VAULT_CAMERAS],
+      [null,[],'06'],
       [null,[],'07'],[null,[],'08'],[null,[],'09'],
     ];
     for(let i=0;i<9;i++){
