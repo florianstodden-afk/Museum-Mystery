@@ -326,3 +326,4 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Prüfung:** 217 Node-Tests bestanden. Im lokalen Browser wurden Gast-Einstieg, Missionsstart, Zahnrad, Sound/Music, Hint, Journal, Resume und Exit zum Home Screen durchgeklickt. Syntax- und Diff-Prüfung ohne Fehler.
 - **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
 - **Nachtrag (Rückmeldung von Florian):** Lesephase von 3 auf 8 Sekunden verlängert, damit man auch die Aufgabe lesen kann. Die Uhr läuft dabei weiter. Tests: 226 bestanden.
+- **Nachtrag:** 10 Sekunden Lesezeit nach „Start“ (Aufgabe und Jahreszahlen sichtbar); die Uhr startet erst danach. Damit das kein Schlupfloch wird, sind Sortieren und Prüfen in der Lesezeit gesperrt. Tests: 227 bestanden.

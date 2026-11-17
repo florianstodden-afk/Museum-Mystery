@@ -115,13 +115,13 @@ test('"?" opens the instructions popup; Enter closes it again', () => {
   s.cleanup();
 });
 
-test('Enter starts; the dates flash for 8 s, then vanish; a wrong check adds 5 s on the bar', async () => {
+test('Enter starts; the dates show for 10 s, then vanish; a wrong check adds 5 s on the bar', async () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   assert.equal(s.last().startedAt, T0);
   assert.deepEqual(s.chips(), ['1883–84', '1865', '1888–90']);
   assert.match(s.text(), /\+15 points\+10 points\+5 points\+0 points/);
-  assert.match(s.text(), /Dates vanish in 8 s/);
+  assert.match(s.text(), /Dates vanish in 10 s/);
   s.clock.ms = T0 + FLASH_MS;
   await tick();
   assert.deepEqual(s.chips(), []);
@@ -135,7 +135,7 @@ test('Enter starts; the dates flash for 8 s, then vanish; a wrong check adds 5 s
 test('a whole run: number keys swap, Enter checks, success popup with letter I and points, Enter returns', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
-  s.clock.ms = T0 + 6000;
+  s.clock.ms = T0 + FLASH_MS + 6000;   // 6 s after the reading time
   s.key('1'); s.key('2');
   assert.deepEqual(s.last().order, RIGHT);
   s.key('Enter');
@@ -185,6 +185,7 @@ test('the drag hint arrow appears once after the flash and goes at the first cli
 test('click-click swaps and dragging moves a card', () => {
   const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
   s.key('Enter');
+  s.clock.ms = T0 + FLASH_MS;   // cards move only after the reading time
   s.faceFor(SARGENT).click();
   s.faceFor(CEZANNE).click();
   assert.deepEqual(s.last().order, [CEZANNE, SARGENT, DEGAS]);
@@ -225,4 +226,18 @@ test('a broken save starts fresh; an old solved save shows the log and reports o
   assert.match(old.text(), /21:02 · Leon – east wing round/);
   assert.deepEqual(old.solvedReports, [{ mistakes: 2, hints: 0 }]);
   old.cleanup();
+});
+
+test('during the 10 s reading time the clock waits and the cards cannot be moved or checked', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  s.key('Enter');
+  s.clock.ms = T0 + 5000;
+  s.key('1'); s.key('2');
+  assert.deepEqual(s.last().order, [SARGENT, DEGAS, CEZANNE], 'no swapping while reading');
+  s.key('Enter');
+  assert.equal(s.last().mistakes, 0, 'no checking while reading');
+  s.clock.ms = T0 + FLASH_MS;
+  s.key('1'); s.key('2');
+  assert.deepEqual(s.last().order, RIGHT, 'after the reading time it works');
+  s.cleanup();
 });

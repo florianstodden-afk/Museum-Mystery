@@ -1,5 +1,5 @@
 // Station I (Portrait Hall) – a speedrun in the look and flow of Station L:
-// intro → Start ↵ → catalogue flash (8 s) → sort oldest to newest with the points bar → success popup with letter I.
+// intro → Start ↵ → 10 s reading time with the dates (clock waits) → sort oldest to newest with the points bar → success popup with letter I.
 // Contract (docs/story/minigame-contract.md): start(container, caseData, onSolved).
 // The host saves progress through caseData.onChange; the engine gives letter, evidence and points (by time, like L).
 import { el } from '../story/dom.js';
@@ -84,8 +84,11 @@ export function start(container, caseData, onSolved) {
     update(next, 'Not yet. +5 s');
   }
 
+  // During the reading time the cards stay put, so sorting there cannot save time.
+  const reading = () => state.flashUntil !== null && now() < state.flashUntil;
+
   function choose(id) {
-    if (!playing()) return;
+    if (!playing() || reading()) return;
     dismissArrow();
     play('click');
     if (selected === null) { selected = id; update(state, `${cards[id].artwork.shortTitle} picked up.`); return; }
@@ -132,7 +135,7 @@ export function start(container, caseData, onSolved) {
       onAction: () => { closePopup?.(); closePopup = null; ui.help.focus?.(); },
       contents: [
         el('h3', { text: 'Sort the portraits' }),
-        el('p', { text: 'Start shows all three dates for 8 seconds. Then put the cards in order, oldest on the left: click two cards (or press 1, 2, 3) to swap them, or drag a card. Enter checks.' }),
+        el('p', { text: 'Start shows all three dates for 10 seconds; the clock starts when they vanish. Then put the cards in order, oldest on the left: click two cards (or press 1, 2, 3) to swap them, or drag a card. Enter checks.' }),
         el('p', { text: 'Peek shows one date again (+5 s); a wrong check adds 5 s. Finish within 20s: +15 points; within 35s: +10; within 50s: +5; later: 0.' }),
       ],
     });
@@ -181,7 +184,7 @@ export function start(container, caseData, onSolved) {
 
   function wireDrag(id) {
     const card = cards[id].root;
-    card.addEventListener('dragstart', event => { dismissArrow(); dragged = id; event.dataTransfer?.setData('text/plain', String(id)); });
+    card.addEventListener('dragstart', event => { if (reading()) { event.preventDefault?.(); return; } dismissArrow(); dragged = id; event.dataTransfer?.setData('text/plain', String(id)); });
     card.addEventListener('dragend', () => { dragged = null; });
     card.addEventListener('dragover', event => { event.preventDefault(); card.classList.add('is-target'); });
     card.addEventListener('dragleave', () => card.classList.remove('is-target'));
