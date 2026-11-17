@@ -169,7 +169,8 @@ export function createStoryHost(options) {
     const station = CASE.stations.find(s => s.id === stationId);
     if (!station) return;
     const { content, actions } = scene(`${station.room} · Station ${station.letter}`);
-    actions.append(closeButton('Back to the museum'));
+    const pictureOwnsControls = stationId === 'restoration' && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
+    if (!pictureOwnsControls) actions.append(closeButton('Back to the museum'));
     if (!state.missionRead) {
       content.append(el('p', { className: 'story-text', text: 'Read the message from M first.' }));
       return;
@@ -180,7 +181,7 @@ export function createStoryHost(options) {
     }
     stationCleanup = runStation(stations[stationId] ?? placeholderStation, content, {
       stationId,
-      caseData: { now, playSound: id => sound?.play(id) },
+      caseData: { now, onClose: closePanel, playSound: id => sound?.play(id) },
       savedProgress: progress[stationId] ?? null,
       onProgress(next) {
         progress = { ...progress, [stationId]: next };
@@ -190,7 +191,7 @@ export function createStoryHost(options) {
       },
       onSolved(result) {
         const outcome = act(solveStation(state, stationId, result), 'solveStation');
-        if (outcome.ok) {
+        if (outcome.ok && !pictureOwnsControls) {
           content.append(el('p', { className: 'story-feedback', text: `Letter ${station.letter} is now in your journal.` }));
         }
       },

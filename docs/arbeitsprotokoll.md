@@ -264,3 +264,10 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Auftrag:** Die im Video gezeigten Galeriegrenzen verbessern und die unterschiedlichen Positionen der geschlossenen und geöffneten Tresortür berücksichtigen. Figuren dürfen hinter Pflanzen und Möbeln teilweise verdeckt sein.
 - **Umsetzung:** Die Türgrenze folgt nun abhängig vom Türzustand dem geschlossenen Türblatt beziehungsweise dem in den Raum geschwenkten Türblatt. Der Abstand zur Rückwand wurde angepasst; Pflanzenbasen bleiben Hindernisse und die Blätter werden bei Figuren dahinter im Vordergrund gezeichnet.
 - **Prüfung:** Geschlossene Tür und Durchgang zum geöffneten Tresor im Browser geprüft; 209 Node-Tests bestanden, darunter Türzustände, Durchgänge und Pflanzen-Vordergrund.
+
+### 2026-11-17 – Renoir-Bilderpuzzle: Bedienung und Anzeige
+
+- **Start und Hilfe:** Reduzierter Startbildschirm mit Hilfe-Popup. Tastenkürzel für Enter und Esc werden als Tasten angezeigt. Der goldene Fokusrahmen entspricht den übrigen Spiel-Dialogen.
+- **Ablage und Bedienung:** Acht feste Ablageplätze stehen im 4×2-Raster neben dem Bild. Teile lassen sich per Tastatur oder Drag-and-drop zurücklegen. Der animierte Mauszeiger führt von einem Teil in der Ablage zu einem leeren Platz im Bildrahmen.
+- **Zeit und Abschluss:** Der Zeitbalken zeigt die Punkte bei 30, 45 und 60 Sekunden. Danach läuft er bis 70 Sekunden aus und zeigt +0 Punkte ohne zusätzliche Zeitmarke. Nach dem Lösen leuchtet der Rahmen, und das Abschlussfenster zeigt den Journalbuchstaben L und die verdienten Punkte.
+- **Prüfung:** Auf Basis von `main` (`2aff91c`) bestanden alle 214 JavaScript-Tests.
