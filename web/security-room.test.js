@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SECURITY_OBJECTS, OFFICE_START, HALL_RETURN, canEnterOffice, officePortal } from './security-room.js';
+import { createSecurityRenderer, SECURITY_OBJECTS, OFFICE_START, HALL_RETURN, canEnterOffice, officePortal } from './security-room.js';
 import { initialState, nearbyObject, restoreState, canEnter } from './engine.js';
 import { advancePlayer } from './motion.js';
 import { INTERACTION_POINTS } from './story/security-office/interactions.js';
@@ -47,4 +47,22 @@ test('the full character stays inside the hall side boundaries',()=>{
   const right=advancePlayer({...initialState(),player:{x:7,y:10}},[1,0],5000,viewport,[],canEnter);
   assert.ok((left.player.x+.5)*896/9-17>=86);
   assert.ok((right.player.x+.5)*896/9+17<=864);
+});
+
+test('two monitors display views from the vault cameras',()=>{
+  const oldImage=globalThis.Image;
+  globalThis.Image=class {constructor(){this.complete=true;this.naturalWidth=1536;this.naturalHeight=1024;}};
+  try {
+    const labels=[],vaultCrops=[];
+    const ctx=new Proxy({}, {get(target,key){
+      if(key==='fillText') return text=>labels.push(text);
+      if(key==='drawImage') return (image,...args)=>{if(image.src==='./assets/treasure-vault.jpg')vaultCrops.push(args.slice(0,4));};
+      return target[key] ?? (()=>{});
+    },set(target,key,value){target[key]=value;return true;}});
+    createSecurityRenderer()(ctx,{time:0,player:{x:4,y:5},target:null,facing:'down',moving:false,drawPerson(){}});
+    assert.ok(labels.includes('04 VAULT'));
+    assert.ok(labels.includes('05 VAULT R'));
+    assert.equal(vaultCrops.length,2);
+    assert.notDeepEqual(vaultCrops[0],vaultCrops[1]);
+  } finally {globalThis.Image=oldImage;}
 });
