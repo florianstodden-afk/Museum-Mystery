@@ -4,14 +4,24 @@ import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } fr
 export function createGalleryRenderer() {
   const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.jpg';
   const openVault = new Image(); openVault.src = './assets/gallery-vault-open.jpg';
+  const vaultInterior = new Image(); vaultInterior.src = './assets/treasure-vault.jpg';
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
   return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion, doorProgress = state.doorOpen ? 1 : 0 }) {
     box(ctx,0,0,896,576,'#061218');
     if(artwork.complete&&artwork.naturalWidth)ctx.drawImage(artwork,16,0,864,576);
     else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the gallery…',350,288);return;}
-    // Blend the matching illustrated doorway into the original scene as it opens.
+    // The opened doorway contains a view of the same room the player enters.
     if(state.doorOpen && openVault.complete && openVault.naturalWidth){
-      ctx.save();ctx.globalAlpha=Math.min(1,Math.max(0,doorProgress));ctx.drawImage(openVault,16,0,864,576);ctx.restore();
+      const progress=Math.min(1,Math.max(0,doorProgress));
+      ctx.save();ctx.globalAlpha=progress;ctx.drawImage(openVault,16,0,864,576);ctx.restore();
+      if(vaultInterior.complete && vaultInterior.naturalWidth){
+        ctx.save();ctx.globalAlpha=progress;ctx.beginPath();ctx.moveTo(782,205);ctx.quadraticCurveTo(791,191,802,199);ctx.lineTo(820,210);ctx.lineTo(827,222);ctx.lineTo(827,352);ctx.lineTo(782,320);ctx.closePath();ctx.clip();
+        ctx.drawImage(vaultInterior,430,80,700,710,782,197,45,159);ctx.restore();
+      }
+      // Move the closed door face toward its swung-open position while the reveal develops.
+      if(progress<1){
+        ctx.save();ctx.globalAlpha=1-progress;ctx.translate(-58*progress,0);ctx.beginPath();ctx.moveTo(773,198);ctx.quadraticCurveTo(780,188,790,194);ctx.lineTo(819,210);ctx.lineTo(819,356);ctx.lineTo(773,325);ctx.closePath();ctx.clip();ctx.drawImage(artwork,16,0,864,576);ctx.restore();
+      }
     }
     // Cover the baked-in red diode before drawing its live on/off state.
     for(const camera of GALLERY_CAMERAS){

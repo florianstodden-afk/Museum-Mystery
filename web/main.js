@@ -9,7 +9,7 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
-import { movementDuration, advancePlayer } from './motion.js';
+import { movementDuration, advancePlayer } from './motion.js?v=vault-entry-2';
 import { chooseGuardAction } from './guard.js';
 
 const TILE = 32;
