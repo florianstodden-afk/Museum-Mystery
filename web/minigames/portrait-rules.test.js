@@ -18,8 +18,8 @@ function sequence(...values) {
 
 // A timeline in a given order; `started` presses Start at T0.
 function timeline(order, extra = {}, started = true) {
-  const fresh = { ...initialTimeline(), order, ...extra };
-  return started ? startTimeline(fresh, T0) : fresh;
+  const fresh = { ...initialTimeline(), ...extra };
+  return { ...(started ? startTimeline(fresh, T0) : fresh), order, ...extra };
 }
 
 test('the correct order comes from the frozen Met begin dates: Degas, Sargent, Cézanne', () => {
@@ -124,4 +124,13 @@ test('validTimeline rejects broken and impossible states', () => {
     { ...timeline(RIGHT, {}, false), finishedAt: T0, solved: true }, timeline(RIGHT, { peek: { id: 1, until: 0 } }),
   ];
   for (const state of bad) assert.equal(validTimeline(state), false, JSON.stringify(state));
+});
+
+test('Start never begins with the cards already in the right order (e.g. an old save)', () => {
+  const sorted = { ...initialTimeline(), order: [...RIGHT] };
+  const started = startTimeline(sorted, T0);
+  assert.notDeepEqual(started.order, RIGHT);
+  assert.deepEqual([...started.order].sort(), [...RIGHT].sort());
+  const mixed = timeline([CEZANNE, DEGAS, SARGENT], {}, false);
+  assert.deepEqual(startTimeline(mixed, T0).order, mixed.order, 'a mixed order stays as it is');
 });

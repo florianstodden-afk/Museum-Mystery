@@ -71,7 +71,9 @@ export function validTimeline(saved) {
 /** Start: the clock runs and all dates show for FLASH_MS. Pressing it again (or reopening) changes nothing. */
 export function startTimeline(state, now = Date.now()) {
   if (state.startedAt !== null || state.solved) return state;
-  return { ...state, startedAt: now, flashUntil: now + FLASH_MS };
+  // An old save may already hold the right order; then the cards are mixed again, so there is always something to sort.
+  const order = sameOrder(state.order, correctOrder()) ? [...state.order.slice(1), state.order[0]] : state.order;
+  return { ...state, order, startedAt: now, flashUntil: now + FLASH_MS };
 }
 
 const playing = state => state.startedAt !== null && !state.solved;
