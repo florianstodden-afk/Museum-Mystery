@@ -1,256 +1,211 @@
-// Station I (Portrait Hall): order three portraits from the oldest to the newest painting.
+// Station I (Portrait Hall) – a speedrun: Start, memorise the dates, sort oldest to newest, Enter.
 // Contract (docs/story/minigame-contract.md): start(container, caseData, onSolved).
-// The host saves progress through caseData.onChange; the engine gives letter, evidence and points.
+// The host saves progress through caseData.onChange; the engine gives letter, evidence and points (by time, like L).
 import { el, button } from '../story/dom.js';
 import {
-  initialTimeline, validTimeline, moveCard, swapCards, checkOrder, useHint, MAX_HINTS, logEntries,
+  initialTimeline, validTimeline, upgradeTimeline, startTimeline, peekDate, revealedDates,
+  moveCard, swapCards, checkOrder, elapsedMs, logEntries, FLASH_MS,
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
+import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
+import { clockBlock, taskLine, cardView, timelineView, footerView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
-const TASK = 'Three portraits from the hall, and on their backs the night-shift log – but someone shuffled them. '
-  + 'Put them in the order they were painted, oldest first. Open each catalogue entry to check the dates.';
-const HELP = 'Click two cards to swap them, or drag a card to a new place. Keyboard: Tab to a card, '
-  + 'Enter or Space to pick it up, arrow keys to move it, Enter or Space to put it down.';
-const WRONG = 'Not quite. Check the catalogue dates again – which portrait was painted first?';
-const SOLVED = 'Correct order – the cards turn over.';
-const VERDICT = 'The log clears Leon – and points to a patron with the initials A. V.';
+const TICK_MS = 100;             // how often the clock is redrawn
+const BLINK_MS = 300;            // red blink after a penalty
+const FLIP_DELAY_MS = 60;        // let the browser draw the front before the cards turn
 
-// The station brings its own stylesheet, so no shared CSS file has to change.
-function ensureStylesheet() {
-  if (typeof document === 'undefined' || !document.head || document.getElementById('portrait-timeline-css')) return;
-  const link = document.createElement('link');
-  link.id = 'portrait-timeline-css';
-  link.rel = 'stylesheet';
-  link.href = new URL('./portrait-timeline.css', import.meta.url).href;
-  document.head.append(link);
-}
-
-function artworkFor(id) {
-  return PORTRAIT_ARTWORKS.find(artwork => artwork.id === id);
-}
-
+/** Opens Station I in `container`; returns a cleanup function. */
 export function start(container, caseData, onSolved) {
   ensureStylesheet();
-  let state = validTimeline(caseData.state) ? structuredClone(caseData.state) : initialTimeline(caseData.random);
-  let images = Object.fromEntries(PORTRAIT_ARTWORKS.map(artwork => [artwork.id, artwork.local]));
-  let selected = null;        // card picked up by click or keyboard
-  let dragged = null;         // card being dragged with the mouse
-  let openCatalogue = null;   // card whose catalogue entry is open
-  let message = '';
-  let offlineNote = '';
+  const now = caseData.now ?? Date.now;
+  let state = validTimeline(caseData.state) ? upgradeTimeline(structuredClone(caseData.state)) : initialTimeline(caseData.random);
+  let selected = null;     // card picked up by click, number key or Space
+  let dragged = null;      // card being dragged with the mouse
   let reported = false;
   let disposed = false;
-  let flipped = state.solved; // a station opened already solved shows the backs at once
-  let cardButtons = {};
-
+  const best = bestTimeStore(caseData.storage ?? safeStorage());
+  const play = id => caseData.playSound?.(id);
   const save = () => caseData.onChange?.(state);
-  const playSound = id => caseData.playSound?.(id); // optional, given by the story host
-  const cards = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, from oldest (left) to newest (right)' } });
-  const status = el('p', { className: 'story-feedback portrait-status', attrs: { role: 'status', 'aria-live': 'polite', tabindex: '-1' } });
-  const counter = el('p', { className: 'story-muted portrait-counter' });
-  const checkButton = button('Check order', () => check());
-  const hintButton = button('Hint (−5 points)', () => hint());
-  const log = el('div', { className: 'portrait-log' });
-  const help = el('p', { className: 'story-muted portrait-help', text: HELP });
-  const actionsRow = el('div', { className: 'story-actions portrait-actions' }, [checkButton, hintButton]);
 
-  container.replaceChildren(el('section', { className: 'portrait-timeline' }, [
-    el('p', { className: 'story-text portrait-task', text: TASK }),
-    help,
-    cards,
-    el('p', { className: 'portrait-axis', attrs: { 'aria-hidden': 'true' } }, [
-      el('span', { text: 'Oldest' }), el('span', { className: 'portrait-axis-line' }), el('span', { text: 'Newest' }),
-    ]),
-    actionsRow,
-    counter,
-    status,
-    log,
-    sourceLine(),
-  ]));
+  // ---------- Building the view once ----------
+  const clock = clockBlock();
+  const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
+  const grid = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, oldest on the left' } });
+  const axis = timelineView();
+  const status = el('p', { className: 'portrait-status', attrs: { role: 'status', 'aria-live': 'polite' } });
+  const scanNote = el('span', { className: 'portrait-scan-note' });          // countdown, not read aloud each tick
+  const spoken = el('p', { className: 'portrait-help-text', attrs: { 'aria-live': 'polite' } }); // dates for screen readers
+  const startButton = button('Start', () => primary(), 'story-button portrait-primary');
+  const checkButton = button('Check order ⏎', () => primary(), 'story-button portrait-primary');
+  const continueButton = button('Continue', () => primary(), 'story-button portrait-primary');
+  const footer = footerView();
+  const section = el('section', { className: 'portrait-timeline' }, [
+    clock.root, taskLine(), grid, axis.root,
+    el('div', { className: 'portrait-actions' }, [startButton, checkButton, continueButton, status, scanNote]), footer.root, spoken,
+  ]);
+  container.replaceChildren(section);
+  section.addEventListener('keydown', onKey);
+  for (const id of state.order) wireDrag(id);
 
   // ---------- Actions ----------
+  const playing = () => state.startedAt !== null && !state.solved;
 
-  function update(next, newMessage, focusId = null) {
-    const changed = next !== state;
+  function update(next, message) {
     const justSolved = next.solved && !state.solved;
-    state = next;
-    if (newMessage !== undefined) message = newMessage;
-    if (changed) save();
+    if (next !== state) { state = next; save(); }
+    if (message !== undefined) status.textContent = message;
     render();
-    if (focusId !== null) cardButtons[focusId]?.focus();
-    if (justSolved) turnCardsOver();
-    if (state.solved) reportSolved();
+    if (justSolved) finish();
   }
 
-  // Draw the cards face up first, then turn them a moment later, so the CSS turn animation plays.
-  function turnCardsOver() {
-    status.focus?.();
-    setTimeout(() => {
-      if (disposed) return;
-      flipped = true;
-      for (const card of cards.children) card.className += ' is-flipped';
-    }, 60);
+  // Enter, the big button and the card faces' Enter all do "the next obvious thing".
+  function primary() {
+    if (state.solved) { close(); return; }
+    if (!playing()) { play('page'); update(startTimeline(state, now()), ''); spoken.textContent = announceDates(); cards[state.order[0]].face.focus?.(); return; }
+    selected = null;
+    const next = checkOrder(state, now());
+    if (next.solved) { play('flip'); update(next); return; }
+    play('wrong');
+    blink();
+    update(next, 'Not yet. +5 s');
   }
 
-  function reportSolved() {
+  function choose(id) {
+    if (!playing()) return;
+    play('click');
+    if (selected === null) { selected = id; update(state, `${cards[id].artwork.shortTitle} picked up.`); return; }
+    if (selected === id) { selected = null; update(state, ''); return; }
+    const other = selected;
+    selected = null;
+    checkButton.classList.add('is-ready');
+    update(swapCards(state, other, id), 'Swapped.');
+    cards[id].face.focus?.();
+  }
+
+  function peek(id) {
+    const next = peekDate(state, id, now());
+    if (next === state) return;
+    play('hint');
+    blink();
+    update(next, `${cards[id].artwork.artist}: ${cards[id].artwork.date}. +5 s`);
+  }
+
+  function finish() {
+    const time = elapsedMs(state, now());
+    const record = best.offer(time);
+    status.textContent = `Solved in ${formatClock(time)} · +${portraitSpeedPoints(time)} · Letter I in your journal${record === time ? ' · New best!' : ''}`;
+    setTimeout(() => { if (!disposed) grid.classList.add('is-flipped'); }, FLIP_DELAY_MS);
+    continueButton.focus?.();
+    report();
+  }
+
+  function report() {
     if (reported) return;
     reported = true;
     onSolved({ mistakes: state.mistakes, hints: state.hints });
   }
 
-  function check() {
-    if (state.solved) return;
-    selected = null;
-    const next = checkOrder(state);
-    playSound(next.solved ? 'flip' : 'wrong');
-    update(next, next.solved ? SOLVED : WRONG);
+  // The host shows a close button below the station; Continue presses it (Escape and × work too).
+  function close() {
+    if (caseData.close) caseData.close();
+    else container.nextElementSibling?.querySelector?.('button')?.click();
   }
 
-  function hint() {
-    const next = useHint(state);
-    if (next === state) return;
-    const id = next.revealed[next.revealed.length - 1];
-    const artwork = artworkFor(id);
-    const which = next.hints === 1 ? 'oldest' : 'newest';
-    update(next, `Hint: ${artwork.artist}’s “${artwork.shortTitle}” is the ${which} of the three. Its card is marked.`);
+  function blink() {
+    clock.root.classList.add('is-penalty');
+    setTimeout(() => clock.root.classList.remove('is-penalty'), BLINK_MS);
   }
 
-  // Click or Enter/Space on a card: pick it up, put it down, or swap with the picked-up card.
-  function choose(id) {
-    if (state.solved) return;
-    playSound('click');
-    if (selected === null) { selected = id; update(state, `${artworkFor(id).shortTitle} picked up. Choose another card to swap, or use the arrow keys.`, id); return; }
-    if (selected === id) { selected = null; update(state, 'Card put down.', id); return; }
-    const other = selected;
-    selected = null;
-    update(swapCards(state, other, id), 'Cards swapped.', id);
+  function announceDates() {
+    return `Catalogue scan: ${state.order.map(id => `${cards[id].artwork.artist} ${cards[id].artwork.date}`).join(', ')}.`;
   }
 
-  // Arrow keys move the picked-up card one place.
-  function shift(id, direction) {
-    if (state.solved || selected !== id) return;
-    const target = state.order.indexOf(id) + direction;
-    const next = moveCard(state, id, target);
-    if (next !== state) update(next, `Moved to place ${target + 1} of 3.`, id);
+  // ---------- Keyboard and mouse ----------
+  function onKey(event) {
+    const face = Object.values(cards).find(card => card.face === event.target);
+    const index = ['1', '2', '3'].indexOf(event.key);
+    if (index !== -1) { event.preventDefault(); choose(state.order[index]); return; }
+    if (event.key === 'Enter' && (face || event.target === section)) { event.preventDefault(); primary(); return; }
+    if (!face || selected === null) return;
+    const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+    if (step) { event.preventDefault(); update(moveCard(state, selected, state.order.indexOf(selected) + step), 'Moved.'); cards[selected]?.face.focus?.(); }
   }
 
-  function dropOn(index) {
-    if (dragged === null || state.solved) return;
-    const id = dragged;
-    dragged = null;
-    selected = null;
-    update(moveCard(state, id, index), 'Card moved.', id);
+  function wireDrag(id) {
+    const card = cards[id].root;
+    card.addEventListener('dragstart', event => { dragged = id; event.dataTransfer?.setData('text/plain', String(id)); });
+    card.addEventListener('dragend', () => { dragged = null; grid.classList.remove('is-dragging'); });
+    card.addEventListener('dragover', event => { event.preventDefault(); card.classList.add('is-target'); });
+    card.addEventListener('dragleave', () => card.classList.remove('is-target'));
+    card.addEventListener('drop', event => {
+      event.preventDefault();
+      card.classList.remove('is-target');
+      if (dragged === null) return;
+      const from = dragged;
+      dragged = null;
+      selected = null;
+      play('click');
+      checkButton.classList.add('is-ready');
+      update(moveCard(state, from, state.order.indexOf(id)), 'Moved.');
+    });
   }
 
   // ---------- Drawing ----------
-
   function render() {
-    cardButtons = {};
-    cards.replaceChildren(...state.order.map((id, index) => renderCard(id, index)));
-    counter.textContent = `Incorrect attempts: ${state.mistakes} · Hints: ${state.hints}`;
-    checkButton.disabled = state.solved;
-    hintButton.disabled = state.solved || state.hints >= MAX_HINTS;
-    // After solving, the controls make room for the log.
-    help.hidden = state.solved;
-    actionsRow.hidden = state.solved;
-    status.textContent = [message, offlineNote].filter(Boolean).join(' ');
-    renderLog();
+    grid.replaceChildren(...state.order.map((id, index) => {
+      const card = cards[id];
+      card.root.className = ['portrait-card', selected === id ? 'is-selected' : ''].filter(Boolean).join(' ');
+      card.root.setAttribute('draggable', String(playing()));
+      card.face.disabled = !playing();
+      card.face.setAttribute('aria-label', `${index + 1}: ${card.artwork.artist}, ${card.artwork.shortTitle}${selected === id ? ' (picked up)' : ''}`);
+      card.back.textContent = state.solved ? logEntries(state)[index] : '';
+      return card.root;
+    }));
+    startButton.hidden = state.startedAt !== null;
+    checkButton.hidden = !playing();
+    continueButton.hidden = !state.solved;
+    if (state.solved) grid.classList.add('is-flipped');
+    tick();
   }
 
-  function renderCard(id, index) {
-    const artwork = artworkFor(id);
-    const hintIndex = state.revealed.indexOf(id);
-    const face = button('', () => choose(id), 'portrait-face');
-    face.setAttribute('aria-pressed', String(selected === id));
-    face.setAttribute('aria-label', `${artwork.artist}, ${artwork.shortTitle}. Place ${index + 1} of 3.${selected === id ? ' Picked up.' : ''}`);
-    face.disabled = state.solved;
-    face.append(
-      el('img', { props: { src: images[id], alt: `${artwork.shortTitle} by ${artwork.artist}`, draggable: false } }),
-      el('span', { className: 'portrait-caption' }, [el('strong', { text: artwork.artist }), el('span', { text: artwork.shortTitle })]),
-    );
-    face.addEventListener('keydown', event => {
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); shift(id, -1); }
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); shift(id, 1); }
-    });
-    cardButtons[id] = face;
-
-    const catalogueOpen = openCatalogue === id;
-    const catalogueButton = button(catalogueOpen ? 'Close entry' : 'Catalogue entry', () => {
-      openCatalogue = catalogueOpen ? null : id;
-      render();
-      cardButtons[id]?.focus();
-    }, 'story-button portrait-catalogue-button');
-    catalogueButton.setAttribute('aria-expanded', String(catalogueOpen));
-    const catalogue = catalogueOpen ? el('div', { className: 'portrait-catalogue', attrs: { role: 'note' } }, [
-      el('strong', { text: artwork.title }),
-      el('span', { text: artwork.artist }),
-      el('span', { text: `Date: ${artwork.date}` }),
-      el('span', { text: artwork.medium }),
-      el('a', { text: 'Open at The Met', props: { href: artwork.url, target: '_blank', rel: 'noopener noreferrer' } }),
-    ]) : null;
-
-    // The back only exists after solving, so the log times cannot give the order away.
-    const back = state.solved ? el('div', { className: 'portrait-back' }, [
-      el('span', { className: 'story-eyebrow', text: `LOG · PART ${index + 1}` }),
-      el('p', { text: logEntries(state)[index] }),
-    ]) : null;
-
-    const classes = ['portrait-card',
-      selected === id ? 'is-selected' : '',
-      flipped ? 'is-flipped' : '',
-      hintIndex !== -1 ? 'is-hinted' : ''].filter(Boolean).join(' ');
-    const card = el('li', { className: classes, attrs: { draggable: String(!state.solved) } }, [
-      el('div', { className: 'portrait-inner' }, [
-        el('div', { className: 'portrait-front' }, [
-          hintIndex !== -1 ? el('span', { className: 'portrait-badge', text: hintIndex === 0 ? 'Oldest' : 'Newest' }) : null,
-          face, catalogue, catalogueButton,
-        ]),
-        back,
-      ]),
-    ]);
-    card.addEventListener('dragstart', event => {
-      dragged = id;
-      event.dataTransfer?.setData('text/plain', String(id));
-      if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
-    });
-    card.addEventListener('dragend', () => { dragged = null; });
-    card.addEventListener('dragover', event => { event.preventDefault(); });
-    card.addEventListener('drop', event => { event.preventDefault(); dropOn(index); });
-    return card;
+  // Runs every TICK_MS: clock, counters and which dates are visible right now.
+  function tick() {
+    const t = now();
+    const shown = revealedDates(state, t);
+    const flashing = !state.solved && state.flashUntil !== null && t < state.flashUntil;
+    clock.time.textContent = formatClock(elapsedMs(state, t));
+    clock.counters.textContent = state.mistakes || state.hints ? `✕${state.mistakes} · Peeks ${state.hints} · ` : '';
+    const record = best.get();
+    clock.goal.textContent = `${record ? `Best ${formatClock(record)} · ` : ''}<${formatClock(PORTRAIT_LIMITS_MS[0])} = 15 pts`;
+    for (const id of state.order) {
+      const card = cards[id];
+      const visible = shown.includes(id);
+      card.chip.textContent = visible ? card.artwork.date : '';
+      card.chip.hidden = !visible;
+      card.peek.hidden = visible || !playing() || flashing;
+    }
+    grid.classList.toggle('is-flashing', flashing);
+    scanNote.textContent = flashing ? `Catalogue scan · dates vanish in ${Math.ceil((state.flashUntil - t) / 1000)} s · Peek = +5 s` : '';
+    status.hidden = flashing;
+    axis.bar.style.setProperty('--flash', flashing ? String((state.flashUntil - t) / FLASH_MS) : '0');
   }
 
-  function renderLog() {
-    if (!state.solved) { log.replaceChildren(); return; }
-    log.replaceChildren(
-      el('p', { className: 'story-eyebrow', text: 'NIGHT-SHIFT LOG' }),
-      el('ol', { className: 'portrait-log-list' }, logEntries(state).map(text => el('li', { text }))),
-      el('p', { className: 'story-text portrait-verdict', text: VERDICT }),
-    );
-  }
-
-  function sourceLine() {
-    const parts = [];
-    PORTRAIT_ARTWORKS.forEach((artwork, index) => {
-      if (index > 0) parts.push(' · ');
-      parts.push(`${artwork.artist}, `, el('a', { text: artwork.shortTitle, props: { href: artwork.url, target: '_blank', rel: 'noopener noreferrer' } }));
-    });
-    parts.push('. Public domain · The Metropolitan Museum of Art.');
-    return el('p', { className: 'story-muted portrait-sources' }, parts);
-  }
-
-  // ---------- Images: shown at once from the bundled copies, then upgraded if the Met API checks out ----------
-
+  // ---------- Images: bundled copies at once, upgraded if the Met API checks out ----------
   async function loadImages() {
+    for (const artwork of PORTRAIT_ARTWORKS) cards[artwork.id].img.src = artwork.local;
     const loaded = await (caseData.loadPortraits ?? loadPortraits)();
     if (disposed) return;
-    images = Object.fromEntries(loaded.map(item => [item.id, item.src ?? images[item.id]]));
-    if (loaded.some(item => item.offline)) offlineNote = 'Using the bundled Met images.';
-    render();
+    for (const item of loaded) if (item.src) cards[item.id].img.src = item.src;
+    footer.offline.hidden = !loaded.some(item => item.offline);
   }
 
   render();
   save();
-  if (state.solved) reportSolved();
+  if (state.solved) report();
+  else (state.startedAt === null ? startButton : cards[state.order[0]].face).focus?.();
   loadImages();
-  return () => { disposed = true; };
+  const timer = setInterval(() => { if (!disposed) tick(); }, TICK_MS);
+  timer.unref?.(); // in Node tests the timer must not keep the process alive
+  return () => { disposed = true; clearInterval(timer); };
 }
+
