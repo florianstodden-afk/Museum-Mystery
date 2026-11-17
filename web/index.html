@@ -4,10 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css?v=home-reference-1">
+  <link rel="stylesheet" href="style.css?v=auth-screen-1">
   <link rel="stylesheet" href="story/story.css?v=ending-screen-1">
 </head>
 <body>
+  <section id="auth-screen" class="auth-screen" aria-labelledby="auth-title">
+    <div class="auth-artboard">
+      <img class="auth-backdrop" src="assets/login-screen-reference.jpg" alt="" aria-hidden="true">
+      <h1 id="auth-title" class="auth-mobile-title">The Night of the Forgery</h1>
+      <div id="auth-choices" class="auth-choices">
+        <button id="auth-login" type="button" aria-label="Log In"><span>Log In</span></button>
+        <button id="auth-signup" type="button" aria-label="Sign Up"><span>Sign Up</span></button>
+      </div>
+      <div id="auth-panel" class="auth-panel" hidden>
+        <button id="auth-back" class="auth-back" type="button">← Back</button>
+        <h2 id="auth-panel-title">Log In</h2>
+        <p id="auth-message" role="status" aria-live="polite"></p>
+        <div id="auth-provider"></div>
+      </div>
+    </div>
+  </section>
   <section id="home-screen" class="home-screen" aria-labelledby="home-title">
     <div class="home-artboard">
       <img class="home-backdrop" src="assets/home-screen-reference.jpg" alt="" aria-hidden="true">
@@ -24,6 +40,8 @@
         <button id="home-sound" type="button" aria-pressed="true">Sounds on</button>
         <button id="home-music" type="button" aria-pressed="false">Music off</button>
         <p>Move with WASD or arrow keys. Press E to inspect.</p>
+        <p id="home-account-name"></p>
+        <button id="home-signout" type="button">Log out</button>
       </div>
       <div id="home-scoreboard-panel" class="home-panel" hidden>
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close scoreboard">×</button>
@@ -67,6 +85,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=home-reference-vault-2"></script>
+  <script type="module" src="entry.js?v=auth-screen-1"></script>
 </body>
 </html>

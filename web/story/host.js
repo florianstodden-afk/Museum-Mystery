@@ -45,6 +45,7 @@ export function createStoryHost(options) {
     sound = null,             // optional: a player from sound.js; without it the story is silent
     speech = null,            // optional: a box from speech-box.js; then Leon talks in it instead of the panel
     stations = {},
+    stationStorage = null,
     storage = safeLocalStorage(),
     storageKey = DEFAULT_STORAGE_KEY,
     now = Date.now,
@@ -182,7 +183,7 @@ export function createStoryHost(options) {
     }
     stationCleanup = runStation(stations[stationId] ?? placeholderStation, content, {
       stationId,
-      caseData: { now, onClose: closePanel, playSound: id => sound?.play(id) },
+      caseData: { now, onClose: closePanel, playSound: id => sound?.play(id), ...(stationStorage ? { storage: stationStorage } : {}) },
       savedProgress: progress[stationId] ?? null,
       onProgress(next) {
         progress = { ...progress, [stationId]: next };

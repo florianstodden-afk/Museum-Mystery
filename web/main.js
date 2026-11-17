@@ -17,6 +17,7 @@ import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { createSpeechBox } from './story/speech-box.js';
 import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proximity.js';
+import { accountStorage, accountStorageKey, getCurrentAccount } from './account.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -31,7 +32,8 @@ let previewStory = readMission(newGame()).state;
 if (vaultPreview) for (const id of STATION_IDS) previewStory = solveStation(previewStory, id).state;
 let previewSave = JSON.stringify({story: JSON.stringify(previewStory), progress: {}});
 const previewStorage = { getItem: () => previewSave, setItem: (_key, value) => { previewSave = value; } };
-const storeKey = 'museum-mystery-walk-v1';         // player position and steps
+const storeKey = accountStorageKey('museum-mystery-walk-v1'); // this account's position and steps
+const stationStorage = (() => { try { return accountStorage(localStorage); } catch { return null; } })();
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
 // Small synthesized sounds for story moments; the player remembers 'muted'.
@@ -62,7 +64,8 @@ const story = createStoryHost({
   sound,
   speech,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
-  storageKey: 'museum-nocturne-story-v1',
+  stationStorage,
+  storageKey: accountStorageKey('museum-nocturne-story-v1'),
   ...(vaultPreview ? {storage: previewStorage} : {}),
 });
 
@@ -536,6 +539,7 @@ function showHome(){
   stopMovement();speech.close();
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
+  document.querySelector('#home-account-name').textContent=`Signed in as ${getCurrentAccount().username ?? 'player'}`;
   document.querySelector('.shell').inert=true;
   homeStart.disabled=!story.state.missionRead;
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');

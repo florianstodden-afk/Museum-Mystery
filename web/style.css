@@ -65,3 +65,30 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .home-actions{grid-template-columns:repeat(2,minmax(0,1fr));bottom:4%;gap:6px}
   .home-actions button{height:44px;font-size:.9rem}
 }
+
+/* Login landing: the supplied illustration carries the title and two painted buttons. */
+.auth-screen[hidden],.auth-choices[hidden],.auth-panel[hidden]{display:none}
+.auth-screen{position:fixed;inset:0;z-index:30;display:grid;place-items:center;overflow:hidden;background:#06131a}
+.auth-artboard{position:relative;width:min(100vw,179.1667dvh);aspect-ratio:1376/768;flex:none}
+.auth-backdrop{display:block;width:100%;height:100%;object-fit:contain}
+.auth-mobile-title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.auth-choices{display:contents}
+.auth-choices button{position:absolute;left:36.85%;width:26.3%;height:10.15%;padding:0;border:2px solid transparent;border-radius:12px;background:transparent;color:transparent;font-size:0}
+.auth-choices button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+#auth-login{top:38.9%}#auth-signup{top:52.1%}
+.auth-choices button:hover,.auth-choices button:focus-visible{border-color:#f6d58f;outline:2px solid #1b2e34;outline-offset:1px;box-shadow:0 0 24px #f6c56e88}
+.auth-panel{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,88%);max-height:82%;overflow:auto;background:#14242bf5;border:2px solid #c49b58;border-radius:14px;box-shadow:0 18px 80px #000b;padding:18px 22px;color:#f7ead1}
+.auth-panel h2{text-align:center;font-size:1.8rem;margin:4px 0 15px}
+.auth-back{border:1px solid #b18e55;border-radius:8px;background:#263f45;color:#f7ead1;padding:8px 12px}
+.auth-back:hover{background:#38575b}
+#auth-message:empty{display:none}#auth-message{line-height:1.5;color:#f7d99d}
+#auth-provider{display:grid;place-items:center;min-height:20px}
+@media(max-width:720px){
+  .auth-artboard{width:100%;height:100dvh;aspect-ratio:auto;overflow:hidden}
+  .auth-backdrop{object-fit:cover;filter:brightness(.55)}
+  .auth-mobile-title{position:absolute;left:7%;right:7%;top:9%;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;text-align:center;color:#f8e9c9;font-size:clamp(2rem,8vw,3.2rem);text-shadow:0 3px 10px #000}
+  .auth-choices{display:grid;position:absolute;inset:auto 7% 14%;gap:12px}
+  .auth-choices button{position:static;width:100%;height:62px;border:2px solid #c49b58;background:#15262bf0;color:#f7ead1;font:700 1.25rem Fraunces,Georgia,serif}
+  .auth-choices button span{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}
+  .auth-panel{width:min(440px,92%);max-height:86dvh}
+}
