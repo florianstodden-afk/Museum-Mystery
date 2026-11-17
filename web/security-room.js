@@ -1,3 +1,5 @@
+import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
+import { GALLERY_CAMERAS } from './gallery-layout.js';
 // The office has its own floor and shares the existing story examination actions.
 export const SECURITY_OBJECTS = [
   {id:'office-roster',x:2,y:1,label:'Shift schedule',story:{examine:'shift-schedule'}},
@@ -28,11 +30,16 @@ export function createSecurityRenderer(){
   const hall=image('./assets/great-hall-security-door.jpg');
   const gallery=image('./assets/gallery-nocturne-nyc.jpg');
   const vault=image('./assets/treasure-vault.jpg');
-  function screen(ctx, x,y,w,h,source,crop,label, time){
+  function screen(ctx, x,y,w,h,source,crop,label,time,cameras,reducedMotion){
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
     ctx.fillStyle='#0b151b';ctx.fillRect(x,y,w,h);
     if(source?.complete && source.naturalWidth){
       ctx.globalAlpha=.8;ctx.drawImage(source,crop[0]*source.naturalWidth,crop[1]*source.naturalHeight,crop[2]*source.naturalWidth,crop[3]*source.naturalHeight,x,y,w,h);ctx.globalAlpha=1;
+      if(cameras){
+        const sx=w/(crop[2]*864), sy=h/(crop[3]*576);
+        ctx.save();ctx.translate(x-(crop[0]*864+16)*sx,y-crop[1]*576*sy);ctx.scale(sx,sy);
+        drawCameraLights(ctx,cameras,time,reducedMotion);ctx.restore();
+      }
       ctx.fillStyle='rgba(27,80,104,.24)';ctx.fillRect(x,y,w,h);
     } else {ctx.fillStyle='#78949a';ctx.font='8px monospace';ctx.fillText('NO SIGNAL',x+5,y+h/2);}
     ctx.fillStyle='rgba(0,0,0,.3)';for(let sy=y+1;sy<y+h;sy+=4)ctx.fillRect(x,sy,w,1);
@@ -40,20 +47,20 @@ export function createSecurityRenderer(){
     if(source){ctx.fillStyle=Math.floor(time/900)%2?'#fb5454':'#8e3030';ctx.beginPath();ctx.arc(x+w-6,y+6,2,0,Math.PI*2);ctx.fill();}
     ctx.restore();
   }
-  return function drawOffice(ctx,{time,player,target,facing,moving,drawPerson}){
+  return function drawOffice(ctx,{time,player,target,facing,moving,drawPerson,reducedMotion=false}){
     ctx.fillStyle='#091317';ctx.fillRect(0,0,896,576);
     if(!background.complete||!background.naturalWidth){ctx.fillStyle='#eee0bc';ctx.font='18px Georgia';ctx.fillText('Opening the security room…',310,280);return;}
     ctx.drawImage(background,16,0,864,576);
     const channels=[
       [hall,[.14,.2,.73,.6],'01 HALL'],
-      [gallery,[0,0,1,1],'02 GALLERY'],
-      [gallery,[.82,.25,.16,.45],'03 DOOR'],
-      [vault,[0,0,1,1],'04 VAULT'],[null,[],'05'],[null,[],'06'],
+      [gallery,[0,0,1,1],'02 GALLERY',GALLERY_CAMERAS],
+      [gallery,[.82,.25,.16,.45],'03 DOOR',GALLERY_CAMERAS],
+      [vault,[0,0,1,1],'04 VAULT',VAULT_CAMERAS],[null,[],'05'],[null,[],'06'],
       [null,[],'07'],[null,[],'08'],[null,[],'09'],
     ];
     for(let i=0;i<9;i++){
-      const [source,crop,label]=channels[i];
-      screen(ctx,298+(i%3)*104,30+Math.floor(i/3)*63,90,50,source,crop,label,time);
+      const [source,crop,label,cameras]=channels[i];
+      screen(ctx,298+(i%3)*104,30+Math.floor(i/3)*63,90,50,source,crop,label,time,cameras,reducedMotion);
     }
     const p=officePosition(player.x,player.y);
     drawPerson(p.x,p.y,'rick',facing,time,moving);

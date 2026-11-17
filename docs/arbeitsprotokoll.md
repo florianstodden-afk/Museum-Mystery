@@ -229,3 +229,9 @@ Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Reg
 
 ## 2026-11-16: Integration Renoir und aktualisiertes main
 Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (Station D Cézanne und L Renoir) bleiben erhalten. Punkte werden wieder verdient: Renoir 15/10/5/0 bei <=30/45/60/>60 Sekunden; Gesamtmaximum 95. Kein Referenzbild, Hover-Zoom oder Slot-Markierungen; native Tastaturbedienung. Browser-Playthrough erfolgreich abgeschlossen.
+
+### 2026-11-17 – Statuslichter der Überwachungskameras
+
+- **Auftrag:** Aktive Kameras sollen allgemein durch ein blinkendes rotes Licht erkennbar sein.
+- **Umsetzung:** Galerie und Tresorraum nutzen dieselbe Blinklogik; die Kameraansichten auf der Monitorwand verwenden sie ebenfalls. Bei reduzierter Bewegung bleibt das Licht dauerhaft sichtbar. Die Vorgabe für neue Räume ist in der README dokumentiert.
+- **Prüfung:** Tresorraum im Browser angesehen; automatisierte Prüfungen für Blinkphasen und reduzierte Bewegung ergänzt.

@@ -1,4 +1,5 @@
-import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } from './gallery-layout.js';
+import { drawCameraLights } from './camera-lights.js';
+import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition } from './gallery-layout.js';
 
 // Keep the approved concept as the actual room background, not an approximation.
 export function createGalleryRenderer() {
@@ -23,13 +24,7 @@ export function createGalleryRenderer() {
         ctx.save();ctx.globalAlpha=1-progress;ctx.translate(-58*progress,0);ctx.beginPath();ctx.moveTo(773,198);ctx.quadraticCurveTo(780,188,790,194);ctx.lineTo(819,210);ctx.lineTo(819,356);ctx.lineTo(773,325);ctx.closePath();ctx.clip();ctx.drawImage(artwork,16,0,864,576);ctx.restore();
       }
     }
-    // Cover the baked-in red diode before drawing its live on/off state.
-    for(const camera of GALLERY_CAMERAS){
-      box(ctx,camera.x-3,camera.y-3,6,6,'#1c1117');
-      const on=reducedMotion||cameraLightOn(time,camera.phase);
-      ctx.save();ctx.fillStyle=on?'#ff4141':'#591d25';ctx.shadowColor='#ff2626';ctx.shadowBlur=on?8:0;
-      ctx.beginPath();ctx.arc(camera.x,camera.y,1.8,0,Math.PI*2);ctx.fill();ctx.restore();
-    }
+    drawCameraLights(ctx,GALLERY_CAMERAS,time,reducedMotion);
     // Tiny labels sit below the actual picture frames. The art remains unobstructed.
     for(const [id,x] of [['note',296],['painting',448],['frames',676]]){
       const active=target?.id===id;ctx.fillStyle=active?'#ffe5a0':'#bd985c';
