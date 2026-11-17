@@ -325,6 +325,8 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/index.html` enthält den Zahnradknopf und das Menü, `web/style.css` gestaltet beides, `web/main.js` steuert Öffnen, Schließen, Pause, Tastaturfokus und Übergänge. [Details und Klickfolge](in-game-menu.md).
 - **Prüfung:** 217 Node-Tests bestanden. Im lokalen Browser wurden Gast-Einstieg, Missionsstart, Zahnrad, Sound/Music, Hint, Journal, Resume und Exit zum Home Screen durchgeklickt. Syntax- und Diff-Prüfung ohne Fehler.
 - **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
+### 2026-11-17 – Nachträge zu Station I
+
 - **Nachtrag (Rückmeldung von Florian):** Lesephase von 3 auf 8 Sekunden verlängert, damit man auch die Aufgabe lesen kann. Die Uhr läuft dabei weiter. Tests: 226 bestanden.
 - **Nachtrag:** 10 Sekunden Lesezeit nach „Start“ (Aufgabe und Jahreszahlen sichtbar); die Uhr startet erst danach. Damit das kein Schlupfloch wird, sind Sortieren und Prüfen in der Lesezeit gesperrt. Tests: 227 bestanden.
 
@@ -332,3 +334,14 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 
 - Die Interaktionstaste öffnet ohne Objekt in der Nähe kein Popup mehr. Stattdessen wackelt die Figur 200 ms um etwa 3 px (nicht bei reduzierter Bewegung) und ein sehr leiser Ton `nudge` erklingt (nur wenn Sound an ist). Neue Datei `web/interaction.js` (reine Logik), Tests `web/interaction.test.js`; `main.js` und `story/sound.js` angepasst. Der Text kam sonst nirgends vor.
 - Prüfung: `node --test` 231 bestanden. Browser: `E` ohne Objekt → kein Dialog; `E` neben Station I → Station öffnet sich wie vorher; keine Konsolenfehler.
+
+### 2026-11-17 - Menü, Journal und Leon überarbeitet
+
+- **Beteiligte:** Florian Stodden (Auftrag und zwei Bildreferenzen), Codex (Umsetzung), Branch `codex/menu-journal-leon` auf Basis von gemergtem PR #18.
+- **Ausgangslage:** Das Menü war nur über das Zahnrad erreichbar, das Journal nur darin und als schmale Seitenleiste im Spiel. Leon sprach bei Annäherung selbst. Die Gestaltung entsprach noch nicht den neuen Vorlagen.
+- **Entscheidung:** `Esc` öffnet/schließt das Spielmenü. Das Journal hat einen eigenen Knopf oben im Spiel und ist über `J` erreichbar; es funktioniert auch vom Home Screen aus, ohne den Spielmodus zu wechseln. Ton- und Musikknöpfe zeigen ihren Zustand direkt. Leon wird mit `E` angesprochen, und die Sprechbox ist transparent. Die Bilder wurden als Referenz genutzt; UI-Text bleibt echte HTML-Schaltfläche.
+- **Umsetzung:** `web/index.html`, `web/main.js`, `web/style.css`, `web/story/journal.js` und `web/story/story.css`. Einfacher Ablauf und Zuständigkeit der Dateien: [docs/menu-journal-leon.md](menu-journal-leon.md).
+- **Prüfung:** 217 Node-Tests bestanden; Syntax- und Diff-Prüfung ohne Fehler. Im lokalen Browser die Home- und Spiel-Journale, `J`, `Esc`, Menütexte und Rückkehr vom Lesen von Ms Nachricht zum Home Screen geprüft; Desktopansichten visuell angesehen.
+- **Offen:** Leon an seiner Position manuell mit `E` prüfen, vollständige Runde und echtes Smartphone prüfen. Kein GitHub-Merge durch Codex.
+- **Nachtrag vor dem Merge:** PR #19 mit Station-I-Änderungen wurde zwischenzeitlich nach `main` gemergt. Dieser Branch wurde auf den neuen Stand gesetzt; danach bestanden 227 Tests.
+- **Weiterer Nachtrag:** PR #21 entfernte den „Nothing nearby“-Dialog. Beim erneuten Abgleich blieben diese Änderung und Leons E-Interaktion erhalten; 231 Tests bestanden.

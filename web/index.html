@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css?v=in-game-menu-1">
-  <link rel="stylesheet" href="story/story.css?v=ending-screen-1">
+  <link rel="stylesheet" href="style.css?v=journal-menu-1">
+  <link rel="stylesheet" href="story/story.css?v=journal-menu-1">
 </head>
 <body>
   <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
@@ -36,6 +36,7 @@
         <button id="home-settings" type="button" aria-expanded="false" aria-controls="home-settings-panel"><span>Settings</span></button>
         <button id="home-scoreboard" type="button" aria-expanded="false" aria-controls="home-scoreboard-panel"><span>Scoreboard</span></button>
       </div>
+      <button id="home-journal" class="home-journal" type="button" aria-haspopup="dialog">Journal</button>
       <div id="home-settings-panel" class="home-panel" hidden>
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close settings">×</button>
         <h2>Settings</h2>
@@ -58,6 +59,7 @@
     </div>
   </section>
   <button id="game-menu-toggle" class="game-menu-toggle" type="button" aria-label="Open in-game menu" aria-expanded="false" aria-controls="game-menu" hidden><span aria-hidden="true">⚙</span></button>
+  <button id="game-journal-toggle" class="game-journal-toggle" type="button" aria-haspopup="dialog" hidden>▣ Journal <kbd>J</kbd></button>
   <main class="shell" inert>
     <section class="game-layout">
       <div class="stage-wrap">
@@ -68,24 +70,39 @@
           <button data-move="down" aria-label="Move down">▼</button>
         </div>
       </div>
-      <aside class="sidebar" id="sidebar" hidden>
-        <div class="panel case"><p class="eyebrow">YOUR MISSION</p><h2>Bring the painting out before sunrise.</h2><p>M wants Van Gogh’s “Wheat Field with Cypresses” from the safe. Solve the four stations, read the word in your journal and decide who gets the painting.</p><button id="mission" class="plain" type="button">Read M’s message</button></div>
-        <div class="panel" id="journal"></div>
-        <div class="panel status"><span id="progress">0 / 4 letters</span><span id="pass">100 / 100 points</span><span id="steps">0 steps</span></div>
-        <div class="panel"><p class="eyebrow">ART SOURCES</p><p>Artworks: <a href="https://www.metmuseum.org/art/collection/search/436121" target="_blank" rel="noopener">Degas</a> · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">Van Gogh</a> · <a href="https://www.metmuseum.org/art/collection/search/12127" target="_blank" rel="noopener">Sargent</a>. The Metropolitan Museum of Art, Open Access.</p></div>
-        <div class="panel help"><p class="eyebrow">HOW TO PLAY</p><p>Move next to a person or marked object and press <kbd>E</kbd>. The orange vault door is the safe: it opens with the word from your journal.</p></div>
-      </aside>
     </section>
     <p class="credit">Fictional museum and characters. Artwork data and image: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
   </main>
+  <aside class="sidebar" id="sidebar" role="dialog" aria-modal="true" aria-labelledby="journal-title" hidden>
+    <div class="journal-book">
+      <button id="journal-close" class="journal-close" type="button" aria-label="Close journal">×</button>
+      <h2 id="journal-title">Investigation Journal</h2>
+      <div class="journal-pages">
+        <section class="journal-page journal-mission" aria-label="Mission and evidence">
+          <h3>Mission</h3>
+          <p class="journal-mission-title">Bring the Van Gogh painting out before sunrise.</p>
+          <button id="mission" type="button">Read M’s message</button>
+          <h3>Evidence &amp; Notes</h3>
+          <div id="journal-evidence"></div>
+        </section>
+        <section class="journal-page journal-progress" aria-label="Investigation progress">
+          <h3>Investigation Progress</h3>
+          <div id="journal"></div>
+          <h3>Stats &amp; Credit</h3>
+          <div class="journal-stats"><span id="progress">0 / 4 letters</span><span id="pass">0 / 90 points</span><span id="steps">0 steps</span></div>
+          <p class="journal-sources">Art sources: <a href="https://www.metmuseum.org/art/collection/search/436121" target="_blank" rel="noopener">Degas</a> · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">Van Gogh</a> · <a href="https://www.metmuseum.org/art/collection/search/12127" target="_blank" rel="noopener">Sargent</a> (The Metropolitan Museum of Art, Open Access)</p>
+        </section>
+      </div>
+    </div>
+  </aside>
   <div id="game-menu" class="game-menu" role="dialog" aria-modal="true" aria-labelledby="game-menu-title" hidden>
     <div class="game-menu-card">
       <header class="game-menu-heading"><h2 id="game-menu-title">The Night of the Forgery</h2><p>In-game menu</p></header>
       <div class="game-menu-grid">
-        <button id="sound-toggle" type="button" aria-pressed="true">🔊 Sound</button>
-        <button id="music-toggle" type="button" aria-pressed="false">♪ Music</button>
+        <button id="sound-toggle" type="button" aria-pressed="true">🔊 Sound on</button>
+        <button id="music-toggle" type="button" aria-pressed="false">♪ Music off</button>
         <button id="hint" type="button">💡 Hint</button>
-        <button id="journal-toggle" type="button" aria-expanded="false" aria-controls="sidebar">▣ Journal</button>
+        <button id="journal-toggle" type="button" aria-haspopup="dialog" aria-controls="sidebar">▣ Journal</button>
       </div>
       <div class="game-menu-actions">
         <button id="game-menu-resume" type="button">Resume Game</button>
@@ -96,6 +113,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=in-game-menu-1"></script>
+  <script type="module" src="main.js?v=journal-menu-1"></script>
 </body>
 </html>
