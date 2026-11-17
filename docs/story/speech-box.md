@@ -15,8 +15,8 @@ Dazu: Styles mit Präfix `speech-` in `web/story/story.css`, Anschluss in `web/s
 ## Ablauf
 
 1. Jedes Bild prüft `main.js` (`checkAutoTalk`): Wie weit ist die Spielfigur von jeder Person im selben Raum entfernt? Gemessen wird auf dem Bildschirm (100 Pixel = 1 Schritt), weil der Boden perspektivisch gezeichnet ist und ein Feld nach unten viel kürzer aussieht als ein Feld nach rechts.
-2. Unter **1,2 Schritten** öffnet sich die Box von selbst (`shouldOpenTalk`). Ein `E` ist dafür nicht nötig, und über Personen steht kein „E“ mehr.
-3. Über **1,8 Schritten** schließt sie sich wieder (`shouldCloseTalk`). Man darf also einfach weggehen. Die Lücke zwischen 1,2 und 1,8 verhindert Flackern am Rand.
+2. Unter **0,8 Schritten** öffnet sich die Box von selbst (`shouldOpenTalk`). Ein `E` ist dafür nicht nötig, und über Personen steht kein „E“ mehr.
+3. Über **1,3 Schritten** schließt sie sich wieder (`shouldCloseTalk`). Man darf also einfach weggehen. Die Lücke zwischen 0,8 und 1,3 verhindert Flackern am Rand.
 4. Nach „Goodbye“ oder `Escape` öffnet sie erst wieder, wenn man einmal weggegangen ist.
 5. Leon bekommt Begrüßung, zwei Fragen und Verabschiedung. Imani und Dr. Vale sagen ihre bisherigen Sätze, darunter steht „Goodbye.“
 
