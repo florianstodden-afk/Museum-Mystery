@@ -20,10 +20,10 @@
 .portrait-front { display: grid; gap: 2px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 
 /* Gold frame like L's board: one 3px border, no inner mat, the picture fills it (face stays visible). */
-.picture-puzzle .portrait-face { display: block; width: 100%; aspect-ratio: 4 / 5; max-height: clamp(120px, 30vh, 240px); margin: 0 0 6px; padding: 0; overflow: hidden; background: #101c23; border: 3px solid #b8965c; border-radius: 0; cursor: grab; transition: transform .18s; }
+.picture-puzzle .portrait-face { display: block; width: 100%; aspect-ratio: 4 / 5; max-height: clamp(110px, 24vh, 240px); margin: 0 0 6px; padding: 0; overflow: hidden; background: #101c23; border: 3px solid #b8965c; border-radius: 0; cursor: grab; transition: transform .18s; }
 .picture-puzzle .portrait-face:hover { background: #101c23; }
 /* The Met photos have a thin black edge; scaling a little lets the frame cut it off. */
-.portrait-face img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, top); transform: scale(1.1); transform-origin: var(--focus, top); }
+.portrait-face img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, top); transform: scale(1.12); transform-origin: center; }
 .picture-puzzle .portrait-face:disabled { cursor: default; opacity: 1; }
 .portrait-card.is-selected .portrait-face { border-color: #ecd8a4; transform: translateY(-3px); }
 .portrait-card.is-target .portrait-face { box-shadow: 0 0 0 3px #ecd8a4; }
@@ -40,7 +40,7 @@
 @keyframes portrait-scan { from { left: 0; } to { left: calc(100% - 3px); } }
 
 /* Back: one log line, shown after the right order */
-.portrait-back { position: absolute; inset: 0 0 auto; aspect-ratio: 4 / 5; max-height: clamp(120px, 30vh, 240px); width: 100%; display: grid; place-items: center; margin: 0; padding: 12px; text-align: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border: 3px solid #b8965c; font: .85rem/1.4 ui-monospace, Menlo, monospace; }
+.portrait-back { position: absolute; inset: 0 0 auto; aspect-ratio: 4 / 5; max-height: clamp(110px, 24vh, 240px); width: 100%; display: grid; place-items: center; margin: 0; padding: 12px; text-align: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border: 3px solid #b8965c; font: .85rem/1.4 ui-monospace, Menlo, monospace; }
 .portrait-cards.is-flipped .portrait-inner { transform: rotateY(180deg); }
 .portrait-cards.is-flipped .portrait-front > :not(.portrait-face) { visibility: hidden; }
 

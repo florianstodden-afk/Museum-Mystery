@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Station L vs I – side by side</title>
+  <!-- Developer page: Station L and Station I in the main game's dialog card, next to each other.
+       Used to check that both look the same and for the screenshots in web/dev/shots/.
+       ?only=I or ?only=L shows one station at full dialog width. -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../story/story.css">
+  <style>
+    body { margin: 0; padding: 16px; background: #0b1419; overflow: auto; height: auto; }
+    .compare { position: relative; z-index: 5; display: grid; grid-template-columns: repeat(var(--columns, 2), minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .compare .dialog-card { max-width: none; max-height: none; margin: 0; }
+    .compare h2 { margin: 0 0 8px; font: 600 .8rem system-ui; letter-spacing: .14em; color: #c3a76a; }
+  </style>
+</head>
+<body>
+  <div class="compare" id="compare"></div>
+  <script type="module">
+    import * as picture from '../minigames/picture-puzzle.js';
+    import * as portraits from '../minigames/portrait-timeline.js';
+
+    const only = new URLSearchParams(location.search).get('only');
+    const stations = [['L', 'Gallery Picture Puzzle · Station L', picture], ['I', 'Portrait Hall · Station I', portraits]]
+      .filter(([letter]) => !only || only === letter);
+    document.documentElement.style.setProperty('--columns', String(stations.length));
+    const memory = () => { const data = {}; return { getItem: k => data[k] ?? null, setItem: (k, v) => { data[k] = v; } }; };
+
+    for (const [letter, title, station] of stations) {
+      const card = document.createElement('div');
+      card.className = 'dialog-card story-dark-card';
+      card.dataset.station = letter;
+      card.innerHTML = `<h2>${title}</h2><div class="story-scene"></div>`;
+      document.querySelector('#compare').append(card);
+      station.start(card.querySelector('.story-scene'), { now: Date.now, onChange() {}, onClose() {}, playSound() {}, storage: memory() }, () => {});
+    }
+  </script>
+</body>
+</html>
