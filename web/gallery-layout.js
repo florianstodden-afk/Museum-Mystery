@@ -54,6 +54,6 @@ export function galleryDoorTransition(from, to) {
 // occupies floor to the left; when closed, only the doorway itself is solid.
 export function galleryVaultDoorBlocks(x,y,doorOpen) {
   const p=galleryPosition(x,y);
-  if(doorOpen) return p.x>=696 && p.x<=780 && p.y>=320 && p.y<360;
-  return p.x>=758 && p.y>=320 && p.y<=402;
+  if(doorOpen) return p.x>=696 && p.x<=780 && p.y>=275 && p.y < 365-(p.x-696)*0.5;
+  return p.x>=758 && p.y>=258 && p.y < 350+(p.x-758)*0.55;
 }
