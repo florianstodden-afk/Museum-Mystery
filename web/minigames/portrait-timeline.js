@@ -1,55 +1,63 @@
-// Station I (Portrait Hall) – a speedrun: Start, memorise the dates, sort oldest to newest, Enter.
+// Station I (Portrait Hall) – a speedrun in the look and flow of Station L:
+// intro → Start ↵ → catalogue flash (3 s) → sort oldest to newest with the points bar → success popup with letter I.
 // Contract (docs/story/minigame-contract.md): start(container, caseData, onSolved).
 // The host saves progress through caseData.onChange; the engine gives letter, evidence and points (by time, like L).
-import { el, button } from '../story/dom.js';
+import { el } from '../story/dom.js';
 import {
   initialTimeline, validTimeline, upgradeTimeline, startTimeline, peekDate, revealedDates,
   moveCard, swapCards, checkOrder, elapsedMs, logEntries, FLASH_MS,
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
-import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
-import { clockBlock, taskLine, cardView, timelineView, footerView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
+import { portraitSpeedPoints, formatClock } from '../story/scoring.js';
+import { introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles } from './station-ui.js';
+import { cardView, timelineView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
-const TICK_MS = 100;             // how often the clock is redrawn
+/** Station I's points by time, as tiers for the bar (same limits as portraitSpeedPoints). */
+export const PORTRAIT_TIERS = [{ s: 0, p: 15 }, { s: 20, p: 10 }, { s: 35, p: 5 }, { s: 50, p: 0 }];
+const TASK = 'Memorise the dates, then sort oldest to newest.';
+const TICK_MS = 100;             // how often bar, dates and arrow are redrawn
 const BLINK_MS = 300;            // red blink after a penalty
 const FLIP_DELAY_MS = 60;        // let the browser draw the front before the cards turn
+const STATIC_ARROW_MS = 2500;    // with reduced motion the arrow shows still, then goes
 
 /** Opens Station I in `container`; returns a cleanup function. */
 export function start(container, caseData, onSolved) {
   ensureStylesheet();
+  ensureStationStyles();
   const now = caseData.now ?? Date.now;
   let state = validTimeline(caseData.state) ? upgradeTimeline(structuredClone(caseData.state)) : initialTimeline(caseData.random);
-  let selected = null;     // card picked up by click, number key or Space
-  let dragged = null;      // card being dragged with the mouse
+  let selected = null;       // card picked up by click, number key or Space
+  let dragged = null;        // card being dragged with the mouse
   let reported = false;
   let disposed = false;
+  let closePopup = null;     // set while the help or success popup is open
+  let arrowSince = null;     // when the drag hint arrow appeared
   const best = bestTimeStore(caseData.storage ?? safeStorage());
+  const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   const play = id => caseData.playSound?.(id);
   const save = () => caseData.onChange?.(state);
+  const playing = () => state.startedAt !== null && !state.solved;
 
   // ---------- Building the view once ----------
-  const clock = clockBlock();
+  const root = el('div', { className: 'picture-puzzle portrait-timeline' });
+  const pane = el('div');
+  const overlay = el('div');
+  const ui = introPopup({ task: TASK, onStart: begin, onBack: leave, onHelp: showHelp });
+  const bar = speedBar({ tiers: PORTRAIT_TIERS, label: 'Portrait time' });
+  const checkButton = shortcutButton('Check order', check, 'Enter');
   const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
   const grid = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, oldest on the left' } });
   const axis = timelineView();
-  const status = el('p', { className: 'portrait-status', attrs: { role: 'status', 'aria-live': 'polite' } });
-  const scanNote = el('span', { className: 'portrait-scan-note' });          // countdown, not read aloud each tick
-  const spoken = el('p', { className: 'portrait-help-text', attrs: { 'aria-live': 'polite' } }); // dates for screen readers
-  const startButton = button('Start', () => primary(), 'story-button portrait-primary');
-  const checkButton = button('Check order ⏎', () => primary(), 'story-button portrait-primary');
-  const continueButton = button('Continue', () => primary(), 'story-button portrait-primary');
-  const footer = footerView();
-  const section = el('section', { className: 'portrait-timeline' }, [
-    clock.root, taskLine(), grid, axis.root,
-    el('div', { className: 'portrait-actions' }, [startButton, checkButton, continueButton, status, scanNote]), footer.root, spoken,
-  ]);
-  container.replaceChildren(section);
-  section.addEventListener('keydown', onKey);
+  const arrow = el('div', { className: 'puzzle-drag-demo', text: '↖', attrs: { 'aria-hidden': 'true' } });
+  const board = el('div', { className: 'portrait-board' }, [grid, axis.root, arrow]);
+  const status = el('p', { className: 'puzzle-status', attrs: { role: 'status', 'aria-live': 'polite' } });
+  const spoken = el('p', { className: 'portrait-sr', attrs: { 'aria-live': 'polite' } }); // dates for screen readers
+  const credit = creditLine(PORTRAIT_ARTWORKS, { dates: false });
+  root.append(pane, overlay, spoken);
+  container.replaceChildren(root);
   for (const id of state.order) wireDrag(id);
 
   // ---------- Actions ----------
-  const playing = () => state.startedAt !== null && !state.solved;
-
   function update(next, message) {
     const justSolved = next.solved && !state.solved;
     if (next !== state) { state = next; save(); }
@@ -58,13 +66,19 @@ export function start(container, caseData, onSolved) {
     if (justSolved) finish();
   }
 
-  // Enter, the big button and the card faces' Enter all do "the next obvious thing".
-  function primary() {
-    if (state.solved) { close(); return; }
-    if (!playing()) { play('page'); update(startTimeline(state, now()), ''); spoken.textContent = announceDates(); cards[state.order[0]].face.focus?.(); return; }
+  function begin() {
+    if (state.startedAt !== null || disposed) return;
+    play('page');
+    update(startTimeline(state, now()), '');
+    spoken.textContent = `Catalogue scan: ${state.order.map(id => `${cards[id].artwork.artist} ${cards[id].artwork.date}`).join(', ')}.`;
+    cards[state.order[0]].face.focus?.();
+  }
+
+  function check() {
+    if (!playing()) return;
     selected = null;
     const next = checkOrder(state, now());
-    if (next.solved) { play('flip'); update(next); return; }
+    if (next.solved) { play('flip'); update(next, ''); return; }
     play('wrong');
     blink();
     update(next, 'Not yet. +5 s');
@@ -72,12 +86,12 @@ export function start(container, caseData, onSolved) {
 
   function choose(id) {
     if (!playing()) return;
+    dismissArrow();
     play('click');
     if (selected === null) { selected = id; update(state, `${cards[id].artwork.shortTitle} picked up.`); return; }
     if (selected === id) { selected = null; update(state, ''); return; }
     const other = selected;
     selected = null;
-    checkButton.classList.add('is-ready');
     update(swapCards(state, other, id), 'Swapped.');
     cards[id].face.focus?.();
   }
@@ -93,10 +107,15 @@ export function start(container, caseData, onSolved) {
   function finish() {
     const time = elapsedMs(state, now());
     const record = best.offer(time);
-    status.textContent = `Solved in ${formatClock(time)} · +${portraitSpeedPoints(time)} · Letter I in your journal${record === time ? ' · New best!' : ''}`;
     setTimeout(() => { if (!disposed) grid.classList.add('is-flipped'); }, FLIP_DELAY_MS);
-    continueButton.focus?.();
     report();
+    closePopup = showPopup({
+      overlay, pane, label: 'Portraits sorted', actionLabel: 'Return to museum', onAction: leave,
+      contents: successPopup({
+        headline: 'Sorted! The night-shift log clears Leon. You receive:', letter: 'I', points: portraitSpeedPoints(time),
+        extra: `Time ${formatClock(time)}${record === time ? ' · New best!' : ` · Best ${formatClock(record)}`}`,
+      }),
+    });
   }
 
   function report() {
@@ -105,36 +124,65 @@ export function start(container, caseData, onSolved) {
     onSolved({ mistakes: state.mistakes, hints: state.hints });
   }
 
-  // The host shows a close button below the station; Continue presses it (Escape and × work too).
-  function close() {
-    if (caseData.close) caseData.close();
-    else container.nextElementSibling?.querySelector?.('button')?.click();
+  function leave() { if (!disposed) caseData.onClose?.(); }
+
+  function showHelp() {
+    closePopup = showPopup({
+      overlay, pane, label: 'Instructions', actionLabel: 'Back to station',
+      onAction: () => { closePopup?.(); closePopup = null; ui.help.focus?.(); },
+      contents: [
+        el('h3', { text: 'Sort the portraits' }),
+        el('p', { text: 'Start shows all three dates for 3 seconds. Then put the cards in order, oldest on the left: click two cards (or press 1, 2, 3) to swap them, or drag a card. Enter checks.' }),
+        el('p', { text: 'Peek shows one date again (+5 s); a wrong check adds 5 s. Finish within 20s: +15 points; within 35s: +10; within 50s: +5; later: 0.' }),
+      ],
+    });
   }
 
   function blink() {
-    clock.root.classList.add('is-penalty');
-    setTimeout(() => clock.root.classList.remove('is-penalty'), BLINK_MS);
+    bar.root.classList.add('is-penalty');
+    setTimeout(() => bar.root.classList.remove('is-penalty'), BLINK_MS);
   }
 
-  function announceDates() {
-    return `Catalogue scan: ${state.order.map(id => `${cards[id].artwork.artist} ${cards[id].artwork.date}`).join(', ')}.`;
+  // ---------- Drag hint arrow (like L): once per round, after the flash, from the last card to place 1 ----------
+  function dismissArrow() {
+    arrow.hidden = true;
+    if (!state.demoDismissed) { state = { ...state, demoDismissed: true }; save(); }
   }
 
-  // ---------- Keyboard and mouse ----------
-  function onKey(event) {
-    const face = Object.values(cards).find(card => card.face === event.target);
+  function positionArrow() {
+    const from = cards[state.order[state.order.length - 1]].face;
+    const to = axis.slots[0];
+    if (!from.getBoundingClientRect || !to.getBoundingClientRect) return;
+    const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), box = board.getBoundingClientRect();
+    arrow.style.setProperty('--drag-start-x', `${a.left + a.width / 2 - box.left}px`);
+    arrow.style.setProperty('--drag-start-y', `${a.top + a.height / 2 - box.top}px`);
+    arrow.style.setProperty('--drag-end-x', `${b.left + b.width / 2 - box.left}px`);
+    arrow.style.setProperty('--drag-end-y', `${b.top + b.height / 2 - box.top}px`);
+  }
+
+  // ---------- Keyboard (like L: Enter = Start/Check, Esc = back to museum) and mouse ----------
+  function keydown(event) {
+    if (disposed || event.repeat) return;
+    const stop = () => { event.preventDefault(); event.stopImmediatePropagation?.(); };
+    if (closePopup) {
+      if (event.key === 'Enter' || event.key === 'Escape' || event.key === 'Tab') { stop(); if (event.key !== 'Tab') closePopup.action.click(); }
+      return;
+    }
+    if (event.key === 'Escape') { stop(); leave(); return; }
     const index = ['1', '2', '3'].indexOf(event.key);
-    if (index !== -1) { event.preventDefault(); choose(state.order[index]); return; }
-    if (event.key === 'Enter' && (face || event.target === section)) { event.preventDefault(); primary(); return; }
-    if (!face || selected === null) return;
+    if (index !== -1 && playing()) { stop(); choose(state.order[index]); return; }
+    // Enter on "?", "Back to museum" or a Peek button presses that button instead.
+    const own = event.target === ui.help || event.target === ui.backButton || Object.values(cards).some(card => card.peek === event.target);
+    if (event.key === 'Enter' && !own) { stop(); if (state.startedAt === null) begin(); else check(); return; }
     const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
-    if (step) { event.preventDefault(); update(moveCard(state, selected, state.order.indexOf(selected) + step), 'Moved.'); cards[selected]?.face.focus?.(); }
+    if (step && selected !== null && playing()) { stop(); update(moveCard(state, selected, state.order.indexOf(selected) + step), 'Moved.'); cards[selected]?.face.focus?.(); }
   }
+  document.addEventListener?.('keydown', keydown, true);
 
   function wireDrag(id) {
     const card = cards[id].root;
-    card.addEventListener('dragstart', event => { dragged = id; event.dataTransfer?.setData('text/plain', String(id)); });
-    card.addEventListener('dragend', () => { dragged = null; grid.classList.remove('is-dragging'); });
+    card.addEventListener('dragstart', event => { dismissArrow(); dragged = id; event.dataTransfer?.setData('text/plain', String(id)); });
+    card.addEventListener('dragend', () => { dragged = null; });
     card.addEventListener('dragover', event => { event.preventDefault(); card.classList.add('is-target'); });
     card.addEventListener('dragleave', () => card.classList.remove('is-target'));
     card.addEventListener('drop', event => {
@@ -145,38 +193,41 @@ export function start(container, caseData, onSolved) {
       dragged = null;
       selected = null;
       play('click');
-      checkButton.classList.add('is-ready');
       update(moveCard(state, from, state.order.indexOf(id)), 'Moved.');
     });
   }
 
   // ---------- Drawing ----------
   function render() {
+    if (state.startedAt === null && !state.solved) {
+      ui.controls.replaceChildren(ui.startButton, ui.backButton);
+      pane.replaceChildren(ui.intro, ui.controls);
+      tick();
+      return;
+    }
     grid.replaceChildren(...state.order.map((id, index) => {
       const card = cards[id];
       card.root.className = ['portrait-card', selected === id ? 'is-selected' : ''].filter(Boolean).join(' ');
       card.root.setAttribute('draggable', String(playing()));
       card.face.disabled = !playing();
+      card.face.setAttribute('aria-pressed', String(selected === id));
       card.face.setAttribute('aria-label', `${index + 1}: ${card.artwork.artist}, ${card.artwork.shortTitle}${selected === id ? ' (picked up)' : ''}`);
       card.back.textContent = state.solved ? logEntries(state)[index] : '';
       return card.root;
     }));
-    startButton.hidden = state.startedAt !== null;
-    checkButton.hidden = !playing();
-    continueButton.hidden = !state.solved;
     if (state.solved) grid.classList.add('is-flipped');
+    ui.controls.replaceChildren(...(state.solved ? [ui.backButton] : [checkButton, ui.backButton]));
+    pane.replaceChildren(ui.intro, bar.root, board, status, credit, ui.controls);
     tick();
   }
 
-  // Runs every TICK_MS: clock, counters and which dates are visible right now.
+  // Runs every TICK_MS: points bar, visible dates, scan countdown and the hint arrow.
   function tick() {
     const t = now();
+    bar.update(elapsedMs(state, t));
+    if (state.startedAt === null) return;
     const shown = revealedDates(state, t);
     const flashing = !state.solved && state.flashUntil !== null && t < state.flashUntil;
-    clock.time.textContent = formatClock(elapsedMs(state, t));
-    clock.counters.textContent = state.mistakes || state.hints ? `✕${state.mistakes} · Peeks ${state.hints} · ` : '';
-    const record = best.get();
-    clock.goal.textContent = `${record ? `Best ${formatClock(record)} · ` : ''}<${formatClock(PORTRAIT_LIMITS_MS[0])} = 15 pts`;
     for (const id of state.order) {
       const card = cards[id];
       const visible = shown.includes(id);
@@ -185,9 +236,13 @@ export function start(container, caseData, onSolved) {
       card.peek.hidden = visible || !playing() || flashing;
     }
     grid.classList.toggle('is-flashing', flashing);
-    scanNote.textContent = flashing ? `Catalogue scan · dates vanish in ${Math.ceil((state.flashUntil - t) / 1000)} s · Peek = +5 s` : '';
-    status.hidden = flashing;
     axis.bar.style.setProperty('--flash', flashing ? String((state.flashUntil - t) / FLASH_MS) : '0');
+    if (flashing) status.textContent = `Dates vanish in ${Math.ceil((state.flashUntil - t) / 1000)} s`;
+    else if (status.textContent.startsWith('Dates vanish')) status.textContent = '';
+    const wantArrow = playing() && !flashing && !state.demoDismissed;
+    if (wantArrow && arrow.hidden !== false) { arrow.hidden = false; arrowSince = t; positionArrow(); }
+    if (!wantArrow) arrow.hidden = true;
+    if (wantArrow && reducedMotion() && t - arrowSince > STATIC_ARROW_MS) dismissArrow();
   }
 
   // ---------- Images: bundled copies at once, upgraded if the Met API checks out ----------
@@ -196,16 +251,15 @@ export function start(container, caseData, onSolved) {
     const loaded = await (caseData.loadPortraits ?? loadPortraits)();
     if (disposed) return;
     for (const item of loaded) if (item.src) cards[item.id].img.src = item.src;
-    footer.offline.hidden = !loaded.some(item => item.offline);
   }
 
+  arrow.hidden = true;
   render();
   save();
   if (state.solved) report();
-  else (state.startedAt === null ? startButton : cards[state.order[0]].face).focus?.();
+  else (state.startedAt === null ? ui.startButton : cards[state.order[0]].face).focus?.();
   loadImages();
   const timer = setInterval(() => { if (!disposed) tick(); }, TICK_MS);
   timer.unref?.(); // in Node tests the timer must not keep the process alive
-  return () => { disposed = true; clearInterval(timer); };
+  return () => { disposed = true; clearInterval(timer); closePopup?.(); document.removeEventListener?.('keydown', keydown, true); };
 }
-

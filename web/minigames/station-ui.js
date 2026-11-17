@@ -22,14 +22,17 @@ export function introPopup({ task, onStart, onBack, onHelp }) {
   return { intro, help, startButton, backButton, controls: el('div', { className: 'story-actions puzzle-actions' }) };
 }
 
-/** Shows a popup like L's (help or success) inside `overlay`, makes `pane` inert, focuses the one button. */
+/** Shows a popup like L's (help or success) inside `overlay`, makes `pane` inert, focuses the one button.
+ *  Returns a close function; `close.action` is the popup's button. */
 export function showPopup({ overlay, pane, label, contents, actionLabel, onAction, keys = ['Enter', 'Escape'] }) {
   pane.inert = true;
   const action = shortcutButton(actionLabel, onAction, ...keys);
   const dialog = el('div', { className: 'puzzle-popup', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': label } }, [...contents, action]);
   overlay.replaceChildren(el('div', { className: 'puzzle-overlay' }, [dialog]));
   action.focus?.();
-  return () => { overlay.replaceChildren(); pane.inert = false; };
+  const close = () => { overlay.replaceChildren(); pane.inert = false; };
+  close.action = action;   // so the station can press it with Enter or Esc
+  return close;
 }
 
 /** The contents of the success popup: a headline, the letter slot "added to journal" and the points. */
