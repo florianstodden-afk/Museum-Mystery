@@ -20,14 +20,23 @@ Ein bestehender Anmeldestatus kann beim nächsten Besuch direkt zum Home Screen 
 | Spielstand, Position, beste Porträtzeit | Browser des jeweiligen Geräts, getrennt nach Clerk-Nutzer-ID | Zwei Konten am selben Gerät sehen getrennte Spielstände. Ein Spielstand wird noch **nicht** zwischen Geräten synchronisiert. |
 | Gemeinsame Bestenliste | Noch nicht vorhanden | Der aktuelle Scoreboard-Knopf zeigt weiterhin nur den lokalen Spielstand. |
 
+## Warum die Spielerkonten nicht im GitHub-Repository liegen
+
+GitHub Pages veröffentlicht HTML, CSS und JavaScript als statische Website. Es führt keinen Anmeldeserver aus, der Passwörter vertraulich prüfen und Konten verwalten könnte. Eine Passwortdatei im Repository wäre für andere lesbar; auch nach dem Löschen kann sie in der Git-Historie verbleiben. Die Warnung „Bitte kein wichtiges Passwort verwenden“ macht das nicht sicher. **Daher werden keine Spielerpasswörter ins Repository geschrieben.**
+
+„Mit GitHub anmelden“ wäre eine andere Möglichkeit. Dabei hätte jeder Spieler ein eigenes GitHub-Konto und würde sich über GitHub ausweisen. Das erfüllt den Wunsch nach einem eigenen Benutzernamen und Passwort **im Spiel** nicht. GitHub bleibt für Code, Dokumentation und die Website zuständig; Clerk soll die Spielerkonten verwalten.
+
+Quellen: [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages), [GitHubs Hinweise zu offengelegten Zugangsdaten](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
+
 ## Einrichtung durch ein Teammitglied
 
-1. Bei [Clerk](https://dashboard.clerk.com/) ein Projekt „Museum Mystery“ anlegen.
-2. Unter **User & authentication** nur **Username** und **Password** aktivieren. E-Mail, Telefonnummer und soziale Anmeldungen deaktivieren. Prüfen, ob die Registrierungsmaske tatsächlich nur Benutzername und Passwort verlangt.
-3. Unter **API keys** den **Publishable Key** (`pk_test_…`) kopieren und in [`web/auth-config.js`](../web/auth-config.js) zwischen die Anführungszeichen eintragen. **Niemals** den Secret Key (`sk_…`) in Dateien, Chat oder GitHub veröffentlichen.
-4. Lokal mit einem Webserver öffnen: im Ordner `web` `uv run --no-project --python 3.14 python -m http.server 8000`, dann `http://localhost:8000`. Mit zwei Testkonten registrieren, ausloggen, wieder einloggen und getrennte Spielstände prüfen.
-5. Für den Online-Test eine **separate Vorschau-URL** für diesen Branch bereitstellen. Die bestehende GitHub-Pages-Einstellung veröffentlicht nur `main`; ein Branch ist dort nicht automatisch als Vorschau erreichbar. Registrierung und Anmeldung auf der Vorschau-URL prüfen, weil `localhost` allein den Online-Betrieb nicht belegt.
-6. Erst wenn die Vorschau funktioniert, Pull Request prüfen und mergen. Danach die öffentliche Spiel-URL erneut testen. In `docs/arbeitsprotokoll.md` Datum, Person, Test und Ergebnis ergänzen.
+1. Bei [Clerk](https://dashboard.clerk.com/sign-up) zunächst ein **Verwaltungskonto** anlegen. Clerk fragt dafür aktuell E-Mail und Passwort ab oder bietet GitHub/Google an. Dieses persönliche Verwaltungskonto ist **nicht** die spätere Anmeldung der Spieler. Zugangsdaten und etwaige Bestätigung selbst im Clerk-Browserfenster eingeben; nicht im Chat oder GitHub veröffentlichen.
+2. Im Clerk-Dashboard ein Projekt „Museum Mystery“ anlegen.
+3. Unter **User & authentication** nur **Username** und **Password** aktivieren. E-Mail, Telefonnummer und soziale Anmeldungen deaktivieren. Prüfen, ob die Registrierungsmaske tatsächlich nur Benutzername und Passwort verlangt.
+4. Unter **API keys** den **Publishable Key** (`pk_test_…`) kopieren und in [`web/auth-config.js`](../web/auth-config.js) zwischen die Anführungszeichen eintragen. **Niemals** den Secret Key (`sk_…`) in Dateien, Chat oder GitHub veröffentlichen.
+5. Lokal mit einem Webserver öffnen: im Ordner `web` `uv run --no-project --python 3.14 python -m http.server 8000`, dann `http://localhost:8000`. Mit zwei Testkonten registrieren, ausloggen, wieder einloggen und getrennte Spielstände prüfen.
+6. Für den Online-Test eine **separate Vorschau-URL** für diesen Branch bereitstellen. Die bestehende GitHub-Pages-Einstellung veröffentlicht nur `main`; ein Branch ist dort nicht automatisch als Vorschau erreichbar. Registrierung und Anmeldung auf der Vorschau-URL prüfen, weil `localhost` allein den Online-Betrieb nicht belegt.
+7. Erst wenn die Vorschau funktioniert, Pull Request prüfen und mergen. Danach die öffentliche Spiel-URL erneut testen. In `docs/arbeitsprotokoll.md` Datum, Person, Test und Ergebnis ergänzen.
 
 Clerks Development-Instanz ist für einen **Kurstest** gedacht, hat laut Anbieter eine Grenze von 100 Nutzern und ist nicht für einen dauerhaften Produktivbetrieb vorgesehen. Eine Clerk-Produktivinstanz benötigt eine eigene Domain mit DNS-Zugang; die bisherige `github.io`-Adresse allein genügt dafür nicht. Wenn das Team eine dauerhafte öffentliche Version will, muss es diese Hosting-Entscheidung separat treffen.
 
