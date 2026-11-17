@@ -69,9 +69,6 @@ export function createGalleryRenderer() {
       ctx.rect(plant.cx-14,plant.cy+25,28,plant.bottom-plant.cy-25);
       ctx.clip();
       ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
-      // A faint silhouette keeps the person readable through the leaves.
-      ctx.globalAlpha=.32;
-      for(const item of behind){const p=galleryPosition(item.x,item.y);if(item.id==='player')drawPerson(p.x,p.y,'rick',facing,time,moving);else if(item.id==='restorer')drawPerson(p.x,p.y,'restorer','down',time,false);}
       ctx.restore();
     }
     ctx.restore();

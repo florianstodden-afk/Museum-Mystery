@@ -166,3 +166,11 @@ test('plant foliage is drawn in front of someone standing behind its base',()=>{
     assert.ok(actorIndex>=0 && foliageIndex>actorIndex);
   } finally {globalThis.Image=oldImage;}
 });
+
+test('lower plant foliage can be walked behind while the pots remain solid',()=>{
+  for(const [x,y] of [[9.77,12.7],[17.28,12.7]]){
+    assert.equal(galleryFootprintFits(x,y),true,`foliage should not block ${x}`);
+    const potY=14.5;
+    assert.equal(galleryFootprintFits(x,potY),false,`pot should block ${x}`);
+  }
+});
