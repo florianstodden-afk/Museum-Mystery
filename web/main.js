@@ -1,3 +1,5 @@
+import { newGame, readMission, solveStation } from './story/engine.js';
+import { STATION_IDS } from './story/case-1.js';
 import { createSecurityRenderer } from './security-room.js';
 import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
@@ -17,6 +19,11 @@ ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
 let dialogOpener = null;
+const vaultPreview = new URLSearchParams(location.search).get('vault-preview') === '1';
+let previewStory = readMission(newGame()).state;
+if (vaultPreview) for (const id of STATION_IDS) previewStory = solveStation(previewStory, id).state;
+let previewSave = JSON.stringify({story: JSON.stringify(previewStory), progress: {}});
+const previewStorage = { getItem: () => previewSave, setItem: (_key, value) => { previewSave = value; } };
 const storeKey = 'museum-mystery-walk-v1';         // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
@@ -36,10 +43,11 @@ const story = createStoryHost({
   sound,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
   storageKey: 'museum-nocturne-story-v1',
+  ...(vaultPreview ? {storage: previewStorage} : {}),
 });
 
 let state;
-try { state = restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
+try { state = vaultPreview ? {...initialState(), player: {x:17,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
 catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
@@ -316,7 +324,7 @@ function runStoryAction(action){
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
   state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();
-  try{localStorage.removeItem(oldLandscapeKey);}catch{}
+  try{if(!vaultPreview)localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
 const directions = {arrowup:[0,-1],w:[0,-1],arrowdown:[0,1],s:[0,1],arrowleft:[-1,0],a:[-1,0],arrowright:[1,0],d:[1,0]};
@@ -324,7 +332,7 @@ const heldKeys = new Map();
 let lastSavedAt=0;
 let lastStepAt=0; // time of the last footstep sound
 function currentRoom(){return state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';}
-function savePosition(){try{localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
+function savePosition(){try{if(!vaultPreview)localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
 function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
