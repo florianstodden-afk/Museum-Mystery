@@ -343,3 +343,5 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/index.html`, `web/main.js`, `web/style.css`, `web/story/journal.js` und `web/story/story.css`. Einfacher Ablauf und Zuständigkeit der Dateien: [docs/menu-journal-leon.md](menu-journal-leon.md).
 - **Prüfung:** 217 Node-Tests bestanden; Syntax- und Diff-Prüfung ohne Fehler. Im lokalen Browser die Home- und Spiel-Journale, `J`, `Esc`, Menütexte und Rückkehr vom Lesen von Ms Nachricht zum Home Screen geprüft; Desktopansichten visuell angesehen.
 - **Offen:** Leon an seiner Position manuell mit `E` prüfen, vollständige Runde und echtes Smartphone prüfen. Kein GitHub-Merge durch Codex.
+- **Nachtrag vor dem Merge:** PR #19 mit Station-I-Änderungen wurde zwischenzeitlich nach `main` gemergt. Dieser Branch wurde auf den neuen Stand gesetzt; danach bestanden 227 Tests.
+- **Weiterer Nachtrag:** PR #21 entfernte den „Nothing nearby“-Dialog. Beim erneuten Abgleich blieben diese Änderung und Leons E-Interaktion erhalten; 231 Tests bestanden.

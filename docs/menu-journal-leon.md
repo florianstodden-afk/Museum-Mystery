@@ -27,3 +27,7 @@ Die Spielstände, Punktregeln und vier Minispiele wurden nicht geändert. Ein ne
 - `node --check main.js` und `git diff --check`: ohne Fehler.
 - Lokaler Browser: Home Screen → Journal → schließen → Home Screen; `J` auf dem Home Screen; im Spiel `Esc` → Menü mit dynamischen Ton-/Musiktexten; Menü → Journal; `J` im Spiel; Home Journal → „Read M’s message“ → Schließen → Home Screen. Menü und Journal wurden als Desktop-Ansichten visuell mit den Vorlagen verglichen.
 - Noch von der Gruppe durchzuspielen: Gespräch mit Leon per `E` an seiner Position, vollständige Spielrunde und Ansicht auf einem echten Smartphone.
+
+**Nachtrag vor dem Merge:** Zwischenzeitlich wurde PR #19 mit weiteren Änderungen an Station I nach `main` gemergt. Dieser Branch wurde darauf aktualisiert; anschließend bestanden **227 Tests**. Die Funktionen aus PR #19 bleiben erhalten.
+
+Danach wurde auch PR #21 (kein „Nothing nearby“-Dialog mehr) gemergt. Der Branch enthält beide Änderungen; nach dem erneuten Abgleich bestanden **231 Tests**.
