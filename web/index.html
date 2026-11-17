@@ -4,11 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css?v=home-reference-1">
+  <link rel="stylesheet" href="style.css?v=in-game-menu-1">
   <link rel="stylesheet" href="story/story.css?v=ending-screen-1">
 </head>
 <body>
-  <section id="home-screen" class="home-screen" aria-labelledby="home-title">
+  <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
+    <div class="entry-artboard">
+      <img class="entry-backdrop" src="assets/login-screen-reference.jpg" alt="" aria-hidden="true">
+      <h1 id="entry-title" class="entry-mobile-title">The Night of the Forgery</h1>
+      <div id="entry-choices" class="entry-choices">
+        <button id="entry-login" type="button" aria-label="Log In"><span>Log In</span></button>
+        <button id="entry-signup" type="button" aria-label="Sign Up"><span>Sign Up</span></button>
+      </div>
+      <p id="entry-status" class="entry-status">Accounts coming soon · play as guest</p>
+      <div id="entry-panel" class="entry-panel" hidden>
+        <button id="entry-back" type="button" class="entry-back">← Back</button>
+        <h2 id="entry-panel-title">Log In</h2>
+        <p>Accounts are coming later. You can play the complete game as a guest now.</p>
+        <button id="entry-continue" type="button" class="entry-continue">Continue as guest</button>
+        <p class="entry-local-note">Progress is saved on this device only.</p>
+      </div>
+    </div>
+  </section>
+  <section id="home-screen" class="home-screen" aria-labelledby="home-title" inert>
     <div class="home-artboard">
       <img class="home-backdrop" src="assets/home-screen-reference.jpg" alt="" aria-hidden="true">
       <h1 id="home-title" class="home-mobile-title">The Night of the Forgery</h1>
@@ -39,14 +57,10 @@
       </div>
     </div>
   </section>
+  <button id="game-menu-toggle" class="game-menu-toggle" type="button" aria-label="Open in-game menu" aria-expanded="false" aria-controls="game-menu" hidden><span aria-hidden="true">⚙</span></button>
   <main class="shell" inert>
-    <header class="topbar">
-      <div><p class="eyebrow">MUSEUM MYSTERY · CHAPTER 01</p><h1>The Night of the Forgery</h1></div>
-      <div class="top-actions"><button id="home-button" class="plain" type="button">Home</button><button id="sound-toggle" class="plain" type="button" aria-pressed="true">🔊 Sound</button><button id="music-toggle" class="plain" type="button" aria-pressed="false">♪ Music</button><button id="hint" class="plain">💡 Hint</button><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ New Game</button></div>
-    </header>
     <section class="game-layout">
       <div class="stage-wrap">
-        <div class="stage-head"><span id="room">Great Hall</span><span>WASD / arrows to move · E to interact / close</span></div>
         <canvas id="game" width="1792" height="1152" tabindex="0" aria-label="Walkable 2D museum map"></canvas>
         <div class="controls" aria-label="Touch movement controls">
           <button data-move="up" aria-label="Move up">▲</button>
@@ -64,9 +78,24 @@
     </section>
     <p class="credit">Fictional museum and characters. Artwork data and image: <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a>.</p>
   </main>
+  <div id="game-menu" class="game-menu" role="dialog" aria-modal="true" aria-labelledby="game-menu-title" hidden>
+    <div class="game-menu-card">
+      <header class="game-menu-heading"><h2 id="game-menu-title">The Night of the Forgery</h2><p>In-game menu</p></header>
+      <div class="game-menu-grid">
+        <button id="sound-toggle" type="button" aria-pressed="true">🔊 Sound</button>
+        <button id="music-toggle" type="button" aria-pressed="false">♪ Music</button>
+        <button id="hint" type="button">💡 Hint</button>
+        <button id="journal-toggle" type="button" aria-expanded="false" aria-controls="sidebar">▣ Journal</button>
+      </div>
+      <div class="game-menu-actions">
+        <button id="game-menu-resume" type="button">Resume Game</button>
+        <button id="home-button" type="button">Exit to Main Menu</button>
+      </div>
+    </div>
+  </div>
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=home-reference-vault-2"></script>
+  <script type="module" src="main.js?v=in-game-menu-1"></script>
 </body>
 </html>

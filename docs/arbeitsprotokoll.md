@@ -309,3 +309,19 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Tests:** `cd web && node --test`: **226 bestanden** (6 neue in `station-ui.test.js`, UI-Tests von Station I auf den neuen Ablauf umgeschrieben).
 - **Vergleich:** `web/dev/station-compare.html` zeigt L und I nebeneinander im Spieldialog; Bilder in `web/dev/shots/` (Übersicht `index.html`), aufgenommen im eingebauten Browser statt mit Playwright.
 - **Offen:** Playwright ist auf diesem Rechner nicht installiert; `web/dev/e2e-station-i.mjs` ist auf den neuen Ablauf angepasst, aber nicht ausgeführt. Hauptspiel-Dialog nicht direkt gemessen.
+
+### 2026-11-17 - Gast-Einstieg als Vorbereitung auf späteren Login
+
+- **Auftrag:** Florian möchte bereits jetzt die Bildvorlage als ersten Bildschirm, dann einen Klick durch eine vorläufige Anmeldeansicht zum Home Screen und erst danach ins Spiel mit Ms Missionsnachricht. Die echte Anmeldung soll später entstehen; er möchte einen fertigen Pull Request zum Mergen.
+- **Umsetzung mit KI-Unterstützung:** Die bereitgestellte Bilddatei `Gemini_Generated_Image_keehk8keehk8keeh.jpg` wurde als `web/assets/login-screen-reference.jpg` eingebunden. „Log In“ und „Sign Up“ sind echte Tastatur- und Mausknöpfe über dem Bild und öffnen getrennte Gast-Ansichten. Diese erklären, dass Konten noch nicht verfügbar sind. **Continue as guest** öffnet den bestehenden Home Screen; dort startet das Spiel wie bisher. Kein Konto, Passwort oder Online-Dienst wurde hinzugefügt. Details: `docs/guest-entry-flow.md`.
+- **Prüfung:** 217 Node-Tests bestanden, Syntax und Diff ohne Fehler. Im lokalen Browser beide Einstiege, Back, Übergang zum Home Screen und **Start New Game → Ms Nachricht** geprüft. Erste Ansicht und Sign-Up-Ansicht visuell geprüft.
+- **Offen:** Nach dem Merge die öffentliche GitHub-Pages-Seite einmal vollständig durchklicken. Eine echte Anmeldung und gemeinsame Bestenliste bleiben spätere Entscheidungen.
+
+### 2026-11-17 - Ruhige Spielansicht mit Zahnrad-Menü
+
+- **Beteiligte:** Florian Stodden (Auftrag und Bildreferenz), Codex (Umsetzung), Branch `codex/in-game-menu`.
+- **Ausgangslage:** Auf `main` war der Gast-Einstieg aus PR #17 bereits vorhanden. Während des Spiels waren Titel, Steuerungshinweis und mehrere Aktionen dauerhaft über dem Museum eingeblendet.
+- **Entscheidung:** Die Szene zeigt nur ein Zahnrad. Sound, Music, Hint, Journal, Resume Game und Exit to Main Menu stehen im neuen Menü. Die Steuerungsanleitung und New Game sind dort bewusst nicht enthalten; ein Neustart bleibt auf dem Home Screen. Die tatsächlichen Touchknöpfe bleiben für Handys. Die Bilddatei `Gemini_Generated_Image_wqqnhqwqqnhqwqqn.jpg` diente nur als Vorlage.
+- **Umsetzung:** `web/index.html` enthält den Zahnradknopf und das Menü, `web/style.css` gestaltet beides, `web/main.js` steuert Öffnen, Schließen, Pause, Tastaturfokus und Übergänge. [Details und Klickfolge](in-game-menu.md).
+- **Prüfung:** 217 Node-Tests bestanden. Im lokalen Browser wurden Gast-Einstieg, Missionsstart, Zahnrad, Sound/Music, Hint, Journal, Resume und Exit zum Home Screen durchgeklickt. Syntax- und Diff-Prüfung ohne Fehler.
+- **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
