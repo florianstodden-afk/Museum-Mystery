@@ -1,21 +1,24 @@
 // Station I (Portrait Hall): pure rules, no DOM.
-// The player orders three portrait cards from the oldest to the newest painting.
+// Speedrun: press Start, memorise the dates during the "catalogue flash",
+// then put the three portraits in order, oldest first. Mistakes and peeks cost time, not points.
 // A card is identified by its Met object ID.
 import { CASE, workById } from '../story/case-1.js';
 
 export const PORTRAIT_IDS = Object.freeze([...CASE.stations.find(station => station.id === 'portraits').metIds]);
-export const MAX_HINTS = 2;
 
-// The back of each card: one part of the fictional night-shift log.
-// Read in the right order (oldest → newest painting) they form the full log.
+export const FLASH_MS = 3000;     // how long all dates show after Start
+export const PEEK_MS = 1500;      // how long one date shows after Peek
+export const PENALTY_MS = 5000;   // added to the clock for a peek or a wrong check
+
+// The back of each card: one short line of the fictional night-shift log.
+// Read in the right order (oldest → newest painting) they form the log.
 export const LOG_BACKS = Object.freeze({
-  436121: '21:02–21:18 · Leon – round of the east wing and the east stairs. All doors checked.',
-  12127: '21:14 · Delivery bay – transport cart signed out. Booked as: patron visit – A. V.',
-  435876: '21:20 · Leon – back at the front desk. Coffee, radio check.',
+  436121: '21:02 · Leon – east wing round',
+  12127: '21:14 · Cart out – “patron visit, A. V.”',
+  435876: '21:20 · Leon – back at the desk',
 });
 
-// The correct order comes from the frozen, checked snapshot in case-1.js – never from live data.
-// For a date range (e.g. 1883–84) the start year counts. Ties would fall back to end year, then ID.
+/** The correct order, from the frozen snapshot in case-1.js (start year first, then end year, then ID). */
 export function correctOrder(ids = PORTRAIT_IDS, findWork = workById) {
   return [...ids].sort((a, b) => {
     const workA = findWork(a);
@@ -30,7 +33,7 @@ function sameOrder(a, b) {
   return a.length === b.length && a.every((id, index) => id === b[index]);
 }
 
-// A shuffled start that is never already solved.
+/** A shuffled, never-solved start with the clock not yet running. */
 export function initialTimeline(random = Math.random) {
   const order = [...PORTRAIT_IDS];
   for (let i = order.length - 1; i > 0; i--) {
@@ -38,71 +41,97 @@ export function initialTimeline(random = Math.random) {
     [order[i], order[j]] = [order[j], order[i]];
   }
   if (sameOrder(order, correctOrder())) order.push(order.shift());
-  return { order, solved: false, mistakes: 0, hints: 0, revealed: [] };
+  return { order, solved: false, mistakes: 0, hints: 0, startedAt: null, finishedAt: null, penaltyMs: 0, flashUntil: null, peek: null };
 }
 
-function isCount(value) {
-  return Number.isInteger(value) && value >= 0;
+const isCount = value => Number.isInteger(value) && value >= 0;
+const isTime = value => value === null || (Number.isFinite(value) && value >= 0);
+
+/** Brings a save from before the speedrun up to date (missing time fields become "not started"). */
+export function upgradeTimeline(saved) {
+  if (!saved || typeof saved !== 'object') return saved;
+  const { revealed, ...rest } = saved;   // `revealed` belonged to the old hint system
+  return { startedAt: null, finishedAt: null, penaltyMs: 0, flashUntil: null, peek: null, ...rest };
 }
 
-// Checks a saved state. Broken or foreign data returns false and the station starts fresh.
-export function validTimeline(state) {
+/** Checks a (possibly old) saved state. Broken or foreign data returns false and the station starts fresh. */
+export function validTimeline(saved) {
+  const state = upgradeTimeline(saved);
   if (!state || typeof state !== 'object') return false;
-  const { order, solved, mistakes, hints, revealed } = state;
+  const { order, solved, mistakes, hints, startedAt, finishedAt, penaltyMs, flashUntil, peek } = state;
   if (!Array.isArray(order) || order.length !== PORTRAIT_IDS.length) return false;
   if (new Set(order).size !== order.length || !order.every(id => PORTRAIT_IDS.includes(id))) return false;
-  if (typeof solved !== 'boolean' || !isCount(mistakes) || !isCount(hints) || hints > MAX_HINTS) return false;
-  if (solved && !sameOrder(order, correctOrder())) return false;
-  // `revealed` lists the cards whose place a hint showed: first the oldest, then the newest.
-  if (!Array.isArray(revealed) || revealed.length !== hints) return false;
-  return revealed.every((id, index) => id === hintTarget(index));
+  if (typeof solved !== 'boolean' || !isCount(mistakes) || !isCount(hints) || !isCount(penaltyMs)) return false;
+  if (!isTime(startedAt) || !isTime(finishedAt) || !isTime(flashUntil)) return false;
+  if (finishedAt !== null && (startedAt === null || finishedAt < startedAt || !solved)) return false;
+  if (peek !== null && (typeof peek !== 'object' || !PORTRAIT_IDS.includes(peek.id) || !isTime(peek.until))) return false;
+  return !solved || sameOrder(order, correctOrder());
 }
 
-// Which card the n-th hint reveals (0 = oldest, 1 = newest).
-function hintTarget(hintIndex) {
-  const correct = correctOrder();
-  return hintIndex === 0 ? correct[0] : correct[correct.length - 1];
+/** Start: the clock runs and all dates show for FLASH_MS. Pressing it again (or reopening) changes nothing. */
+export function startTimeline(state, now = Date.now()) {
+  if (state.startedAt !== null || state.solved) return state;
+  // An old save may already hold the right order; then the cards are mixed again, so there is always something to sort.
+  const order = sameOrder(state.order, correctOrder()) ? [...state.order.slice(1), state.order[0]] : state.order;
+  return { ...state, order, startedAt: now, flashUntil: now + FLASH_MS };
 }
 
-// Move one card to a new position; the others shift. Solved timelines stay as they are.
+const playing = state => state.startedAt !== null && !state.solved;
+
+/** Peek: shows one date for PEEK_MS and costs PENALTY_MS. Not needed (and not allowed) during the flash. */
+export function peekDate(state, id, now = Date.now()) {
+  if (!playing(state) || !PORTRAIT_IDS.includes(id) || now < state.flashUntil) return state;
+  return { ...state, hints: state.hints + 1, penaltyMs: state.penaltyMs + PENALTY_MS, peek: { id, until: now + PEEK_MS } };
+}
+
+/** The cards whose date is visible right now. */
+export function revealedDates(state, now = Date.now()) {
+  if (state.solved) return [...PORTRAIT_IDS];
+  if (state.flashUntil !== null && now < state.flashUntil) return [...PORTRAIT_IDS];
+  if (state.peek && now < state.peek.until) return [state.peek.id];
+  return [];
+}
+
+/** Moves one card to a new position; the others shift. Only while the clock runs. */
 export function moveCard(state, card, toIndex) {
   const from = state.order.indexOf(card);
-  if (state.solved || from === -1 || !Number.isInteger(toIndex) || toIndex < 0 || toIndex >= state.order.length) return state;
+  if (!playing(state) || from === -1 || !Number.isInteger(toIndex) || toIndex < 0 || toIndex >= state.order.length) return state;
   if (from === toIndex) return state;
   const order = state.order.filter(id => id !== card);
   order.splice(toIndex, 0, card);
   return { ...state, order };
 }
 
-// Swap two cards (click one card, then another).
+/** Swaps two cards (click one, then another, or press two numbers). */
 export function swapCards(state, a, b) {
   const indexA = state.order.indexOf(a);
   const indexB = state.order.indexOf(b);
-  if (state.solved || indexA === -1 || indexB === -1 || a === b) return state;
+  if (!playing(state) || indexA === -1 || indexB === -1 || a === b) return state;
   const order = [...state.order];
   order[indexA] = b;
   order[indexB] = a;
   return { ...state, order };
 }
 
-// "Check order": a wrong order counts one mistake and the cards stay movable.
-export function checkOrder(state, correct = correctOrder()) {
-  if (state.solved) return state;
-  if (sameOrder(state.order, correct)) return { ...state, solved: true };
-  return { ...state, mistakes: state.mistakes + 1 };
+/** "Check order": right stops the clock; wrong counts a mistake and adds PENALTY_MS. */
+export function checkOrder(state, now = Date.now(), correct = correctOrder()) {
+  if (!playing(state)) return state;
+  if (sameOrder(state.order, correct)) return { ...state, solved: true, finishedAt: Math.max(now, state.startedAt), peek: null };
+  return { ...state, mistakes: state.mistakes + 1, penaltyMs: state.penaltyMs + PENALTY_MS };
 }
 
-// Up to two hints: the first reveals the oldest work, the second the newest.
-export function useHint(state) {
-  if (state.solved || state.hints >= MAX_HINTS) return state;
-  return { ...state, hints: state.hints + 1, revealed: [...state.revealed, hintTarget(state.hints)] };
+/** Time on the clock: real time since Start plus all penalties. Stops when solved. */
+export function elapsedMs(state, now = Date.now()) {
+  if (!state || state.startedAt == null) return 0;
+  return Math.max(0, (state.finishedAt ?? now) - state.startedAt) + (state.penaltyMs ?? 0);
 }
 
+/** True once the right order was checked. */
 export function isSolved(state) {
   return state.solved === true;
 }
 
-// The log, read from the backs of the cards in the player's (correct) order.
+/** The log, read from the backs of the cards in the player's (correct) order. */
 export function logEntries(state) {
   return state.order.map(id => LOG_BACKS[id]);
 }

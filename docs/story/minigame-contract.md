@@ -113,4 +113,6 @@ Station I (Portrait Hall) erfüllt diesen Vertrag als zweites Beispiel nach Stat
 Die Zuordnung der Werke zu den Stationen 2–4 ist eine Annahme der Story-Logik (das Konzept nennt nur die Werkliste). Wenn ihr andere Werke nehmt, bitte `metIds` in `web/story/case-1.js` anpassen.
 
 
-Station L integration: host preserves cleanup and saved progress. Renoir completion time awards 15 (<=30s), 10 (<=45s), 5 (<=60s), or 0 points. Other stations keep standard scoring; total maximum is 95. Saved completed legacy L rewards are capped at 15; unfinished puzzles award nothing.
+Station L integration: host preserves cleanup and saved progress. Renoir completion time awards 15 (<=30s), 10 (<=45s), 5 (<=60s), or 0 points. Other stations keep standard scoring; total maximum is 90 (since Station I is timed too). Saved completed legacy L rewards are capped at 15; unfinished puzzles award nothing.
+
+**Station I als Speedrun (17.11.2026):** Wie Station L meldet Station I nur `onSolved({ mistakes, hints })` und speichert ihre Zeit im Fortschritt (`startedAt`, `finishedAt`, `penaltyMs`). Die Punkte setzt `synchronizeScore` in `scoring.js` aus dieser Zeit: `portraitSpeedPoints` gibt 15 (≤ 20 s), 10 (≤ 35 s), 5 (≤ 50 s) oder 0. Gelöst ohne gespeicherte Zeit (alter Spielstand) → 5. Die Uhr startet mit „Start“, läuft beim Schließen weiter und stoppt beim Lösen; Peek und falsches Prüfen kosten je 5 s. `hints` zählt die Peeks.

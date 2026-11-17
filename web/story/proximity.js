@@ -5,8 +5,8 @@
 // The gap between NEAR and FAR (hysteresis) stops the box from flickering at the edge.
 // After "Goodbye" the player has to walk away once before the box opens again.
 
-export const NEAR = 0.8;
-export const FAR = 1.3;
+export const NEAR = 1.0;
+export const FAR = 1.5;
 
 // distance: tiles between player and character
 // wasNear: true after a talk opened, until the player walks away

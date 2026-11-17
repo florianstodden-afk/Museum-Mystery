@@ -1,93 +1,99 @@
-/* Station I – Portrait Hall timeline. Loaded by portrait-timeline.js itself.
-   Colours and text styles come from web/story/story.css (--story-* variables, story-* classes). */
+/* Station I – Portrait Hall speedrun. Loaded by portrait-timeline.js itself.
+   One accent colour: gold. Colours and fonts come from web/story/story.css (--story-* variables). */
 
 /* A little more room in the dark story dialog while this station is open. */
 .dialog-card.story-dark-card:has(.portrait-timeline),
-.story-modal:has(.portrait-timeline) { max-width: 780px; width: min(780px, calc(100vw - 24px)); }
+.story-modal:has(.portrait-timeline) { max-width: 860px; width: min(860px, calc(100vw - 24px)); }
+/* The clock sits in the dialog's top corner. A modal <dialog> is already positioned; the game's card needs this. */
+.dialog-card.story-dark-card:has(.portrait-timeline) { position: relative; }
+/* Continue, × and Escape close the station, so the host's extra close row and note are not needed here. */
+.story-scene:has(.portrait-timeline) + .story-actions,
+.story-scene:has(.portrait-timeline) > .story-feedback { display: none; }
 
-.portrait-timeline { font-size: .95rem; }
-.portrait-task { margin-bottom: 4px; }
-.portrait-help { margin: 0 0 12px; font-size: .82rem; }
+.portrait-timeline { --gold: var(--story-gold, #e0b660); font-size: .95rem; color: var(--story-ink, #ece6d8); }
+.portrait-timeline [hidden] { display: none !important; }
 
-.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.portrait-card { position: relative; perspective: 1200px; min-width: 0; }
-.portrait-inner { position: relative; height: 100%; transform-style: preserve-3d; transition: transform .7s ease; }
-.portrait-front, .portrait-back {
-  display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 8px;
-  border: 1px solid #6e5a38; border-radius: 10px; background: #121c23;
-  box-shadow: 0 8px 20px #0007; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-}
+/* Clock: top right, next to the dialog's × */
+.portrait-clock { position: absolute; z-index: 3; top: 14px; right: 74px; display: grid; justify-items: end; line-height: 1; }
+.portrait-time { font: 600 2.1rem/1 Georgia, serif; color: var(--gold); font-variant-numeric: tabular-nums; transition: color .3s; }
+.portrait-clock-sub { margin-top: 4px; font-size: .74rem; color: var(--story-muted, #a9b3b8); }
+.portrait-clock.is-penalty .portrait-time { color: #e0645a; }
 
-/* Front: the portrait in a thin gold frame, like the frames in the Great Hall. */
-.dialog-card .portrait-face, .portrait-face {
-  display: flex; flex-direction: column; gap: 6px; width: 100%; margin: 0; padding: 0;
-  background: transparent; border: 0; border-radius: 6px; color: var(--story-ink); cursor: grab; text-align: left;
-}
-.portrait-face img {
-  display: block; width: 100%; height: 190px; max-height: none; object-fit: contain;
-  background: #0b1217; border: 3px solid #b8965c; border-radius: 3px; box-shadow: inset 0 0 0 2px #5c4a2c;
-}
+/* Task line with the "?" */
+.portrait-task { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.portrait-help { display: inline-grid; place-items: center; width: 20px; height: 20px; border: 1px solid #8a8f8f; border-radius: 50%; font-size: .75rem; color: var(--story-muted, #a9b3b8); cursor: help; }
+.portrait-help:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.portrait-help-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Three equal cards */
+.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; position: relative; }
+.portrait-card { min-width: 0; perspective: 1200px; }
+.portrait-inner { position: relative; transition: transform .6s ease; transform-style: preserve-3d; }
+.portrait-front { display: grid; gap: 2px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.dialog-card .portrait-face, .portrait-face { display: block; width: 100%; margin: 0 0 6px; padding: 0; background: #0b1217; border: 2px solid #b8965c; border-radius: 3px; cursor: grab; transition: transform .18s, box-shadow .18s; }
+.dialog-card .portrait-timeline .portrait-face:hover, .portrait-timeline .portrait-face:hover { background: #0b1217; }
+.portrait-face img { display: block; width: 100%; height: clamp(110px, 26vh, 210px); object-fit: contain; }
 .portrait-face:disabled { cursor: default; opacity: 1; }
-/* The main game's dialog gives every button a blue hover background; the cards keep theirs clear. */
-.dialog-card .portrait-timeline .portrait-face:hover, .portrait-timeline .portrait-face:hover { background: transparent; }
-.portrait-caption { display: grid; gap: 1px; min-height: 2.6em; font-size: .82rem; line-height: 1.25; }
-.portrait-caption strong { color: #f8e9c9; font-family: Fraunces, Georgia, serif; font-weight: 600; }
-.portrait-caption span { color: var(--story-muted); }
-/* margin-top: auto keeps all three buttons on one line, even when a title needs two lines. */
-.portrait-timeline .portrait-front .portrait-catalogue-button { width: 100%; margin: auto 0 0; padding: 6px 8px; font-size: .8rem; }
+.portrait-face:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.portrait-card.is-selected .portrait-face { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold); transform: translateY(-3px); }
+.portrait-card.is-target .portrait-face { box-shadow: 0 0 0 3px #f3d48b; }
+.portrait-artist { font: 600 1rem/1.25 Georgia, serif; color: #f8e9c9; }
+.portrait-title { font-size: .85rem; color: var(--story-muted, #a9b3b8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.portrait-meta { display: flex; align-items: center; gap: 8px; min-height: 26px; margin-top: 4px; }
+.portrait-chip { padding: 2px 10px; border-radius: 99px; background: var(--gold); color: #1d2931; font-weight: 700; font-size: .85rem; animation: portrait-fade-in .2s; }
+.dialog-card .portrait-peek, .portrait-peek { padding: 2px 10px; border: 1px dashed #8a7a55; border-radius: 99px; background: transparent; color: var(--story-muted, #a9b3b8); font-size: .8rem; cursor: pointer; }
+.portrait-peek:hover, .portrait-peek:focus-visible { color: var(--gold); border-color: var(--gold); }
+.portrait-link { margin-left: auto; color: var(--story-muted, #a9b3b8); text-decoration: none; font-size: .85rem; }
+.portrait-link:hover, .portrait-link:focus-visible { color: var(--gold); }
+@keyframes portrait-fade-in { from { opacity: 0; } }
 
-/* Hover, focus and the picked-up card */
-.portrait-card:hover .portrait-front { border-color: #a88a52; }
-.portrait-face:focus-visible { outline: 3px solid var(--story-gold); outline-offset: 3px; }
-.portrait-card.is-selected .portrait-front { border-color: var(--story-gold); box-shadow: 0 0 0 2px var(--story-gold), 0 10px 24px #0009; }
-.portrait-card.is-selected .portrait-face img { border-color: var(--story-gold); }
-.portrait-badge {
-  position: absolute; top: 14px; left: 14px; z-index: 1; padding: 2px 8px; border-radius: 99px;
-  background: var(--story-gold); color: #1d2931; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-}
+/* Catalogue scan: a thin gold line runs over the cards while the dates show */
+.portrait-cards.is-flashing::after { content: ''; position: absolute; top: 0; bottom: 70px; width: 3px; background: linear-gradient(transparent, var(--gold), transparent); box-shadow: 0 0 14px var(--gold); animation: portrait-scan 1.5s ease-in-out 2 alternate; pointer-events: none; }
+@keyframes portrait-scan { from { left: 0; } to { left: calc(100% - 3px); } }
 
-/* Catalogue entry: lies over the picture, so opening it does not change the dialog height. */
-.portrait-catalogue {
-  position: absolute; left: 8px; right: 8px; top: 8px; height: 190px; z-index: 2; overflow: auto;
-  display: grid; align-content: start; gap: 4px; padding: 10px; border-radius: 4px;
-  background: #0d151bf2; border: 1px solid var(--story-gold-deep); font-size: .8rem; line-height: 1.35;
-}
-.portrait-catalogue strong { color: #f8e9c9; font-family: Fraunces, Georgia, serif; font-weight: 600; }
-.portrait-catalogue a { color: var(--story-gold); }
+/* Back: one log line, shown after the right order */
+.portrait-back { position: absolute; inset: 0 0 auto; height: clamp(110px, 26vh, 210px); display: grid; place-items: center; margin: 0; padding: 12px; text-align: center; transform: rotateY(180deg); backface-visibility: hidden; -webkit-backface-visibility: hidden; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border: 2px solid #b8965c; border-radius: 3px; font: .9rem/1.4 ui-monospace, Menlo, monospace; }
+.portrait-cards.is-flipped .portrait-inner { transform: rotateY(180deg); }
+.portrait-cards.is-flipped .portrait-front > :not(.portrait-face) { visibility: hidden; }
 
-/* Back: the log entry. Shown by turning the card over after the right order. */
-.portrait-back { position: absolute; inset: 0; transform: rotateY(180deg); justify-content: center; background: linear-gradient(170deg, #e7dcc5, #d6c7a6); color: #213039; border-color: #b8965c; }
-.portrait-back .story-eyebrow { color: #805a23; }
-.portrait-back p { margin: 0; font-family: ui-monospace, Menlo, monospace; font-size: .86rem; line-height: 1.45; }
-.portrait-card.is-flipped .portrait-inner { transform: rotateY(180deg); }
+/* Timeline with three numbered places and the flash progress bar */
+.portrait-axis { margin: 14px 0 0; }
+.portrait-axis-row { display: flex; align-items: center; gap: 8px; }
+.portrait-slot { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #8a8f8f; border-radius: 50%; font-size: .75rem; color: var(--story-muted, #a9b3b8); }
+.portrait-line { flex: 1; height: 1px; background: #5d6668; }
+.portrait-axis-label { margin-left: 10px; font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--story-muted, #a9b3b8); }
+.portrait-flashbar { display: block; height: 3px; margin-top: 10px; border-radius: 2px; background: linear-gradient(90deg, #b8965c, #f3d48b) left / calc(var(--flash, 0) * 100%) 100% no-repeat; }
 
-/* Timeline under the cards */
-.portrait-axis { display: flex; align-items: center; gap: 10px; margin: 10px 0 0; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--story-muted); }
-.portrait-axis-line { flex: 1; height: 2px; background: linear-gradient(90deg, #6e5a38, var(--story-gold)); position: relative; }
-.portrait-axis-line::after { content: ''; position: absolute; right: -2px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--story-gold); }
+/* One action row */
+.portrait-actions { display: flex; align-items: center; gap: 14px; margin-top: 12px; min-height: 44px; }
+.dialog-card .portrait-primary, .portrait-primary { margin: 0; padding: 9px 18px; background: var(--gold); color: #1d2931; border: 0; font-weight: 700; }
+.portrait-primary.is-ready { animation: portrait-pulse .8s ease-out 1; }
+@keyframes portrait-pulse { 50% { box-shadow: 0 0 0 6px #e0b66055; } }
+.portrait-scan-note { margin-left: auto; font-size: .85rem; color: var(--story-muted, #a9b3b8); }
+.portrait-status { margin: 0 0 0 auto; font-size: .85rem; color: var(--story-muted, #a9b3b8); text-align: right; }
 
-.portrait-actions { margin-top: 10px; }
-.portrait-counter { margin: 8px 0 0; }
-.portrait-status { min-height: 1.4em; }
-.portrait-log { margin-top: 4px; }
-.portrait-log:empty { display: none; }
-.portrait-log-list { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-family: ui-monospace, Menlo, monospace; font-size: .84rem; }
-.portrait-verdict { margin: 8px 0 0; color: #f8e9c9; font-weight: 600; }
-.portrait-sources { margin-top: 10px; font-size: .76rem; }
-.portrait-sources a { color: var(--story-gold); }
+/* Footer: one small line */
+.portrait-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: .74rem; color: var(--story-muted, #a9b3b8); }
+.dialog-card .portrait-info, .portrait-info { display: inline-grid; place-items: center; width: 20px; height: 20px; margin: 0; padding: 0; border: 1px solid #8a8f8f; border-radius: 50%; background: transparent; color: inherit; font-size: .72rem; }
+.portrait-sources { flex-basis: 100%; margin: 2px 0 0; }
+.portrait-sources a { color: var(--gold); }
 
-/* Phones: cards below each other, image beside the caption to save height. */
+/* Phones: three small cards side by side, smaller text, no scrolling */
 @media (max-width: 600px) {
-  .portrait-cards { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .portrait-timeline .portrait-face { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 10px; }
-  .portrait-timeline .portrait-face img { height: 120px; }
-  .portrait-timeline .portrait-help { display: none; } /* keyboard help is not needed on a phone */
-  .portrait-catalogue { height: auto; bottom: 46px; }
+  .portrait-clock { position: static; justify-items: start; margin-bottom: 8px; }
+  .portrait-time { font-size: 1.6rem; }
+  .portrait-cards { gap: 8px; }
+  .portrait-face img, .portrait-back { height: 120px; }
+  .portrait-artist { font-size: .8rem; }
+  .portrait-title { font-size: .72rem; }
+  .portrait-meta { flex-wrap: wrap; gap: 4px; }
+  .portrait-chip, .portrait-peek { font-size: .7rem; padding: 1px 6px; }
+  .portrait-back { font-size: .7rem; padding: 6px; }
+  .portrait-axis-label { display: none; }
+  .portrait-actions { flex-wrap: wrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portrait-inner { transition: none; }
+  .portrait-inner, .portrait-face, .portrait-time { transition: none; }
+  .portrait-cards.is-flashing::after, .portrait-chip, .portrait-primary.is-ready { animation: none; }
 }
-
-/* .story-actions sets display:flex, which would beat the browser's [hidden] rule. */
-.portrait-timeline [hidden] { display: none !important; }

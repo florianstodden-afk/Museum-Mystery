@@ -24,7 +24,7 @@ Der [Kursüberblick](https://nova-sbe-introduction-to-programming.github.io/intr
 
 ### Aktueller Prototyp: Die Nacht der Fälschung
 
-Seit dem 12.11.2026 läuft im Hauptspiel die **Nocturne-Story** (Kurzfassung: [docs/spielkonzept-kurz.md](docs/spielkonzept-kurz.md)). „M“ schickt die Spielfigur los, Van Goghs *Wheat Field with Cypresses* aus dem Safe zu holen. Vier Stationen in beliebiger Reihenfolge geben die Buchstaben B‑I‑L‑D; die Tresortür zwischen Galerie und Depot öffnet sich mit diesem Wort. Im Depot folgen die Schlussfrage und zwei Enden (*The Heist* / *The Open File*), maximal 95 Punkte. Station B ist das echte Landschafts-Minispiel. **Station I (Porträtsaal)** ist eine Zeitleiste: Man ordnet drei echte Met-Porträts (Degas, Sargent, Cézanne) mithilfe ihrer Katalogdaten vom ältesten zum jüngsten, dann drehen sich die Karten um und ergeben das Nachtschichtprotokoll, das Wachmann Leon entlastet (`web/minigames/portrait-*`). Station L ist das Renoir-Bilderpuzzle (Tab, Enter/Leertaste, Klick oder Drag-and-drop). Station D bleibt ein Platzhalter. Ein Hinweis-Knopf verhindert, dass jemand feststeckt. Bewegung: WASD oder Pfeiltasten, Interaktion: `E`. Die alte Prototyp-Story (drei Belege, Ausweis, Code 2114) liegt unverändert in `web/legacy/`.
+Seit dem 12.11.2026 läuft im Hauptspiel die **Nocturne-Story** (Kurzfassung: [docs/spielkonzept-kurz.md](docs/spielkonzept-kurz.md)). „M“ schickt die Spielfigur los, Van Goghs *Wheat Field with Cypresses* aus dem Safe zu holen. Vier Stationen in beliebiger Reihenfolge geben die Buchstaben B‑I‑L‑D; die Tresortür zwischen Galerie und Depot öffnet sich mit diesem Wort. Im Depot folgen die Schlussfrage und zwei Enden (*The Heist* / *The Open File*), maximal 90 Punkte. Station B ist das echte Landschafts-Minispiel. **Station I (Porträtsaal)** ist ein Speedrun: Nach „Start“ zeigt ein Katalog-Scan 3 Sekunden lang die echten Met-Daten von drei Porträts (Degas, Sargent, Cézanne); dann sortiert man sie vom ältesten zum jüngsten (Klick, Ziehen oder Tasten 1/2/3, Enter prüft). „Peek“ und falsches Prüfen kosten je 5 Sekunden. Danach drehen sich die Karten um und ergeben das Nachtschichtprotokoll, das Wachmann Leon entlastet (`web/minigames/portrait-*`). Station L ist das Renoir-Bilderpuzzle (Tab, Enter/Leertaste, Klick oder Drag-and-drop). Station D bleibt ein Platzhalter. Ein Hinweis-Knopf verhindert, dass jemand feststeckt. Bewegung: WASD oder Pfeiltasten, Interaktion: `E`. Die alte Prototyp-Story (drei Belege, Ausweis, Code 2114) liegt unverändert in `web/legacy/`.
 
 **Galerie und Zugang:** Die Galerie zeigt eine nächtliche, KI-gestaltete Museumsszene mit New Yorker Skyline im Fenster, Sitzbänken und zwei Überwachungskameras. Deren rote Lichter blinken als Dekoration; sie erkennen die Spielfigur nicht. Bei aktivierter Systemeinstellung für reduzierte Bewegung leuchten sie dauerhaft. Der beleuchtete Bogen rechts in der Eingangshalle führt in die Galerie. Wände und Bänke begrenzen die Bewegung, vorhandene Aufgaben und die verriegelte Tresortür bleiben spielbar. Die Landschaften im generierten Hintergrund sind Dekoration; die echten Met-Daten erscheinen in den bestehenden Rätseln.
 
@@ -196,8 +196,24 @@ Kopiere als Auftrag: „Lies zuerst die README und den aktuellen Stand des Repos
 
 **Regel für KI und Team:** Behauptungen über erledigte Arbeit nur mit Datei, Commit, PR oder tatsächlichem Prüfergebnis belegen. Wenn eine Quelle nicht zugänglich ist, die Lücke nennen. Keine Funktion als fertig bezeichnen, nur weil sie in dieser README als Idee steht.
 
-Renoir: bis einschließlich 30 Sekunden 15 Punkte, bis 45 Sekunden 10, bis 60 Sekunden 5, danach 0. Die Zeit läuft beim Verlassen weiter und stoppt beim Lösen. Das Spiel startet bei 0 Punkten.
+Renoir: bis einschließlich 30 Sekunden 15 Punkte, bis 45 Sekunden 10, bis 60 Sekunden 5, danach 0. Station I: bis 20 Sekunden 15 Punkte, bis 35 Sekunden 10, bis 50 Sekunden 5, danach 0 (Strafzeiten eingerechnet; alte Spielstände ohne Zeit: 5). Die Zeit läuft beim Verlassen weiter und stoppt beim Lösen. Das Spiel startet bei 0 Punkten.
 
 ### Aktive Überwachungskameras
 
 Aktive Kameras zeigen ein blinkendes rotes Statuslicht. Neue Räume und Kameraansichten sollen dafür die gemeinsame Darstellung in `web/camera-lights.js` verwenden. Bei aktivierter Betriebssystem-Einstellung für reduzierte Bewegung leuchtet das Licht dauerhaft, statt zu blinken.
+
+### End-to-End-Test Station I
+
+`web/dev/e2e-station-i.mjs` prüft Station I im echten Browser (falscher Check, Lösen, Punkte, kein Scrollen bei 1280×720, 1440×900, 390×844, keine Konsolenfehler, Bilder bei blockierter Met-API). Playwright gehört nicht zum Projekt:
+
+```bash
+npm i -D playwright && npx playwright install chromium
+```
+
+```bash
+python3 -m http.server 8000 --directory web
+```
+
+```bash
+node web/dev/e2e-station-i.mjs
+```

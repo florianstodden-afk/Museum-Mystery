@@ -1,6 +1,8 @@
-// Points for "Museum Nocturne". Maximum: 3 stations × 20 + Renoir 15 + safe 10 + final question 10 = 95.
-// Renoir awards 15/10/5/0 by completion time; other stations retain their standard rules.
+// Points for "Museum Nocturne". Maximum: 2 stations × 20 + Portraits 15 + Renoir 15 + safe 10 + final question 10 = 90.
+// The two speedrun stations award points by time: Portraits (I) 15/10/5/0, Renoir (L) 15/10/5/0.
+// The other stations keep their standard rules (20 − mistakes − hints).
 import { elapsedMs, validPuzzle } from '../minigames/picture-rules.js';
+import { elapsedMs as portraitElapsedMs, validTimeline, upgradeTimeline } from '../minigames/portrait-rules.js';
 import { CASE, STATION_IDS } from './case-1.js';
 
 export const STATION_MAX = 20;
@@ -10,7 +12,25 @@ export const HINT_COST = 5;
 export const SAFE_MAX = 10;
 export const ACCUSATION_MAX = 10;
 export const POINTS_AFTER_MISTAKE = 5;
-export const MAX_SCORE = (STATION_IDS.length - 1) * STATION_MAX + 15 + SAFE_MAX + ACCUSATION_MAX;
+export const SPEED_MAX = 15;                 // best time at a speedrun station
+export const PORTRAIT_UNTIMED_POINTS = 5;    // Station I solved in an old save without a time
+const SPEED_STATIONS = ['portraits', 'restoration'];
+export const MAX_SCORE = (STATION_IDS.length - SPEED_STATIONS.length) * STATION_MAX + SPEED_STATIONS.length * SPEED_MAX + SAFE_MAX + ACCUSATION_MAX;
+
+// Speedrun limits for Station I (three cards, so faster than Renoir's eight pieces).
+export const PORTRAIT_LIMITS_MS = [20000, 35000, 50000];
+
+/** Station I points by final time (penalties included): ≤20 s → 15, ≤35 s → 10, ≤50 s → 5, else 0. */
+export function portraitSpeedPoints(ms) {
+  const [fast, medium, slow] = PORTRAIT_LIMITS_MS;
+  return ms <= fast ? 15 : ms <= medium ? 10 : ms <= slow ? 5 : 0;
+}
+
+/** "0:17" */
+export function formatClock(ms) {
+  const seconds = Math.floor(ms / 1000);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+}
 
 // Points for one solved station: 20 − 3 per mistake − 5 per hint, but never less than 5.
 export function stationPoints(mistakes, hints) {
@@ -32,14 +52,15 @@ export function accusationPoints(attempts) {
 export function scoreBreakdown(state) {
   const rows = CASE.stations.map(station => {
     const progress = state.stations[station.id];
+    const max = SPEED_STATIONS.includes(station.id) ? SPEED_MAX : STATION_MAX;
     return {
       id: station.id,
       label: `${station.room} (${station.letter})`,
-      points: progress.solved ? Math.min(progress.points, station.id === 'restoration' ? 15 : STATION_MAX) : 0,
-      max: station.id === 'restoration' ? 15 : STATION_MAX,
-      detail: progress.solved
-        ? `${progress.mistakes} mistake(s), ${progress.hints} hint(s)`
-        : 'not solved',
+      points: progress.solved ? Math.min(progress.points, max) : 0,
+      max,
+      detail: !progress.solved ? 'not solved'
+        : station.id === 'portraits' ? portraitDetail(progress)
+          : `${progress.mistakes} mistake(s), ${progress.hints} hint(s)`,
     };
   });
   rows.push({
@@ -59,6 +80,11 @@ export function scoreBreakdown(state) {
   return rows;
 }
 
+// The end screen shows the time for Station I, if one was saved.
+function portraitDetail(progress) {
+  return progress.timeMs == null ? 'Portrait timeline time: not recorded' : `Portrait timeline time ${formatClock(progress.timeMs)}`;
+}
+
 export function totalScore(state) {
   let total = 0;
   for (const row of scoreBreakdown(state)) total += row.points;
@@ -68,10 +94,29 @@ export function totalScore(state) {
 // Compatibility with saves from the former deduction-based branch.
 export function emptyPenalties() { return Object.fromEntries([...STATION_IDS, 'safe', 'accusation', 'picture'].map(id => [id, 0])); }
 export function pictureSpeedPoints(ms) { return ms <= 30000 ? 15 : ms <= 45000 ? 10 : ms <= 60000 ? 5 : 0; }
+/** Sets the time-based points of the speedrun stations from their saved progress. */
 export function synchronizeScore(state, progress = {}) {
+  return syncPortraits(syncRestoration(state, progress), progress);
+}
+
+function withStation(state, id, changes) {
+  const current = state.stations[id];
+  if (Object.entries(changes).every(([key, value]) => current[key] === value)) return state;
+  return { ...state, stations: { ...state.stations, [id]: { ...current, ...changes } } };
+}
+
+function syncRestoration(state, progress) {
   const puzzle = progress.restoration;
   if (!state.stations.restoration.solved || !validPuzzle(puzzle) || puzzle.finishedAt === null) return state;
-  const points = pictureSpeedPoints(elapsedMs(puzzle, puzzle.finishedAt));
-  if (state.stations.restoration.points === points) return state;
-  return { ...state, stations: { ...state.stations, restoration: { ...state.stations.restoration, points } } };
+  return withStation(state, 'restoration', { points: pictureSpeedPoints(elapsedMs(puzzle, puzzle.finishedAt)) });
+}
+
+// Station I solved with a saved finish time → points by time; solved without one (old save) → 5.
+function syncPortraits(state, progress) {
+  // The engine calls this without any progress; only the host knows the station's saved timeline.
+  if (!state.stations.portraits.solved || !('portraits' in progress)) return state;
+  const timeline = validTimeline(progress.portraits) ? upgradeTimeline(progress.portraits) : null;
+  if (!timeline || timeline.finishedAt === null) return withStation(state, 'portraits', { points: PORTRAIT_UNTIMED_POINTS });
+  const timeMs = portraitElapsedMs(timeline);
+  return withStation(state, 'portraits', { points: portraitSpeedPoints(timeMs), timeMs });
 }

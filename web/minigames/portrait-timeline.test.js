@@ -1,9 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  PORTRAIT_IDS, correctOrder, initialTimeline, validTimeline, moveCard, swapCards,
-  checkOrder, useHint, isSolved, logEntries,
-} from './portrait-rules.js';
+import { PORTRAIT_IDS, initialTimeline, startTimeline, FLASH_MS, PENALTY_MS } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortrait, loadPortraits, verifiedImageUrl } from './portrait-artwork.js';
 import { start } from './portrait-timeline.js';
 import { installFakeDom, createContainer, findAll, findButton } from '../story/tests/fake-dom.js';
@@ -12,100 +9,13 @@ const DEGAS = 436121;
 const SARGENT = 12127;
 const CEZANNE = 435876;
 const RIGHT = [DEGAS, SARGENT, CEZANNE];
-
-// A fixed "random" sequence, so a test can produce any shuffle it needs.
-function sequence(...values) {
-  let i = 0;
-  return () => values[i++ % values.length];
-}
+const T0 = 1_000_000;
 
 function timeline(order, extra = {}) {
-  return { order, solved: false, mistakes: 0, hints: 0, revealed: [], ...extra };
+  return { ...initialTimeline(), order, ...extra };
 }
 
-// ---------- Rules ----------
-
-test('the correct order comes from the frozen Met begin dates: Degas, Sargent, Cézanne', () => {
-  assert.deepEqual(correctOrder(), RIGHT);
-});
-
-test('a date range is sorted by its start year, not its end year', () => {
-  const works = {
-    1: { objectBeginDate: 1883, objectEndDate: 1899 }, // range that ends late
-    2: { objectBeginDate: 1885, objectEndDate: 1885 },
-    3: { objectBeginDate: 1883, objectEndDate: 1884 }, // same start, earlier end
-  };
-  assert.deepEqual(correctOrder([2, 1, 3], id => works[id]), [3, 1, 2]);
-});
-
-test('a shuffle is never already solved, whatever the random numbers are', () => {
-  for (const randoms of [[0, 0], [0.99, 0.99], [0.5, 0.2], [0.1, 0.9], [0.7, 0.4], [0.34, 0.67]]) {
-    const start = initialTimeline(sequence(...randoms));
-    assert.notDeepEqual(start.order, RIGHT, String(randoms));
-    assert.deepEqual([...start.order].sort(), [...PORTRAIT_IDS].sort());
-    assert.equal(validTimeline(start), true);
-  }
-});
-
-test('moving and swapping cards change only the order', () => {
-  let s = timeline([CEZANNE, DEGAS, SARGENT]);
-  s = moveCard(s, DEGAS, 0);
-  assert.deepEqual(s.order, [DEGAS, CEZANNE, SARGENT]);
-  s = swapCards(s, CEZANNE, SARGENT);
-  assert.deepEqual(s.order, RIGHT);
-  assert.equal(s.mistakes, 0);
-  assert.equal(moveCard(s, DEGAS, 7), s, 'an impossible position changes nothing');
-  assert.equal(swapCards(s, DEGAS, 999), s, 'an unknown card changes nothing');
-});
-
-test('the right order solves the station and turns the log into the right reading order', () => {
-  const s = checkOrder(timeline(RIGHT));
-  assert.equal(isSolved(s), true);
-  assert.equal(s.mistakes, 0);
-  assert.deepEqual(logEntries(s), [
-    '21:02–21:18 · Leon – round of the east wing and the east stairs. All doors checked.',
-    '21:14 · Delivery bay – transport cart signed out. Booked as: patron visit – A. V.',
-    '21:20 · Leon – back at the front desk. Coffee, radio check.',
-  ]);
-});
-
-test('a wrong check counts exactly one mistake and the cards stay movable', () => {
-  const wrong = checkOrder(timeline([SARGENT, DEGAS, CEZANNE]));
-  assert.equal(wrong.mistakes, 1);
-  assert.equal(wrong.solved, false);
-  const moved = moveCard(wrong, DEGAS, 0);
-  assert.deepEqual(moved.order, RIGHT);
-  assert.equal(checkOrder(moved).solved, true);
-});
-
-test('after solving, moves, swaps, checks and hints change nothing', () => {
-  const solved = checkOrder(timeline(RIGHT));
-  assert.equal(moveCard(solved, DEGAS, 2), solved);
-  assert.equal(swapCards(solved, DEGAS, SARGENT), solved);
-  assert.equal(checkOrder(solved), solved);
-  assert.equal(useHint(solved), solved);
-});
-
-test('at most two hints: first the oldest work, then the newest', () => {
-  let s = timeline([CEZANNE, SARGENT, DEGAS]);
-  s = useHint(s);
-  assert.deepEqual([s.hints, s.revealed], [1, [DEGAS]]);
-  s = useHint(s);
-  assert.deepEqual([s.hints, s.revealed], [2, [DEGAS, CEZANNE]]);
-  assert.equal(useHint(s), s);
-  assert.equal(validTimeline(s), true);
-});
-
-test('validTimeline rejects broken, foreign and impossible saved states', () => {
-  const bad = [
-    null, 'text', {}, timeline([DEGAS, SARGENT]), timeline([DEGAS, DEGAS, CEZANNE]),
-    timeline([DEGAS, SARGENT, 459111]), timeline(RIGHT, { mistakes: -1 }), timeline(RIGHT, { hints: 3, revealed: [DEGAS, CEZANNE, DEGAS] }),
-    timeline([SARGENT, DEGAS, CEZANNE], { solved: true }), timeline(RIGHT, { hints: 1, revealed: [] }),
-    timeline(RIGHT, { hints: 1, revealed: [CEZANNE] }), timeline(RIGHT, { solved: 'yes' }),
-  ];
-  for (const state of bad) assert.equal(validTimeline(state), false, JSON.stringify(state));
-  assert.equal(validTimeline(timeline(RIGHT, { solved: true, mistakes: 2, hints: 1, revealed: [DEGAS] })), true);
-});
+// The rules are tested in portrait-rules.test.js.
 
 // ---------- Artwork loader (fake fetch, never the live API) ----------
 
@@ -156,101 +66,128 @@ test('every portrait has a bundled offline copy and the loader returns all three
 
 // ---------- Station UI (small fake DOM, no browser) ----------
 
-function openStation(savedState) {
+// Opens the station with a hand-moved clock: station.clock.ms is "now".
+function openStation(savedState, extra = {}) {
   installFakeDom();
   const container = createContainer();
   const saved = [];
   const solvedReports = [];
+  const played = [];
+  const clock = { ms: T0 };
+  const store = {};
   const cleanup = start(container, {
     state: savedState,
+    now: () => clock.ms,
     onChange: state => saved.push(structuredClone(state)),
+    playSound: id => played.push(id),
+    storage: { getItem: k => store[k] ?? null, setItem: (k, v) => { store[k] = v; } },
     loadPortraits: async () => PORTRAIT_IDS.map(id => ({ id, src: `local-${id}.jpg`, offline: true })),
+    ...extra,
   }, report => solvedReports.push(report));
   const faces = () => findAll(container, node => node.className === 'portrait-face');
-  const faceFor = id => faces().find(face => face.getAttribute('aria-label').startsWith(PORTRAIT_ARTWORKS.find(a => a.id === id).artist));
-  return { container, saved, solvedReports, cleanup, faces, faceFor, last: () => saved[saved.length - 1] };
+  const faceFor = id => faces().find(face => face.getAttribute('aria-label').includes(PORTRAIT_ARTWORKS.find(a => a.id === id).artist));
+  const chips = () => findAll(container, node => node.className === 'portrait-chip' && !node.hidden).map(node => node.textContent);
+  const time = () => findAll(container, node => node.className === 'portrait-time')[0].textContent;
+  const key = k => findAll(container, node => node.className === 'portrait-timeline')[0].dispatch('keydown', { key: k });
+  return { container, saved, solvedReports, played, clock, store, cleanup, faces, faceFor, chips, time, key, last: () => saved[saved.length - 1] };
 }
 
-test('the station reports onSolved exactly once with mistakes and hints only', () => {
-  const station = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
-  findButton(station.container, 'Check order').click();
-  assert.match(station.container.textContent, /Not quite\. Check the catalogue dates again/);
-  assert.equal(station.last().mistakes, 1);
-  findButton(station.container, 'Hint').click();
-  assert.match(station.container.textContent, /Degas’s “A Woman Seated beside a Vase of Flowers” is the oldest/);
-  station.faceFor(SARGENT).click();   // pick up Sargent
-  station.faceFor(DEGAS).click();     // swap with Degas
-  assert.deepEqual(station.last().order, RIGHT);
-  findButton(station.container, 'Check order').click();
-  findButton(station.container, 'Check order').click(); // disabled after solving: no second report
-  assert.deepEqual(station.solvedReports, [{ mistakes: 1, hints: 1 }]);
-  assert.match(station.container.textContent, /Booked as: patron visit – A\. V\./);
-  assert.match(station.container.textContent, /The log clears Leon/);
-  station.cleanup();
+test('before Start: no clock, no dates, cards locked, one short task line', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  assert.equal(s.time(), '0:00');
+  assert.deepEqual(s.chips(), []);
+  assert.match(s.container.textContent, /Memorise the dates, then sort oldest to newest\./);
+  assert.match(s.container.textContent, /<0:20 = 15 pts/);
+  s.faces()[0].click();
+  assert.equal(s.last().startedAt, null);
+  s.cleanup();
 });
 
-test('keyboard: Enter picks a card up and the arrow keys move it', () => {
-  const station = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
-  station.faceFor(DEGAS).click(); // Enter/Space on a button triggers click
-  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' });
-  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' });
-  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
-  station.faceFor(DEGAS).dispatch('keydown', { key: 'ArrowLeft' }); // already first: nothing happens
-  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
-  station.faceFor(DEGAS).click(); // put it down
-  station.faceFor(SARGENT).dispatch('keydown', { key: 'ArrowLeft' }); // not picked up: no move
-  assert.deepEqual(station.last().order, [DEGAS, CEZANNE, SARGENT]);
+test('Start runs the clock and flashes all dates for 3 s, then they vanish', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  findButton(s.container, 'Start').click();
+  assert.equal(s.last().startedAt, T0);
+  assert.deepEqual(s.chips(), ['1883–84', '1865', '1888–90']);
+  assert.match(s.container.textContent, /dates vanish in 3 s/);
+  s.clock.ms = T0 + FLASH_MS;
+  findButton(s.container, 'Check order').click(); // wrong order: +5 s
+  assert.deepEqual(s.chips(), []);
+  assert.equal(s.time(), '0:08');
+  assert.match(s.container.textContent, /Not yet\. \+5 s/);
+  s.cleanup();
 });
 
-test('dragging a card onto another place moves it there', () => {
-  const station = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
-  const cardsList = () => findAll(station.container, node => node.tagName === 'LI' && node.className.startsWith('portrait-card'));
-  cardsList()[2].dispatch('dragstart', { dataTransfer: { setData() {} } }); // Degas
-  cardsList()[0].dispatch('drop');
-  assert.deepEqual(station.last().order, [DEGAS, SARGENT, CEZANNE]);
+test('a whole run: Start, number keys to swap, Enter to check – onSolved once, log on the backs', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  s.key('Enter');                   // Enter = Start
+  s.clock.ms = T0 + 6000;
+  s.key('1'); s.key('2');           // swap places 1 and 2
+  assert.deepEqual(s.last().order, RIGHT);
+  s.key('Enter');                   // check
+  assert.equal(s.last().solved, true);
+  assert.deepEqual(s.solvedReports, [{ mistakes: 0, hints: 0 }]);
+  assert.match(s.container.textContent, /Solved in 0:06 · \+15 · Letter I in your journal · New best!/);
+  assert.match(s.container.textContent, /21:14 · Cart out – “patron visit, A\. V\.”/);
+  s.key('Enter');
+  assert.deepEqual(s.solvedReports.length, 1);
+  assert.deepEqual(s.played, ['page', 'click', 'click', 'flip']);
+  assert.equal(s.store['museum-nocturne-portrait-best-v1'], '6000');
+  s.cleanup();
 });
 
-test('progress survives closing and reopening the station', () => {
-  const first = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
-  findButton(first.container, 'Check order').click();
-  findButton(first.container, 'Hint').click();
+test('Peek shows one date for a moment and costs 5 s', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  findButton(s.container, 'Start').click();
+  s.clock.ms = T0 + 4000;
+  findButton(s.container, 'Peek').click();     // first card: Sargent
+  assert.deepEqual(s.chips(), ['1883–84']);
+  assert.equal(s.last().penaltyMs, PENALTY_MS);
+  assert.equal(s.time(), '0:09');
+  assert.deepEqual(s.played, ['page', 'hint']);
+  s.cleanup();
+});
+
+test('click-click swaps and dragging moves a card', () => {
+  const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
+  findButton(s.container, 'Start').click();
+  s.faceFor(SARGENT).click();
+  s.faceFor(CEZANNE).click();
+  assert.deepEqual(s.last().order, [CEZANNE, SARGENT, DEGAS]);
+  const cards = () => findAll(s.container, node => node.tagName === 'LI');
+  cards()[2].dispatch('dragstart', { dataTransfer: { setData() {} } }); // Degas
+  cards()[0].dispatch('drop');
+  assert.deepEqual(s.last().order, [DEGAS, CEZANNE, SARGENT]);
+  s.cleanup();
+});
+
+test('reopening keeps the clock running and gives no second flash', async () => {
+  const first = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  findButton(first.container, 'Start').click();
   first.cleanup();
   const again = openStation(first.last());
-  assert.match(again.container.textContent, /Incorrect attempts: 1 · Hints: 1/);
-  assert.deepEqual(again.last().order, [CEZANNE, SARGENT, DEGAS]);
-  assert.equal(again.solvedReports.length, 0);
+  again.clock.ms = T0 + 20000;
+  await new Promise(resolve => setTimeout(resolve, 150)); // the station redraws its clock every 100 ms
+  assert.equal(again.time(), '0:20');
+  assert.deepEqual(again.chips(), []);
+  assert.equal(findButton(again.container, 'Start').hidden, true);
+  again.cleanup();
 });
 
-test('a broken saved state starts a fresh shuffle; an already solved one shows the log', () => {
+test('a broken save starts fresh; an old solved save shows the log and reports once', () => {
   const fresh = openStation({ order: [1, 2, 3], solved: true });
-  assert.equal(validTimeline(fresh.last()), true);
   assert.equal(fresh.last().solved, false);
-  const done = openStation(timeline(RIGHT, { solved: true, mistakes: 2 }));
-  assert.match(done.container.textContent, /NIGHT-SHIFT LOG/);
-  assert.deepEqual(done.solvedReports, [{ mistakes: 2, hints: 0 }]);
+  fresh.cleanup();
+  const old = openStation({ order: RIGHT, solved: true, mistakes: 2, hints: 0, revealed: [] });
+  assert.match(old.container.textContent, /21:02 · Leon – east wing round/);
+  assert.deepEqual(old.solvedReports, [{ mistakes: 2, hints: 0 }]);
+  old.cleanup();
 });
 
-test('years are hidden on the cards until a catalogue entry is opened', () => {
-  const station = openStation(timeline([CEZANNE, SARGENT, DEGAS]));
-  assert.doesNotMatch(station.container.textContent, /1865|1883|1888/);
-  findButton(station.container, 'Catalogue entry').click();
-  assert.match(station.container.textContent, /Date: 1888–90/);
-});
-
-test('the station asks the host for small sounds: click, wrong, flip', () => {
-  installFakeDom();
-  const container = createContainer();
-  const played = [];
-  start(container, {
-    state: timeline([SARGENT, DEGAS, CEZANNE]),
-    onChange() {},
-    playSound: id => played.push(id),
-    loadPortraits: async () => [],
-  }, () => {});
-  findButton(container, 'Check order').click();
-  const faces = () => findAll(container, node => node.className === 'portrait-face');
-  faces()[0].click();
-  faces()[1].click();
-  findButton(container, 'Check order').click();
-  assert.deepEqual(played, ['wrong', 'click', 'click', 'flip']);
+test('a broken best-time store does not break the station', () => {
+  const s = openStation(timeline(RIGHT.slice().reverse()), { storage: { getItem() { throw new Error('x'); }, setItem() { throw new Error('x'); } } });
+  findButton(s.container, 'Start').click();
+  s.key('1'); s.key('3');
+  s.key('Enter');
+  assert.equal(s.last().solved, true);
+  s.cleanup();
 });
