@@ -1,229 +1,66 @@
-# Museum Mystery
+# Museum Mystery – The Night of the Forgery
 
-Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/27)**. Diese README ist unser Einstiegspunkt für Teammitglieder und neue KI-Chats. **Vor jeder Aufgabe zuerst diese Datei und den aktuellen Code lesen.** Danach den Stand auf GitHub prüfen. Ein Chat kennt spätere Änderungen nicht automatisch.
+[![Story tests](https://github.com/florianstodden-afk/Museum-Mystery/actions/workflows/story-tests.yml/badge.svg)](https://github.com/florianstodden-afk/Museum-Mystery/actions/workflows/story-tests.yml)
 
-**Stand: 17. November 2026.** Die Gruppe verbessert nach positivem Feedback des Professors das bestehende begehbare 2D-Spiel, statt den früheren Ideenbaukasten umzusetzen. Im Fokus stehen klare Räume und Interaktionen, kurze Texte, ein aufgeräumtes Journal, vier saubere Minispiele, ein Home Screen und zwei verständliche Enden. **Aktuelle Entscheidung: vorerst ohne echte Anmeldung.** Der vorbereitete Einstieg zeigt das Login-Bild, führt aber als Gast zum Home Screen. Ein gemeinsames Online-Leaderboard ist nicht implementiert. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
+A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Login-Idee pausiert:** Am 17.11. wurden erst Benutzername/Passwort, dann GitHub-Anmeldung besprochen und auf dem separaten Branch [`codex/login-signup`](https://github.com/florianstodden-afk/Museum-Mystery/tree/codex/login-signup) vorbereitet. Florian entschied danach ausdrücklich: kein Clerk und vorerst **gar kein Login**. Dieser Branch ist ein pausierter Entwurf, wurde **nicht** in `main` übernommen und ist nicht Teil des öffentlichen Spiels. Es wurden keine Spielerkonten angelegt. [Warum Passwörter nicht im GitHub-Repository gespeichert werden können](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
+**Play it:** <https://florianstodden-afk.github.io/Museum-Mystery/>
 
-**Gast-Einstieg:** [PR #17](https://github.com/florianstodden-afk/Museum-Mystery/pull/17) setzt Florians Login-Bild vor den Home Screen. „Log In“ und „Sign Up“ öffnen vorerst nur eigene Gast-Zwischenansichten; **Continue as guest** führt zum Home Screen und von dort zum Spiel. Es werden keine Konten angelegt. Der genaue Ablauf und die Prüfung stehen in [docs/guest-entry-flow.md](docs/guest-entry-flow.md).
+![The museum at night](docs/screenshots/readme-game.png)
 
-**Aktuelle Arbeit am Spielmenü:** Während des Spielens bleibt die Museumsszene frei von Titel, Tastaturhinweisen und den bisherigen Knöpfen am oberen Rand. Das Zahnrad oben rechts öffnet ein Menü mit Sound, Music, Hint, Journal, Resume Game und Exit to Main Menu. Die genaue Umsetzung und Prüfung stehen in [docs/in-game-menu.md](docs/in-game-menu.md). Ein neues Spiel beginnt weiterhin nur über den Home Screen.
+## How to play
 
-**Nächste Überarbeitung:** Das Menü lässt sich mit `Esc` öffnen und schließen. Das Journal ist mit einem Knopf oben im Spiel und mit `J` erreichbar; vom Home Screen öffnet es sich ebenfalls, ohne das Spiel zu starten. Beide Fenster verwenden jetzt eine aufgeräumte Gestaltung nach Florians Bildvorlagen. Leon beginnt sein Gespräch erst bei `E` in seiner Nähe; seine Sprechbox lässt die Museumsszene durchscheinen. [Ablauf und Prüfung](docs/menu-journal-leon.md).
+- Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
+- Four stations (B, I, L, D) each give one letter. Together they open the vault.
+- In the vault, answer the final question. There are two endings and up to 90 points.
+- **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 
-Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
+## Run locally
 
-Öffentliches Spiel (Stand von `main`): <https://florianstodden-afk.github.io/Museum-Mystery/>
-
-Kurs: <https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html>
-
-Ideenvergleich: <https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8>
-
-## Unser Ziel im Kurs
-
-Wir entwickeln eine funktionierende App beziehungsweise ein Spiel mit KI-Unterstützung. Entscheidend ist, dass **jedes Teammitglied das gemeinsam abgegebene Ergebnis erklären kann**, auch Code, den jemand anderes oder eine KI geschrieben hat. Wir halten die Lösung daher klein, lesbar und überprüfbar. Unverstandene Funktionen werden erklärt, vereinfacht oder entfernt, bevor wir sie übernehmen.
-
-Die [offizielle Bewertungsseite](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/evaluation.html) nennt für das Teamprojekt eine Präsentation mit **Live-Demo an einer bereitgestellten URL und Code-Walkthrough** (40 % der Kursnote). Jedes Mitglied kann zu fremdem Code befragt werden. Die Kriterien sind Funktion, Design, Umfang/Ambition, Überprüfung und Erklärung. Die schriftliche Prüfung (60 %) betrifft teilweise das **eigene Solo-Projekt** und allgemeines Lesen von Code; diese beiden Leistungen sollten wir nicht verwechseln. Laut Kursseite lebt die Arbeit auf GitHub, nicht als Moodle-Dateiupload.
-
-Der [Kursüberblick](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html) beschreibt das Teamprojekt für Wochen 8–10 und die Präsentationen für Wochen 11–12. Er spricht davon, das Beste aus Solo-Projekten weiterzuentwickeln. **Museum Mystery ist unser gewähltes Teamthema.** Ob und welche Ideen aus Solo-Projekten einfließen, entscheidet das Team ausdrücklich. Das separate Solo-Repository **Plot Twist** wird nicht als Git-Remote dieses Projekts verwendet.
-
-## Was wir bauen wollen
-
-**Museum Mystery** soll sich wie ein kleines Abenteuer in einer 2D-Draufsicht spielen: im Museum herumlaufen, mit Menschen sprechen, Gegenstände untersuchen, Beweise kombinieren und am Ende eine folgenreiche Entscheidung treffen. Die [Collection API des Metropolitan Museum of Art](https://metmuseum.github.io/) liefert ein echtes Werk und überprüfbare Kunstdaten. Die Gestaltung der Karte und Figuren ist eigenständig; Harvest Moon und Pokémon sind nur Referenzen für Perspektive und Bewegungsgefühl.
-
-### Aktueller Prototyp: Die Nacht der Fälschung
-
-Seit dem 12.11.2026 läuft im Hauptspiel die **Nocturne-Story** (Kurzfassung: [docs/spielkonzept-kurz.md](docs/spielkonzept-kurz.md)). „M“ schickt die Spielfigur los, Van Goghs *Wheat Field with Cypresses* aus dem Safe zu holen. Vier Stationen in beliebiger Reihenfolge geben die Buchstaben B‑I‑L‑D; die Tresortür zwischen Galerie und Depot öffnet sich mit diesem Wort. Im Depot folgen die Schlussfrage und zwei Enden (*The Heist* / *The Open File*), maximal 90 Punkte. Station B ist das echte Landschafts-Minispiel. **Station I (Porträtsaal)** ist ein Speedrun: Nach „Start“ zeigt ein Katalog-Scan 3 Sekunden lang die echten Met-Daten von drei Porträts (Degas, Sargent, Cézanne); dann sortiert man sie vom ältesten zum jüngsten (Klick, Ziehen oder Tasten 1/2/3, Enter prüft). „Peek“ und falsches Prüfen kosten je 5 Sekunden. Danach drehen sich die Karten um und ergeben das Nachtschichtprotokoll, das Wachmann Leon entlastet (`web/minigames/portrait-*`). Station L ist das Renoir-Bilderpuzzle (Tab, Enter/Leertaste, Klick oder Drag-and-drop). Station D bleibt ein Platzhalter. Ein Hinweis-Knopf verhindert, dass jemand feststeckt. Bewegung: WASD oder Pfeiltasten, Interaktion: `E`. Die alte Prototyp-Story (drei Belege, Ausweis, Code 2114) liegt unverändert in `web/legacy/`.
-
-**Galerie und Zugang:** Die Galerie zeigt eine nächtliche, KI-gestaltete Museumsszene mit New Yorker Skyline im Fenster, Sitzbänken und zwei Überwachungskameras. Deren rote Lichter blinken als Dekoration; sie erkennen die Spielfigur nicht. Bei aktivierter Systemeinstellung für reduzierte Bewegung leuchten sie dauerhaft. Der beleuchtete Bogen rechts in der Eingangshalle führt in die Galerie. Wände und Bänke begrenzen die Bewegung, vorhandene Aufgaben und die verriegelte Tresortür bleiben spielbar. Die Landschaften im generierten Hintergrund sind Dekoration; die echten Met-Daten erscheinen in den bestehenden Rätseln.
-
-**Sicherheitsraum:** Links im Haupteingang führt der mit „SECURITY“ beschriftete Bogen in einen eigenen begehbaren Raum. Die Monitorwand zeigt drei illustrative Kameravorschauen (Eingangshalle, Galerie, Tresor); die übrigen sechs Anzeigen haben kein Signal. Die Vorschauen sind keine Liveüberwachung. Im Raum lassen sich Monitorwand, Dienstplan, Funkgerät und Schlüsselbrett mit `E` untersuchen. Der Ausgang unten führt in die Eingangshalle zurück; Standort und Story-Fortschritt werden lokal gespeichert.
-
-**Aktuelle Startseite:** `web/index.html` über einen lokalen Webserver (Anleitung unten). `web/engine.js` enthält Karte und Bewegung, `web/story/` die Story (Überblick: [docs/story/README.md](docs/story/README.md)), `web/main.js` Zeichnung, Eingaben und die Verbindung zur Story über `web/story/host.js`. `cd web && node --test` prüft Karte, Story, Minispiel und Legacy-Code. Die frühere Python-App und ihre SQLite-Datei sind **nicht** mit diesem Browser-Spielstand verbunden.
-
-Der [geteilte Ideenvergleich](https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8) verglich zwölf Spielideen und empfahl Museum Mystery als Balance aus anschaulicher Demo, klaren Regeln und machbarer Umsetzung für Anfänger. Dort wurden **3–4 Personen, 4–6 Wochen und fast kein Budget nur angenommen**. Diese Zahlen sind keine bestätigten Teamdaten. Ein Quiz war die risikoärmere Alternative; ein Wetter-Festival die ambitioniertere. Wir haben Museum Mystery als Thema gewählt.
-
-### Frühere Idee und erster Bilderrätsel-Prototyp
-
-- Zuerst **drei sorgfältig geprüfte Fälle** mit ungefähr 24 kuratierten Kunstwerken; kein unbegrenzter Zufallsgenerator.
-- Ein Fall zeigt sechs mögliche Werke, Werkansichten mit überprüfbaren Angaben und einen kostenlosen Anfangshinweis.
-- Start mit 100 Punkten. Bis zu drei zusätzliche Hinweise kosten je 15 Punkte. Ein erster falscher Tipp kostet 25 Punkte und scheidet den Kandidaten aus. Ein zweiter falscher Tipp beendet den Versuch. Ein richtiger Tipp löst den Fall.
-- Hinweise müssen anhand der sichtbaren Werkdaten auf **genau eine Lösung** führen. Fehlende API-Felder oder Bilder dürfen keinen unlösbaren Fall erzeugen.
-- Eigene Konten und gespeicherte Spielstände; perspektivisch Fallhistorie und Bestenliste. Getrennte Konten bedeuten **nicht** automatisch gleichzeitiges Mehrspieler-Spiel.
-- Für eine faire Bestenliste wurde im Ideenvergleich **ein gewerteter Versuch pro Konto und Fall**, daneben ein Übungsmodus, vorgeschlagen.
-
-Diese Punkte führten zum ersten, statischen Streamlit-Prototyp in [specs/first-case.md](specs/first-case.md). Nach Spieltest wurde er als zu einfach und langweilig verworfen; die begehbare Quest ist nun die Richtung. Drei Fälle, 24 Werke, echte Konten, gewertete Versuche und Bestenliste bleiben Vorschläge aus dem Ideenvergleich, keine bestätigte Kursvorschrift. Der alte lokale Spielstand verwendet SQLite; die gemeinsame Online-Anmeldung und Hosting-Lösung sind offen.
-
-Bewusst zunächst außerhalb des Umfangs: 3D-Museum, Live-Multiplayer, freie Texteingaben als Anschuldigung, ungeprüft KI-generierte Rätsel und beliebige API-Werksuche. Erst drei zuverlässige Fälle, dann mögliche Extras.
-
-## So arbeiten wir bei jeder Aufgabe
-
-1. **Stand lesen:** README, relevante Dateien, `git status` und jüngste Commits prüfen. Bei neuen Chats diese README nennen und die konkrete Aufgabe abgrenzen.
-2. **Aufgabe beschreiben:** In wenigen Sätzen festhalten: *Warum? Was genau? Was ausdrücklich nicht? Woran erkennen wir, dass es fertig ist?* Mindestens einen erlaubten, einen abgelehnten und gegebenenfalls einen Neustart-Fall formulieren.
-3. **Erst verstehen, dann bauen:** KI darf einen Vorschlag für Dateien, Datenfluss, Regeln und Tests machen. Ein Mensch prüft die erwarteten Ergebnisse. Falsche Tests werden gegen die beschlossenen Regeln korrigiert, nicht bloß für grüne Ausgabe abgeschwächt.
-4. **Klein umsetzen:** Eine überschaubare Aufgabe pro Branch. Spiellogik von Bildschirm und Speicherung trennen, damit wir Regeln ohne Klicks testen können. Keine unnötigen Dienste oder komplizierten Abstraktionen einführen.
-5. **Selbst prüfen:** Tests ausführen, die App durchklicken, einen ungültigen Zug ausprobieren und gespeicherten Fortschritt nach einem echten App-Neustart prüfen. Ein Browser-Refresh allein ist kein Neustart-Test.
-6. **Erklären und dokumentieren:** Vor dem Commit festhalten, welche Dateien geändert wurden, was jede Änderung bewirkt, wer die Idee/Umsetzung lieferte, welche KI beteiligt war, welche Tests tatsächlich liefen und welches Ergebnis sie hatten. Behauptungen durch Commit, Pull Request, Testausgabe oder Screenshot belegbar machen.
-7. **Gemeinsam prüfen:** Branch pushen, Pull Request nach `main` öffnen, eine andere Person den Code und die Erklärung lesen lassen, Fragen klären, dann mergen. Anschließend `main` lokal aktualisieren und die README bei geänderten Entscheidungen ergänzen.
-
-**Verständnis-Check für jedes Mitglied:** Wo startet die Aktion? Welche Eingabe wird geprüft? Welche Regel entscheidet? Welche Daten ändern sich? Wo werden sie gespeichert? Was passiert bei ungültiger Eingabe oder fehlender API-Antwort? Welcher Test belegt das? Wenn wir das nicht in einfachen Worten beantworten können, ist die Aufgabe noch nicht abgeschlossen.
-
-## Dokumentationsregel: jede relevante Aktion nachvollziehbar machen
-
-Git speichert **welche Dateien** sich wann durch einen Commit änderten. Es erklärt nicht automatisch **warum**, was eine KI vorschlug, welche Alternativen verworfen wurden oder wie ein Test manuell verlief. Deshalb dokumentieren wir Entscheidungen und Prüfungen zusätzlich. Für jede Aufgabe gehört eine kurze, dauerhaft im Repository gespeicherte Notiz in `docs/arbeitsprotokoll.md` (Datei bei der ersten Implementierungsaufgabe anlegen). Ein Link auf einen Chat ist ergänzende Quelle, kein Ersatz für die Zusammenfassung: Links können unzugänglich werden oder spätere Nachrichten nicht enthalten.
-
-Vorlage für einen Eintrag:
-
-```markdown
-### YYYY-MM-DD – Kurzer Titel
-- Beteiligte: Namen/Initialen; KI-Werkzeug und Chat-Link, falls verwendet
-- Ausgangslage und Ziel: Was war vorher vorhanden? Was sollte sich ändern?
-- Entscheidung und Grund: Welche Regel, Technik oder Gestaltung wurde gewählt? Was wurde verworfen?
-- Umsetzung: Branch/PR/Commit und betroffene Dateien; was passiert dort in einfachen Worten?
-- Prüfung: genauer Befehl oder Klickfolge, tatsächliches Ergebnis, Fehler und Korrektur
-- Verständnis: Wer hat die Änderung erklärt oder gegengeprüft? Offene Fragen?
-```
-
-Dokumentiert auch GitHub-Aktionen (Repository angelegt, Branch gepusht, PR geprüft/gemergt), Beiträge anderer Teammitglieder, Datenquellen und Lizenzen, Hosting-Änderungen sowie Hilfe durch KI. **Nichts rückwirkend erfinden.** Unbekannte Zeitpunkte, Beteiligte oder Testergebnisse als „nicht dokumentiert“ markieren und nachfragen. Vor jedem Merge prüfen, ob die Notiz und README zum tatsächlichen Stand passen. Kurze Notizen nach jeder Aufgabe sind zuverlässiger als ein Rekonstruktionsversuch am Semesterende.
-
-### Bisher nachvollziehbare Projektgeschichte
-
-| Zeitpunkt/Beleg | Was geschah | Was wir daraus wissen |
-|---|---|---|
-| [Ideenvergleich](https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8) | Zwölf Konzepte verglichen; Museum Mystery empfohlen. | Spielregeln, Met-API und Login waren Vorschläge, kein implementierter Code. |
-| 09.11.2026 · [Initial commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/aaf0940) | GitHub-Repository `Museum-Mystery` entstand mit einer kurzen README. | Die exakte Einrichtung durch die anlegende Person ist hier nicht weiter dokumentiert. |
-| 09.11.2026 · [Dokumentations-Commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/070fe3c) | Dieser lokale Gruppenordner wurde über **HTTPS** mit dem bestehenden Repository verbunden; eine ausführliche deutsche Setup-README entstand im Branch `docs/project-readme`. | SSH war mangels hinterlegtem öffentlichem Schlüssel nicht eingerichtet; `gh` war lokal nicht installiert. Normales Git über HTTPS funktionierte. |
-| 09.11.2026 · [Pull Request #1](https://github.com/florianstodden-afk/Museum-Mystery/pull/1) / [Merge-Commit](https://github.com/florianstodden-afk/Museum-Mystery/commit/0c4cf0a) | Die README wurde in `main` übernommen; danach wurde `main` lokal aktualisiert und der erledigte **lokale** Dokumentations-Branch gelöscht. | Der Remote-Branch existierte bei der letzten Prüfung noch. Ob er später gelöscht wurde, muss aktuell geprüft werden. |
-| 09.11.2026 · [Pull Request #2](https://github.com/florianstodden-afk/Museum-Mystery/pull/2) | Kursziel, Museum-Mystery-Entwurf und Dokumentationsablauf wurden in dieser README ergänzt und nach `main` gemergt. | Diese README dient nun als gemeinsamer Einstiegspunkt. |
-| 09.11.2026 · [Pull Request #3](https://github.com/florianstodden-afk/Museum-Mystery/pull/3) | Ein kuratierter Bilderrätsel-Fall, Regeln, lokale Speicherung und sechs Tests wurden erstellt und nach `main` gemergt. | Dieser Prototyp erwies sich im Spieltest als zu statisch. Die spätere Bildkorrektur wird mit dem begehbaren Spiel in einem neuen PR übernommen. |
-| 09.11.2026 · Richtungswechsel | Der erste Fall wurde nach Nutzerfeedback als zu statisch bewertet. Eine begehbare 2D-Quest mit zwei Enden entstand als neuer Prototyp. | Siehe [Aufgabe](specs/museum-walk.md) und [Arbeitsprotokoll](docs/arbeitsprotokoll.md); menschlicher vollständiger Spieldurchlauf steht noch aus. |
-
-Der geteilte Chat ist eine Momentaufnahme der **Ideenwahl**. Er dokumentiert keine danach erfolgte Implementierung. Für neue Änderungen gilt immer der aktuelle Repository-Stand.
-
-## Git und GitHub in einfachen Worten
-
-`main` ist die gemeinsame Hauptversion. Ein **Branch** ist ein eigener Arbeitszweig für eine Aufgabe. Ein **Commit** speichert einen benannten Stand zunächst lokal. **Push** lädt Commits zu GitHub hoch. **Pull** holt neue Änderungen von GitHub herunter. Ein **Pull Request (PR)** schlägt vor, den Arbeitszweig nach Prüfung in `main` zu übernehmen; **Merge** führt ihn dort tatsächlich zusammen. Ein Push allein ändert `main` nicht.
-
-```text
-GitHub/main → pull → eigener Computer → Branch → ändern und testen
-                                                   → commit → push → PR → Review → Merge nach main
-```
-
-Im Projektordner vor einer neuen Aufgabe:
-
-```powershell
-git switch main
-git pull --ff-only origin main
-git switch -c feature/kurzer-name
-```
-
-Nach Änderungen:
-
-```powershell
-git status
-git diff
-git add README.md
-git commit -m "Explain project workflow"
-git push -u origin feature/kurzer-name
-```
-
-`git add README.md` ist nur ein Beispiel: immer die **tatsächlich geänderten Dateien** auswählen. Auf GitHub den PR von diesem Branch nach `main` öffnen, die Änderung und die Prüfung erklären und nach Review mergen. Danach:
-
-```powershell
-git switch main
-git pull --ff-only origin main
-```
-
-Bei einem Konflikt nicht blind überschreiben oder `--force` verwenden; gemeinsam die betroffenen Zeilen und Absichten klären. Vor dem ersten Push `git remote -v` prüfen: `origin` muss `https://github.com/florianstodden-afk/Museum-Mystery.git` sein.
-
-Weitere Teammitglieder klonen über HTTPS:
-
-```powershell
-git clone https://github.com/florianstodden-afk/Museum-Mystery.git
-cd Museum-Mystery
-```
-
-Das vorhandene Repository wird nicht noch einmal mit `git init` begonnen. `gh repo clone ...` wäre nur mit installierter und angemeldeter GitHub-CLI nötig; normales `git clone` genügt. Eine SSH-Adresse (`git@github.com:...`) setzt einen im GitHub-Konto hinterlegten SSH-Schlüssel voraus.
-
-## Technischer Start und aktueller Zustand
-
-### Begehbares Spiel starten
-
-Im Projektordner einen lokalen Server starten (Node wird nur für die Tests gebraucht):
-
-```powershell
-$projectPython = uv python find --no-project --managed-python --system 3.14
-& $projectPython -m http.server 8000 --directory web
-```
-
-Dann <http://localhost:8000> im Browser öffnen. Zum Stoppen im Terminal `Strg+C`. Die Python-Version `3.14` entspricht der bisher lokal verwendeten uv-Version; auf einem anderen Rechner kann sie angepasst werden. Bitte `web/index.html` nicht einfach als Datei doppelklicken: JavaScript-Module brauchen einen lokalen Webserver.
-
-Regeltests für das begehbare Spiel (dafür wird Node.js benötigt; zum Spielen nicht):
-
-```powershell
-cd web
-node --test
-```
-
-Der Browser-Prototyp braucht keine zusätzlichen JavaScript-Pakete. Seine API-Abfrage funktioniert online; bei einem Netzfehler kann man mit dem Text-Ersatz weiterspielen. Der Browser speichert den lokalen Stand in `localStorage`. Er ist weder ein Online-Konto noch ein geräteübergreifender Spielstand.
-
-### Älteren Streamlit-Prototyp prüfen
-
-Die [Kurs-Einrichtung](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/setup.html) verwendet **uv, Python, Codex und Streamlit**. Die [Solo-Projekt-Anleitung](https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/weeks/week-05/index.html) nennt für eine erste App Python, Streamlit, SQLite und pytest sowie die Trennung von Oberfläche, Regeln, Speicherung und Tests. Wir können diese vertraute Struktur als Ausgangspunkt nehmen, sofern sie zu unserem Teamprojekt passt.
-
-**Vorhanden:** `app.py` (Oberfläche und Met-API), `game.py` (Regeln), `storage.py` (SQLite), `tests/`, `pyproject.toml`, `uv.lock`, `.gitignore` und die erste [Aufgabenspezifikation](specs/first-case.md). Die lokale Datenbank entsteht erst beim ersten Spielstart. **Noch nicht vorhanden:** Online-Login, Bestenliste und Deployment. Abhängigkeiten installieren und testen:
-
-```powershell
-uv sync
-uv run pytest
-uv run python -m streamlit run app.py
-```
-
-Auf diesem Windows-Rechner wurde die direkte Streamlit-Startdatei von der Anwendungssteuerung blockiert. Der Server startete mit dem verwalteten Python-Interpreter und den installierten Paketen so (Python-Version an die von `uv sync` verwendete Version anpassen):
-
-```powershell
-$env:PYTHONPATH = (Join-Path (Get-Location) '.venv\Lib\site-packages')
-$projectPython = uv python find --no-project --managed-python --system 3.14
-& $projectPython -m streamlit run app.py
-```
-
-Die `.gitignore` schließt `.venv/`, Python-Caches, lokale SQLite-Dateien und Geheimnisse aus. `pyproject.toml` und `uv.lock` gehören ins Repository. Persönliche oder lokale Datenbanken werden nicht committed. API-Bilder und Metadaten müssen auf Eignung, Quellenangabe und Nutzungsrechte geprüft werden. Die sechs konkreten Objekt-IDs wurden am 09.11.2026 per Met-API auf öffentliche Bilder und notwendige Daten geprüft; die [offizielle Met-Dokumentation](https://metmuseum.github.io/) beschreibt die API ohne Registrierung oder Schlüssel. Vor einer öffentlichen Bereitstellung die aktuellen Bedingungen erneut prüfen.
-
-**Korrektur vom 09.11.2026:** Zwei zuerst ausgewählte Werke hatten entgegen der ersten Prüfung kein nutzbares öffentliches Bild. Nach der Fehlermeldung beim Öffnen wurden sie ersetzt und alle sechs aktuellen IDs erneut geprüft. Der Fehler und die Tests stehen im [Arbeitsprotokoll](docs/arbeitsprotokoll.md).
-
-## Nächste gemeinsame Entscheidungen
-
-1. Das begehbare Spiel gemeinsam vollständig durchspielen, beide Enden testen und Bewegung, Dialoge und Rätselspaß bewerten.
-2. Teamgröße, Zeitplan und genaue Anforderungen der Lehrperson bestätigen; insbesondere klären, ob API-Integration Pflicht ist oder aus unserem eigenen Ideenkonzept stammt. Die öffentlich erreichbare Bewertungsseite nennt Login und API nicht ausdrücklich. Die Gruppe hat Login derzeit pausiert.
-3. Das bestehende Spiel und seine öffentliche Demo-URL prüfen. Eine spätere gemeinsame Bestenliste würde erneut eine Entscheidung über Online-Speicherung und Anmeldung erfordern.
-4. Nach Review der Quest Karte, Figuren, Hinweise und weitere Fälle verbessern; erst danach zusätzliche Systeme erwägen.
-5. Nach **jeder** Aufgabe Protokoll, README und PR-Erklärung aktualisieren. Vor der Präsentation lässt jedes Mitglied eine fremde Funktion und den gesamten Spielweg erklären.
-
-## Für einen neuen KI-Chat
-
-Kopiere als Auftrag: „Lies zuerst die README und den aktuellen Stand des Repositories Museum Mystery. Nenne mir in einfachen Worten, was bereits umgesetzt ist und was nur geplant ist. Bearbeite dann ausschließlich **[konkrete Aufgabe]** auf einem eigenen Branch. Erkläre jede Änderung, prüfe sie und ergänze die Dokumentation so, dass jedes Teammitglied sie später erklären kann.“
-
-**Regel für KI und Team:** Behauptungen über erledigte Arbeit nur mit Datei, Commit, PR oder tatsächlichem Prüfergebnis belegen. Wenn eine Quelle nicht zugänglich ist, die Lücke nennen. Keine Funktion als fertig bezeichnen, nur weil sie in dieser README als Idee steht.
-
-Renoir: bis einschließlich 30 Sekunden 15 Punkte, bis 45 Sekunden 10, bis 60 Sekunden 5, danach 0. Station I: bis 20 Sekunden 15 Punkte, bis 35 Sekunden 10, bis 50 Sekunden 5, danach 0 (Strafzeiten eingerechnet; alte Spielstände ohne Zeit: 5). Die Zeit läuft beim Verlassen weiter und stoppt beim Lösen. Das Spiel startet bei 0 Punkten.
-
-### Aktive Überwachungskameras
-
-Aktive Kameras zeigen ein blinkendes rotes Statuslicht. Neue Räume und Kameraansichten sollen dafür die gemeinsame Darstellung in `web/camera-lights.js` verwenden. Bei aktivierter Betriebssystem-Einstellung für reduzierte Bewegung leuchtet das Licht dauerhaft, statt zu blinken.
-
-### End-to-End-Test Station I
-
-`web/dev/e2e-station-i.mjs` prüft Station I im echten Browser (falscher Check, Lösen, Punkte, kein Scrollen bei 1280×720, 1440×900, 390×844, keine Konsolenfehler, Bilder bei blockierter Met-API). Playwright gehört nicht zum Projekt:
-
-```bash
-npm i -D playwright && npx playwright install chromium
-```
+JavaScript modules need a small web server (no build step, no packages):
 
 ```bash
 python3 -m http.server 8000 --directory web
 ```
 
+Then open <http://localhost:8000>.
+
+## Run tests
+
 ```bash
-node web/dev/e2e-station-i.mjs
+cd web && node --test
 ```
+
+GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The Python files (`app.py`, `game.py`, `storage.py`, `tests/`) belong to the first Streamlit prototype. They are legacy and not part of the game; `uv run pytest` still runs them.
+
+## Project structure
+
+| Path | Purpose |
+|---|---|
+| `web/index.html`, `web/style.css` | Page, home screen, menu, journal |
+| `web/main.js` | Drawing, input, rooms, connects the game to the story |
+| `web/engine.js` | Map and movement rules |
+| `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |
+| `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
+| `web/dev/` | Preview pages, screenshots and browser checks |
+| `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
+
+## Stations and owners
+
+| Part | Owner |
+|---|---|
+| Station B – Landscape Gallery | Fabian Bergvall |
+| Station I – Portrait Hall | Florian Baumgartl |
+| Station L – Renoir picture puzzle | Leopold Heppe |
+| Station D – Frame Archive | open (placeholder) |
+| Story engine | Florian Baumgartl |
+| Rooms and graphics | Fabian Bergvall |
+| Repository and setup | Florian Stodden |
+
+## Credits
+
+Artworks and data: [The Metropolitan Museum of Art Collection API](https://metmuseum.github.io/), Open Access (Public Domain). The museum and all characters are fictional.
+
+## Course context
+
+Team project for *Introduction to Programming* at Nova SBE (2026/27). Earlier decisions, the old setup guide and the full history are in [docs/project-history.md](docs/project-history.md).

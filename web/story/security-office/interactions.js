@@ -10,8 +10,8 @@ export const INTERACTION_POINTS = Object.freeze([
     area: LAYOUT.monitorWall,
     noteId: 'transport-cart',
     title: 'Monitor wall · CAM 07, 21:14',
-    text: 'Leon rewinds the delivery-exit camera. At 21:14 a transport cart rolls past the loading door. ' +
-      'Two people in grey coats, a crate under a blanket. Whatever is inside, the camera cannot see it.',
+    text: 'Leon rewinds the delivery-exit camera. 21:14: two people in grey coats push a covered cart ' +
+      'past the loading door. The camera cannot see inside.',
   },
   {
     id: 'shift-schedule',
@@ -19,8 +19,8 @@ export const INTERACTION_POINTS = Object.freeze([
     area: LAYOUT.shiftSchedule,
     noteId: 'duty-roster',
     title: 'Shift schedule',
-    text: 'Leon: night round, all wings. Imani: studio until 22:00. One line in different ink: ' +
-      '“21:00 – patron visit, delivery exit.” The night-shift log in the Portrait Hall should say who booked it.',
+    text: 'Leon: night round. Imani: studio until 22:00. In different ink: ' +
+      '“21:00 – patron visit, delivery exit.” The Portrait Hall log should say who booked it.',
   },
   {
     id: 'radio',

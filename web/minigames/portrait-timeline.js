@@ -135,8 +135,8 @@ export function start(container, caseData, onSolved) {
       onAction: () => { closePopup?.(); closePopup = null; ui.help.focus?.(); },
       contents: [
         el('h3', { text: 'Sort the portraits' }),
-        el('p', { text: 'Start shows all three dates for 10 seconds; the clock starts when they vanish. Then put the cards in order, oldest on the left: click two cards (or press 1, 2, 3) to swap them, or drag a card. Enter checks.' }),
-        el('p', { text: 'Peek shows one date again (+5 s); a wrong check adds 5 s. Finish within 20s: +15 points; within 35s: +10; within 50s: +5; later: 0.' }),
+        el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press 1, 2, 3. Enter checks.' }),
+        el('p', { text: 'Peek shows one date (+5 s). A wrong check adds 5 s. Within 20 s: +15 points, 35 s: +10, 50 s: +5, later: 0.' }),
       ],
     });
   }

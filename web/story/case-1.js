@@ -28,9 +28,8 @@ export const CASE = deepFreeze({
     from: 'M',
     title: 'A message from M',
     text:
-      'Tonight the Museum Nocturne is yours. Somewhere inside, a safe holds Van Gogh’s ' +
-      '“Wheat Field with Cypresses”. Bring it to me before sunrise. The curator left four ' +
-      'clues behind – at four stations. Follow them, and the safe will open. – M',
+      'The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. ' +
+      'Four stations hide the way in. Bring it to me before sunrise. – M',
   },
 
   stations: [
@@ -61,7 +60,7 @@ export const CASE = deepFreeze({
       evidenceId: 'hidden-mark',
       evidence: 'Hidden mark “V” on the fake transport slip.',
       pointsToVoss: 'Someone marked the fake slip with a hidden “V” to recognise their own paperwork.',
-      task: 'In the Gallery, find Station L to the left of the wall label (B) and frame rack (D). Restore Renoir’s eight-piece picture to reveal the hidden mark on the transport slip.',
+      task: 'Station L hangs left of the wall label in the Gallery. Restore Renoir’s eight-piece picture to reveal a mark on the transport slip.',
       metIds: [459111],
     },
     {
@@ -86,8 +85,8 @@ export const CASE = deepFreeze({
     {
       id: 'duty-roster',
       title: 'Shift schedule',
-      text: 'Tonight’s roster: Leon on the night round, Imani in the studio until 22:00. ' +
-        'One line says only “21:00 – patron visit”. The night-shift log in the Portrait Hall should say more.',
+      text: 'Leon on the night round, Imani in the studio until 22:00. ' +
+        'One line says only “21:00 – patron visit”. The Portrait Hall log should say more.',
     },
   ],
 

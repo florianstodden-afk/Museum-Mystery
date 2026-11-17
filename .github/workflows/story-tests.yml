@@ -1,8 +1,11 @@
-# Runs all JavaScript tests (old game tests and story tests) for every pull request.
+# Runs all JavaScript tests (old game tests and story tests) for every pull request
+# and after every merge (push) to main.
 name: Story tests
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 jobs:

@@ -50,6 +50,8 @@ export function createStoryHost(options) {
     now = Date.now,
   } = options;
 
+  // True when an old or broken save was found and thrown away; the home screen says so once.
+  let discardedSave = false;
   let { state, progress } = load();
   state = synchronizeScore(state, progress, now());
   // Recover if the page closed between saving the final placement and awarding L.
@@ -74,13 +76,17 @@ export function createStoryHost(options) {
   // ---------- Saving ----------
 
   function load() {
+    let text = null;
     try {
-      const saved = JSON.parse(storage.getItem(storageKey));
+      text = storage.getItem(storageKey);
+      const saved = JSON.parse(text);
       const story = deserialize(saved?.story);
-      if (story) return { state: story, progress: saved.progress ?? {} };
+      const progress = saved.progress ?? {};
+      if (story && typeof progress === 'object') return { state: story, progress };
     } catch {
       // Broken or blocked storage: start a fresh game.
     }
+    discardedSave = typeof text === 'string';   // something was saved, but it could not be used
     return { state: newGame(), progress: {} };
   }
 
@@ -290,6 +296,8 @@ export function createStoryHost(options) {
   // What the page can call.
   return {
     get state() { return state; },
+    get discardedSave() { return discardedSave; },
+    get progress() { return progress; },   // saved station progress (read-only use: scoreboard times)
     leaveStation,
     tick,
     start() { if (!state.missionRead) showMission(); },

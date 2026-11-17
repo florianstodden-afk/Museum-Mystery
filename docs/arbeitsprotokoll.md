@@ -8,7 +8,7 @@
 - **Umsetzung:** `web/main.js` lässt Tastatureingaben in geöffneten Dialogen beim Dialog, statt sie für die Spielfigur abzufangen.
 - **Prüfung:** Der vorhandene Testlauf mit Node `--test` meldete 6 bestandene Tests. Ein manueller Browsertest dieser Änderung steht aus.
 
-Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](../README.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
+Hier steht nach jeder Aufgabe, was tatsächlich geschah. Die Vorlage und die Regeln stehen in der [README](project-history.md). Fehlende Fakten werden nicht ergänzt, bis sie geprüft sind.
 
 ### 2026-11-09 – Erster lokaler Museum-Mystery-Fall
 
@@ -345,3 +345,29 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Offen:** Leon an seiner Position manuell mit `E` prüfen, vollständige Runde und echtes Smartphone prüfen. Kein GitHub-Merge durch Codex.
 - **Nachtrag vor dem Merge:** PR #19 mit Station-I-Änderungen wurde zwischenzeitlich nach `main` gemergt. Dieser Branch wurde auf den neuen Stand gesetzt; danach bestanden 227 Tests.
 - **Weiterer Nachtrag:** PR #21 entfernte den „Nothing nearby“-Dialog. Beim erneuten Abgleich blieben diese Änderung und Leons E-Interaktion erhalten; 231 Tests bestanden.
+
+### 2026-11-17 – Background cleanup: CI, README, saves, scoreboard, text audit
+- **Beteiligte:** Florian Baumgartl; Claude Code (Opus 5.5).
+- **Ziel:** Tests auch nach jedem Merge, kurze englische README für die Präsentation, robuster Spielstand, aussagekräftiges Scoreboard, einheitliche kurze Texte.
+- **Umsetzung (Branch `feature/background-cleanup`):**
+  - M1: `story-tests.yml` läuft zusätzlich bei `push` auf `main`. Die Python-Tests gehören zum verworfenen Streamlit-Prototyp. Sie stehen nur in der README und laufen nicht in CI.
+  - M2: Neue englische `README.md` mit Badge und Screenshot. Die alte README liegt unverändert in `docs/project-history.md`, angepasst wurden nur die relativen Links.
+  - M3:
+    - `save.js` lehnt unbekannte Stationen ab.
+    - `host.discardedSave` meldet einen verworfenen Spielstand.
+    - Der Home Screen zeigt dann einmal „Game updated. Your run starts fresh.“.
+    - Alle anderen `localStorage`-Zugriffe hatten schon try/catch.
+  - M4:
+    - `scoreboard()`, `betterRun()` und `bestRunStore()` in `scoring.js` lesen nur vorhandene Werte.
+    - Die Anzeige liegt in `story/scoreboard-view.js` und nutzt den Look von `.puzzle-popup`.
+  - M5:
+    - `docs/text-audit.md` enthält 313 Texte.
+    - Acht Texte sind gekürzt.
+    - Für Station B, Station L und die Spoiler-Frage gibt es Vorschläge an die jeweiligen Besitzer.
+- **Prüfung:**
+  - `cd web && node --test`: 257/257 grün.
+  - Headless Chrome über das DevTools-Protokoll (Playwright ist nicht installiert):
+    - Scoreboard leer, mitten im Spiel und nach Ende bei 1440×900, 1280×720 und 390×844, jeweils ohne Scrollen.
+    - Der Hinweis bei verworfenem Spielstand erscheint.
+    - Keine Konsolenfehler.
+  - `web/dev/e2e-station-i.mjs` ist nicht gelaufen, weil Playwright fehlt.

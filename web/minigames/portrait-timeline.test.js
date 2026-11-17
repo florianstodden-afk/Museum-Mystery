@@ -108,7 +108,7 @@ test('"?" opens the instructions popup; Enter closes it again', () => {
   const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
   findButton(s.container, '?').click();
   assert.match(s.text(), /Sort the portraits/);
-  assert.match(s.text(), /Finish within 20s: \+15 points/);
+  assert.match(s.text(), /Within 20 s: \+15 points/);
   s.key('Enter');
   assert.doesNotMatch(s.text(), /Sort the portraits/);
   assert.equal(s.last().startedAt, null, 'closing help does not start the clock');

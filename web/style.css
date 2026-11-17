@@ -51,7 +51,10 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .home-panel button{border:1px solid #b18e55;border-radius:8px;background:#263f45;color:#f7ead1;padding:10px 14px;margin:0 8px 8px 0}
 .home-panel button:hover{background:#38575b}.home-panel .home-panel-close{float:right;margin:0;font-size:1.35rem;line-height:1}
 .home-panel-note{font-size:.85rem;color:#cbbfae}
+/* One quiet line when an old save was discarded (no dialog to click away). */
+.home-notice{position:absolute;z-index:1;left:50%;top:3%;transform:translateX(-50%);margin:0;padding:6px 14px;max-width:90%;border:1px solid #c49b58;border-radius:999px;background:#14242be6;color:#f7ead1;font-size:.95rem;text-align:center}
 @media(max-width:720px){
+  .home-notice{top:27%;white-space:nowrap;font-size:.85rem}
   .home-artboard{width:100%;height:100dvh;aspect-ratio:auto;overflow:hidden}
   .home-backdrop{object-fit:cover;filter:brightness(.45)}
   .home-mobile-title{position:absolute;left:7%;right:7%;top:10%;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;text-align:center;color:#f8e9c9;font-size:clamp(2rem,8vw,3.2rem);text-shadow:0 3px 10px #000}

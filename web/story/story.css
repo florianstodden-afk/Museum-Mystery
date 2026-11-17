@@ -302,3 +302,16 @@ a.story-button { display: inline-block; text-decoration: none; }
  .puzzle-time-rewards { font-size: .7rem; }
  .picture-puzzle .puzzle-slot, .picture-puzzle .puzzle-piece { min-height: 0; }
 }
+
+/* Home screen scoreboard: same panel look as Station L's popups (.puzzle-popup). */
+.scoreboard-panel { width: min(520px, 92%); max-height: 92%; padding: 22px; }
+.scoreboard-panel h2 { margin: 0 0 10px; }
+.scoreboard-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.scoreboard-table th, .scoreboard-table td { padding: 6px 8px; border-bottom: 1px solid #c3a76a44; text-align: left; }
+.scoreboard-table thead th { color: #c3a76a; font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.scoreboard-table td:nth-child(3), .scoreboard-table td:nth-child(4) { text-align: right; white-space: nowrap; }
+.scoreboard-table thead th:nth-child(n+3) { text-align: right; }
+.scoreboard-table tr.is-solved td:nth-child(2) { color: #9fd3a8; }
+.scoreboard-total, .scoreboard-best { margin: 12px 0 0; }
+.scoreboard-best { color: #cbbfae; font-size: .9rem; }
+@media (max-width: 420px) { .scoreboard-table { font-size: .8rem; } .scoreboard-table th, .scoreboard-table td { padding: 5px 4px; } }
