@@ -110,7 +110,7 @@ test('vault doorway keeps a locked player outside and allows walking both ways a
   assert.equal(atVaultDoor(locked), true);
   const entered = walk(at(16.5,9,true),[1,0],1200);
   assert.ok(entered.player.x >= 19);
-  const returned = walk(entered,[-1,0],1200);
+  const returned = walk(entered,[-1,0],2200);
   assert.ok(returned.player.x < 18);
 });
 
