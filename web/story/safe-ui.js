@@ -27,23 +27,70 @@ export function renderSafe(container, { state, message = '' }, onTry) {
     parts.push(el('p', { className: 'story-text', text: 'The safe stands open. The original painting and a folder of documents are inside.' }));
   } else {
     if (!model.ready) parts.push(el('p', { className: 'story-text', text: 'Collect proof from all four stations before the code can unlock the door.' }));
-    input = el('input', {
-      className: 'story-input',
-      attrs: { id: 'story-safe-word', name: 'word', autocomplete: 'off', maxlength: '12', spellcheck: 'false' },
+    let degrees = 0;
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const increment = 360 / alphabet.length;
+    const currentLetter = () => alphabet[((Math.round(-degrees / increment) % 26) + 26) % 26];
+    input = el('input', {attrs: {id:'story-safe-word', name:'word', type:'hidden'}});
+    const slots=el('div',{className:'vault-code-slots',attrs:{'aria-label':'Entered code','aria-live':'polite'}});
+    function showSlots(){
+      slots.replaceChildren(...Array.from({length:4},(_,i)=>el('span',{className:'vault-code-slot',text:input.value[i] || '·'})));
+    }
+    showSlots();
+    const ring = el('div', {className:'vault-wheel-ring', attrs:{tabindex:'0',role:'slider','aria-label':'Alphabet wheel','aria-valuemin':'1','aria-valuemax':'26','aria-valuenow':'1','aria-valuetext':'A'}});
+    for(let i=0;i<alphabet.length;i++){
+      const letter=el('span',{className:'vault-wheel-letter',text:alphabet[i]});
+      letter.style.setProperty('--letter-angle',`${i * increment}deg`);
+      ring.append(letter);
+    }
+    const select = el('button',{className:'vault-wheel-hub',text:'A',attrs:{type:'button','aria-label':'Select letter A'}});
+    const dial=el('div',{className:'vault-wheel'},[ring,select]);
+    function update(){
+      ring.style.transform=`rotate(${degrees}deg)`;
+      const letter=currentLetter();
+      select.textContent=letter;select.setAttribute('aria-label',`Select letter ${letter}`);
+      ring.setAttribute('aria-valuenow',String(alphabet.indexOf(letter)+1));ring.setAttribute('aria-valuetext',letter);
+    }
+    let previousAngle=null, pointerId=null;
+    function angle(event){
+      const rect=dial.getBoundingClientRect();
+      return Math.atan2(event.clientY-(rect.top+rect.height/2),event.clientX-(rect.left+rect.width/2))*180/Math.PI;
+    }
+    dial.addEventListener('pointerdown',event=>{
+      if(event.target===select || (event.button!==undefined && event.button!==0))return;
+      event.preventDefault();previousAngle=angle(event);pointerId=event.pointerId;
+      dial.setPointerCapture?.(pointerId);
     });
-    const form = el('form', { className: 'story-form' }, [
-      el('label', { className: 'story-label', text: 'Code word', attrs: { for: 'story-safe-word' } }),
-      input,
-      el('button', { className: 'story-button', text: 'Try the lock', attrs: { type: 'submit' } }),
+    dial.addEventListener('pointermove',event=>{
+      if(pointerId!==event.pointerId || previousAngle===null)return;
+      const next=angle(event);let delta=next-previousAngle;
+      if(delta>180)delta-=360;if(delta< -180)delta+=360;
+      degrees+=delta;previousAngle=next;update();
+    });
+    function finish(event){
+      if(pointerId!==event.pointerId)return;
+      previousAngle=null;pointerId=null;degrees=Math.round(degrees/increment)*increment;update();
+    }
+    dial.addEventListener('pointerup',finish);dial.addEventListener('pointercancel',finish);
+    dial.addEventListener('keydown',event=>{
+      if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+        event.preventDefault();event.stopPropagation?.();degrees+=(event.key==='ArrowLeft'?increment:-increment);update();
+      }
+    });
+    select.addEventListener('click',()=>{if(input.value.length<4){input.value+=currentLetter();showSlots();}});
+    const erase=el('button',{className:'story-button',text:'Remove last letter',attrs:{type:'button'}});
+    erase.addEventListener('click',()=>{input.value=input.value.slice(0,-1);showSlots();});
+    const wheel=el('div',{className:'vault-wheel-wrap'},[
+      el('div',{className:'vault-wheel-pointer',attrs:{'aria-hidden':'true'}}),dial,
     ]);
-    form.addEventListener('submit', event => {
-      event.preventDefault();
-      onTry(input.value);
-    });
-    parts.push(el('p', { className: 'story-text', text: 'Four letters. The journal knows the order.' }), form);
+    const form = el('form', {className:'story-form vault-code-form'}, [input,slots,erase,
+      el('button',{className:'story-button',text:'Try the lock',attrs:{type:'submit'}}),
+    ]);
+    form.addEventListener('submit', event=>{event.preventDefault();onTry(input.value);});
+    parts.push(el('p',{className:'story-text',text:'Drag the wheel to a letter, then press the centre. Repeat for all four letters.'}),wheel,form);
   }
 
   parts.push(feedback);
   container.replaceChildren(el('section', { className: 'story-safe' }, parts));
-  if (input) input.focus(); // ready to type, also again after a wrong word
+
 }
