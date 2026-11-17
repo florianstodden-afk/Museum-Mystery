@@ -27,6 +27,7 @@ export function createSecurityRenderer(){
   const background=image('./assets/security-office-hall-exit.jpg');
   const hall=image('./assets/great-hall-security-door.jpg');
   const gallery=image('./assets/gallery-nocturne-nyc.jpg');
+  const vault=image('./assets/treasure-vault.jpg');
   function screen(ctx, x,y,w,h,source,crop,label, time){
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
     ctx.fillStyle='#0b151b';ctx.fillRect(x,y,w,h);
@@ -46,8 +47,8 @@ export function createSecurityRenderer(){
     const channels=[
       [hall,[.14,.2,.73,.6],'01 HALL'],
       [gallery,[0,0,1,1],'02 GALLERY'],
-      [gallery,[.82,.25,.16,.45],'03 VAULT'],
-      [null,[], '04'],[null,[],'05'],[null,[],'06'],
+      [gallery,[.82,.25,.16,.45],'03 DOOR'],
+      [vault,[0,0,1,1],'04 VAULT'],[null,[],'05'],[null,[],'06'],
       [null,[],'07'],[null,[],'08'],[null,[],'09'],
     ];
     for(let i=0;i<9;i++){

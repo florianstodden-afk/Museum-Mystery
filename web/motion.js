@@ -1,10 +1,11 @@
+import { VAULT_STEP_X, VAULT_STEP_Y, vaultFloorContains } from './vault-layout.js';
 import { officePortal, canEnterOffice } from './security-room.js';
 import { GALLERY, galleryFootprintFits, galleryDoorTransition } from './gallery-layout.js';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
 export function movementDuration(from, to, viewport, room) {
-  const horizontal = room === 'hall' ? 896 / 9 : room === 'gallery' ? GALLERY.stepX : room === 'security' ? 100 : 32;
-  const vertical = room === 'hall' ? 14 : room === 'gallery' ? GALLERY.stepY : room === 'security' ? 20 : 32;
+  const horizontal = room === 'hall' ? 896 / 9 : room === 'gallery' ? GALLERY.stepX : room === 'security' ? 100 : VAULT_STEP_X;
+  const vertical = room === 'hall' ? 14 : room === 'gallery' ? GALLERY.stepY : room === 'security' ? 20 : VAULT_STEP_Y;
   const dx = (to.x - from.x) * horizontal * viewport.width / 896;
   const dy = (to.y - from.y) * vertical * viewport.height / 576;
   return Math.hypot(dx, dy) / PLAYER_SPEED * 1000;
@@ -14,8 +15,8 @@ export function movementDuration(from, to, viewport, room) {
 export function advancePlayer(state, direction, milliseconds, viewport, guards, canEnter) {
   if (!direction || state.ending || milliseconds <= 0) return state;
   const room=state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';
-  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:room==='security'?100:32)*viewport.width/896;
-  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:room==='security'?20:32)*viewport.height/576;
+  const sx=(room==='hall'?896/9:room==='gallery'?GALLERY.stepX:room==='security'?100:VAULT_STEP_X)*viewport.width/896;
+  const sy=(room==='hall'?14:room==='gallery'?GALLERY.stepY:room==='security'?20:VAULT_STEP_Y)*viewport.height/576;
   const distance=PLAYER_SPEED*milliseconds/1000;
   const dx=direction[0]*distance/sx, dy=direction[1]*distance/sy;
   const count=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/0.04));
@@ -49,6 +50,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
     // Keep the character inside the hall floor, without drawing a guide over the artwork.
     const hallScreenX=(nx+0.5)*896/9;
     if(room==='hall' && (hallScreenX-17<86 || hallScreenX+17>864)) break;
+    if(room==='storage' && !vaultFloorContains(nx,ny)) break;
     const cx=Math.round(nx),cy=Math.round(ny);
     if(!canEnter(state,cx,cy,guards[0])) break;
     // Use the same gallery footprint on both sides of a doorway. A centre-only

@@ -1,5 +1,6 @@
 import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
+import { vaultPosition } from './vault-layout.js';
 import { createSecurityRenderer } from './security-room.js';
 import { createGalleryRenderer } from './gallery.js';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
@@ -9,7 +10,7 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
-import { movementDuration, advancePlayer } from './motion.js?v=vault-entry-2';
+import { movementDuration, advancePlayer } from './motion.js?v=vault-floor-3';
 import { chooseGuardAction } from './guard.js';
 
 const TILE = 32;
@@ -205,8 +206,9 @@ function drawTreasureRoom(){
   // The genuine artwork is part of the case, displayed in the central frame.
   if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)ctx.drawImage(hallPaintings[1],438,169,47,43);
   const curator=OBJECTS.find(o=>o.id==='curator');
-  drawPerson(45+(curator.x-18)*75,330+(curator.y-5)*18,'restorer','down',animationTime,false);
-  const px=45+(displayPlayer.x-18)*75, py=330+(displayPlayer.y-5)*18;
+  const cp=vaultPosition(curator.x,curator.y);
+  drawPerson(cp.x,cp.y,'restorer','down',animationTime,false);
+  const {x:px,y:py}=vaultPosition(displayPlayer.x,displayPlayer.y);
   drawPerson(px,py,'rick',facing,animationTime,heldKeys.size>0);
   const target=nearbyObject(state,currentGuard());if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
 }
