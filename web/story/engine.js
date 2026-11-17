@@ -144,8 +144,8 @@ export function accuse(state, suspectId) {
     return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. ${suspect.counterText} Try again.` };
   }
   next.accusation.solved = true;
-  return accept(next, 'Adrien Voss. The false label, the patron visit, the “V” and the frame order all lead to him. ' +
-    '“M” stands for mécène – patron. He could not open Dr. Vale’s safe himself, so he sent you.');
+  return accept(next, 'Adrien Voss. Label, patron visit, “V” and frame order all lead to him. ' +
+    '“M” is for mécène, patron. He could not open Dr. Vale’s safe, so he sent you.');
 }
 
 export function chooseEnding(state, endingId) {
