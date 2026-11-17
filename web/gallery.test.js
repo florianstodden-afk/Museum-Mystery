@@ -105,10 +105,10 @@ test('walking toward the back wall away from the arch stays in the hall',()=>{
 
 
 test('vault doorway keeps a locked player outside and allows walking both ways after unlocking', () => {
-  const locked = walk(at(16.6,9),[1,0],1200);
-  assert.ok(locked.player.x <= 16.68);
+  const locked = walk(at(16.5,9),[1,0],1200);
+  assert.ok(locked.player.x <= 16.58);
   assert.equal(atVaultDoor(locked), true);
-  const entered = walk(at(16.6,9,true),[1,0],1200);
+  const entered = walk(at(16.5,9,true),[1,0],1200);
   assert.ok(entered.player.x >= 19);
   const returned = walk(entered,[-1,0],1200);
   assert.ok(returned.player.x < 18);
