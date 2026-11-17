@@ -3,11 +3,16 @@ import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } fr
 // Keep the approved concept as the actual room background, not an approximation.
 export function createGalleryRenderer() {
   const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.jpg';
+  const openVault = new Image(); openVault.src = './assets/gallery-vault-open.jpg';
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
   return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion, doorProgress = state.doorOpen ? 1 : 0 }) {
     box(ctx,0,0,896,576,'#061218');
     if(artwork.complete&&artwork.naturalWidth)ctx.drawImage(artwork,16,0,864,576);
     else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the gallery…',350,288);return;}
+    // Blend the matching illustrated doorway into the original scene as it opens.
+    if(state.doorOpen && openVault.complete && openVault.naturalWidth){
+      ctx.save();ctx.globalAlpha=Math.min(1,Math.max(0,doorProgress));ctx.drawImage(openVault,16,0,864,576);ctx.restore();
+    }
     // Cover the baked-in red diode before drawing its live on/off state.
     for(const camera of GALLERY_CAMERAS){
       box(ctx,camera.x-3,camera.y-3,6,6,'#1c1117');
@@ -24,16 +29,6 @@ export function createGalleryRenderer() {
         ctx.fillStyle='#182a32';ctx.fillRect(x-38,177,76,19);
         ctx.fillStyle='#f3dca4';ctx.font='bold 11px sans-serif';ctx.fillText('L · PUZZLE',x-31,190);
       }
-    }
-    if(state.doorOpen){
-      // The door swings inward: reveal the opening, then narrow the hinged slab.
-      const progress=Math.min(1,Math.max(0,doorProgress));
-      ctx.save();ctx.beginPath();ctx.moveTo(770,200);ctx.lineTo(819,216);ctx.lineTo(819,362);ctx.lineTo(770,329);ctx.closePath();ctx.clip();
-      ctx.fillStyle='#111d20';ctx.fillRect(768,198,54,166);
-      const glow=ctx.createLinearGradient(770,210,819,350);glow.addColorStop(0,'#2d3532');glow.addColorStop(1,'#8c6844');ctx.fillStyle=glow;ctx.fillRect(770,205,50,155);
-      const remaining=1-progress*.86;
-      if(remaining>0){ctx.drawImage(artwork,1340,340,100,290,770,191,52*remaining,164);}
-      ctx.restore();
     }
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
     ctx.save();ctx.beginPath();ctx.rect(20,150,856,400);ctx.clip();
@@ -55,7 +50,7 @@ export function createGalleryRenderer() {
       }
     }
     ctx.restore();
-    if(target||vaultNearby){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??(state.doorOpen?'Walk into vault':'Enter vault code')}`;
+    if(target||(vaultNearby&&!state.doorOpen)){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??'Enter vault code'}`;
       ctx.font='12px sans-serif';const width=Math.min(800,ctx.measureText(text).width+26),x=Math.max(48,Math.min(846-width,p.x-width/2)),y=Math.max(215,p.y-88);
       ctx.fillStyle='#101c22ed';ctx.strokeStyle='#cba868';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(x,y,width,29,5);ctx.fill();ctx.stroke();ctx.fillStyle='#f4dfae';ctx.fillText(text,x+13,y+19);
     }

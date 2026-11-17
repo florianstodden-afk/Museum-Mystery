@@ -48,7 +48,7 @@ const story = createStoryHost({
 });
 
 let state;
-try { state = vaultPreview ? {...initialState(), player: {x:16.6,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
+try { state = vaultPreview ? {...initialState(), player: {x:16.5,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
 catch { state = restoreState(null, story.state.safe.open); }
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
