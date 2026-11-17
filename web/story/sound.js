@@ -4,7 +4,7 @@
 //   recipe(id)               – each sound described as data: a few tones (pure, tested)
 //   createSoundPlayer()      – plays a recipe and remembers "muted" (needs a browser)
 
-export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open',
+export const SOUND_IDS = ['page', 'click', 'nudge', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open',
   'step-hall', 'step-gallery', 'step-office', 'step-storage', 'vault-tick', 'vault-set', 'vault-correct'];
 export const MUSIC_KEY = 'museum-nocturne-music-v1';
 export const STEP_INTERVAL_MS = 420; // one footstep sound per 0.42 s of walking: a calm pace
@@ -56,6 +56,8 @@ export function recipe(id) {
       return [tone('noise', 1700, 0, 0.02, 0.22), tone('triangle', 700, 0.006, 0.045, 0.16, 480)];
     case 'vault-correct': // a slightly brighter pin falling into place
       return [tone('noise', 2600, 0, 0.018, 0.20), tone('triangle', 1150, 0.006, 0.055, 0.20, 820)];
+    case 'nudge': // nothing to use here: one very quiet, soft low tap
+      return [tone('sine', 'A3', 0, 0.09, 0.12, NOTES.G3)];
     case 'wrong': // two low, dull notes going down
       return [tone('triangle', 'D3', 0, 0.18, 0.5), tone('triangle', 'C3', 0.18, 0.28, 0.5)];
     case 'letter': // a short rising arpeggio: a clue clicks into place
