@@ -1,7 +1,7 @@
 // What the characters say. The lines depend on the story progress.
 // dialogueFor(characterId, state) → { id, name, role, available, lines }
 // renderDialogue(container, dialogue) shows it in any container.
-import { CASE } from './case-1.js';
+import { CASE, STATION_IDS } from './case-1.js';
 import { el } from './dom.js';
 
 export const CHARACTERS = [
@@ -119,4 +119,81 @@ export function renderDialogue(container, dialogue) {
     el('h3', { className: 'story-title', text: dialogue.name }),
     ...dialogue.lines.map(line => el('p', { className: 'story-dialogue-line', text: line })),
   ]));
+}
+
+// ---------- Short conversations with choices (speech box) ----------
+// conversationFor(characterId, state) → { id, name, role, greeting, questions, goodbye } or null.
+// Each answer is a list of boxes; each box holds one or two short sentences.
+// The help is in the answers, never in the questions. Nobody names a solution.
+
+export function conversationFor(characterId, state) {
+  const character = CHARACTERS.find(c => c.id === characterId);
+  const build = { leon: leonConversation }[characterId];
+  if (!character || !build) return null;
+  return { ...character, ...build(state) };
+}
+
+export function questionsFor(characterId, state) {
+  return conversationFor(characterId, state)?.questions ?? [];
+}
+
+function leonConversation(state) {
+  return {
+    greeting: [leonGreeting(state)],
+    questions: [
+      { id: 'night', label: 'Rough night so far?', lines: leonNight(state) },
+      { id: 'quiet', label: 'Quiet in here, isn’t it?', lines: leonRound(state) },
+    ],
+    goodbye: { id: 'bye', label: 'I’ll let you get back to it.', lines: ['Mind the cameras.'] },
+  };
+}
+
+function leonGreeting(state) {
+  if (state.accusation.solved) return 'There you are. The whole building is talking.';
+  if (state.safe.open) return 'The vault was open? Nobody tells me anything.';
+  if (state.stations.portraits.solved) return 'Ah. You again. I suppose you’ve read the log.';
+  return 'Evening. Keep your voice down – the cameras have ears tonight.';
+}
+
+// Option 1: Leon's own story. It follows the trail of the night.
+function leonNight(state) {
+  if (state.accusation.solved) return linesForLeon(state).lines;
+  if (state.stations.portraits.solved) {
+    return [
+      'East stairs at 21:14. It’s in the log now, black on white.',
+      'And the cart? Booked as a “patron visit”.',
+      'I can’t book a coffee, let alone a cart.',
+    ];
+  }
+  if (state.notes.includes('transport-cart')) {
+    return [
+      'So you’ve seen the footage. A cart, nothing more.',
+      'Everyone looks at the guard first.',
+      'Funny – nobody asks where the guard actually was.',
+      'Somebody keeps the night-shift log by the portraits.',
+      'Neat handwriting, terrible coffee.',
+    ];
+  }
+  return [
+    'Rough? A cart rolled out of the delivery exit at 21:14.',
+    'Covered. Didn’t see what was under the sheet.',
+    'The monitors in the security office caught it.',
+    'If you don’t believe me, look for yourself.',
+  ];
+}
+
+// Option 2: small talk about his round. What seemed odd to him points at the first open station.
+const ODD_ON_MY_ROUND = {
+  landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'The year looked wrong to me.'],
+  portraits: ['Quiet, until you count the portraits.', 'Three ladies, and the cards beside them are all shuffled.'],
+  restoration: ['Imani’s been muttering about a puzzle of Renoir’s cliffs.', 'Says it hides something on the back of a slip.'],
+  archive: ['The frame archive door was ajar on my last round.', 'Archives don’t open themselves.'],
+};
+
+function leonRound(state) {
+  const open = STATION_IDS.find(id => !state.stations[id].solved);
+  if (open) return ODD_ON_MY_ROUND[open];
+  if (!state.safe.open) return ['Dr. Vale went down to the vault earlier.', 'Came back pale as a sheet.'];
+  if (!state.accusation.solved) return ['Whoever planned this didn’t wear a uniform.', 'Think about who signs things around here.'];
+  return ['Quiet again, finally.', 'I might even finish my coffee tonight.'];
 }
