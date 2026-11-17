@@ -25,7 +25,7 @@ Ein bestehender Anmeldestatus kann beim nächsten Besuch direkt zum Home Screen 
 1. Bei [Clerk](https://dashboard.clerk.com/) ein Projekt „Museum Mystery“ anlegen.
 2. Unter **User & authentication** nur **Username** und **Password** aktivieren. E-Mail, Telefonnummer und soziale Anmeldungen deaktivieren. Prüfen, ob die Registrierungsmaske tatsächlich nur Benutzername und Passwort verlangt.
 3. Unter **API keys** den **Publishable Key** (`pk_test_…`) kopieren und in [`web/auth-config.js`](../web/auth-config.js) zwischen die Anführungszeichen eintragen. **Niemals** den Secret Key (`sk_…`) in Dateien, Chat oder GitHub veröffentlichen.
-4. Lokal mit einem Webserver öffnen: im Ordner `web` `python -m http.server 8000`, dann `http://localhost:8000`. Mit zwei Testkonten registrieren, ausloggen, wieder einloggen und getrennte Spielstände prüfen.
+4. Lokal mit einem Webserver öffnen: im Ordner `web` `uv run --no-project --python 3.14 python -m http.server 8000`, dann `http://localhost:8000`. Mit zwei Testkonten registrieren, ausloggen, wieder einloggen und getrennte Spielstände prüfen.
 5. Für den Online-Test eine **separate Vorschau-URL** für diesen Branch bereitstellen. Die bestehende GitHub-Pages-Einstellung veröffentlicht nur `main`; ein Branch ist dort nicht automatisch als Vorschau erreichbar. Registrierung und Anmeldung auf der Vorschau-URL prüfen, weil `localhost` allein den Online-Betrieb nicht belegt.
 6. Erst wenn die Vorschau funktioniert, Pull Request prüfen und mergen. Danach die öffentliche Spiel-URL erneut testen. In `docs/arbeitsprotokoll.md` Datum, Person, Test und Ergebnis ergänzen.
 
