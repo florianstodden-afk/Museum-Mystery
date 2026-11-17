@@ -21,6 +21,8 @@ import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proxim
 const TILE = 32;
 const canvas = document.querySelector('#game');
 const homeScreen = document.querySelector('#home-screen');
+const gameMenu = document.querySelector('#game-menu');
+const gameMenuToggle = document.querySelector('#game-menu-toggle');
 const ctx = canvas.getContext('2d');
 ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
@@ -119,7 +121,6 @@ let renderedStory = null; // the story state the journal currently shows
 function save() { savePosition(); draw(); }
 function updateSidebar() {
   document.body.dataset.room = state.room==='security' ? 'security' : state.player.x < 9 ? 'hall' : state.player.x < 18 ? 'gallery' : 'storage';
-  document.querySelector('#room').textContent = state.room==='security' ? 'Security Room' : state.player.x < 9 ? 'Great Hall' : state.player.x < 18 ? 'Gallery & Conservation' : 'Treasure Room';
   document.querySelector('#steps').textContent = `${state.steps} steps`;
   // Walking saves the position several times a second. The journal only changes with the story,
   // so it is rebuilt only when the story state is a new object (every story action creates one).
@@ -337,6 +338,7 @@ function showDialog(title,text,options=[{label:'Continue (E)',action:closeDialog
   const actions=document.querySelector('#dialog-actions');actions.replaceChildren();
   for(const option of options){const b=document.createElement('button');b.textContent=option.label;if(option.secondary)b.className='secondary';b.addEventListener('click',option.action);actions.append(b);}
   dialog.classList.remove('hidden');
+  gameMenuToggle.hidden = true;
   document.querySelector('.shell').inert = true;
   // The host adds its content synchronously after showDialog returns.
   queueMicrotask(() => (dialog.querySelector('button:not(:disabled), input, select, a[href]') ?? document.querySelector('.dialog-card')).focus());
@@ -345,6 +347,7 @@ function closeDialog(){
   story.leaveStation();
   dialog.classList.add('hidden');
   document.querySelector('.shell').inert = false;
+  gameMenuToggle.hidden = !homeScreen.hidden || !entryScreen.hidden;
   const target = dialogOpener?.isConnected && dialogOpener !== document.body ? dialogOpener : canvas;
   target.focus();
 }
@@ -384,7 +387,7 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
-  if(!homeScreen.hidden){requestAnimationFrame(animate);return;}
+  if(!homeScreen.hidden || !gameMenu.hidden){requestAnimationFrame(animate);return;}
   const playerInHall=state.room!=='security' && state.player.x<9;
   if(!roomTransition && talkingTo!=='leon') { // Leon stands still while he talks
     if(guardMotion) {
@@ -468,6 +471,16 @@ function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
   if(!homeScreen.hidden)return;
+  if(!gameMenu.hidden){
+    if(event.key==='Escape'){event.preventDefault();closeGameMenu();return;}
+    if(event.key==='Tab'){
+      const focusable=[...gameMenu.querySelectorAll('button:not(:disabled)')];
+      const first=focusable[0],last=focusable.at(-1);
+      if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+    }
+    return;
+  }
   if(speech.isOpen && speech.handleKey(event)){event.preventDefault();return;} // walking keys go on below
   if (!dialog.classList.contains('hidden')) {
     if(event.key === 'Tab') {
@@ -500,9 +513,8 @@ document.querySelectorAll('[data-move]').forEach(button=>{
   button.addEventListener('keyup',event=>{if(event.key===' '||event.key==='Enter'){event.preventDefault();event.stopPropagation();heldKeys.delete(key);if(!heldKeys.size)savePosition();}});
 });
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
-document.querySelector('#journal-toggle').addEventListener('click', event=>{const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));});
-document.querySelector('#reset').addEventListener('click',()=>story.confirmNewGame());
-document.querySelector('#hint').addEventListener('click',()=>story.showHint());
+document.querySelector('#journal-toggle').addEventListener('click', event=>{closeGameMenu(false);const sidebar=document.querySelector('#sidebar');sidebar.hidden=!sidebar.hidden;event.currentTarget.setAttribute('aria-expanded',String(!sidebar.hidden));canvas.focus();});
+document.querySelector('#hint').addEventListener('click',()=>{closeGameMenu(false);canvas.focus();story.showHint();});
 const soundButton=document.querySelector('#sound-toggle');
 const homeSoundButton=document.querySelector('#home-sound');
 function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');homeSoundButton.textContent=sound.muted?'Sounds off':'Sounds on';homeSoundButton.setAttribute('aria-pressed',String(!sound.muted));}
@@ -561,10 +573,36 @@ function closeHomePanels(){
   homeSettings.setAttribute('aria-expanded','false');
   homeScoreboard.setAttribute('aria-expanded','false');
 }
+function openGameMenu(){
+  if(!homeScreen.hidden || !dialog.classList.contains('hidden'))return;
+  stopMovement();
+  speech.close();
+  const sidebar=document.querySelector('#sidebar');
+  sidebar.hidden=true;
+  document.querySelector('#journal-toggle').setAttribute('aria-expanded','false');
+  gameMenu.hidden=false;
+  gameMenuToggle.setAttribute('aria-expanded','true');
+  gameMenuToggle.setAttribute('aria-label','Close in-game menu');
+  document.querySelector('.shell').inert=true;
+  document.querySelector('#game-menu-resume').focus();
+}
+function closeGameMenu(restoreFocus=true){
+  if(gameMenu.hidden)return;
+  gameMenu.hidden=true;
+  gameMenuToggle.setAttribute('aria-expanded','false');
+  gameMenuToggle.setAttribute('aria-label','Open in-game menu');
+  document.querySelector('.shell').inert=!dialog.classList.contains('hidden') || !homeScreen.hidden;
+  if(restoreFocus)gameMenuToggle.focus();
+}
+gameMenuToggle.addEventListener('click',()=>gameMenu.hidden?openGameMenu():closeGameMenu());
+gameMenu.addEventListener('click',event=>{if(event.target===gameMenu)closeGameMenu();});
+document.querySelector('#game-menu-resume').addEventListener('click',()=>closeGameMenu());
 function showHome(){
+  closeGameMenu(false);
   stopMovement();speech.close();
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
+  gameMenuToggle.hidden=true;
   document.querySelector('.shell').inert=true;
   homeStart.disabled=!story.state.missionRead;
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
@@ -575,6 +613,7 @@ function showHome(){
 }
 function enterGame(){
   homeScreen.hidden=true;
+  gameMenuToggle.hidden=false;
   document.querySelector('.shell').inert=false;
   canvas.focus();
   if(story.state.ending)story.openVault();
@@ -588,6 +627,7 @@ homeNew.addEventListener('click',()=>{
 document.querySelector('#home-confirm-new').addEventListener('click',()=>{
   homeConfirm.hidden=true;
   homeScreen.hidden=true;
+  gameMenuToggle.hidden=false;
   document.querySelector('.shell').inert=false;
   story.reset();
 });

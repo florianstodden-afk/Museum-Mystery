@@ -6,7 +6,9 @@ Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/
 
 **Login-Idee pausiert:** Am 17.11. wurden erst Benutzername/Passwort, dann GitHub-Anmeldung besprochen und auf dem separaten Branch [`codex/login-signup`](https://github.com/florianstodden-afk/Museum-Mystery/tree/codex/login-signup) vorbereitet. Florian entschied danach ausdrücklich: kein Clerk und vorerst **gar kein Login**. Dieser Branch ist ein pausierter Entwurf, wurde **nicht** in `main` übernommen und ist nicht Teil des öffentlichen Spiels. Es wurden keine Spielerkonten angelegt. [Warum Passwörter nicht im GitHub-Repository gespeichert werden können](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
 
-**Gast-Einstieg:** Der Branch `codex/guest-entry-flow` setzt Florians Login-Bild vor den Home Screen. „Log In“ und „Sign Up“ öffnen vorerst nur eigene Gast-Zwischenansichten; **Continue as guest** führt zum Home Screen und von dort zum Spiel. Es werden keine Konten angelegt. Der genaue Ablauf und die Prüfung stehen in [docs/guest-entry-flow.md](docs/guest-entry-flow.md).
+**Gast-Einstieg:** [PR #17](https://github.com/florianstodden-afk/Museum-Mystery/pull/17) setzt Florians Login-Bild vor den Home Screen. „Log In“ und „Sign Up“ öffnen vorerst nur eigene Gast-Zwischenansichten; **Continue as guest** führt zum Home Screen und von dort zum Spiel. Es werden keine Konten angelegt. Der genaue Ablauf und die Prüfung stehen in [docs/guest-entry-flow.md](docs/guest-entry-flow.md).
+
+**Aktuelle Arbeit am Spielmenü:** Während des Spielens bleibt die Museumsszene frei von Titel, Tastaturhinweisen und den bisherigen Knöpfen am oberen Rand. Das Zahnrad oben rechts öffnet ein Menü mit Sound, Music, Hint, Journal, Resume Game und Exit to Main Menu. Die genaue Umsetzung und Prüfung stehen in [docs/in-game-menu.md](docs/in-game-menu.md). Ein neues Spiel beginnt weiterhin nur über den Home Screen.
 
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 
