@@ -8,10 +8,39 @@
   <link rel="stylesheet" href="story/story.css?v=speech-box-1">
 </head>
 <body>
-  <main class="shell">
+  <section id="home-screen" class="home-screen" aria-labelledby="home-title">
+    <div class="home-card">
+      <div class="home-copy">
+        <p class="eyebrow">MUSEUM MYSTERY · CHAPTER 01</p>
+        <h1 id="home-title">The Night of the Forgery</h1>
+        <p class="home-line">Four artworks. One vault. Your choice.</p>
+        <div class="home-actions">
+          <button id="home-start" class="home-primary" type="button">Start game</button>
+          <button id="home-new" type="button" hidden>New game</button>
+          <button id="home-settings" type="button" aria-expanded="false" aria-controls="home-settings-panel">Settings</button>
+        </div>
+        <div id="home-settings-panel" class="home-settings" hidden>
+          <h2>Settings</h2>
+          <button id="home-sound" type="button" aria-pressed="true">Sounds on</button>
+          <button id="home-music" type="button" aria-pressed="false">Music off</button>
+          <p>Move with WASD or arrow keys. Press E to inspect.</p>
+        </div>
+        <div id="home-confirm" class="home-confirm" hidden>
+          <p>Start over? Your current case progress will be erased.</p>
+          <button id="home-confirm-new" type="button">Start new game</button>
+          <button id="home-cancel-new" type="button">Cancel</button>
+        </div>
+      </div>
+      <figure class="home-art">
+        <img src="assets/met-436535.jpg" alt="Wheat Field with Cypresses by Vincent van Gogh">
+        <figcaption>Vincent van Gogh · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener noreferrer">The Met, Open Access</a></figcaption>
+      </figure>
+    </div>
+  </section>
+  <main class="shell" inert>
     <header class="topbar">
       <div><p class="eyebrow">MUSEUM MYSTERY · CHAPTER 01</p><h1>The Night of the Forgery</h1></div>
-      <div class="top-actions"><button id="sound-toggle" class="plain" type="button" aria-pressed="true">🔊 Sound</button><button id="music-toggle" class="plain" type="button" aria-pressed="false">♪ Music</button><button id="hint" class="plain">💡 Hint</button><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ New Game</button></div>
+      <div class="top-actions"><button id="home-button" class="plain" type="button">Home</button><button id="sound-toggle" class="plain" type="button" aria-pressed="true">🔊 Sound</button><button id="music-toggle" class="plain" type="button" aria-pressed="false">♪ Music</button><button id="hint" class="plain">💡 Hint</button><button id="journal-toggle" class="plain" aria-expanded="false" aria-controls="sidebar">Journal</button><button id="reset" class="plain">↻ New Game</button></div>
     </header>
     <section class="game-layout">
       <div class="stage-wrap">

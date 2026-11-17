@@ -80,7 +80,7 @@ test('a whole game runs through the host, including wrong answers', () => {
   assert.match(page.panel.textContent, /night-shift log/);
   click(page, 'Adrien Voss');
   click(page, 'Decide what happens');
-  click(page, 'Bring painting and evidence to Dr. Vale');
+  click(page, 'Quit the mission');
   assert.equal(host.state.ending, 'open-file');
   assert.equal(page.title, 'Case closed');
   // 17 + 15 (Station I max is now 15) + 15 + 20 + safe 5 + question 5
@@ -265,7 +265,7 @@ test('the host plays a sound for each story moment and stays silent without a pl
   click(page, 'Leon');       // wrong
   click(page, 'Adrien Voss');
   click(page, 'Decide what happens');
-  click(page, 'Hand the painting to Voss');
+  click(page, 'Steal the artwork');
   assert.deepEqual(played, ['page', 'letter', 'letter', 'letter', 'letter', 'hint', 'wrong', 'unlock', 'wrong', 'letter', 'ending-heist']);
 
   const silent = createStoryHost({ ...fakePage().options });

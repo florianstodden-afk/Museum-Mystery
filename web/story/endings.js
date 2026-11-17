@@ -7,23 +7,19 @@ import { el, button } from './dom.js';
 
 export const ENDINGS = {
   heist: {
-    kicker: 'ENDING A',
-    title: 'The Heist',
-    choiceLabel: 'Hand the painting to Voss',
+    kicker: 'STEAL THE ARTWORK',
+    title: 'I am a thief',
+    choiceLabel: 'Steal the artwork',
     paragraphs: [
-      'At the loading dock a dark car waits with its lights off. Adrien Voss takes the painting without a word and hands you an envelope.',
-      'By sunrise the forgery still hangs in the Landscape Gallery, under a label that carries his approval. Nobody asks questions.',
-      'The file stays closed – for now.',
+      'You take the original out of the museum and deliver it to Voss. The money is yours, but the forgery stays on the wall.',
     ],
   },
   'open-file': {
-    kicker: 'ENDING B',
-    title: 'The Open File',
-    choiceLabel: 'Bring painting and evidence to Dr. Vale',
+    kicker: 'QUIT THE MISSION',
+    title: 'I am not a thief',
+    choiceLabel: 'Quit the mission',
     paragraphs: [
-      'You carry the painting and the folder to Dr. Vale’s office. She lays the evidence out in a row: the label, the log, the slip, the frame.',
-      'At seven the board reads the file. By noon Adrien Voss is no longer a patron of the Museum Nocturne.',
-      '“Wheat Field with Cypresses” returns to its wall – the real one.',
+      'You return the original to Dr. Vale and leave the evidence with the museum. Voss loses his cover; the painting stays where it belongs.',
     ],
   },
 };
@@ -56,11 +52,11 @@ export function endingModel(state) {
 // The decision after the right answer. onChoose(endingId).
 export function renderEndingChoice(container, onChoose) {
   container.replaceChildren(el('section', { className: 'story-ending-choice' }, [
-    el('p', { className: 'story-eyebrow', text: 'YOUR DECISION' }),
-    el('p', { className: 'story-text', text: 'You hold the original and the proof. Where does the painting go?' }),
+    el('p', { className: 'story-eyebrow', text: 'ONE FINAL CHOICE' }),
+    el('p', { className: 'story-text', text: 'You have the original. What do you do?' }),
     el('div', { className: 'story-choices' }, [
-      button(ENDINGS.heist.choiceLabel, () => onChoose('heist'), 'story-choice'),
-      button(ENDINGS['open-file'].choiceLabel, () => onChoose('open-file'), 'story-choice'),
+      button(`${ENDINGS.heist.choiceLabel} · I am a thief`, () => onChoose('heist'), 'story-choice'),
+      button(`${ENDINGS['open-file'].choiceLabel} · I am not a thief`, () => onChoose('open-file'), 'story-choice'),
     ]),
   ]));
 }
@@ -90,15 +86,25 @@ export function renderEnding(container, model, options = {}) {
     ])]),
   ]);
 
-  const parts = [
-    el('p', { className: 'story-eyebrow', text: model.kicker }),
-    el('h2', { className: 'story-ending-title', text: model.title }),
-    figure,
-    ...model.paragraphs.map(text => el('p', { className: 'story-text', text })),
+  const details = el('details', { className: 'story-ending-details' }, [
+    el('summary', { text: 'View evidence and score details' }),
     renderChain(model.chain),
     table,
     el('p', { className: 'story-disclaimer', text: model.disclaimer }),
+  ]);
+  const actions = el('div', { className: 'story-ending-actions' });
+  if (options.onHome) actions.append(button('Back to home', options.onHome));
+  if (options.onNewGame) actions.append(button('New game', options.onNewGame));
+  const parts = [
+    el('div', { className: 'story-ending-copy' }, [
+      el('p', { className: 'story-eyebrow', text: model.kicker }),
+      el('h2', { className: 'story-ending-title', text: model.title }),
+      ...model.paragraphs.map(text => el('p', { className: 'story-text', text })),
+      el('p', { className: 'story-ending-total', text: `${model.total} / ${model.max} points` }),
+      actions,
+      details,
+    ]),
+    figure,
   ];
-  if (options.onNewGame) parts.push(button('New game', options.onNewGame));
   container.replaceChildren(el('section', { className: `story-ending is-${model.id}` }, parts));
 }

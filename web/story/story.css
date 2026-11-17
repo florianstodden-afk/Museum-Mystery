@@ -120,6 +120,19 @@ a.story-button { display: inline-block; text-decoration: none; }
 .dialog-card.story-dark-card .story-button:hover, .dialog-card.story-dark-card .story-choice:hover { background: #39474e; }
 .dialog-card.story-dark-card .story-choice { padding: 12px 14px; }
 
+/* The ending is a full screen result, with the detailed case file available on demand. */
+#dialog:has(.story-ending) .dialog-card{width:min(1100px,100%);max-width:1100px;max-height:calc(100dvh - 32px);margin:0 auto}
+#dialog:has(.story-ending){align-items:center}
+.story-ending{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.85fr);gap:clamp(18px,4vw,42px);align-items:center}
+.story-ending-copy{min-width:0}.story-ending .story-text{font-size:1.05rem;max-width:50ch}
+.story-ending-total{font:700 1.35rem Fraunces,Georgia,serif;color:var(--story-gold);margin:18px 0}
+.story-ending-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.story-ending-figure{margin:0}.story-ending-figure img{max-height:min(65vh,570px);object-fit:contain}
+.story-ending-details{border-top:1px solid #ffffff36;padding-top:12px;margin-top:18px}
+.story-ending-details summary{cursor:pointer;color:var(--story-gold);font-size:.9rem}
+.story-ending-details .story-chain{margin-bottom:16px}
+@media(max-width:680px){.story-ending{grid-template-columns:1fr}.story-ending-figure{grid-row:1}.story-ending-figure img{max-height:26vh}.story-ending .story-text{font-size:.95rem}}
+
 /* One uncropped image, four columns by two rows. Pieces use the same proportions. */
 .picture-puzzle { font-size: .95rem; }
 .puzzle-clock { font-variant-numeric: tabular-nums; color: var(--story-gold); font-weight: bold; }
