@@ -5,7 +5,7 @@
 //   createSoundPlayer()      – plays a recipe and remembers "muted" (needs a browser)
 
 export const SOUND_IDS = ['page', 'click', 'wrong', 'letter', 'unlock', 'hint', 'flip', 'ending-heist', 'ending-open',
-  'step-hall', 'step-gallery', 'step-office', 'step-storage'];
+  'step-hall', 'step-gallery', 'step-office', 'step-storage', 'vault-tick', 'vault-set', 'vault-correct'];
 export const MUSIC_KEY = 'museum-nocturne-music-v1';
 export const STEP_INTERVAL_MS = 420; // one footstep sound per 0.42 s of walking: a calm pace
 const STEP_VOLUME = 0.3;             // footsteps play at about a third of the other sounds
@@ -50,12 +50,18 @@ export function recipe(id) {
       return [tone('noise', 2400, 0, 0.12, 0.35)];
     case 'click': // brass click of the dial or a card
       return [tone('square', 1800, 0, 0.03, 0.25), tone('triangle', 900, 0.02, 0.05, 0.2)];
+    case 'vault-tick': // light metal detent as the dial passes a letter
+      return [tone('noise', 3400, 0, 0.012, 0.14, null, 'highpass'), tone('triangle', 1500, 0, 0.024, 0.10, 1050)];
+    case 'vault-set': // a soft latch when a letter is set
+      return [tone('noise', 1700, 0, 0.02, 0.22), tone('triangle', 700, 0.006, 0.045, 0.16, 480)];
+    case 'vault-correct': // a slightly brighter pin falling into place
+      return [tone('noise', 2600, 0, 0.018, 0.20), tone('triangle', 1150, 0.006, 0.055, 0.20, 820)];
     case 'wrong': // two low, dull notes going down
       return [tone('triangle', 'D3', 0, 0.18, 0.5), tone('triangle', 'C3', 0.18, 0.28, 0.5)];
     case 'letter': // a short rising arpeggio: a clue clicks into place
       return [tone('sine', 'C5', 0, 0.35, 0.4), tone('sine', 'E5', 0.08, 0.35, 0.35), tone('sine', 'G5', 0.16, 0.5, 0.35)];
     case 'unlock': // heavy bolt, then the door swings open
-      return [tone('square', 'C3', 0, 0.08, 0.5), tone('noise', 600, 0.08, 0.2, 0.4), tone('sawtooth', 'G3', 0.25, 0.9, 0.18, NOTES.C4)];
+      return [tone('noise', 900, 0, 0.07, 0.5), tone('triangle', 180, 0, 0.16, 0.5, 90), tone('noise', 600, 0.10, 0.2, 0.4), tone('sawtooth', 'G3', 0.25, 0.9, 0.18, NOTES.C4)];
     case 'hint': // gentle bell
       return [tone('sine', 'A4', 0, 0.6, 0.35), tone('sine', 'E5', 0.01, 0.5, 0.12)];
     case 'flip': // cards turning over

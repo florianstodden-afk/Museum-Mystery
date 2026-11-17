@@ -1,6 +1,6 @@
 // The safe: a code-word field with feedback. The host passes the state and gets the word back.
 // renderSafe(container, { state, message }, onTry)  – onTry(word) is called on submit.
-import { CASE } from './case-1.js';
+import { CASE, CODEWORD } from './case-1.js';
 import { el } from './dom.js';
 
 export function safeModel(state) {
@@ -14,7 +14,7 @@ export function safeModel(state) {
   };
 }
 
-export function renderSafe(container, { state, message = '' }, onTry) {
+export function renderSafe(container, { state, message = '', playSound = () => {} }, onTry) {
   const model = safeModel(state);
   let input = null;
   const feedback = el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } });
@@ -45,7 +45,10 @@ export function renderSafe(container, { state, message = '' }, onTry) {
     }
     const select = el('button',{className:'vault-wheel-hub',text:'A',attrs:{type:'button','aria-label':'Select letter A'}});
     const dial=el('div',{className:'vault-wheel'},[ring,select]);
+    let lastNotch = 0;
     function update(){
+      const notch=Math.round(-degrees/increment);
+      if(notch!==lastNotch){playSound('vault-tick');lastNotch=notch;}
       ring.style.transform=`rotate(${degrees}deg)`;
       const letter=currentLetter();
       select.textContent=letter;select.setAttribute('aria-label',`Select letter ${letter}`);
@@ -77,7 +80,7 @@ export function renderSafe(container, { state, message = '' }, onTry) {
         event.preventDefault();event.stopPropagation?.();degrees+=(event.key==='ArrowLeft'?increment:-increment);update();
       }
     });
-    select.addEventListener('click',()=>{if(input.value.length<4){input.value+=currentLetter();showSlots();}});
+    select.addEventListener('click',()=>{if(input.value.length<4){const letter=currentLetter();playSound(letter===CODEWORD[input.value.length]?'vault-correct':'vault-set');input.value+=letter;showSlots();}});
     const erase=el('button',{className:'story-button',text:'Remove last letter',attrs:{type:'button'}});
     erase.addEventListener('click',()=>{input.value=input.value.slice(0,-1);showSlots();});
     const wheel=el('div',{className:'vault-wheel-wrap'},[

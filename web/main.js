@@ -7,9 +7,9 @@ import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObj
 import * as landscapeStation from './minigames/landscape.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
-import { createStoryHost } from './story/host.js?v=vault-wheel-4';
+import { createStoryHost } from './story/host.js?v=vault-wheel-7';
 import { journalModel, renderJournal } from './story/journal.js';
-import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js';
+import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { movementDuration, advancePlayer } from './motion.js?v=vault-floor-3';
 import { chooseGuardAction } from './guard.js';
 
