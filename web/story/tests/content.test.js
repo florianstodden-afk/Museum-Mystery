@@ -167,3 +167,37 @@ test('the chain of evidence stays hidden after a wrong answer', () => {
   renderAccusation(container, { state: accuse(s, 'voss').state }, () => {});
   assert.match(container.textContent, /CHAIN OF EVIDENCE/);
 });
+
+test('vault wheel selects letters, wraps around, and removes mistakes', () => {
+  installFakeDom();
+  const container=createContainer();let submitted;
+  renderSafe(container,{state:started()},word=>{submitted=word;});
+  const hub=findAll(container,node=>node.className==='vault-wheel-hub')[0];
+  const dial=findAll(container,node=>node.className==='vault-wheel')[0];
+  const input=findAll(container,node=>node.tagName==='INPUT')[0];
+  const turn=key=>dial.dispatch('keydown',{key});
+  turn('ArrowLeft');hub.click();assert.equal(input.value,'Z');
+  findButton(container,'Remove last letter').click();
+  turn('ArrowRight');turn('ArrowRight');hub.click();
+  for(let i=0;i<7;i++)turn('ArrowRight');hub.click();
+  for(let i=0;i<3;i++)turn('ArrowRight');hub.click();
+  for(let i=0;i<8;i++)turn('ArrowLeft');hub.click();
+  assert.equal(input.value,'BILD');
+  findAll(container,node=>node.tagName==='FORM')[0].dispatch('submit');
+  assert.equal(submitted,'BILD');
+});
+
+test('dragging the wheel rotates the selected letter and snaps on release', () => {
+  installFakeDom();
+  const container=createContainer();
+  renderSafe(container,{state:started()},()=>{});
+  const dial=findAll(container,node=>node.className==='vault-wheel')[0];
+  const hub=findAll(container,node=>node.className==='vault-wheel-hub')[0];
+  const input=findAll(container,node=>node.tagName==='INPUT')[0];
+  dial.getBoundingClientRect=()=>({left:0,top:0,width:200,height:200});
+  dial.dispatch('pointerdown',{target:dial,pointerId:1,button:0,clientX:100,clientY:10});
+  dial.dispatch('pointermove',{target:dial,pointerId:1,clientX:78,clientY:13});
+  dial.dispatch('pointerup',{target:dial,pointerId:1});
+  hub.click();
+  assert.equal(input.value,'B');
+});
