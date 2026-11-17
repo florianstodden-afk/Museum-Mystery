@@ -327,3 +327,8 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Offen:** Merge durch die Gruppe; anschließend öffentliche GitHub-Pages-Version und echtes Smartphone prüfen. Eine vollständige Runde bis zu beiden Enden wurde für diese Oberflächenänderung nicht erneut gespielt.
 - **Nachtrag (Rückmeldung von Florian):** Lesephase von 3 auf 8 Sekunden verlängert, damit man auch die Aufgabe lesen kann. Die Uhr läuft dabei weiter. Tests: 226 bestanden.
 - **Nachtrag:** 10 Sekunden Lesezeit nach „Start“ (Aufgabe und Jahreszahlen sichtbar); die Uhr startet erst danach. Damit das kein Schlupfloch wird, sind Sortieren und Prüfen in der Lesezeit gesperrt. Tests: 227 bestanden.
+
+### 2026-11-17 – Kein „Nothing nearby“-Dialog mehr (Branch `feature/remove-nothing-nearby`)
+
+- Die Interaktionstaste öffnet ohne Objekt in der Nähe kein Popup mehr. Stattdessen wackelt die Figur 200 ms um etwa 3 px (nicht bei reduzierter Bewegung) und ein sehr leiser Ton `nudge` erklingt (nur wenn Sound an ist). Neue Datei `web/interaction.js` (reine Logik), Tests `web/interaction.test.js`; `main.js` und `story/sound.js` angepasst. Der Text kam sonst nirgends vor.
+- Prüfung: `node --test` 231 bestanden. Browser: `E` ohne Objekt → kein Dialog; `E` neben Station I → Station öffnet sich wie vorher; keine Konsolenfehler.

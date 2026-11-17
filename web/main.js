@@ -15,6 +15,7 @@ import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wh
 import { totalScore, MAX_SCORE } from './story/scoring.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
+import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js';
 import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proximity.js';
 
@@ -42,6 +43,7 @@ const sound = createSoundPlayer();
 // Every person starts talking by themselves when the player comes close,
 // and stops when the player walks away (see story/proximity.js). No E needed.
 const PEOPLE = {guard:'leon', restorer:'imani', curator:'vale'}; // map object id → story character
+let nudgedAt = -Infinity;        // when the player last shook "nothing here" (interaction.js)
 const talkWasNear = {};           // per character: true until the player walks away
 let talkingTo = null;             // the character in the speech box right now
 const speech = createSpeechBox(document.body, {
@@ -257,7 +259,14 @@ function cameraPeople(){
   }
   return rooms;
 }
+// Draws the scene; during a nudge the player is drawn a few pixels to the side.
 function draw() {
+  const resting=displayPlayer;
+  const shake=nudgeOffset(performance.now()-nudgedAt,reducedMotion.matches);
+  if(shake) displayPlayer={...resting,x:resting.x+shake};
+  try{drawScene();}finally{displayPlayer=resting;}
+}
+function drawScene() {
   canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
   if(state.room==='security'){
@@ -355,13 +364,15 @@ function handleInteract(){
   if(!homeScreen.hidden)return;
   if(speech.isOpen){speech.advance();return;}
   if(!dialog.classList.contains('hidden') || roomTransition)return;
-  if(atVaultDoor(state)){
+  const object=interactTarget();
+  const action=interactionFor({atVaultDoor:atVaultDoor(state),target:object});
+  if(action==='vault'){
     if(state.doorOpen) showDialog('Vault unlocked','Walk right through the open doorway.');
     else story.openVault();
     return;
   }
-  const object=interactTarget();
-  if(!object){showDialog('Nothing nearby','Move closer to a marked object. People talk to you by themselves.');return;}
+  // No object near: no popup, just a short shake and a quiet tap sound (see interaction.js).
+  if(action==='nudge'){nudgedAt=performance.now();sound.play('nudge');return;}
   runStoryAction(object.story);
 }
 // Each map object says in engine.js what it does in the story.
