@@ -61,6 +61,8 @@ function objectsWithGuard(guardPosition) {
 
 export function canEnter(state, x, y, guardPosition) {
   if(state.room === 'security') return canEnterOffice(x,y);
+  // Keep feet on the visible vault floor; the door is reached with E.
+  if (state.player.x >= 18 && (x > 26 || y < 5 || y > 15 || (x < 19 && !(x === 18 && y === 9)))) return false;
   if (x <= 0 || y <= 0 || x >= WIDTH - 1 || y >= HEIGHT - 1) return false;
   if (x < 9 && y >= 16) return false; // Keep feet above the hall floor border.
   if (x < 9 && y < 4) return false; // Keep the player below the full-height picture wall.

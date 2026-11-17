@@ -96,3 +96,11 @@ test('state can be saved as JSON and restored',()=>{
   const s=move(initialState(),1,0);
   assert.deepEqual(JSON.parse(JSON.stringify(s)),s);
 });
+
+test('vault boundaries keep the player on the floor while preserving the gallery exit', () => {
+  const inside = { ...initialState(), doorOpen: true, player: { x: 20, y: 9 } };
+  assert.equal(canEnter(inside, 20, 4), false);
+  assert.equal(canEnter(inside, 20, 16), false);
+  assert.equal(canEnter(inside, 18, 8), false);
+  assert.equal(canEnter(inside, 18, 9), true);
+});
