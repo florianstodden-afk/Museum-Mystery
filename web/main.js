@@ -10,7 +10,7 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js?v=vault-wheel-7';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
-import { movementDuration, advancePlayer } from './motion.js?v=vault-floor-3';
+import { movementDuration, advancePlayer } from './motion.js?v=vault-exit-4';
 import { chooseGuardAction } from './guard.js';
 
 const TILE = 32;
@@ -370,7 +370,11 @@ function animate(now){
     const guards=[guardDisplay()];
     const next=advancePlayer(state,direction,delta,viewportForGame(),guards,canEnter);
     if(next!==state){
-      if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9)) || ((state.player.x<18)!==(next.player.x<18))) roomTransition={start:now,destination:next,switched:false};
+      if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9)) || ((state.player.x<18)!==(next.player.x<18))) {
+        // Stop held movement at the vault threshold so it cannot immediately reverse the transition.
+        if((state.player.x<18)!==(next.player.x<18)) heldKeys.clear();
+        roomTransition={start:now,destination:next,switched:false};
+      }
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
       // Footsteps while the player really moves; each floor sounds different (see story/sound.js).
       if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}

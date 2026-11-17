@@ -35,7 +35,11 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
     // Cross at the painted vault doorway only after the story code unlocks it.
     if(state.doorOpen && room==='gallery' && ((direction[0]>0 && nx>=16.58 && ny>=8.6 && ny<=9.4) || (direction[1]<0 && nx>=16.35 && nx<=16.8 && ny<=8.8)))
       return {...state,player:{x:19.3,y:9},steps:state.steps+1};
-    if(state.doorOpen && room==='storage' && direction[0]<0 && nx<=19.1 && ny>=8.6 && ny<=9.4)
+    // The vault arch is on the left wall. Accept approaches along its full
+    // visible floor opening, including walking up into the arch.
+    if(state.doorOpen && room==='storage' &&
+      ((direction[0]<0 && nx<=19.1 && ny>=5 && ny<=9.5) ||
+       (direction[1]<0 && nx>=19 && nx<=19.7 && ny<=5.55)))
       return {...state,player:{x:16.4,y:9.2},steps:state.steps+1};
     const landing=galleryDoorTransition({x,y},{x:nx,y:ny});
     const crossedDoor=landing.x!==nx || landing.y!==ny;
