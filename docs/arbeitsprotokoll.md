@@ -271,3 +271,9 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Ablage und Bedienung:** Acht feste Ablageplätze stehen im 4×2-Raster neben dem Bild. Teile lassen sich per Tastatur oder Drag-and-drop zurücklegen. Der animierte Mauszeiger führt von einem Teil in der Ablage zu einem leeren Platz im Bildrahmen.
 - **Zeit und Abschluss:** Der Zeitbalken zeigt die Punkte bei 30, 45 und 60 Sekunden. Danach läuft er bis 70 Sekunden aus und zeigt +0 Punkte ohne zusätzliche Zeitmarke. Nach dem Lösen leuchtet der Rahmen, und das Abschlussfenster zeigt den Journalbuchstaben L und die verdienten Punkte.
 - **Prüfung:** Auf Basis von `main` (`2aff91c`) bestanden alle 214 JavaScript-Tests.
+
+### 2026-11-17 – Pflanzenumriss und Weg zum Tresor
+
+- **Auftrag:** Pflanzenumrisse genauer zeichnen und die unsichtbare Sperre zwischen rechter Pflanze und Tresor entfernen.
+- **Umsetzung:** Die Pflanzen im Vordergrund werden entlang eines nachgezeichneten Umrisses ausgeschnitten. Für die kontinuierliche Bewegung prüft die Galerie die sichtbare Bodenform und Hindernisse statt zusätzlicher gerundeter Rastergrenzen; der offene Tresor ist auch von rechts vorne erreichbar.
+- **Prüfung:** Den Weg von der rechten Pflanze zur Tür und anschließend in den geöffneten Tresor im Browser geprüft; alle 216 Node-Tests bestehen.

@@ -27,7 +27,7 @@ export function galleryFloorContains(x, y, doorOpen = false) {
   if (x < 150 && y >= 287 && y <= 341) return true; // west archway
   if (doorOpen && x > 780 && y >= 373 && y <= 395) return true; // east vault
   const left = y < 333 ? 150 - (y - 241) * 80 / 92 : 70 - (y - 333) * 36 / 216;
-  const right = y < 378 ? 747 + (y - 241) * 83 / 137 : 830 + (y - 378) * 32 / 171;
+  const right = y < 378 ? 747 + (y - 241) * 83 / 137 : 830 + (y - 378) * 50 / 171;
   return x >= left && x <= right;
 }
 export function galleryWalkable(x, y, doorOpen = false, skipBottomPlants = false) {

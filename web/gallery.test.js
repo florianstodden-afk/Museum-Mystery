@@ -133,7 +133,7 @@ test('vault exit works along the visible arch, including a forward approach', ()
     const exited=walk(at(19.3,y,true),[-1,0],500);
     assert.ok(exited.player.x<18, `left exit at row ${y}`);
   }
-  const forward=walk(at(19.4,6,true),[0,-1],64);
+  const forward=advancePlayer(at(19.4,6,true),[0,-1],100,viewport,[],canEnter);
   assert.ok(forward.player.x<18, 'walk forward through the arch');
   const closed=walk(at(19.3,7,false),[-1,0],500);
   assert.ok(closed.player.x>=18, 'locked vault does not bypass the door');
@@ -173,4 +173,13 @@ test('lower plant foliage can be walked behind while the pots remain solid',()=>
     const potY=14.5;
     assert.equal(galleryFootprintFits(x,potY),false,`pot should block ${x}`);
   }
+});
+
+test('the route beside the lower-right plant reaches the vault without a grid-shaped wall',()=>{
+  const start=at(17.05,13.2,false);
+  const approach=walk(start,[0,-1],1800);
+  assert.ok(approach.player.y<9.5,`stopped early at y=${approach.player.y}`);
+  assert.ok(approach.player.x>=17);
+  const opened=walk(at(17.05,13.2,true),[0,-1],1800);
+  assert.ok(opened.player.x>=19,'open vault remains enterable from this route');
 });
