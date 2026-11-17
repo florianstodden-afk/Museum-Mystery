@@ -54,6 +54,14 @@ export function createGalleryRenderer() {
         ctx.drawImage(artwork,(b.left-16)/.5625,b.top/.5625,(b.right-b.left)/.5625,(b.bottom-b.top)/.5625,b.left,b.top,b.right-b.left,b.bottom-b.top);
       }
     }
+    // Foliage is foreground when someone walks behind a plant; its base remains solid.
+    const foregroundPlants=[{left:133,top:185,right:193,bottom:277},{left:36,top:420,right:110,bottom:520},{left:787,top:420,right:860,bottom:520}];
+    const backdrop=state.doorOpen && openVault.complete && openVault.naturalWidth ? openVault : artwork;
+    for(const plant of foregroundPlants){
+      if(items.some(item=>{const p=galleryPosition(item.x,item.y);return p.y<plant.bottom && p.y>plant.top && p.x+16>plant.left && p.x-16<plant.right;})){
+        ctx.drawImage(backdrop,(plant.left-16)/.5625,plant.top/.5625,(plant.right-plant.left)/.5625,(plant.bottom-plant.top)/.5625,plant.left,plant.top,plant.right-plant.left,plant.bottom-plant.top);
+      }
+    }
     ctx.restore();
     if(target||(vaultNearby&&!state.doorOpen)){const p=galleryPosition(player.x,player.y);const text=`E · ${target?.label??'Enter vault code'}`;
       ctx.font='12px sans-serif';const width=Math.min(800,ctx.measureText(text).width+26),x=Math.max(48,Math.min(846-width,p.x-width/2)),y=Math.max(215,p.y-88);

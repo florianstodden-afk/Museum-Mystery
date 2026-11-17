@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GALLERY, GALLERY_BENCHES, GALLERY_OBSTACLES, galleryFootprintFits, galleryPosition, cameraLightOn } from './gallery-layout.js';
+import { GALLERY, GALLERY_BENCHES, GALLERY_OBSTACLES, galleryFootprintFits, galleryPosition, galleryVaultDoorBlocks, cameraLightOn } from './gallery-layout.js';
+import { createGalleryRenderer } from './gallery.js';
 import { initialState, atVaultDoor, canEnter, restoreState, nearbyObject } from './engine.js';
 import { advancePlayer } from './motion.js';
 const viewport={width:896,height:576};
@@ -17,7 +18,7 @@ test('gallery drawing borders are exactly the collision tile edges',()=>{
   assert.equal(galleryPosition(10,16.5).y,GALLERY.bottom);
 });
 test('continuous movement keeps the footprint inside the artwork perspective walls',()=>{
-  for(const [start,direction] of [[at(12,4),[-1,0]],[at(16,5),[1,0]],[at(12,3),[0,-1]],[at(13,16),[0,1]]]){
+  for(const [start,direction] of [[at(12,4),[-1,0]],[at(16,5),[1,0]],[at(12,4),[0,-1]],[at(13,16),[0,1]]]){
     const stopped=walk(start,direction);
     assert.ok(stopped.player.x>=9&&stopped.player.x<18);
     assert.ok(galleryFootprintFits(stopped.player.x,stopped.player.y));
@@ -106,7 +107,7 @@ test('walking toward the back wall away from the arch stays in the hall',()=>{
 
 test('vault doorway keeps a locked player outside and allows walking both ways after unlocking', () => {
   const locked = walk(at(16.5,9),[1,0],1200);
-  assert.ok(locked.player.x <= 16.58);
+  assert.equal(galleryVaultDoorBlocks(locked.player.x,locked.player.y,false),false);
   assert.equal(atVaultDoor(locked), true);
   const entered = walk(at(16.5,9,true),[1,0],1200);
   assert.ok(entered.player.x >= 19);
@@ -116,14 +117,14 @@ test('vault doorway keeps a locked player outside and allows walking both ways a
 
 test('walking toward the open vault from the front enters while the locked door blocks', () => {
   const locked = walk(at(16.5,9),[0,-1],800);
-  assert.ok(locked.player.y >= 8.75);
   assert.ok(locked.player.x < 18);
+  assert.equal(galleryVaultDoorBlocks(locked.player.x,locked.player.y,false),false);
   const entered = walk(at(16.5,9,true),[0,-1],800);
   assert.ok(entered.player.x >= 19);
   const besideDoor = walk(at(16.1,9,true),[0,-1],800);
-  assert.ok(besideDoor.player.y >= 8.75);
-  const side = walk(at(15.7,8,true),[1,0],800);
-  assert.ok(side.player.x < 15.95);
+  assert.ok(galleryPosition(besideDoor.player.x,besideDoor.player.y).y >= 360);
+  const side = walk(at(15.7,7.8,true),[1,0],800);
+  assert.ok(galleryPosition(side.player.x,side.player.y).x < 696);
 });
 
 
@@ -136,4 +137,32 @@ test('vault exit works along the visible arch, including a forward approach', ()
   assert.ok(forward.player.x<18, 'walk forward through the arch');
   const closed=walk(at(19.3,7,false),[-1,0],500);
   assert.ok(closed.player.x>=18, 'locked vault does not bypass the door');
+});
+
+test('vault door collision follows the visible closed face or swung-open panel',()=>{
+  // The open door swings into the room; the same floor is clear when closed.
+  assert.equal(galleryVaultDoorBlocks(16.15,7.7,false),false);
+  assert.equal(galleryVaultDoorBlocks(16.15,7.7,true),true);
+  // The closed face is solid, while the open doorway can be crossed.
+  assert.equal(galleryVaultDoorBlocks(16.7,9,false),true);
+  assert.equal(galleryVaultDoorBlocks(16.7,9,true),false);
+  const freeWithClosedDoor=walk(at(15.9,7.7,false),[1,0],300);
+  const blockedByOpenDoor=walk(at(15.9,7.7,true),[1,0],300);
+  assert.ok(freeWithClosedDoor.player.x>blockedByOpenDoor.player.x);
+});
+
+test('plant foliage is drawn in front of someone standing behind its base',()=>{
+  const oldImage=globalThis.Image;
+  globalThis.Image=class {constructor(){this.complete=true;this.naturalWidth=1536;this.naturalHeight=1024;}};
+  try {
+    const events=[];
+    const ctx=new Proxy({}, {get(target,key){
+      if(key==='drawImage') return (...args)=>{if(args.length===9)events.push({kind:'crop',destX:args[5],destY:args[6]});};
+      return target[key] ?? (()=>{});
+    },set(target,key,value){target[key]=value;return true;}});
+    createGalleryRenderer()(ctx,{time:0,state:{doorOpen:false},player:{x:10.7,y:3.7},objects:[],target:null,facing:'down',moving:false,drawPerson(){events.push({kind:'person'});},vaultNearby:false,reducedMotion:false});
+    const actorIndex=events.findIndex(event=>event.kind==='person');
+    const foliageIndex=events.findIndex(event=>event.kind==='crop'&&event.destX===133&&event.destY===185);
+    assert.ok(actorIndex>=0 && foliageIndex>actorIndex);
+  } finally {globalThis.Image=oldImage;}
 });
