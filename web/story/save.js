@@ -43,6 +43,7 @@ export function isValidState(value) {
   }
 
   if (value.stations === null || typeof value.stations !== 'object') return false;
+  if (Object.keys(value.stations).some(id => !STATION_IDS.includes(id))) return false;   // unknown station
   for (const id of STATION_IDS) {
     if (!isStationProgress(value.stations[id])) return false;
   }

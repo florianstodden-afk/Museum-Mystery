@@ -663,6 +663,14 @@ function closeGameMenu(restoreFocus=true){
 gameMenuToggle.addEventListener('click',()=>gameMenu.hidden?openGameMenu():closeGameMenu());
 gameMenu.addEventListener('click',event=>{if(event.target===gameMenu)closeGameMenu();});
 document.querySelector('#game-menu-resume').addEventListener('click',()=>closeGameMenu());
+// An old or broken save was thrown away: say so once on the home screen, without a dialog.
+let saveNoticeShown=false;
+function showSaveNotice(){
+  const notice=document.querySelector('#home-notice');
+  notice.hidden=saveNoticeShown || !story.discardedSave;
+  if(!notice.hidden)notice.textContent='Game updated. Your run starts fresh.';
+  saveNoticeShown=true;
+}
 function showHome(){
   closeJournal(false);
   closeGameMenu(false);
@@ -676,6 +684,7 @@ function showHome(){
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
   document.querySelector('#home-scoreboard-result').textContent=
     `${story.state.ending?'Finished run':'Current run'}: ${totalScore(story.state)} / ${MAX_SCORE} points.`;
+  showSaveNotice();
   closeHomePanels();
   (homeStart.disabled?homeNew:homeStart).focus();
 }
