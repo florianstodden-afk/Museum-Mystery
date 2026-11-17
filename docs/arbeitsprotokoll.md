@@ -304,3 +304,9 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Ergebnis:** Nein. GitHub Pages ist eine statische Website ohne Anmeldeserver. Passwortdateien im Repository wären lesbar und könnten in der Git-Historie erhalten bleiben. GitHub-Login wäre technisch ein anderer Weg, würde aber GitHub-Konten für alle Spieler voraussetzen. Belege und Entscheidung stehen in `docs/login-setup.md`.
 - **Tatsächlich erledigt:** Die Clerk-Registrierungsseite wurde im Browser geöffnet. Sie bietet für das **Verwaltungskonto** E-Mail/Passwort oder GitHub/Google an. Das ist getrennt von den späteren Spieler-Anmeldungen. Die Eingabe persönlicher Zugangsdaten liegt bei Florian.
 - **Noch nicht erledigt:** Es wurde kein Clerk-Konto, kein Clerk-Projekt und kein Spieler-Konto angelegt. Es liegt noch kein Publishable Key vor; Anmeldung und Registrierung im Spiel sind daher nicht funktionsfähig.
+
+### 2026-11-17 - Entscheidung für GitHub-Anmeldung der Spieler
+
+- **Entscheidung:** Florian möchte statt eines eigenen Benutzernamens und Passworts im Spiel die Anmeldung mit GitHub. Jeder Spieler benötigt damit ein eigenes GitHub-Konto. Die beiden Knöpfe aus der Bildvorlage bleiben sichtbar; Anmeldung und Registrierung laufen über denselben GitHub-OAuth-Weg.
+- **Umsetzung mit KI-Unterstützung:** Die vorbereitete Oberfläche nennt GitHub, und das Spiel zeigt nach Möglichkeit den GitHub-Namen. Clerk soll GitHub als einzigen Anmeldeweg anbieten und weiterhin die Spielerkonto-ID liefern. Detaillierte Einrichtung: `docs/login-setup.md`.
+- **Noch offen:** Clerk-Verwaltungskonto über GitHub anlegen, Projekt erstellen, GitHub-Verbindung aktivieren, Publishable Key eintragen und den gesamten Weg testen. Die bisherige öffentliche Spielversion wurde nicht verändert.

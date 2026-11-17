@@ -4,7 +4,7 @@ Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/
 
 **Stand: 17. November 2026.** Die Gruppe verbessert nach positivem Feedback des Professors das bestehende begehbare 2D-Spiel, statt den früheren Ideenbaukasten umzusetzen. Im Fokus stehen klare Räume und Interaktionen, kurze Texte, ein aufgeräumtes Journal, vier saubere Minispiele, ein Home Screen und zwei verständliche Enden. Ein gemeinsames Online-Leaderboard mit Login ist gewünscht, aber noch nicht implementiert. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
 
-**Login-Arbeit in Prüfung:** Der Branch `codex/login-signup` bereitet eine bebilderte Eingangsseite, getrennte Login- und Registrierungsansichten sowie Spielstände pro Konto vor. Das ist **noch nicht im öffentlichen Spiel aktiv**: Ein Clerk-Projekt und ein Test der Anmeldung fehlen. Der genaue Spielweg, die Einrichtung und die Grenzen stehen in [docs/login-setup.md](docs/login-setup.md).
+**Login-Arbeit in Prüfung:** Der Branch `codex/login-signup` bereitet eine bebilderte Eingangsseite, GitHub-Anmeldung und Spielstände pro Konto vor. Florian entschied sich am 17.11.2026 für GitHub-Konten der Spieler statt eigener Spiel-Passwörter. Das ist **noch nicht im öffentlichen Spiel aktiv**: Ein Clerk-Projekt und ein Test der Anmeldung fehlen. Der genaue Spielweg, die Einrichtung und die Grenzen stehen in [docs/login-setup.md](docs/login-setup.md).
 
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 

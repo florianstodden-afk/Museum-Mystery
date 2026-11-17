@@ -57,7 +57,7 @@ function showForm(kind) {
   choices.hidden = true;
   panel.hidden = false;
   title.textContent = kind === 'login' ? 'Log In' : 'Sign Up';
-  message.textContent = clerk ? '' : 'Login is not connected yet. The team must add a Clerk publishable key.';
+  message.textContent = clerk ? 'Continue with your GitHub account.' : 'GitHub login is not connected yet. The team must add a Clerk publishable key.';
   if (clerk) {
     const options = {
       routing: 'hash',

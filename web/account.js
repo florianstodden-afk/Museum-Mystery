@@ -1,7 +1,8 @@
 let currentAccount = null;
 
 export function setCurrentAccount(user) {
-  currentAccount = user ? { id: user.id, username: user.username } : null;
+  const github = user?.externalAccounts?.find(account => account.provider?.includes('github'));
+  currentAccount = user ? { id: user.id, username: github?.username ?? user.username ?? user.fullName ?? 'player' } : null;
 }
 
 export function getCurrentAccount() {

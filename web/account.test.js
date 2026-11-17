@@ -16,6 +16,8 @@ test('game progress is separated by account ID', () => {
   assert.equal(accountStorage(storage, flo).getItem('portrait-best'), '31');
   assert.equal(accountStorage(storage, leo).getItem('portrait-best'), '42');
   assert.notEqual(accountStorageKey('story', flo), accountStorageKey('story', leo));
+  setCurrentAccount({ id: 'user_flo', username: null, externalAccounts: [{ provider: 'oauth_github', username: 'florianstodden-afk' }] });
+  assert.equal(accountStorageKey('story'), accountStorageKey('story', flo));
   setCurrentAccount(null);
   assert.throws(() => accountStorageKey('story'), /account is required/i);
 });
