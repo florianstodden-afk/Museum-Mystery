@@ -1,0 +1,8 @@
+/* Shared station look (station-ui.js). Everything else comes from L's rules in web/story/story.css. */
+
+/* Tick marks at the station's own tiers instead of L's fixed 30/45/60 s. */
+.station-time-track::after { background: linear-gradient(to right, var(--ticks)); }
+/* L positions its 2nd–4th marks with nth-child rules; a station with its own tiers sets `left` inline. */
+.station-time-marks span:nth-child(n) { left: auto; }
+.station-time-marks span:first-child { left: 0; }
+.station-extra { text-align: center; margin: 0 0 14px; }
