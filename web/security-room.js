@@ -1,5 +1,6 @@
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
-import { GALLERY_CAMERAS } from './gallery-layout.js';
+import { vaultPosition } from './vault-layout.js';
+import { GALLERY_CAMERAS, galleryPosition } from './gallery-layout.js';
 // The office has its own floor and shares the existing story examination actions.
 export const SECURITY_OBJECTS = [
   {id:'office-roster',x:2,y:1,label:'Shift schedule',story:{examine:'shift-schedule'}},
@@ -29,12 +30,26 @@ export function createSecurityRenderer(){
   const background=image('./assets/security-office-hall-exit.jpg');
   const hall=image('./assets/great-hall-security-door.jpg');
   const gallery=image('./assets/gallery-nocturne-nyc.jpg');
+  const galleryOpen=image('./assets/gallery-vault-open.jpg');
   const vault=image('./assets/treasure-vault.jpg');
-  function screen(ctx, x,y,w,h,source,crop,label,time,cameras,reducedMotion){
+  function screen(ctx, x,y,w,h,source,crop,label,time,cameras,reducedMotion,people,drawPerson,scene){
     ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
     ctx.fillStyle='#0b151b';ctx.fillRect(x,y,w,h);
     if(source?.complete && source.naturalWidth){
       ctx.globalAlpha=.8;ctx.drawImage(source,crop[0]*source.naturalWidth,crop[1]*source.naturalHeight,crop[2]*source.naturalWidth,crop[3]*source.naturalHeight,x,y,w,h);ctx.globalAlpha=1;
+      if(people?.length){
+        // Project the same world positions used in each room into this camera crop.
+        const sceneW=scene==='hall'?896:864;
+        const sceneH=scene==='hall'?896*source.naturalHeight/source.naturalWidth:576;
+        const originX=scene==='hall'?0:16, originY=scene==='hall'?(576-sceneH)/2:0;
+        const sx=w/(crop[2]*sceneW), sy=h/(crop[3]*sceneH);
+        ctx.save();ctx.translate(x-(crop[0]*sceneW+originX)*sx,y-(crop[1]*sceneH+originY)*sy);ctx.scale(sx,sy);
+        for(const person of [...people].sort((a,b)=>a.y-b.y)) {
+          const p=scene==='hall'?{x:(person.x+.5)*896/9,y:345+(person.y-2)*14}:scene==='gallery'?galleryPosition(person.x,person.y):vaultPosition(person.x,person.y);
+          drawPerson(p.x,p.y,person.kind,person.facing||'down',time,Boolean(person.moving));
+        }
+        ctx.restore();
+      }
       if(cameras){
         const sx=w/(crop[2]*864), sy=h/(crop[3]*576);
         ctx.save();ctx.translate(x-(crop[0]*864+16)*sx,y-crop[1]*576*sy);ctx.scale(sx,sy);
@@ -47,22 +62,23 @@ export function createSecurityRenderer(){
     if(source){ctx.fillStyle=Math.floor(time/900)%2?'#fb5454':'#8e3030';ctx.beginPath();ctx.arc(x+w-6,y+6,2,0,Math.PI*2);ctx.fill();}
     ctx.restore();
   }
-  return function drawOffice(ctx,{time,player,target,facing,moving,drawPerson,reducedMotion=false}){
+  return function drawOffice(ctx,{time,player,target,facing,moving,drawPerson,reducedMotion=false,peopleByRoom={},doorOpen=false}){
     ctx.fillStyle='#091317';ctx.fillRect(0,0,896,576);
     if(!background.complete||!background.naturalWidth){ctx.fillStyle='#eee0bc';ctx.font='18px Georgia';ctx.fillText('Opening the security room…',310,280);return;}
     ctx.drawImage(background,16,0,864,576);
+    const galleryView=doorOpen && galleryOpen.complete && galleryOpen.naturalWidth ? galleryOpen : gallery;
     const channels=[
-      [hall,[.14,.2,.73,.6],'01 HALL'],
-      [gallery,[0,0,1,1],'02 GALLERY',GALLERY_CAMERAS],
-      [gallery,[.82,.25,.16,.45],'03 DOOR',GALLERY_CAMERAS],
-      [vault,[0,0,1,1],'04 VAULT',VAULT_CAMERAS],
-      [vault,[.34,.12,.62,.74],'05 VAULT R',VAULT_CAMERAS],
+      [hall,[.14,.2,.73,.6],'01 HALL',null,'hall'],
+      [galleryView,[0,0,1,1],'02 GALLERY',GALLERY_CAMERAS,'gallery'],
+      [galleryView,[.82,.25,.16,.45],'03 DOOR',GALLERY_CAMERAS,'gallery'],
+      [vault,[0,0,1,1],'04 VAULT',VAULT_CAMERAS,'vault'],
+      [vault,[.34,.12,.62,.74],'05 VAULT R',VAULT_CAMERAS,'vault'],
       [null,[],'06'],
       [null,[],'07'],[null,[],'08'],[null,[],'09'],
     ];
     for(let i=0;i<9;i++){
-      const [source,crop,label,cameras]=channels[i];
-      screen(ctx,298+(i%3)*104,30+Math.floor(i/3)*63,90,50,source,crop,label,time,cameras,reducedMotion);
+      const [source,crop,label,cameras,scene]=channels[i];
+      screen(ctx,298+(i%3)*104,30+Math.floor(i/3)*63,90,50,source,crop,label,time,cameras,reducedMotion,peopleByRoom[scene],drawPerson,scene);
     }
     const p=officePosition(player.x,player.y);
     drawPerson(p.x,p.y,'rick',facing,time,moving);

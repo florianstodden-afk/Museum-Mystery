@@ -2,7 +2,7 @@ import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
-import { createSecurityRenderer } from './security-room.js?v=camera-lights-2';
+import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=camera-lights-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js';
 import * as landscapeStation from './minigames/landscape.js';
@@ -218,11 +218,24 @@ function drawTreasureRoom(){
   const {x:px,y:py}=vaultPosition(displayPlayer.x,displayPlayer.y);
   const target=nearbyObject(state,currentGuard());if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
 }
+// The monitor wall uses the same actors and positions as the walkable rooms.
+function cameraPeople(){
+  const guard=guardDisplay();
+  const guardFacing=guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
+  const restorer=OBJECTS.find(object=>object.id==='restorer');
+  const curator=OBJECTS.find(object=>object.id==='curator');
+  const rooms={hall:[{...guard,kind:'guard',facing:guardFacing,moving:Boolean(guardMotion)}],gallery:[{...restorer,kind:'restorer'}],vault:[{...curator,kind:'restorer'}]};
+  if(state.room!=='security'){
+    const room=state.player.x<9?'hall':state.player.x<18?'gallery':'vault';
+    rooms[room].push({...displayPlayer,kind:'rick',facing,moving:heldKeys.size>0});
+  }
+  return rooms;
+}
 function draw() {
   canvas.style.objectPosition='50% 50%';
   ctx.clearRect(0,0,896,576);
   if(state.room==='security'){
-    drawSecurityRoom(ctx,{time:animationTime,player:displayPlayer,target:nearbyObject(state),facing,moving:heldKeys.size>0,drawPerson,reducedMotion:reducedMotion.matches});return;
+    drawSecurityRoom(ctx,{time:animationTime,player:displayPlayer,target:nearbyObject(state),facing,moving:heldKeys.size>0,drawPerson,reducedMotion:reducedMotion.matches,peopleByRoom:cameraPeople(),doorOpen:state.doorOpen});return;
   }
   if(state.player.x < 9){drawHall();return;}
   if(state.player.x < 18){
@@ -344,17 +357,19 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
-  if(!roomTransition && state.room!=='security' && state.player.x < 9 && dialog.classList.contains('hidden')) {
+  const playerInHall=state.room!=='security' && state.player.x<9;
+  if(!roomTransition) {
     if(guardMotion) {
       const nextElapsed=Math.min(guardMotion.duration,guardMotion.elapsed+delta);
       const t=nextElapsed/guardMotion.duration;
       const future={x:guardMotion.from.x+(guardMotion.to.x-guardMotion.from.x)*t,y:guardMotion.from.y+(guardMotion.to.y-guardMotion.from.y)*t};
-      if(Math.abs(future.x-state.player.x)>=0.45 || Math.abs(future.y-state.player.y)>=2.4)guardMotion.elapsed=nextElapsed;
+      if(!playerInHall || Math.abs(future.x-state.player.x)>=0.45 || Math.abs(future.y-state.player.y)>=2.4)guardMotion.elapsed=nextElapsed;
       if(guardMotion.elapsed>=guardMotion.duration){guardLastFacing=guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down';guardPosition=guardMotion.to;guardDelay=guardMotion.pause;guardMotion=null;}
     } else {
       guardDelay-=delta;
       if(guardDelay<=0){
-        const action=chooseGuardAction(state,guardPosition);
+        const guardWorld=playerInHall?state:{...state,room:'museum',player:{x:-100,y:-100}};
+        const action=chooseGuardAction(guardWorld,guardPosition);
         if(action.kind==='wait')guardDelay=action.duration;
         else guardMotion={from:{...guardPosition},to:action.target,elapsed:0,duration:Math.max(250,movementDuration(guardPosition,action.target,viewportForGame(),'hall')*4.4),pause:action.pause};
       }

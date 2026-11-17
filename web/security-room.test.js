@@ -66,3 +66,18 @@ test('two monitors display views from the vault cameras',()=>{
     assert.notDeepEqual(vaultCrops[0],vaultCrops[1]);
   } finally {globalThis.Image=oldImage;}
 });
+
+test('active monitors render each room’s actual people and walking state',()=>{
+  const oldImage=globalThis.Image;
+  globalThis.Image=class {constructor(){this.complete=true;this.naturalWidth=1536;this.naturalHeight=1024;}};
+  try {
+    const people=[]; const ctx=new Proxy({}, {get(target,key){return target[key] ?? (()=>{});},set(target,key,value){target[key]=value;return true;}});
+    createSecurityRenderer()(ctx,{time:1200,player:{x:4,y:5},target:null,facing:'down',moving:false,
+      peopleByRoom:{hall:[{x:5,y:5,kind:'guard',facing:'left',moving:true}],gallery:[{x:15,y:12,kind:'restorer'}],vault:[{x:21,y:12,kind:'restorer'}]},
+      drawPerson(...args){people.push(args);}});
+    assert.equal(people.length,6); // hall, two gallery feeds, two vault feeds, office player
+    assert.equal(people[0][2],'guard');assert.equal(people[0][3],'left');assert.equal(people[0][5],true);
+    assert.equal(people.filter(p=>p[2]==='restorer').length,4);
+    assert.equal(people.at(-1)[2],'rick');
+  } finally {globalThis.Image=oldImage;}
+});
