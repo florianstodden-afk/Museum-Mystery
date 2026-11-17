@@ -93,14 +93,15 @@ test('ending model has no ending before the decision', () => {
 test('ending model gives the right breakdown for both endings', () => {
   const heist = endingModel(finished('heist', { wrongWord: true, stationResult: { landscape: { mistakes: 1, hints: 1 } } }));
   assert.equal(heist.title, 'The Heist');
-  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 20, 15, 20, 5, 10]);
-  assert.equal(heist.total, 82);
+  // Station I is a speedrun station now: at most 15 points (like L).
+  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 15, 15, 20, 5, 10]);
+  assert.equal(heist.total, 77);
   assert.match(heist.image.src, /assets\/met-436535\.jpg$/);
   assert.match(heist.disclaimer, /Fictional museum and characters/);
 
   const openFile = endingModel(finished('open-file', { wrongSuspect: 'vale' }));
   assert.equal(openFile.title, 'The Open File');
-  assert.equal(openFile.total, 90);
+  assert.equal(openFile.total, 85);
   assert.equal(openFile.chain.every(link => link.found), true);
 });
 
@@ -109,7 +110,7 @@ test('ending renders the score table and a new-game button', () => {
   const container = createContainer();
   let restarted = false;
   renderEnding(container, endingModel(finished('open-file')), { onNewGame: () => { restarted = true; } });
-  assert.match(container.textContent, /95 \/ 95/);
+  assert.match(container.textContent, /90 \/ 90/);
   findButton(container, 'New game').click();
   assert.equal(restarted, true);
 });
