@@ -41,6 +41,7 @@ export function createStoryHost(options) {
     onChange = () => {},
     onVaultUnlocked = null,
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
+    onHome = null,            // optional: return from an ending to the home screen
     sound = null,             // optional: a player from sound.js; without it the story is silent
     speech = null,            // optional: a box from speech-box.js; then Leon talks in it instead of the panel
     stations = {},
@@ -243,7 +244,7 @@ export function createStoryHost(options) {
     const model = endingModel(state);
     if (!model) return;
     const { content } = scene('Case closed');
-    renderEnding(content, model, { onNewGame: confirmNewGame });
+    renderEnding(content, model, { onNewGame: confirmNewGame, onHome });
   }
 
   function showHint() {

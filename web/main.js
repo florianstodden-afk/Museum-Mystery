@@ -12,6 +12,7 @@ import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js?v=speech-box-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
+import { totalScore, MAX_SCORE } from './story/scoring.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { createSpeechBox } from './story/speech-box.js';
@@ -19,6 +20,7 @@ import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proxim
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
+const homeScreen = document.querySelector('#home-screen');
 const ctx = canvas.getContext('2d');
 ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
@@ -56,6 +58,7 @@ const story = createStoryHost({
   onVaultUnlocked: closeDialog,
   onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
+  onHome: showHome,
   sound,
   speech,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
@@ -346,6 +349,7 @@ function closeDialog(){
   target.focus();
 }
 function handleInteract(){
+  if(!homeScreen.hidden)return;
   if(speech.isOpen){speech.advance();return;}
   if(!dialog.classList.contains('hidden') || roomTransition)return;
   if(atVaultDoor(state)){
@@ -380,6 +384,7 @@ function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
   animationTime = now;
+  if(!homeScreen.hidden){requestAnimationFrame(animate);return;}
   const playerInHall=state.room!=='security' && state.player.x<9;
   if(!roomTransition && talkingTo!=='leon') { // Leon stands still while he talks
     if(guardMotion) {
@@ -462,6 +467,7 @@ function checkAutoTalk(){
 function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.78;}
 requestAnimationFrame(animate);
 document.addEventListener('keydown',event=>{
+  if(!homeScreen.hidden)return;
   if(speech.isOpen && speech.handleKey(event)){event.preventDefault();return;} // walking keys go on below
   if (!dialog.classList.contains('hidden')) {
     if(event.key === 'Tab') {
@@ -498,17 +504,86 @@ document.querySelector('#journal-toggle').addEventListener('click', event=>{cons
 document.querySelector('#reset').addEventListener('click',()=>story.confirmNewGame());
 document.querySelector('#hint').addEventListener('click',()=>story.showHint());
 const soundButton=document.querySelector('#sound-toggle');
-function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');}
-soundButton.addEventListener('click',()=>{sound.toggle();showSoundState();sound.play('click');});
+const homeSoundButton=document.querySelector('#home-sound');
+function showSoundState(){soundButton.textContent=sound.muted?'🔇 Muted':'🔊 Sound';soundButton.setAttribute('aria-pressed',String(!sound.muted));soundButton.setAttribute('aria-label',sound.muted?'Sound is off. Turn sound on':'Sound is on. Turn sound off');homeSoundButton.textContent=sound.muted?'Sounds off':'Sounds on';homeSoundButton.setAttribute('aria-pressed',String(!sound.muted));}
+function toggleSound(){sound.toggle();showSoundState();sound.play('click');}
+soundButton.addEventListener('click',toggleSound);
+homeSoundButton.addEventListener('click',toggleSound);
 showSoundState();
 const musicButton=document.querySelector('#music-toggle');
-function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music';musicButton.setAttribute('aria-pressed',String(sound.musicOn));}
-musicButton.addEventListener('click',()=>{sound.toggleMusic();showMusicState();});
+const homeMusicButton=document.querySelector('#home-music');
+function showMusicState(){musicButton.textContent=sound.musicOn?'♪ Music on':'♪ Music';musicButton.setAttribute('aria-pressed',String(sound.musicOn));homeMusicButton.textContent=sound.musicOn?'Music on':'Music off';homeMusicButton.setAttribute('aria-pressed',String(sound.musicOn));}
+function toggleMusic(){sound.toggleMusic();showMusicState();}
+musicButton.addEventListener('click',toggleMusic);
+homeMusicButton.addEventListener('click',toggleMusic);
 showMusicState();
 // Browsers only allow sound after the first click or key press; music that was left on starts then.
 for(const type of ['pointerdown','keydown'])document.addEventListener(type,()=>sound.resumeMusic(),{once:true});
 document.querySelector('#mission').addEventListener('click',()=>story.showMission());
+const homeStart=document.querySelector('#home-start');
+const homeNew=document.querySelector('#home-new');
+const homeSettings=document.querySelector('#home-settings');
+const homeSettingsPanel=document.querySelector('#home-settings-panel');
+const homeScoreboard=document.querySelector('#home-scoreboard');
+const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
+const homeConfirm=document.querySelector('#home-confirm');
+function closeHomePanels(){
+  homeSettingsPanel.hidden=true;homeScoreboardPanel.hidden=true;homeConfirm.hidden=true;
+  homeSettings.setAttribute('aria-expanded','false');
+  homeScoreboard.setAttribute('aria-expanded','false');
+}
+function showHome(){
+  stopMovement();speech.close();
+  if(!dialog.classList.contains('hidden'))closeDialog();
+  homeScreen.hidden=false;
+  document.querySelector('.shell').inert=true;
+  homeStart.disabled=!story.state.missionRead;
+  homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
+  document.querySelector('#home-scoreboard-result').textContent=
+    `${story.state.ending?'Finished run':'Current run'}: ${totalScore(story.state)} / ${MAX_SCORE} points.`;
+  closeHomePanels();
+  (homeStart.disabled?homeNew:homeStart).focus();
+}
+function enterGame(){
+  homeScreen.hidden=true;
+  document.querySelector('.shell').inert=false;
+  canvas.focus();
+  if(story.state.ending)story.openVault();
+  else story.start();
+}
+homeStart.addEventListener('click',enterGame);
+homeNew.addEventListener('click',()=>{
+  if(!story.state.missionRead){enterGame();return;}
+  closeHomePanels();homeConfirm.hidden=false;document.querySelector('#home-confirm-new').focus();
+});
+document.querySelector('#home-confirm-new').addEventListener('click',()=>{
+  homeConfirm.hidden=true;
+  homeScreen.hidden=true;
+  document.querySelector('.shell').inert=false;
+  story.reset();
+});
+document.querySelector('#home-cancel-new').addEventListener('click',()=>{closeHomePanels();homeNew.focus();});
+homeSettings.addEventListener('click',()=>{
+  const opening=homeSettingsPanel.hidden;closeHomePanels();homeSettingsPanel.hidden=!opening;
+  homeSettings.setAttribute('aria-expanded',String(opening));
+  if(opening)document.querySelector('#home-sound').focus();
+});
+homeScoreboard.addEventListener('click',()=>{
+  const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
+  homeScoreboard.setAttribute('aria-expanded',String(opening));
+  if(opening)homeScoreboardPanel.querySelector('button').focus();
+});
+homeScreen.querySelectorAll('[data-close-home-panel]').forEach(button=>button.addEventListener('click',()=>{
+  const opener=button.closest('#home-settings-panel')?homeSettings:homeScoreboard;
+  closeHomePanels();opener.focus();
+}));
+homeScreen.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && (!homeSettingsPanel.hidden || !homeScoreboardPanel.hidden || !homeConfirm.hidden)){
+    closeHomePanels();homeNew.focus();event.preventDefault();
+  }
+});
+document.querySelector('#home-button').addEventListener('click',showHome);
 save();
-story.start(); // M's message on the very first visit
+showHome(); // The mission starts only after the player chooses Start game.
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });

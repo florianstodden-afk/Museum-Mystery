@@ -2,9 +2,11 @@
 
 Ein gemeinsames Spielprojekt für **Introduction to Programming (Nova SBE, 2026/27)**. Diese README ist unser Einstiegspunkt für Teammitglieder und neue KI-Chats. **Vor jeder Aufgabe zuerst diese Datei und den aktuellen Code lesen.** Danach den Stand auf GitHub prüfen. Ein Chat kennt spätere Änderungen nicht automatisch.
 
-**Stand: 9. November 2026.** Die aktuelle Spielrichtung ist ein begehbares 2D-Museum mit Mystery-Quest und zwei Enden. Der Browser-Prototyp liegt in `web/`; die frühere Streamlit-Bilderrätsel-App bleibt als dokumentierter Zwischenstand erhalten. Echte Benutzerkonten, gemeinsame Online-Spielstände und eine öffentliche Demo-URL fehlen noch. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
+**Stand: 17. November 2026.** Die Gruppe verbessert nach positivem Feedback des Professors das bestehende begehbare 2D-Spiel, statt den früheren Ideenbaukasten umzusetzen. Im Fokus stehen klare Räume und Interaktionen, kurze Texte, ein aufgeräumtes Journal, vier saubere Minispiele, ein Home Screen und zwei verständliche Enden. Ein gemeinsames Online-Leaderboard mit Login ist gewünscht, aber noch nicht implementiert. Frühere Aussagen in der Projektgeschichte sind jeweils auf ihren damaligen Stand bezogen.
 
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
+
+Öffentliches Spiel (Stand von `main`): <https://florianstodden-afk.github.io/Museum-Mystery/>
 
 Kurs: <https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html>
 
