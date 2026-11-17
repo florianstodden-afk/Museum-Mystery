@@ -174,3 +174,31 @@ a.story-button { display: inline-block; text-decoration: none; }
   border-color: #a58655;
   box-shadow: 0 22px 80px #000d, inset 0 0 28px #05070ba8;
 }
+
+/* ---------- Speech box (story/speech-box.js): RPG-style talk at the bottom of the game ---------- */
+.speech { position: fixed; z-index: 5; left: 50%; bottom: 28px; transform: translateX(-50%); width: min(820px, calc(100vw - 24px)); font-family: system-ui, sans-serif; }
+.speech.is-top { bottom: auto; top: 96px; }
+.speech.hidden { display: none; }
+.speech-tag { display: inline-flex; align-items: baseline; gap: 10px; margin-left: 22px; padding: 7px 18px 9px; background: #17262b; color: #f4ecdc; border: 2px solid #c49b58; border-bottom: 0; border-radius: 8px 8px 0 0; }
+.speech-name { font-weight: 700; font-size: 16px; }
+.speech-role { font-size: 13px; color: #d7b06a; }
+.speech-box { position: relative; background: #f0e9d9; color: #1e2a2d; border: 2px solid #c49b58; border-radius: 22px; padding: 18px 28px 20px; box-shadow: 0 14px 40px #0008; cursor: pointer; }
+.speech-text { margin: 0; min-height: 1.4em; font-size: 19px; line-height: 1.4; }
+.speech-choices { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.speech-choices:empty { display: none; }
+.speech-choice { font: inherit; font-size: 15px; padding: 9px 17px; border-radius: 999px; border: 1.5px solid #c49b58; background: #f7f1e4; color: #1e2a2d; cursor: pointer; }
+.speech-choice:first-child { background: #164a52; color: #f4ecdc; border-color: #164a52; }
+.speech-choice.is-goodbye { border-style: dashed; color: #7d7466; background: transparent; }
+.speech-choice:hover, .speech-choice:focus-visible { outline: 3px solid #c49b58; outline-offset: 2px; }
+.speech-more { position: absolute; right: 22px; bottom: 10px; color: #a07a3c; font-size: 14px; animation: speech-bob 0.9s ease-in-out infinite; }
+.speech-more[hidden], .speech.is-typing .speech-more { display: none; }
+@keyframes speech-bob { 50% { transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) { .speech-more { animation: none; } }
+@media (max-width: 650px) {
+  .speech { bottom: 64px; }
+  .speech.is-top { top: 70px; }
+  .speech-tag { margin-left: 14px; padding: 5px 12px 7px; }
+  .speech-box { padding: 14px 16px 16px; border-radius: 18px; }
+  .speech-text { font-size: 16px; }
+  .speech-choice { font-size: 14px; padding: 8px 13px; }
+}

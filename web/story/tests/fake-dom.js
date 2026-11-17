@@ -11,6 +11,13 @@ class FakeElement {
     this.ownText = '';
     this.disabled = false;
     this.value = '';
+    const classes = () => new Set(this.className.split(' ').filter(Boolean));
+    this.classList = {
+      add: name => { this.className = [...classes().add(name)].join(' '); },
+      remove: name => { const set = classes(); set.delete(name); this.className = [...set].join(' '); },
+      toggle: (name, on = !classes().has(name)) => { on ? this.classList.add(name) : this.classList.remove(name); return on; },
+      contains: name => classes().has(name),
+    };
     this.style = { setProperty(name, value) { this[name] = value; } };
   }
   set textContent(text) { this.ownText = String(text); this.children = []; }
