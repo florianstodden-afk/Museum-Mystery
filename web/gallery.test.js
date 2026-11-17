@@ -1,3 +1,4 @@
+import { foliageOpacity } from './plant-mask.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GALLERY, GALLERY_BENCHES, GALLERY_OBSTACLES, galleryFootprintFits, galleryPosition, galleryVaultDoorBlocks, cameraLightOn } from './gallery-layout.js';
@@ -152,19 +153,20 @@ test('vault door collision follows the visible closed face or swung-open panel',
 });
 
 test('plant foliage is drawn in front of someone standing behind its base',()=>{
-  const oldImage=globalThis.Image;
+  const oldImage=globalThis.Image, oldDocument=globalThis.document;
+  globalThis.document={createElement(){return {getContext(){return {drawImage(){},getImageData(){return {data:new Uint8ClampedArray(4)};},putImageData(){}};}};}};
   globalThis.Image=class {constructor(){this.complete=true;this.naturalWidth=1536;this.naturalHeight=1024;}};
   try {
     const events=[];
     const ctx=new Proxy({}, {get(target,key){
-      if(key==='drawImage') return (...args)=>{if(args.length===9)events.push({kind:'crop',destX:args[5],destY:args[6]});};
+      if(key==='drawImage') return (...args)=>{if(args.length===5)events.push({kind:'crop',destX:args[1],destY:args[2]});};
       return target[key] ?? (()=>{});
     },set(target,key,value){target[key]=value;return true;}});
     createGalleryRenderer()(ctx,{time:0,state:{doorOpen:false},player:{x:10.7,y:3.7},objects:[],target:null,facing:'down',moving:false,drawPerson(){events.push({kind:'person'});},vaultNearby:false,reducedMotion:false});
     const actorIndex=events.findIndex(event=>event.kind==='person');
     const foliageIndex=events.findIndex(event=>event.kind==='crop'&&event.destX===133&&event.destY===185);
     assert.ok(actorIndex>=0 && foliageIndex>actorIndex);
-  } finally {globalThis.Image=oldImage;}
+  } finally {globalThis.Image=oldImage;globalThis.document=oldDocument;}
 });
 
 test('lower plant foliage can be walked behind while the pots remain solid',()=>{
@@ -182,4 +184,10 @@ test('the route beside the lower-right plant reaches the vault without a grid-sh
   assert.ok(approach.player.x>=17);
   const opened=walk(at(17.05,13.2,true),[0,-1],1800);
   assert.ok(opened.player.x>=19,'open vault remains enterable from this route');
+});
+
+test('plant foreground keeps wooden floor transparent while retaining green leaves',()=>{
+  assert.equal(foliageOpacity(180,83,35),0);
+  assert.equal(foliageOpacity(130,140,45),255);
+  assert.equal(foliageOpacity(35,38,50),0);
 });
