@@ -31,7 +31,7 @@ const story = createStoryHost({
     return document.querySelector('#dialog-body');
   },
   closePanel: closeDialog,
-  onChange() { state = { ...state, doorOpen: story.state.safe.open }; savePosition(); draw(); },
+  onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
   sound,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
@@ -68,6 +68,7 @@ let guardDelay = 1200;
 let guardLastFacing = 'down';
 let lastFrame = 0;
 let roomTransition = null;
+let vaultOpenedAt = null;
 function currentGuard(){return guardDisplay();}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
@@ -211,7 +212,7 @@ function draw() {
   if(state.player.x < 18){
     drawGallery(ctx, { time: animationTime, state, player: displayPlayer, objects: OBJECTS,
       target: nearbyObject(state,currentGuard()), facing, moving: heldKeys.size > 0, drawPerson,
-      vaultNearby: atVaultDoor(state), reducedMotion: reducedMotion.matches });
+      vaultNearby: atVaultDoor(state), reducedMotion: reducedMotion.matches, doorProgress: state.doorOpen ? (vaultOpenedAt === null || reducedMotion.matches ? 1 : Math.min(1, Math.max(0,(performance.now()-vaultOpenedAt)/1600))) : 0 });
     return;
   }
   drawTreasureRoom();return;
@@ -294,13 +295,13 @@ function closeDialog(){
   target.focus();
 }
 function handleInteract(){
-  if(!dialog.classList.contains('hidden'))return;
+  if(!dialog.classList.contains('hidden') || roomTransition)return;
   if(atVaultDoor(state)){
-    if(state.doorOpen){state={...state,player:{x:19.3,y:9}};displayPlayer={...state.player};savePosition();draw();}
+    if(state.doorOpen){heldKeys.clear();roomTransition={start:performance.now(),destination:{...state,player:{x:19.3,y:9}},switched:false};}
     else story.openVault();
     return;
   }
-  if(state.player.x>=18 && state.player.x<20.2){state={...state,player:{x:17,y:9}};displayPlayer={...state.player};savePosition();draw();return;}
+  if(state.player.x>=18 && state.player.x<20.2){heldKeys.clear();roomTransition={start:performance.now(),destination:{...state,player:{x:17,y:9}},switched:false};return;}
   const object=nearbyObject(state,currentGuard());
   if(!object){showDialog('Nothing nearby','Move closer to a marked object or a person.');return;}
   runStoryAction(object.story);
@@ -358,7 +359,7 @@ function animate(now){
     const guards=[guardDisplay()];
     const next=advancePlayer(state,direction,delta,viewportForGame(),guards,canEnter);
     if(next!==state){
-      if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9))) roomTransition={start:now,destination:next,switched:false};
+      if((state.room==='security')!==(next.room==='security') || ((state.player.x<9)!==(next.player.x<9)) || ((state.player.x<18)!==(next.player.x<18))) roomTransition={start:now,destination:next,switched:false};
       else {state=next;displayPlayer={...state.player};if(now-lastSavedAt>250){savePosition();lastSavedAt=now;}}
       // Footsteps while the player really moves; each floor sounds different (see story/sound.js).
       if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}

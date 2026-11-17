@@ -4,7 +4,7 @@ import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition, cameraLightOn } fr
 export function createGalleryRenderer() {
   const artwork = new Image(); artwork.src = './assets/gallery-nocturne-nyc.jpg';
   const box=(ctx,x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(x,y,w,h);};
-  return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion }) {
+  return function drawGallery(ctx, { time, state, player, objects, target, facing, moving, drawPerson, vaultNearby, reducedMotion, doorProgress = state.doorOpen ? 1 : 0 }) {
     box(ctx,0,0,896,576,'#061218');
     if(artwork.complete&&artwork.naturalWidth)ctx.drawImage(artwork,16,0,864,576);
     else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the gallery…',350,288);return;}
@@ -26,7 +26,7 @@ export function createGalleryRenderer() {
       }
     }
     if(state.doorOpen){
-      ctx.save();ctx.fillStyle='#07141bde';ctx.beginPath();ctx.moveTo(778,251);ctx.lineTo(819,272);ctx.lineTo(819,352);ctx.lineTo(778,322);ctx.closePath();ctx.fill();
+      ctx.save();ctx.globalAlpha=doorProgress;ctx.fillStyle='#07141bde';ctx.beginPath();ctx.moveTo(778,251);ctx.lineTo(819,272);ctx.lineTo(819,352);ctx.lineTo(778,322);ctx.closePath();ctx.fill();
       ctx.fillStyle='#c4db9a';ctx.beginPath();ctx.arc(772,305,2,0,Math.PI*2);ctx.fill();ctx.restore();
     }
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);

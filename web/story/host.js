@@ -203,6 +203,7 @@ export function createStoryHost(options) {
       const result = act(tryOpenSafe(state, word), 'tryOpenSafe');
       showSafe(result.message);
     });
+    if (state.safe.open) actions.append(button('Return to the gallery', () => closePanel()));
     actions.append(state.safe.open
       ? button('Look at the documents', () => showAccusation(''))
       : closeButton());
