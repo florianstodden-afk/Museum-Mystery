@@ -75,8 +75,12 @@ test('the Great Hall desk opens the portrait timeline (Station I)',()=>{
 });
 
 test('standing in front of the vault door is detected',()=>{
-  assert.equal(atVaultDoor(at(initialState(),17,9)),true);
+  for (const y of [5.5, 6, 7, 8, 9, 10]) {
+    assert.equal(atVaultDoor(at(initialState(),16.6,y)),true, `door approach at row ${y}`);
+  }
   assert.equal(atVaultDoor(at(initialState(),16,9)),false);
+  assert.equal(atVaultDoor(at(initialState(),16.6,5)),false);
+  assert.equal(atVaultDoor({...at(initialState(),16.6,7),room:'security'}),false);
 });
 
 test('old saves keep position and steps but nothing from the old story',()=>{

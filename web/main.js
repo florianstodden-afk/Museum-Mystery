@@ -5,7 +5,7 @@ import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=gallery-plants-6';
-import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=gallery-route-8';
+import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=vault-interaction-2';
 import * as landscapeStation from './minigames/landscape.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
