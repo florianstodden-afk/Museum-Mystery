@@ -371,3 +371,22 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
     - Der Hinweis bei verworfenem Spielstand erscheint.
     - Keine Konsolenfehler.
   - `web/dev/e2e-station-i.mjs` ist nicht gelaufen, weil Playwright fehlt.
+
+### 2026-11-18 – Station I: team feedback (focus, fourth portrait)
+- **Beteiligte:** Florian Baumgartl; Claude Code (Opus 5.5).
+- **Fokus:**
+  - `main.js` fokussiert nach dem Öffnen eines Fensters den ersten Knopf, das war bisher „?“.
+  - Station I holt sich den Fokus danach zurück (`queueMicrotask`) und setzt ihn auf „Start“. Enter startet also immer das Spiel.
+  - Nach dem Hilfe-Popup liegt der Fokus wieder auf „Start“ bzw. auf der ersten Karte.
+  - `main.js` und Station L blieben unverändert. L hat sehr wahrscheinlich dasselbe Problem: Ihr Start-Fokus wird ebenfalls überschrieben.
+- **Viertes Bild:**
+  - Neu ist Ingres, *Madame Jacques-Louis Leblanc (Françoise Poncelle, 1788–1839)*, 1823, Met 436703.
+  - Daten und Public Domain habe ich am 18.11. über die Met API geprüft. Die lokale Kopie `web/assets/met-436703.jpg` ist 96 KB groß, die Quelle steht in `met-436703-source.md`.
+  - Der neue Log-Eintrag lautet „20:48 · Shift change – Leon on duty“.
+  - Im Code ist nichts mehr fest auf drei Karten eingestellt: Plätze, Zifferntasten, Achse und Texte richten sich nach der Kartenanzahl.
+  - Layout: auf dem Desktop eine Reihe mit vier Karten, auf dem Handy 2 × 2.
+  - Punkte: 15 bis 25 s, 10 bis 40 s, 5 bis 55 s. Die Grenzen stehen nur in `PORTRAIT_LIMITS_MS`, die Punkte-Leiste rechnet damit.
+- **Prüfung:**
+  - `cd web && node --test`: 260/260 grün.
+  - Im echten Spiel mit headless Chrome bei 1440×900, 1280×720 und 390×844 gespielt: E, sofort Enter, Ablesezeit, Sortieren, Erfolg. Der Fokus lag auf Start, es öffnete sich kein Hilfe-Popup, es gab kein Scrollen, vier gleich große Karten, alle Bilder geladen, keine Konsolenfehler.
+  - `web/dev/e2e-station-i.mjs` habe ich auf vier Bilder angepasst, aber nicht laufen lassen, weil Playwright nicht installiert ist.

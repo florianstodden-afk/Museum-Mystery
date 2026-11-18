@@ -1,4 +1,4 @@
-// Station I: loads the three portrait images.
+// Station I: loads the portrait images.
 // First the Met Collection API (checked carefully), otherwise the bundled copy in web/assets.
 // The ORDER of the cards never comes from here – only from the frozen snapshot in case-1.js.
 import { workById } from '../story/case-1.js';
@@ -54,7 +54,7 @@ export async function loadPortrait(artwork, { fetchData = fetch, readImage = loa
   }
 }
 
-// All three portraits, in the order of PORTRAIT_ARTWORKS.
+// All portraits, in the order of PORTRAIT_ARTWORKS.
 export function loadPortraits(options) {
   return Promise.all(PORTRAIT_ARTWORKS.map(artwork => loadPortrait(artwork, options)));
 }

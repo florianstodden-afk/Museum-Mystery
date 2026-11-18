@@ -91,18 +91,18 @@ function solvedWith(timeline) {
 }
 
 test('Station I speed boundaries: ≤20 s → 15, ≤35 s → 10, ≤50 s → 5, else 0', () => {
-  for (const [ms, points] of [[0, 15], [20000, 15], [20001, 10], [35000, 10], [35001, 5], [50000, 5], [50001, 0]]) {
+  for (const [ms, points] of [[0, 15], [25000, 15], [25001, 10], [40000, 10], [40001, 5], [55000, 5], [55001, 0]]) {
     assert.equal(portraitSpeedPoints(ms), points, String(ms));
     assert.equal(totalScore(solvedWith(portraitRun(ms))), points, `game ${ms}`);
   }
 });
 
-test('Station I penalties count: 12 s + one wrong check + one peek = 22 s → 10 points', () => {
-  const state = solvedWith(portraitRun(12000, { wrong: 1, peeks: 1 }));
+test('Station I penalties count: 17 s + one wrong check + one peek = 27 s → 10 points', () => {
+  const state = solvedWith(portraitRun(17000, { wrong: 1, peeks: 1 }));
   assert.equal(state.stations.portraits.points, 10);
-  assert.equal(state.stations.portraits.timeMs, 22000);
+  assert.equal(state.stations.portraits.timeMs, 27000);
   const row = scoreBreakdown(state).find(r => r.id === 'portraits');
-  assert.equal(row.detail, 'Portrait timeline time 0:22');
+  assert.equal(row.detail, 'Portrait timeline time 0:27');
   assert.equal(row.max, 15);
 });
 

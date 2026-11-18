@@ -8,7 +8,7 @@
 // It plays the flow of Station I (same as Station L): intro → Start ↵ → catalogue flash → sorting with the
 // points bar (one wrong check) → success popup with letter I → Return to museum. It checks: no scrolling at
 // 1280×720, 1440×900 and 390×844, the drag hint arrow, points by time, letter I in the journal,
-// no console errors, and that all three images show when the Met API is blocked (offline copies).
+// no console errors, and that all four images show when the Met API is blocked (offline copies).
 import { chromium } from 'playwright';
 
 const URL = process.env.STATION_URL ?? 'http://localhost:8000/dev/story.html';
@@ -29,6 +29,8 @@ for (const [width, height] of SIZES) {
   await page.getByRole('button', { name: 'Read M’s message' }).click();
   await page.getByRole('button', { name: 'Accept the mission' }).click();
   await page.getByRole('button', { name: 'Enter station' }).nth(1).click();
+  // Feedback: Start has the focus right away, so Enter starts the game (not the "?" help).
+  ok(`${width}×${height} focus on Start`, await page.evaluate(() => document.activeElement?.textContent.startsWith('Start')));
 
   const fits = () => page.evaluate(() => { const d = document.querySelector('dialog[open]'); return [d.scrollHeight, d.clientHeight]; });
   const report = async label => { const [s, c] = await fits(); ok(`${width}×${height} ${label}: no scrolling`, s <= c, `${s}/${c}`); };
@@ -40,9 +42,9 @@ for (const [width, height] of SIZES) {
   const started = Date.now();
   await page.keyboard.press('Enter');                                   // Start ↵
   const years = await page.locator('.portrait-chip').allTextContents();
-  ok(`${width}×${height} flash shows three dates`, years.length === 3, years.join(', '));
+  ok(`${width}×${height} flash shows four dates`, years.length === 4, years.join(', '));
   await report('flash');
-  await page.waitForTimeout(3100);                                      // the dates vanish, the arrow appears
+  await page.waitForTimeout(10100);                                     // 10 s reading time, then the arrow appears
   ok(`${width}×${height} drag hint arrow`, await page.locator('.portrait-timeline .puzzle-drag-demo').isVisible());
   await page.keyboard.press('Enter');                                   // still shuffled → wrong, +5 s
   ok(`${width}×${height} wrong check says "Not yet"`, (await page.locator('.puzzle-status').textContent()).includes('Not yet'));
@@ -50,9 +52,9 @@ for (const [width, height] of SIZES) {
 
   // Sort with the number keys by the remembered years (selection sort).
   const order = years.map(text => parseInt(text, 10));
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < order.length; i++) {
     let min = i;
-    for (let j = i + 1; j < 3; j++) if (order[j] < order[min]) min = j;
+    for (let j = i + 1; j < order.length; j++) if (order[j] < order[min]) min = j;
     if (min === i) continue;
     await page.keyboard.press(String(i + 1));
     await page.keyboard.press(String(min + 1));
@@ -64,7 +66,7 @@ for (const [width, height] of SIZES) {
   await report('solved');
 
   const images = await page.locator('.portrait-face img').evaluateAll(list => list.map(img => img.complete && img.naturalWidth > 0));
-  ok(`${width}×${height} offline images`, images.length === 3 && images.every(Boolean));
+  ok(`${width}×${height} offline images`, images.length === 4 && images.every(Boolean));
   await page.keyboard.press('Enter');                                   // Return to museum ↵
   const body = await page.locator('body').innerText();
   ok(`${width}×${height} back in the museum with letter I`, !(await page.locator('dialog[open]').count()) && /Score: (15|10) \/ 90/.test(body));

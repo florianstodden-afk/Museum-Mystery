@@ -1,6 +1,6 @@
 // Station I (Portrait Hall): pure rules, no DOM.
 // Speedrun: press Start, memorise the dates during the "catalogue flash",
-// then put the three portraits in order, oldest first. Mistakes and peeks cost time, not points.
+// then put the portraits in order, oldest first. Mistakes and peeks cost time, not points.
 // A card is identified by its Met object ID.
 import { CASE, workById } from '../story/case-1.js';
 
@@ -13,6 +13,7 @@ export const PENALTY_MS = 5000;   // added to the clock for a peek or a wrong ch
 // The back of each card: one short line of the fictional night-shift log.
 // Read in the right order (oldest → newest painting) they form the log.
 export const LOG_BACKS = Object.freeze({
+  436703: '20:48 · Shift change – Leon on duty',
   436121: '21:02 · Leon – east wing round',
   12127: '21:14 · Cart out – “patron visit, A. V.”',
   435876: '21:20 · Leon – back at the desk',

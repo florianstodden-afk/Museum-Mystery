@@ -12,9 +12,9 @@
 .portrait-timeline [hidden] { display: none !important; }
 .portrait-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-/* Board: three equal cards, the timeline and the hint arrow */
+/* Board: four equal cards in a row (2 × 2 on phones), the timeline and the hint arrow */
 .portrait-board { position: relative; margin: 12px 0; }
-.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 2vw, 18px); position: relative; }
+.portrait-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(8px, 2vw, 18px); position: relative; }
 .portrait-card { min-width: 0; perspective: 1200px; }
 .portrait-inner { position: relative; transition: transform .6s ease; transform-style: preserve-3d; }
 .portrait-front { display: grid; gap: 2px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -44,7 +44,7 @@
 .portrait-cards.is-flipped .portrait-inner { transform: rotateY(180deg); }
 .portrait-cards.is-flipped .portrait-front > :not(.portrait-face) { visibility: hidden; }
 
-/* Timeline with three numbered places and the scan progress */
+/* Timeline with one numbered place per card and the scan progress */
 .portrait-axis { margin: 10px 0 0; }
 .portrait-axis-row { display: flex; align-items: center; gap: 8px; }
 .portrait-slot { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #9c875a; border-radius: 50%; font-size: .75rem; color: #c3c7c5; }
@@ -56,11 +56,16 @@
 .portrait-timeline .puzzle-clock.is-penalty .puzzle-time-fill { background: #e0645a; }
 .portrait-timeline .puzzle-clock.is-penalty .puzzle-time-track { border-color: #e0645a; }
 
-/* Phones: three small cards side by side */
+/* Phones: four cards as 2 × 2 */
 @media (max-width: 600px) {
-  .picture-puzzle .portrait-face, .portrait-back { max-height: 130px; }
-  .portrait-artist { font-size: .78rem; }
-  .portrait-title { font-size: .7rem; }
+  .portrait-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 6px; }
+  /* 2 × 2 must fit a phone without scrolling: smaller frames, one line of text per card. */
+  .picture-puzzle .portrait-face, .portrait-back { max-height: 92px; margin-bottom: 2px; }
+  .portrait-artist { font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .portrait-title { display: none; }
+  .portrait-meta { min-height: 20px; margin-top: 0; }
+  .portrait-timeline .puzzle-credit { font-size: .66rem; line-height: 1.3; margin: 4px 0; }
+  .portrait-board { margin: 6px 0; }
   .portrait-meta { flex-wrap: wrap; gap: 4px; }
   .portrait-chip, .picture-puzzle .portrait-peek { font-size: .7rem; padding: 1px 6px; }
   .portrait-back { font-size: .68rem; padding: 6px; }

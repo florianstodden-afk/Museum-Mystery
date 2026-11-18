@@ -5,10 +5,11 @@ import { PORTRAIT_ARTWORKS, loadPortrait, loadPortraits, verifiedImageUrl } from
 import { start } from './portrait-timeline.js';
 import { installFakeDom, createContainer, findAll, findButton } from '../story/tests/fake-dom.js';
 
+const INGRES = 436703;
 const DEGAS = 436121;
 const SARGENT = 12127;
 const CEZANNE = 435876;
-const RIGHT = [DEGAS, SARGENT, CEZANNE];
+const RIGHT = [INGRES, DEGAS, SARGENT, CEZANNE];
 const T0 = 1_000_000;
 
 function timeline(order, extra = {}) {
@@ -53,7 +54,7 @@ test('the loader falls back to the bundled copy on API error, wrong data or a fo
   assert.throws(() => verifiedImageUrl(metAnswer(degas, { primaryImageSmall: '' }), degas));
 });
 
-test('every portrait has a bundled offline copy and the loader returns all three', async () => {
+test('every portrait has a bundled offline copy and the loader returns all four', async () => {
   const { existsSync } = await import('node:fs');
   for (const artwork of PORTRAIT_ARTWORKS) {
     assert.equal(existsSync(new URL(artwork.local)), true, artwork.local);
@@ -97,7 +98,7 @@ function openStation(savedState, extra = {}, pageFocusesFirstButton = false) {
 const tick = () => new Promise(resolve => setTimeout(resolve, 150)); // the station redraws every 100 ms
 
 test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back to museum Esc – no cards yet', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Points are given based on speed\?/);
   assert.match(findButton(s.container, 'Start').textContent, /Start↵/);
   assert.match(findButton(s.container, 'Back to museum').textContent, /Back to museumEsc/);
@@ -107,7 +108,7 @@ test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back 
 
 test('opening the station puts the focus on Start, even after the page focuses the first button ("?")', async () => {
   // main.js focuses the first button of a new panel in a microtask; that is the "?" of the intro.
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]), {}, true);
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]), {}, true);
   await Promise.resolve();
   await Promise.resolve();
   assert.equal(document.activeElement, findButton(s.container, 'Start'));
@@ -119,7 +120,7 @@ test('opening the station puts the focus on Start, even after the page focuses t
 });
 
 test('closing the help puts the focus back on Start before the game, on the first card while playing', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   findButton(s.container, '?').click();
   s.key('Enter');
   assert.equal(document.activeElement, findButton(s.container, 'Start'));
@@ -129,10 +130,10 @@ test('closing the help puts the focus back on Start before the game, on the firs
 });
 
 test('"?" opens the instructions popup; Enter closes it again', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   findButton(s.container, '?').click();
   assert.match(s.text(), /Sort the portraits/);
-  assert.match(s.text(), /Within 20 s: \+15 points/);
+  assert.match(s.text(), /Within 25 s: \+15 points/);
   s.key('Enter');
   assert.doesNotMatch(s.text(), /Sort the portraits/);
   assert.equal(s.last().startedAt, null, 'closing help does not start the clock');
@@ -140,10 +141,10 @@ test('"?" opens the instructions popup; Enter closes it again', () => {
 });
 
 test('Enter starts; the dates show for 10 s, then vanish; a wrong check adds 5 s on the bar', async () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   assert.equal(s.last().startedAt, T0);
-  assert.deepEqual(s.chips(), ['1883–84', '1865', '1888–90']);
+  assert.deepEqual(s.chips(), ['1823', '1883–84', '1865', '1888–90']);
   assert.match(s.text(), /\+15 points\+10 points\+5 points\+0 points/);
   assert.match(s.text(), /Dates vanish in 10 s/);
   s.clock.ms = T0 + FLASH_MS;
@@ -157,10 +158,10 @@ test('Enter starts; the dates show for 10 s, then vanish; a wrong check adds 5 s
 });
 
 test('a whole run: number keys swap, Enter checks, success popup with letter I and points, Enter returns', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   s.clock.ms = T0 + FLASH_MS + 6000;   // 6 s after the reading time
-  s.key('1'); s.key('2');
+  s.key('2'); s.key('3');
   assert.deepEqual(s.last().order, RIGHT);
   s.key('Enter');
   assert.equal(s.last().solved, true);
@@ -174,25 +175,25 @@ test('a whole run: number keys swap, Enter checks, success popup with letter I a
 });
 
 test('Escape goes back to the museum, like L', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Escape');
   assert.equal(s.closed(), 1);
   s.cleanup();
 });
 
 test('Peek shows one date for a moment and costs 5 s', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   s.clock.ms = T0 + FLASH_MS + 1000;
-  findButton(s.container, 'Peek').click();     // first card: Sargent
-  assert.deepEqual(s.chips(), ['1883–84']);
+  findButton(s.container, 'Peek').click();     // first card: Ingres
+  assert.deepEqual(s.chips(), ['1823']);
   assert.equal(s.last().penaltyMs, PENALTY_MS);
   assert.deepEqual(s.played, ['page', 'hint']);
   s.cleanup();
 });
 
 test('the drag hint arrow appears once after the flash and goes at the first click', async () => {
-  const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
+  const s = openStation(timeline([INGRES, SARGENT, CEZANNE, DEGAS]));
   const arrow = () => findAll(s.container, node => node.className === 'puzzle-drag-demo')[0];
   s.key('Enter');
   assert.equal(arrow().hidden, true, 'not during the flash');
@@ -207,21 +208,21 @@ test('the drag hint arrow appears once after the flash and goes at the first cli
 });
 
 test('click-click swaps and dragging moves a card', () => {
-  const s = openStation(timeline([SARGENT, CEZANNE, DEGAS]));
+  const s = openStation(timeline([INGRES, SARGENT, CEZANNE, DEGAS]));
   s.key('Enter');
   s.clock.ms = T0 + FLASH_MS;   // cards move only after the reading time
   s.faceFor(SARGENT).click();
   s.faceFor(CEZANNE).click();
-  assert.deepEqual(s.last().order, [CEZANNE, SARGENT, DEGAS]);
+  assert.deepEqual(s.last().order, [INGRES, CEZANNE, SARGENT, DEGAS]);
   const cards = () => findAll(s.container, node => node.tagName === 'LI');
-  cards()[2].dispatch('dragstart', { dataTransfer: { setData() {} } }); // Degas
-  cards()[0].dispatch('drop');
-  assert.deepEqual(s.last().order, [DEGAS, CEZANNE, SARGENT]);
+  cards()[3].dispatch('dragstart', { dataTransfer: { setData() {} } }); // Degas
+  cards()[1].dispatch('drop');
+  assert.deepEqual(s.last().order, [INGRES, DEGAS, CEZANNE, SARGENT]);
   s.cleanup();
 });
 
 test('reopening keeps the clock running and gives no second flash', async () => {
-  const first = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const first = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   first.key('Enter');
   first.cleanup();
   const again = openStation(first.last());
@@ -234,7 +235,7 @@ test('reopening keeps the clock running and gives no second flash', async () => 
 });
 
 test('the credit line never shows the years (they are the puzzle)', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   const credit = findAll(s.container, node => node.className === 'story-muted puzzle-credit')[0];
   assert.match(credit.textContent, /Edgar Degas, A Woman Seated beside a Vase of Flowers · .*Public domain · The Metropolitan Museum of Art/);
@@ -243,7 +244,7 @@ test('the credit line never shows the years (they are the puzzle)', () => {
 });
 
 test('a broken save starts fresh; an old solved save shows the log and reports once', () => {
-  const fresh = openStation({ order: [1, 2, 3], solved: true });
+  const fresh = openStation({ order: [1, 2, 3, 4], solved: true });
   assert.equal(fresh.last().solved, false);
   fresh.cleanup();
   const old = openStation({ order: RIGHT, solved: true, mistakes: 2, hints: 0, revealed: [] });
@@ -253,15 +254,15 @@ test('a broken save starts fresh; an old solved save shows the log and reports o
 });
 
 test('during the 10 s reading time the clock waits and the cards cannot be moved or checked', () => {
-  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   s.clock.ms = T0 + 5000;
-  s.key('1'); s.key('2');
-  assert.deepEqual(s.last().order, [SARGENT, DEGAS, CEZANNE], 'no swapping while reading');
+  s.key('2'); s.key('3');
+  assert.deepEqual(s.last().order, [INGRES, SARGENT, DEGAS, CEZANNE], 'no swapping while reading');
   s.key('Enter');
   assert.equal(s.last().mistakes, 0, 'no checking while reading');
   s.clock.ms = T0 + FLASH_MS;
-  s.key('1'); s.key('2');
+  s.key('2'); s.key('3');
   assert.deepEqual(s.last().order, RIGHT, 'after the reading time it works');
   s.cleanup();
 });

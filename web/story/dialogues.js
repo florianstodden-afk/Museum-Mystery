@@ -194,7 +194,7 @@ function leonNight(state) {
 // Option 2: small talk about his round. What seemed odd to him points at the first open station.
 const ODD_ON_MY_ROUND = {
   landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'The year looked wrong to me.'],
-  portraits: ['Quiet, until you count the portraits.', 'Three ladies, and the cards beside them are all shuffled.'],
+  portraits: ['Quiet, until you count the portraits.', 'Four ladies, and the cards beside them are all shuffled.'],
   restoration: ['Imani’s been muttering about a puzzle of Renoir’s cliffs.', 'Says it hides something on the back of a slip.'],
   archive: ['The frame archive door was ajar on my last round.', 'Archives don’t open themselves.'],
 };
