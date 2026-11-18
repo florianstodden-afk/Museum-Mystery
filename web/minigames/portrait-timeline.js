@@ -132,13 +132,19 @@ export function start(container, caseData, onSolved) {
   function showHelp() {
     closePopup = showPopup({
       overlay, pane, label: 'Instructions', actionLabel: 'Back to station',
-      onAction: () => { closePopup?.(); closePopup = null; ui.help.focus?.(); },
+      onAction: () => { closePopup?.(); closePopup = null; focusMain(); },
       contents: [
         el('h3', { text: 'Sort the portraits' }),
         el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press 1, 2, 3. Enter checks.' }),
         el('p', { text: 'Peek shows one date (+5 s). A wrong check adds 5 s. Within 20 s: +15 points, 35 s: +10, 50 s: +5, later: 0.' }),
       ],
     });
+  }
+
+  // Enter should always do the main thing: Start before the game, the first card while playing.
+  function focusMain() {
+    if (state.solved) return;
+    (state.startedAt === null ? ui.startButton : cards[state.order[0]].face).focus?.();
   }
 
   function blink() {
@@ -260,7 +266,11 @@ export function start(container, caseData, onSolved) {
   render();
   save();
   if (state.solved) report();
-  else (state.startedAt === null ? ui.startButton : cards[state.order[0]].face).focus?.();
+  else {
+    focusMain();
+    // The page focuses the first button of a new panel (that is "?") right after we return; take it back.
+    queueMicrotask(() => { if (!disposed && !closePopup) focusMain(); });
+  }
   loadImages();
   const timer = setInterval(() => { if (!disposed) tick(); }, TICK_MS);
   timer.unref?.(); // in Node tests the timer must not keep the process alive

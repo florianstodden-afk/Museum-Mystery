@@ -67,9 +67,10 @@ test('every portrait has a bundled offline copy and the loader returns all three
 // ---------- Station UI (small fake DOM, no browser) ----------
 
 // Opens the station with a hand-moved clock: station.clock.ms is "now".
-function openStation(savedState, extra = {}) {
+function openStation(savedState, extra = {}, pageFocusesFirstButton = false) {
   installFakeDom();
   const container = createContainer();
+  if (pageFocusesFirstButton) queueMicrotask(() => findAll(container, node => node.tagName === 'BUTTON')[0]?.focus());
   const saved = [];
   const solvedReports = [];
   const played = [];
@@ -101,6 +102,29 @@ test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back 
   assert.match(findButton(s.container, 'Start').textContent, /Start↵/);
   assert.match(findButton(s.container, 'Back to museum').textContent, /Back to museumEsc/);
   assert.equal(s.faces().length, 0, 'the cards appear after Start, like L’s board');
+  s.cleanup();
+});
+
+test('opening the station puts the focus on Start, even after the page focuses the first button ("?")', async () => {
+  // main.js focuses the first button of a new panel in a microtask; that is the "?" of the intro.
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]), {}, true);
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(document.activeElement, findButton(s.container, 'Start'));
+  s.key('Enter');
+  assert.doesNotMatch(s.text(), /Sort the portraits/, 'no help popup');
+  assert.notEqual(s.last().startedAt, null, 'the game runs');
+  assert.equal(s.chips().length, PORTRAIT_IDS.length, 'the flash shows every date');
+  s.cleanup();
+});
+
+test('closing the help puts the focus back on Start before the game, on the first card while playing', () => {
+  const s = openStation(timeline([SARGENT, DEGAS, CEZANNE]));
+  findButton(s.container, '?').click();
+  s.key('Enter');
+  assert.equal(document.activeElement, findButton(s.container, 'Start'));
+  s.key('Enter');
+  assert.notEqual(s.last().startedAt, null);
   s.cleanup();
 });
 
