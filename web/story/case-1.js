@@ -50,8 +50,8 @@ export const CASE = deepFreeze({
       evidenceId: 'shift-log',
       evidence: 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.',
       pointsToVoss: 'Leon was on his round; the cart was booked as a “patron visit” – and Voss is the patron.',
-      task: 'Put the three portraits in the order they were painted, oldest first – their backs hold the night-shift log.',
-      metIds: [436121, 12127, 435876],
+      task: 'Put the four portraits in the order they were painted, oldest first – their backs hold the night-shift log.',
+      metIds: [436703, 436121, 12127, 435876],
     },
     {
       id: 'restoration',
@@ -138,6 +138,14 @@ export const CASE = deepFreeze({
       url: 'https://www.metmuseum.org/art/collection/search/459193',
       image: 'https://images.metmuseum.org/CRDImages/rl/web-large/DP359031.jpg',
       checked: '2026-11-10',
+    },
+    {
+      id: 436703, shortTitle: 'Madame Leblanc', title: 'Madame Jacques-Louis Leblanc (Françoise Poncelle, 1788–1839)',
+      artist: 'Jean Auguste Dominique Ingres', date: '1823', medium: 'Oil on canvas',
+      url: 'https://www.metmuseum.org/art/collection/search/436703',
+      objectBeginDate: 1823, objectEndDate: 1823, datesChecked: '2026-11-18',
+      image: 'https://images.metmuseum.org/CRDImages/ep/web-large/DT1926.jpg',
+      checked: '2026-11-18',
     },
     {
       id: 436121, shortTitle: 'A Woman Seated beside a Vase of Flowers', title: 'A Woman Seated beside a Vase of Flowers (Madame Paul Valpinçon?)',

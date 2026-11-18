@@ -8,12 +8,12 @@ import {
   moveCard, swapCards, checkOrder, elapsedMs, logEntries, FLASH_MS,
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
-import { portraitSpeedPoints, formatClock } from '../story/scoring.js';
+import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
 import { introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles } from './station-ui.js';
 import { cardView, timelineView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
 /** Station I's points by time, as tiers for the bar (same limits as portraitSpeedPoints). */
-export const PORTRAIT_TIERS = [{ s: 0, p: 15 }, { s: 20, p: 10 }, { s: 35, p: 5 }, { s: 50, p: 0 }];
+export const PORTRAIT_TIERS = PORTRAIT_LIMITS_MS.reduce((tiers, ms, i) => [...tiers, { s: ms / 1000, p: [10, 5, 0][i] }], [{ s: 0, p: 15 }]);
 const TASK = 'Memorise the dates, then sort oldest to newest.';
 const TICK_MS = 100;             // how often bar, dates and arrow are redrawn
 const BLINK_MS = 300;            // red blink after a penalty
@@ -47,7 +47,7 @@ export function start(container, caseData, onSolved) {
   const checkButton = shortcutButton('Check order', check, 'Enter');
   const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
   const grid = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, oldest on the left' } });
-  const axis = timelineView();
+  const axis = timelineView(state.order.length);
   const arrow = el('div', { className: 'puzzle-drag-demo', text: '↖', attrs: { 'aria-hidden': 'true' } });
   const board = el('div', { className: 'portrait-board' }, [grid, axis.root, arrow]);
   const status = el('p', { className: 'puzzle-status', attrs: { role: 'status', 'aria-live': 'polite' } });
@@ -132,13 +132,19 @@ export function start(container, caseData, onSolved) {
   function showHelp() {
     closePopup = showPopup({
       overlay, pane, label: 'Instructions', actionLabel: 'Back to station',
-      onAction: () => { closePopup?.(); closePopup = null; ui.help.focus?.(); },
+      onAction: () => { closePopup?.(); closePopup = null; focusMain(); },
       contents: [
         el('h3', { text: 'Sort the portraits' }),
-        el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press 1, 2, 3. Enter checks.' }),
-        el('p', { text: 'Peek shows one date (+5 s). A wrong check adds 5 s. Within 20 s: +15 points, 35 s: +10, 50 s: +5, later: 0.' }),
+        el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press their numbers. Enter checks.' }),
+        el('p', { text: 'Peek shows one date (+5 s). A wrong check adds 5 s. Within 25 s: +15 points, 40 s: +10, 55 s: +5, later: 0.' }),
       ],
     });
+  }
+
+  // Enter should always do the main thing: Start before the game, the first card while playing.
+  function focusMain() {
+    if (state.solved) return;
+    (state.startedAt === null ? ui.startButton : cards[state.order[0]].face).focus?.();
   }
 
   function blink() {
@@ -172,7 +178,7 @@ export function start(container, caseData, onSolved) {
       return;
     }
     if (event.key === 'Escape') { stop(); leave(); return; }
-    const index = ['1', '2', '3'].indexOf(event.key);
+    const index = state.order.findIndex((_, i) => event.key === String(i + 1));   // keys 1…4
     if (index !== -1 && playing()) { stop(); choose(state.order[index]); return; }
     // Enter on "?", "Back to museum" or a Peek button presses that button instead.
     const own = event.target === ui.help || event.target === ui.backButton || Object.values(cards).some(card => card.peek === event.target);
@@ -260,7 +266,11 @@ export function start(container, caseData, onSolved) {
   render();
   save();
   if (state.solved) report();
-  else (state.startedAt === null ? ui.startButton : cards[state.order[0]].face).focus?.();
+  else {
+    focusMain();
+    // The page focuses the first button of a new panel (that is "?") right after we return; take it back.
+    queueMicrotask(() => { if (!disposed && !closePopup) focusMain(); });
+  }
   loadImages();
   const timer = setInterval(() => { if (!disposed) tick(); }, TICK_MS);
   timer.unref?.(); // in Node tests the timer must not keep the process alive

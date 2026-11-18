@@ -9,7 +9,7 @@ export function artworkFor(id) {
 }
 
 // Which part of each painting stays visible in the equal frames: the face (Degas sits on the right).
-const FOCUS = { 436121: '88% 30%', 12127: '50% 8%', 435876: '50% 10%' };
+const FOCUS = { 436703: '45% 18%', 436121: '88% 30%', 12127: '50% 8%', 435876: '50% 10%' };
 
 /** One card: picture in a gold frame, artist, short title, and a date chip (or Peek) below. */
 export function cardView(id, { onChoose, onPeek }) {
@@ -32,14 +32,16 @@ export function cardView(id, { onChoose, onPeek }) {
   return { root, face, img, chip, peek, back, artwork };
 }
 
-/** The timeline under the cards: three numbered places, oldest on the left, plus the scan progress bar. */
-export function timelineView() {
-  const slots = [1, 2, 3].map(n => el('span', { className: 'portrait-slot', text: String(n) }));
+/** The timeline under the cards: one numbered place per card, oldest on the left, plus the scan progress bar. */
+export function timelineView(count) {
+  const slots = Array.from({ length: count }, (_, i) => el('span', { className: 'portrait-slot', text: String(i + 1) }));
   const line = () => el('span', { className: 'portrait-line' });
   const bar = el('span', { className: 'portrait-flashbar' });
+  // 1 — 2 — 3 — 4: a line between every two places.
+  const row = slots.flatMap((slot, i) => (i === 0 ? [slot] : [line(), slot]));
   return {
     root: el('div', { className: 'portrait-axis', attrs: { 'aria-hidden': 'true' } }, [
-      el('div', { className: 'portrait-axis-row' }, [slots[0], line(), slots[1], line(), slots[2], el('span', { className: 'portrait-axis-label', text: 'Oldest → Newest' })]),
+      el('div', { className: 'portrait-axis-row' }, [...row, el('span', { className: 'portrait-axis-label', text: 'Oldest → Newest' })]),
       bar,
     ]),
     slots,
@@ -66,7 +68,7 @@ export function ensureStylesheet() {
   const link = document.createElement('link');
   link.id = 'portrait-timeline-css';
   link.rel = 'stylesheet';
-  link.href = new URL('./portrait-timeline.css?v=look-like-l-1', import.meta.url).href;
+  link.href = new URL('./portrait-timeline.css?v=four-cards-1', import.meta.url).href;
   document.head.append(link);
 }
 

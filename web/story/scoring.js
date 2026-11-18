@@ -17,10 +17,10 @@ export const PORTRAIT_UNTIMED_POINTS = 5;    // Station I solved in an old save 
 const SPEED_STATIONS = ['portraits', 'restoration'];
 export const MAX_SCORE = (STATION_IDS.length - SPEED_STATIONS.length) * STATION_MAX + SPEED_STATIONS.length * SPEED_MAX + SAFE_MAX + ACCUSATION_MAX;
 
-// Speedrun limits for Station I (three cards, so faster than Renoir's eight pieces).
-export const PORTRAIT_LIMITS_MS = [20000, 35000, 50000];
+// Speedrun limits for Station I (four cards, still faster than Renoir's eight pieces).
+export const PORTRAIT_LIMITS_MS = [25000, 40000, 55000];
 
-/** Station I points by final time (penalties included): ≤20 s → 15, ≤35 s → 10, ≤50 s → 5, else 0. */
+/** Station I points by final time (penalties included): ≤25 s → 15, ≤40 s → 10, ≤55 s → 5, else 0. */
 export function portraitSpeedPoints(ms) {
   const [fast, medium, slow] = PORTRAIT_LIMITS_MS;
   return ms <= fast ? 15 : ms <= medium ? 10 : ms <= slow ? 5 : 0;

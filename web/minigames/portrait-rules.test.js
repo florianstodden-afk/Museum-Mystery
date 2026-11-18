@@ -5,10 +5,11 @@ import {
   startTimeline, peekDate, revealedDates, moveCard, swapCards, checkOrder, elapsedMs, isSolved, logEntries,
 } from './portrait-rules.js';
 
+const INGRES = 436703;
 const DEGAS = 436121;
 const SARGENT = 12127;
 const CEZANNE = 435876;
-const RIGHT = [DEGAS, SARGENT, CEZANNE];
+const RIGHT = [INGRES, DEGAS, SARGENT, CEZANNE];
 const T0 = 1_000_000;
 
 function sequence(...values) {
@@ -42,7 +43,7 @@ test('a shuffle is never already solved and the clock has not started', () => {
 });
 
 test('Start shows all dates for 10 s of reading time; only then the clock runs', () => {
-  const before = timeline([CEZANNE, DEGAS, SARGENT], {}, false);
+  const before = timeline([INGRES, CEZANNE, DEGAS, SARGENT], {}, false);
   assert.equal(moveCard(before, DEGAS, 0), before, 'cards stay put before Start');
   assert.equal(checkOrder(before, T0), before);
   const s = startTimeline(before, T0);
@@ -55,13 +56,13 @@ test('Start shows all dates for 10 s of reading time; only then the clock runs',
 });
 
 test('reopening (Start again) never gives a second free flash', () => {
-  const s = timeline([CEZANNE, DEGAS, SARGENT]);
+  const s = timeline([INGRES, CEZANNE, DEGAS, SARGENT]);
   assert.equal(startTimeline(s, T0 + 60000), s);
   assert.deepEqual(revealedDates(s, T0 + 60000), []);
 });
 
 test('a save with a running flash continues where it was', () => {
-  const s = timeline([CEZANNE, DEGAS, SARGENT]);
+  const s = timeline([INGRES, CEZANNE, DEGAS, SARGENT]);
   const reloaded = JSON.parse(JSON.stringify(s));
   assert.equal(validTimeline(reloaded), true);
   assert.deepEqual(revealedDates(reloaded, T0 + FLASH_MS - 1000), PORTRAIT_IDS, 'still 1 s left');
@@ -70,7 +71,7 @@ test('a save with a running flash continues where it was', () => {
 
 test('peek shows one date for 1.5 s and adds 5 s; two penalties add 10 s', () => {
   const AFTER = T0 + FLASH_MS + 1000;   // one second after the flash
-  let s = timeline([CEZANNE, DEGAS, SARGENT]);
+  let s = timeline([INGRES, CEZANNE, DEGAS, SARGENT]);
   assert.equal(peekDate(s, DEGAS, T0 + 1000), s, 'no peek during the flash');
   s = peekDate(s, DEGAS, AFTER);
   assert.deepEqual(revealedDates(s, AFTER + PEEK_MS - 1), [DEGAS]);
@@ -83,9 +84,9 @@ test('peek shows one date for 1.5 s and adds 5 s; two penalties add 10 s', () =>
 });
 
 test('moving and swapping change only the order', () => {
-  let s = timeline([CEZANNE, DEGAS, SARGENT]);
-  s = moveCard(s, DEGAS, 0);
-  assert.deepEqual(s.order, [DEGAS, CEZANNE, SARGENT]);
+  let s = timeline([INGRES, CEZANNE, DEGAS, SARGENT]);
+  s = moveCard(s, DEGAS, 1);
+  assert.deepEqual(s.order, [INGRES, DEGAS, CEZANNE, SARGENT]);
   s = swapCards(s, CEZANNE, SARGENT);
   assert.deepEqual(s.order, RIGHT);
   assert.equal(moveCard(s, DEGAS, 7), s);
@@ -97,7 +98,7 @@ test('the right order stops the clock and turns the log into reading order', () 
   assert.equal(isSolved(s), true);
   assert.equal(s.finishedAt, T0 + FLASH_MS + 8000);
   assert.equal(elapsedMs(s, T0 + 99999), 8000, 'the clock stopped');
-  assert.deepEqual(logEntries(s), ['21:02 · Leon – east wing round', '21:14 · Cart out – “patron visit, A. V.”', '21:20 · Leon – back at the desk']);
+  assert.deepEqual(logEntries(s), ['20:48 · Shift change – Leon on duty', '21:02 · Leon – east wing round', '21:14 · Cart out – “patron visit, A. V.”', '21:20 · Leon – back at the desk']);
   for (const line of logEntries(s)) assert.ok(line.split(/\s+/).length <= 10, line);
 });
 
@@ -110,7 +111,7 @@ test('after solving, nothing changes any more', () => {
 });
 
 test('old saves without time are still valid: not started, or solved without a time', () => {
-  const oldOpen = { order: [CEZANNE, SARGENT, DEGAS], solved: false, mistakes: 1, hints: 1, revealed: [DEGAS] };
+  const oldOpen = { order: [INGRES, CEZANNE, SARGENT, DEGAS], solved: false, mistakes: 1, hints: 1, revealed: [DEGAS] };
   const oldSolved = { order: RIGHT, solved: true, mistakes: 0, hints: 0, revealed: [] };
   assert.equal(validTimeline(oldOpen), true);
   assert.equal(validTimeline(oldSolved), true);
@@ -121,8 +122,8 @@ test('old saves without time are still valid: not started, or solved without a t
 
 test('validTimeline rejects broken and impossible states', () => {
   const bad = [
-    null, 'text', {}, timeline([DEGAS, SARGENT]), timeline([DEGAS, DEGAS, CEZANNE]), timeline([DEGAS, SARGENT, 459111]),
-    timeline(RIGHT, { mistakes: -1 }), timeline([SARGENT, DEGAS, CEZANNE], { solved: true }), timeline(RIGHT, { solved: 'yes' }),
+    null, 'text', {}, timeline([INGRES, DEGAS, SARGENT]), timeline([INGRES, DEGAS, DEGAS, CEZANNE]), timeline([INGRES, DEGAS, SARGENT, 459111]),
+    timeline(RIGHT, { mistakes: -1 }), timeline([INGRES, SARGENT, DEGAS, CEZANNE], { solved: true }), timeline(RIGHT, { solved: 'yes' }),
     timeline(RIGHT, { penaltyMs: -5 }), timeline(RIGHT, { startedAt: 'soon' }),
     { ...timeline(RIGHT, {}, false), finishedAt: T0, solved: true }, timeline(RIGHT, { peek: { id: 1, until: 0 } }),
   ];
@@ -134,6 +135,6 @@ test('Start never begins with the cards already in the right order (e.g. an old 
   const started = startTimeline(sorted, T0);
   assert.notDeepEqual(started.order, RIGHT);
   assert.deepEqual([...started.order].sort(), [...RIGHT].sort());
-  const mixed = timeline([CEZANNE, DEGAS, SARGENT], {}, false);
+  const mixed = timeline([INGRES, CEZANNE, DEGAS, SARGENT], {}, false);
   assert.deepEqual(startTimeline(mixed, T0).order, mixed.order, 'a mixed order stays as it is');
 });

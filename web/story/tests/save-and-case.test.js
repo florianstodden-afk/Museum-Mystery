@@ -54,18 +54,18 @@ test('case data: every station artwork exists in the work list', () => {
   for (const station of CASE.stations) {
     for (const id of station.metIds) assert.ok(workById(id), `missing work ${id}`);
   }
-  assert.equal(CASE.works.length, 7);
+  assert.equal(CASE.works.length, 8);
   assert.equal(workById(436535).date, '1889');
 });
 
-test('case data: Portrait Hall shows Degas, Sargent and Cézanne with verified Met dates', () => {
+test('case data: Portrait Hall shows Ingres, Degas, Sargent and Cézanne with verified Met dates', () => {
   const portraits = CASE.stations.find(s => s.id === 'portraits');
-  assert.deepEqual(portraits.metIds, [436121, 12127, 435876]);
+  assert.deepEqual(portraits.metIds, [436703, 436121, 12127, 435876]);
   const dates = portraits.metIds.map(id => {
     const work = workById(id);
     return [work.objectBeginDate, work.objectEndDate, work.datesChecked];
   });
-  assert.deepEqual(dates, [[1865, 1865, '2026-11-15'], [1883, 1884, '2026-11-15'], [1888, 1890, '2026-11-15']]);
+  assert.deepEqual(dates, [[1823, 1823, '2026-11-18'], [1865, 1865, '2026-11-15'], [1883, 1884, '2026-11-15'], [1888, 1890, '2026-11-15']]);
 });
 
 test('case data: Frame Archive no longer repeats a Portrait Hall work', () => {
