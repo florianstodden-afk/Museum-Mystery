@@ -14,6 +14,7 @@ A small top-down detective game in the browser: walk through a museum at night, 
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four stations (B, I, L, D) each give one letter. Together they open the vault.
 - In the vault, answer the final question. There are two endings and up to 85 points.
+- The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 
 ## Run locally
