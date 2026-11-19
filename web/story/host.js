@@ -21,7 +21,7 @@ import { CASE } from './case-1.js';
 import { serialize, deserialize } from './save.js';
 import { openStation as runStation } from './stations.js';
 import * as placeholderStation from './placeholder-station.js';
-import { dialogueFor, renderDialogue, conversationFor } from './dialogues.js';
+import { dialogueFor, renderDialogue, conversationFor } from './dialogues.js?v=npc-conversation-1';
 import { renderSafe } from './safe-ui.js?v=vault-wheel-7';
 import { renderAccusation } from './accusation-ui.js';
 import { endingModel, renderEnding, renderEndingChoice } from './endings.js';

@@ -423,3 +423,10 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/story/endings.js` zeigt für den Diebstahl die Übergabe an Voss und die Fälschung an der Wand; beim Abbruch die Rückgabe an Dr. Vale und die Aufdeckung von Voss. `web/story/story.css` zeigt den passenden Nachthimmel beziehungsweise das Morgenlicht. Das echte Met-Bild 436535 mit Quelle, Punktzahl, Beweiskette, Home und New Game bleiben erreichbar. Die Endentscheidung, Story-Zustände und Speicherung wurden nicht geändert.
 - **Dokumentation:** `docs/ending-screens.md` erklärt Ablauf, Dateien und Bildentscheidung.
 - **Prüfung:** Beide Resultate und die Beweisansicht im lokalen Browser bei 1280 × 720 visuell geprüft. 276 Node-Tests bestanden; `git diff --check` ohne Fehler. Handyansicht und komplette Spielrunde bleiben zur Nachprüfung.
+
+## 2026-11-19 · Gespräche mit Leon und Imani enden (`codex/npc-conversation-once`)
+
+- **Auftrag:** Florian Stodden wollte, dass Leon und Imani nach allen Gesprächsinhalten automatisch aufhören und bereits gestellte Fragen erst nach einem neuen Ansprechen wieder verfügbar sind.
+- **Vorher:** Leons zwei Fragen blieben nach jeder Antwort beide anklickbar; Imani zeigte ihre Textzeilen und wartete danach auf „Goodbye.“.
+- **Umsetzung:** `web/story/speech-box.js` merkt sich beantwortete Fragen nur während des offenen Gesprächs. Leons beantwortete Frage verschwindet, nach seiner zweiten Antwort schließt die Box beim nächsten Weiterklicken. `web/story/dialogues.js` markiert Imanis Gespräch für ein automatisches Ende nach der letzten Zeile. Das nächste **E** beginnt bei beiden einen neuen Durchgang. Dr. Vales Gespräch wurde nicht verändert. `web/index.html`, `web/main.js` und `web/story/host.js` verwenden neue Modulversionen für den Browsercache.
+- **Dokumentation und Prüfung:** `docs/story/speech-box.md` beschreibt den Ablauf und die Tasten. Tests in `web/story/tests/speech-box.test.js` prüfen das Ende und erneute Ansprechen. Die vollständige Testzahl und der GitHub-Check stehen im Pull Request.

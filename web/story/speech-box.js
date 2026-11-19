@@ -6,7 +6,8 @@
 //   box.handleKey(event);       // returns true if the box used the key
 //   box.close();
 //
-// Flow: greeting boxes → choices → answer boxes → choices again … → goodbye line → closed.
+// Flow: greeting boxes → unanswered choices → answer boxes. The last answer
+// closes Leon's talk; Imani closes after her greeting lines.
 import { el } from './dom.js';
 
 export const LETTERS_PER_SECOND = 35;
@@ -36,6 +37,7 @@ export function createSpeechBox(parent, options = {}) {
 
   // ---------- What is happening right now ----------
   let conversation = null;
+  let askedQuestions = new Set(); // reset whenever the player starts a new talk
   let queue = [];          // lines still to show
   let afterQueue = null;   // what happens after the last line: 'choices' or 'close'
   let fullLine = '';
@@ -44,10 +46,11 @@ export function createSpeechBox(parent, options = {}) {
 
   function show(next) {
     conversation = next;
+    askedQuestions = new Set();
     name.textContent = next.name;
     role.textContent = next.role;
     root.classList.remove('hidden');
-    say(next.greeting, 'choices');
+    say(next.greeting, next.autoCloseAfterGreeting ? 'close' : 'choices');
   }
 
   function close() {
@@ -92,7 +95,7 @@ export function createSpeechBox(parent, options = {}) {
   }
 
   function showChoices() {
-    const all = [...conversation.questions, { ...conversation.goodbye, isGoodbye: true }];
+    const all = [...conversation.questions.filter(question => !askedQuestions.has(question.id)), { ...conversation.goodbye, isGoodbye: true }];
     choices.replaceChildren(...all.map(choice => {
       const node = el('button', { className: choice.isGoodbye ? 'speech-choice is-goodbye' : 'speech-choice', text: choice.label });
       node.type = 'button';
@@ -104,8 +107,10 @@ export function createSpeechBox(parent, options = {}) {
 
   function choose(choice) {
     playSound('click');
-    if (!choice.lines.length) { close(); return; }
-    say(choice.lines, choice.isGoodbye ? 'close' : 'choices');
+    if (!choice.isGoodbye) askedQuestions.add(choice.id);
+    const done = choice.isGoodbye || askedQuestions.size === conversation.questions.length;
+    if (!choice.lines.length) { if (done) close(); else showChoices(); return; }
+    say(choice.lines, done ? 'close' : 'choices');
   }
 
   function choiceButtons() { return [...choices.children]; }
