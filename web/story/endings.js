@@ -11,7 +11,7 @@ export const ENDINGS = {
     title: 'I am a thief',
     choiceLabel: 'Steal the artwork',
     paragraphs: [
-      'You take the original out of the museum and deliver it to Voss. The money is yours, but the forgery stays on the wall.',
+      'You deliver the original to Voss. His forgery stays on the wall.',
     ],
   },
   'open-file': {
@@ -19,7 +19,7 @@ export const ENDINGS = {
     title: 'I am not a thief',
     choiceLabel: 'Quit the mission',
     paragraphs: [
-      'You return the original to Dr. Vale and leave the evidence with the museum. Voss loses his cover; the painting stays where it belongs.',
+      'You return the original to Dr. Vale. Your evidence exposes Voss.',
     ],
   },
 };
@@ -88,6 +88,9 @@ export function renderEnding(container, model, options = {}) {
 
   const details = el('details', { className: 'story-ending-details' }, [
     el('summary', { text: 'View evidence and score details' }),
+    el('p', { className: 'story-ending-detail-intro', text: model.id === 'heist'
+      ? 'Voss gets the original and pays you. The forgery remains in the Gallery.'
+      : 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.' }),
     renderChain(model.chain),
     table,
     el('p', { className: 'story-disclaimer', text: model.disclaimer }),
@@ -96,15 +99,19 @@ export function renderEnding(container, model, options = {}) {
   if (options.onHome) actions.append(button('Back to home', options.onHome));
   if (options.onNewGame) actions.append(button('New game', options.onNewGame));
   const parts = [
-    el('div', { className: 'story-ending-copy' }, [
+    el('div', { className: 'story-ending-plaque' }, [
       el('p', { className: 'story-eyebrow', text: model.kicker }),
       el('h2', { className: 'story-ending-title', text: model.title }),
       ...model.paragraphs.map(text => el('p', { className: 'story-text', text })),
-      el('p', { className: 'story-ending-total', text: `${model.total} / ${model.max} points` }),
-      actions,
-      details,
     ]),
-    figure,
+    el('div', { className: 'story-ending-bottom' }, [
+      figure,
+      el('div', { className: 'story-ending-controls' }, [
+        el('p', { className: 'story-ending-total', text: `${model.total} / ${model.max} points` }),
+        actions,
+        details,
+      ]),
+    ]),
   ];
   container.replaceChildren(el('section', { className: `story-ending is-${model.id}` }, parts));
 }

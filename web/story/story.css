@@ -81,15 +81,13 @@ a.story-button { display: inline-block; text-decoration: none; }
 .story-placeholder-work img { width: 100%; height: 170px; object-fit: contain; background: #0d151b; border-radius: 6px; }
 .story-placeholder-work p { font-size: .82rem; margin: 6px 0 0; color: var(--story-muted); }
 
-/* Endings */
-.story-ending-title { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 14px; }
-.story-ending.is-heist .story-ending-title { color: var(--story-danger); }
-.story-ending.is-open-file .story-ending-title { color: var(--story-gold); }
-.story-ending-figure { margin: 0 0 16px; }
-.story-ending-figure img { width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; border: 4px solid #5c4a2c; box-shadow: 0 16px 40px #0008; }
-.story-ending.is-heist .story-ending-figure img { filter: grayscale(.55) brightness(.7) contrast(1.1); }
-.story-ending-figure figcaption { font-size: .78rem; color: var(--story-muted); margin-top: 6px; }
-.story-ending-figure a { color: var(--story-gold); }
+/* Endings: the generated museum scenes contain no text. Live text, score, actions and
+   the real Met artwork stay readable and usable on top of either image. */
+.story-ending-title { font-size: clamp(1.5rem, 3.5vw, 3.5rem); text-transform: uppercase; line-height: 1.05; color: #f8e9c9; }
+.story-ending-figure { margin: 0; display: flex; align-items: center; gap: 10px; max-width: 250px; }
+.story-ending-figure img { width: 72px !important; height: 72px; max-height: none !important; object-fit: contain; flex: none; border: 2px solid #bc9552; border-radius: 4px; background: #111f26; }
+.story-ending-figure figcaption { font-size: .73rem; line-height: 1.3; color: #eadbbb; text-shadow: 0 2px 4px #000; }
+.story-ending-figure a { color: #f5d18b; }
 .story-score-table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: .88rem; }
 .story-score-table caption { text-align: left; font: 700 .72rem 'DM Sans', sans-serif; letter-spacing: .18em; color: var(--story-gold); padding-bottom: 6px; text-transform: uppercase; }
 .story-score-table th, .story-score-table td { text-align: left; padding: 7px 6px; border-bottom: 1px solid #ffffff14; }
@@ -120,18 +118,39 @@ a.story-button { display: inline-block; text-decoration: none; }
 .dialog-card.story-dark-card .story-button:hover, .dialog-card.story-dark-card .story-choice:hover { background: #39474e; }
 .dialog-card.story-dark-card .story-choice { padding: 12px 14px; }
 
-/* The ending is a full screen result, with the detailed case file available on demand. */
-#dialog:has(.story-ending) .dialog-card{width:min(1100px,100%);max-width:1100px;max-height:calc(100dvh - 32px);margin:0 auto}
-#dialog:has(.story-ending){align-items:center}
-.story-ending{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.85fr);gap:clamp(18px,4vw,42px);align-items:center}
-.story-ending-copy{min-width:0}.story-ending .story-text{font-size:1.05rem;max-width:50ch}
-.story-ending-total{font:700 1.35rem Fraunces,Georgia,serif;color:var(--story-gold);margin:18px 0}
-.story-ending-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
-.story-ending-figure{margin:0}.story-ending-figure img{max-height:min(65vh,570px);object-fit:contain}
-.story-ending-details{border-top:1px solid #ffffff36;padding-top:12px;margin-top:18px}
-.story-ending-details summary{cursor:pointer;color:var(--story-gold);font-size:.9rem}
+/* The result is a full-screen scene. The choice and all game rules still live in JS. */
+#dialog:has(.story-ending){display:grid;place-items:center;padding:0;overflow:hidden;background:#06121b}
+#dialog:has(.story-ending) .dialog-card{width:min(100vw,177.68dvh);max-width:none;max-height:none;aspect-ratio:1672/941;margin:0;padding:0;border:0;border-radius:0;overflow:visible;box-shadow:none;background:#07141d}
+#dialog:has(.story-ending) .dialog-card>.eyebrow,#dialog:has(.story-ending) #dialog-title,#dialog:has(.story-ending) #dialog-actions{display:none}
+#dialog:has(.story-ending) #dialog-body,#dialog:has(.story-ending) .story-scene{height:100%}
+.story-ending{position:relative;width:100%;height:100%;overflow:hidden;background-size:cover;background-position:center;color:#f8e9c9}
+.story-ending.is-heist{background-image:url('../assets/ending-thief-background.png')}
+.story-ending.is-open-file{background-image:url('../assets/ending-not-thief-background.png')}
+.story-ending-plaque{position:absolute;top:22%;left:30%;width:40%;height:27%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:1% 1.5%;box-sizing:border-box}
+.story-ending-plaque .story-eyebrow{margin:0 0 1%;font-size:clamp(.6rem,.9vw,.88rem);letter-spacing:.16em;color:#d5ad62}
+.story-ending-plaque .story-text{max-width:95%;margin:auto 0 0;font-size:clamp(.82rem,1.35vw,1.2rem);line-height:1.3;color:#f7e7cb;text-wrap:balance}
+.story-ending-bottom{position:absolute;left:4%;right:4%;bottom:2.5%;display:flex;align-items:end;justify-content:space-between;gap:20px}
+.story-ending-controls{text-align:right;min-width:0}
+.story-ending-total{font:700 clamp(1rem,1.6vw,1.45rem) Fraunces,Georgia,serif;color:#f5d18b;margin:0 0 7px;text-shadow:0 2px 5px #000}
+.story-ending-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:0 0 7px}
+.story-ending-actions .story-button{margin:0 !important;padding:9px 14px !important;background:#18303bdb !important;color:#f8e9c9 !important;border:1px solid #c49b58 !important}
+.story-ending-actions .story-button:hover{background:#31515c !important}
+.story-ending-details summary{cursor:pointer;color:#f5d18b;font-size:.85rem;text-shadow:0 2px 5px #000}
+.story-ending-details[open]{position:fixed;z-index:2;left:14vw;right:14vw;top:18dvh;bottom:12dvh;overflow:auto;text-align:left;padding:14px 18px;border:2px solid #b99053;border-radius:10px;background:#13252bf5;box-shadow:0 12px 40px #000b}
+.story-ending-details[open] summary{font-size:1rem;margin-bottom:12px}
+.story-ending-detail-intro{margin:0 0 12px}
 .story-ending-details .story-chain{margin-bottom:16px}
-@media(max-width:680px){.story-ending{grid-template-columns:1fr}.story-ending-figure{grid-row:1}.story-ending-figure img{max-height:26vh}.story-ending .story-text{font-size:.95rem}}
+@media(max-width:680px){
+  #dialog:has(.story-ending) .dialog-card{width:100vw;height:100dvh;aspect-ratio:auto}
+  .story-ending{background-position:68% center}
+  .story-ending-plaque{top:13%;left:5%;width:90%;height:auto;min-height:160px;padding:16px 12px;border:1px solid #b99053;border-radius:10px;background:#081922ed;box-shadow:0 10px 35px #000a}
+  .story-ending-title{font-size:clamp(1.6rem,7vw,2.4rem)}
+  .story-ending-plaque .story-text{margin:14px 0 0;font-size:.95rem}
+  .story-ending-bottom{left:5%;right:5%;bottom:max(3%,env(safe-area-inset-bottom));align-items:center;flex-direction:column;gap:10px;padding:12px;border:1px solid #b99053;border-radius:10px;background:#081922eb}
+  .story-ending-figure{max-width:100%}.story-ending-figure img{width:54px !important;height:54px}
+  .story-ending-controls{text-align:center}.story-ending-actions{justify-content:center}
+  .story-ending-details[open]{left:5vw;right:5vw;top:18dvh;bottom:8dvh}
+}
 
 /* One uncropped image, four columns by two rows. Pieces use the same proportions. */
 .picture-puzzle { font-size: .95rem; }

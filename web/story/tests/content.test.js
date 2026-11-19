@@ -93,6 +93,7 @@ test('ending model has no ending before the decision', () => {
 test('ending model gives the right breakdown for both endings', () => {
   const heist = endingModel(finished('heist', { wrongWord: true, stationResult: { landscape: { mistakes: 1, hints: 1 } } }));
   assert.equal(heist.title, 'I am a thief');
+  assert.match(heist.paragraphs.join(' '), /deliver the original to Voss/);
   // Station I is a speedrun station now: at most 15 points (like L).
   assert.deepEqual(heist.breakdown.map(row => row.points), [12, 15, 15, 15, 5, 10]);
   assert.equal(heist.total, 72);
@@ -101,6 +102,7 @@ test('ending model gives the right breakdown for both endings', () => {
 
   const openFile = endingModel(finished('open-file', { wrongSuspect: 'vale' }));
   assert.equal(openFile.title, 'I am not a thief');
+  assert.match(openFile.paragraphs.join(' '), /evidence exposes Voss/);
   assert.equal(openFile.total, 80);
   assert.equal(openFile.chain.every(link => link.found), true);
 });
@@ -111,6 +113,8 @@ test('ending offers home and a new game while keeping score details', () => {
   let restarted = false, wentHome = false;
   renderEnding(container, endingModel(finished('open-file')), { onNewGame: () => { restarted = true; }, onHome: () => { wentHome = true; } });
   assert.match(container.textContent, /85 \/ 85/);
+  assert.match(container.textContent, /Dr\. Vale/);
+  assert.equal(findAll(container, node => node.tagName === 'IMG').length, 1);
   findButton(container, 'Back to home').click();
   assert.equal(wentHome, true);
   findButton(container, 'New game').click();
