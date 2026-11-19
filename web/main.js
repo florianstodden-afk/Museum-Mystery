@@ -5,7 +5,7 @@ import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=forgery-sign-3';
-import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-i-wall-1';
+import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-i-wall-2';
 import * as landscapeStation from './minigames/landscape.js';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
@@ -198,7 +198,7 @@ function drawHall(){
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
   }
-  // Station I is Sargent's portrait on the wall (12127, one of the four station cards).
+  // Station I is the large painting in the middle of the hall wall.
   drawStationPortrait(interactTarget()?.id==='ledger');
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
   const guardFacing=guardFacingNow();
@@ -226,8 +226,8 @@ function drawHall(){
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=interactTarget(); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
-// Gold frame around the hall's Sargent portrait, a sign below, and the gallery's E marker.
-const STATION_I_FRAME={x:650,y:247,width:40,height:59};
+// Gold frame around the middle hall painting, a sign below, and the gallery's E marker.
+const STATION_I_FRAME={x:405,y:244,width:88,height:55};
 function drawStationPortrait(active){
   const {x,y,width,height}=STATION_I_FRAME, mid=x+width/2;
   ctx.save();

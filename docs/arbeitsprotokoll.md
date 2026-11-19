@@ -393,5 +393,5 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 
 ## 2026-11-19 · Alle NPCs per E, Station I an der Wand (`feature/npc-e-and-signs`)
 - **M1:** Imani und Dr. Vale sprechen wie Leon nur nach `E`. `handleInteract` nutzt für alle Personen denselben Weg über `PEOPLE` und `talkPartner`. Auto-Talk (`shouldOpenTalk`, `NEAR`, `talkWasNear`, `checkAutoTalk`) ist entfernt. Weggehen schließt die Box weiter (`checkTalkDistance`). Vale dreht sich beim Reden zur Figur (`facingToward`). Imani nicht, weil `gallery.js` sie zeichnet.
-- **M2:** Kasten und Oval in der Hall sind weg. Station I ist jetzt das Sargent-Porträt (Met 12127) an der Hallwand, mit Goldrahmen, Schild „I · PORTRAITS“ (`drawStationSign`, Stil wie in der Gallery) und E-Markierung. `ledger` steht auf x 6, y 3. Leon bleibt nie direkt vor einer Station stehen (`frontOfStation` in `guard.js`).
+- **M2:** Kasten und Oval in der Hall sind weg. Station I ist jetzt das mittlere Bild an der Hallwand (Van Gogh, Wunsch von Florian), mit Goldrahmen, Schild „I · PORTRAITS“ (`drawStationSign`, Stil wie in der Gallery) und E-Markierung. `ledger` steht auf x 4, y 3. Leon bleibt nie direkt vor einer Station stehen (`frontOfStation` in `guard.js`).
 - **Tests:** 269 bestanden. Screenshots `web/dev/shots/npc-*`.
