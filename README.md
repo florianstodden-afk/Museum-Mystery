@@ -8,12 +8,12 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 ## Team
 
-| Name | Student number | Main contributions |
-|---|---|---|
-| Florian Baumgartl | 78089 | Story engine (`web/story/`), Station I – Portrait Timeline, NPC talks |
-| Florian Stodden | 78574 | Repository & deployment, home/login screens, menu, journal, ending screens |
-| Fabian Oscar Bergvall | 78922 | Rooms & graphics, Station B – Landscape |
-| Leo Johannes Oskar Heppe | 79527 | Station L – Picture Puzzle, Station D – Spot the Forgery |
+| Name | Student number |
+|---|---|
+| Florian Baumgartl | 78089 |
+| Florian Stodden | 78574 |
+| Fabian Oscar Bergvall | 78922 |
+| Leo Johannes Oskar Heppe | 79527 |
 
 In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `FlorianBaumgartl78086`, Florian Stodden also as `florianstodden-afk` and Leo as `leomasterofcode`.
 
