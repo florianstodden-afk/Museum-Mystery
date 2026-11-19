@@ -58,6 +58,14 @@ test('case data: every station artwork exists in the work list', () => {
   assert.equal(workById(436535).date, '1889');
 });
 
+import { ROOMS, stationPlace } from '../case-1.js';
+test('every station stands in a room that exists in the game, and Gallery stations name their spot', () => {
+  for (const station of CASE.stations) assert.ok(ROOMS.includes(station.room), `${station.id}: ${station.room}`);
+  assert.deepEqual(CASE.stations.map(stationPlace), ['Gallery, middle painting', 'Portrait Hall', 'Gallery, left painting', 'Gallery, frame rack']);
+  const gallery = CASE.stations.filter(s => s.room === 'Gallery');
+  assert.equal(new Set(gallery.map(s => s.spot)).size, gallery.length, 'each Gallery station has its own spot');
+});
+
 test('case data: Portrait Hall shows Ingres, Degas, Sargent and Cézanne with verified Met dates', () => {
   const portraits = CASE.stations.find(s => s.id === 'portraits');
   assert.deepEqual(portraits.metIds, [436703, 436121, 12127, 435876]);
@@ -68,7 +76,7 @@ test('case data: Portrait Hall shows Ingres, Degas, Sargent and Cézanne with ve
   assert.deepEqual(dates, [[1823, 1823, '2026-11-18'], [1865, 1865, '2026-11-15'], [1883, 1884, '2026-11-15'], [1888, 1890, '2026-11-15']]);
 });
 
-test('case data: Frame Archive no longer repeats a Portrait Hall work', () => {
+test('case data: Station D no longer repeats a Portrait Hall work', () => {
   const portraits = CASE.stations.find(s => s.id === 'portraits').metIds;
   const archive = CASE.stations.find(s => s.id === 'archive').metIds;
   assert.deepEqual(archive, [435882]);

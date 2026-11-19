@@ -66,7 +66,7 @@ test('journal keeps letters in their fixed slots', () => {
   assert.deepEqual(model.slots.map(slot => slot.letter), ['B', '_', 'L', '_']);
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
   assert.equal(model.score.total, 35);
-  assert.match(model.nextStep, /Portrait Hall, Frame Archive/);
+  assert.match(model.nextStep, /Portrait Hall; Gallery, frame rack\./);
 });
 
 test('journal renders slots, evidence and notes', () => {

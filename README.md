@@ -49,10 +49,10 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 | Part | Owner |
 |---|---|
-| Station B – Landscape Gallery | Fabian Bergvall |
+| Station B – Gallery, middle painting | Fabian Bergvall |
 | Station I – Portrait Hall | Florian Baumgartl |
 | Station L – Renoir picture puzzle | Leopold Heppe |
-| Station D – Frame Archive | Spot the Forgery — find any 3 of 5 differences |
+| Station D – Gallery, frame rack | Spot the Forgery — find any 3 of 5 differences |
 | Story engine | Florian Baumgartl |
 | Rooms and graphics | Fabian Bergvall |
 | Repository and setup | Florian Stodden |

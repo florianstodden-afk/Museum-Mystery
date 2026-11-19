@@ -386,3 +386,4 @@ a.story-button { display: inline-block; text-decoration: none; }
   100% { transform: translate(calc(-50% + -0.00px), calc(-50% + -0.00px)); }
 }
 @media (prefers-reduced-motion: reduce) { .forgery-lens.is-guiding { animation: none; } }
+.story-slot-spot { color: var(--story-gold); }
