@@ -20,6 +20,7 @@ import { chooseGuardAction } from './guard.js';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
+import { SESSION_KEY, registerLocalAccount, logInLocalAccount, profileStorageKey } from './local-auth.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -32,11 +33,13 @@ function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Ma
 const dialog = document.querySelector('#dialog');
 let dialogOpener = null;
 const vaultPreview = new URLSearchParams(location.search).get('vault-preview') === '1';
+let activeProfile = null;
+try { activeProfile = sessionStorage.getItem(SESSION_KEY) || null; } catch {}
 let previewStory = readMission(newGame()).state;
 if (vaultPreview) for (const id of STATION_IDS) previewStory = solveStation(previewStory, id).state;
 let previewSave = JSON.stringify({story: JSON.stringify(previewStory), progress: {}});
 const previewStorage = { getItem: () => previewSave, setItem: (_key, value) => { previewSave = value; } };
-const storeKey = 'museum-mystery-walk-v1';         // player position and steps
+const storeKey = profileStorageKey('museum-mystery-walk-v1', activeProfile); // player position and steps
 const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, no longer used
 
 // Small synthesized sounds for story moments; the player remembers 'muted'.
@@ -66,7 +69,7 @@ const story = createStoryHost({
   sound,
   speech,
   stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
-  storageKey: 'museum-nocturne-story-v1',
+  storageKey: profileStorageKey('museum-nocturne-story-v1', activeProfile),
   ...(vaultPreview ? {storage: previewStorage} : {}),
 });
 
@@ -593,23 +596,57 @@ const entryChoices=document.querySelector('#entry-choices');
 const entryPanel=document.querySelector('#entry-panel');
 const entryLogin=document.querySelector('#entry-login');
 const entrySignup=document.querySelector('#entry-signup');
+const entryBackdrop=document.querySelector('.entry-backdrop');
+const entryForm=document.querySelector('#entry-form');
+const entryMessage=document.querySelector('#entry-message');
 let entryOpener=entryLogin;
-function openEntryPanel(label, opener){
+let entryMode='login';
+function openEntryPanel(mode, opener){
+  entryMode=mode;
   entryOpener=opener;
-  document.querySelector('#entry-panel-title').textContent=label;
+  const signingUp=mode==='signup';
+  document.querySelector('#entry-panel-title').textContent=signingUp?'Sign Up':'Log In';
+  entryBackdrop.src=signingUp?'assets/signup-screen-reference.jpg':'assets/login-form-reference.jpg';
+  document.querySelector('#entry-password').autocomplete=signingUp?'new-password':'current-password';
+  document.querySelector('#entry-forgot').hidden=signingUp;
+  entryForm.reset();entryMessage.textContent='';
   entryChoices.hidden=true;
   entryPanel.hidden=false;
-  document.querySelector('#entry-continue').focus();
+  document.querySelector('#entry-username').focus();
 }
 function closeEntryPanel(){
   entryPanel.hidden=true;
   entryChoices.hidden=false;
+  entryBackdrop.src='assets/login-screen-reference.jpg';
+  entryForm.reset();entryMessage.textContent='';
   entryOpener.focus();
 }
-entryLogin.addEventListener('click',()=>openEntryPanel('Log In',entryLogin));
-entrySignup.addEventListener('click',()=>openEntryPanel('Sign Up',entrySignup));
+entryLogin.addEventListener('click',()=>openEntryPanel('login',entryLogin));
+entrySignup.addEventListener('click',()=>openEntryPanel('signup',entrySignup));
 document.querySelector('#entry-back').addEventListener('click',closeEntryPanel);
-document.querySelector('#entry-continue').addEventListener('click',()=>{
+entryForm.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const submit=document.querySelector('#entry-submit');
+  submit.disabled=true;
+  entryMessage.textContent='Checking…';
+  let result;
+  try {
+    const storage=localStorage;
+    const username=document.querySelector('#entry-username').value;
+    const password=document.querySelector('#entry-password').value;
+    result=entryMode==='signup'
+      ? await registerLocalAccount(storage,username,password)
+      : await logInLocalAccount(storage,username,password);
+  } catch { result={ok:false,message:'Account storage is unavailable. Try guest play.'}; }
+  submit.disabled=false;
+  if(!result.ok){entryMessage.textContent=result.message;document.querySelector('#entry-password').focus();return;}
+  try {sessionStorage.setItem(SESSION_KEY,result.username);location.reload();}
+  catch {entryMessage.textContent='This browser cannot start a local profile. Try guest play.';}
+});
+document.querySelector('#entry-forgot').addEventListener('click',()=>{
+  entryMessage.textContent='Local accounts have no password reset. Create another account or play as guest.';
+});
+document.querySelector('#entry-guest').addEventListener('click',()=>{
   entryScreen.hidden=true;
   homeScreen.inert=false;
   showHome();
@@ -689,13 +726,16 @@ function showHome(){
   stopMovement();speech.close();
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
+  const profileLabel=document.querySelector('#home-current-profile');
+  profileLabel.hidden=!activeProfile;
+  profileLabel.textContent=activeProfile?`Local profile: ${activeProfile}`:'';
   gameMenuToggle.hidden=true;
   gameJournalToggle.hidden=true;
   document.querySelector('.shell').inert=true;
   homeStart.disabled=!story.state.missionRead;
   homeStart.setAttribute('aria-label',story.state.ending?'Resume Game - view ending':'Resume Game');
   const board=scoreboard(story.state,story.progress);
-  const bestRun=bestRunStore((()=>{try{return localStorage;}catch{return null;}})());
+  const bestRun=bestRunStore((()=>{try{return localStorage;}catch{return null;}})(),profileStorageKey('museum-nocturne-best-run-v1',activeProfile));
   // A finished run may become the best run (stored on this device only).
   const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
@@ -731,6 +771,10 @@ homeSettings.addEventListener('click',()=>{
   homeSettings.setAttribute('aria-expanded',String(opening));
   if(opening)document.querySelector('#home-sound').focus();
 });
+document.querySelector('#home-switch-profile').addEventListener('click',()=>{
+  try {sessionStorage.removeItem(SESSION_KEY);} catch {}
+  location.reload();
+});
 homeScoreboard.addEventListener('click',()=>{
   const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
   homeScoreboard.setAttribute('aria-expanded',String(opening));
@@ -747,7 +791,8 @@ homeScreen.addEventListener('keydown',event=>{
 });
 document.querySelector('#home-button').addEventListener('click',showHome);
 save();
+if(activeProfile){entryScreen.hidden=true;homeScreen.inert=false;}
 showHome(); // The mission starts only after the player chooses Start game.
-entryLogin.focus(); // The guest entry screen is always first, even when a local save exists.
+if(!activeProfile)entryLogin.focus();
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });

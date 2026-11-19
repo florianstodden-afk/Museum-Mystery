@@ -1,5 +1,7 @@
 # Gast-Einstieg vor dem Home Screen
 
+**Historischer Stand vom 17.11.2026.** Für den später ergänzten lokalen Profilzugang siehe [Lokale Profile: Anmeldung und Spielstart](local-login.md). Die folgenden Angaben dokumentieren die damalige Umsetzung und beschreiben nicht mehr den aktuellen Anmeldebildschirm.
+
 **Stand: 17.11.2026, Branch `codex/guest-entry-flow`.** Dies ist der vorbereitete Ablauf für den nächsten Pull Request. Bis zum Merge startet das öffentliche Spiel weiterhin direkt im Home Screen.
 
 ## Ablauf für Spieler

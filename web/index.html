@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css?v=compact-journal-1">
+  <link rel="stylesheet" href="style.css?v=local-login-1">
   <link rel="stylesheet" href="story/story.css?v=room-names-1">
 </head>
 <body>
@@ -16,13 +16,19 @@
         <button id="entry-login" type="button" aria-label="Log In"><span>Log In</span></button>
         <button id="entry-signup" type="button" aria-label="Sign Up"><span>Sign Up</span></button>
       </div>
-      <p id="entry-status" class="entry-status">Accounts coming soon · play as guest</p>
+      <p id="entry-status" class="entry-status">Local accounts · this device only</p>
       <div id="entry-panel" class="entry-panel" hidden>
-        <button id="entry-back" type="button" class="entry-back">← Back</button>
+        <button id="entry-back" type="button" class="entry-back" aria-label="Back to Log In or Sign Up">×</button>
         <h2 id="entry-panel-title">Log In</h2>
-        <p>Accounts are coming later. You can play the complete game as a guest now.</p>
-        <button id="entry-continue" type="button" class="entry-continue">Continue as guest</button>
-        <p class="entry-local-note">Progress is saved on this device only.</p>
+        <form id="entry-form" class="entry-form">
+          <label class="entry-username"><span>Username</span><input id="entry-username" name="username" type="text" placeholder="Username" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_-]+" required></label>
+          <label class="entry-password"><span>Password</span><input id="entry-password" name="password" type="password" placeholder="Password" autocomplete="current-password" minlength="8" maxlength="128" required></label>
+          <button id="entry-submit" type="submit">SUBMIT</button>
+        </form>
+        <button id="entry-forgot" type="button" class="entry-forgot">Forgot Password?</button>
+        <p id="entry-message" class="entry-message" role="status" aria-live="polite"></p>
+        <button id="entry-guest" type="button" class="entry-guest">Continue as guest</button>
+        <p class="entry-local-note">Accounts and progress stay on this device. Use a unique password.</p>
       </div>
     </div>
   </section>
@@ -36,6 +42,7 @@
         <button id="home-settings" type="button" aria-expanded="false" aria-controls="home-settings-panel"><span>Settings</span></button>
         <button id="home-scoreboard" type="button" aria-expanded="false" aria-controls="home-scoreboard-panel"><span>Scoreboard</span></button>
       </div>
+      <p id="home-current-profile" class="home-current-profile" hidden></p>
       <p id="home-notice" class="home-notice" role="status" hidden></p>
       <button id="home-journal" class="home-journal" type="button" aria-haspopup="dialog">Journal</button>
       <div id="home-settings-panel" class="home-panel" hidden>
@@ -44,6 +51,7 @@
         <button id="home-sound" type="button" aria-pressed="true">Sounds on</button>
         <button id="home-music" type="button" aria-pressed="false">Music off</button>
         <p>Move with WASD or arrow keys. Press E to inspect.</p>
+        <button id="home-switch-profile" type="button">Switch profile</button>
       </div>
       <div id="home-scoreboard-panel" class="home-panel puzzle-popup scoreboard-panel" hidden>
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close scoreboard">×</button>
@@ -114,6 +122,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=art-cards-compact-journal-1"></script>
+  <script type="module" src="main.js?v=local-login-1"></script>
 </body>
 </html>

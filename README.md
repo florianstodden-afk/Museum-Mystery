@@ -10,6 +10,7 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 ## How to play
 
+- On the first screen, choose **Sign Up** to create a local profile, **Log In** to return to one, or **Continue as guest**. Profiles and their progress exist only in the browser on this device. They are not shared through GitHub or the online scoreboard. See [the login flow](docs/local-login.md).
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four stations (B, I, L, D) each give one letter. Together they open the vault.
 - In the vault, answer the final question. There are two endings and up to 85 points.
@@ -39,6 +40,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 |---|---|
 | `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.png` | Page, home screen, menu and compact illustrated journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
+| `web/local-auth.js` | Device-only username/password profiles and separate local saves |
 | `web/engine.js` | Map and movement rules |
 | `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
