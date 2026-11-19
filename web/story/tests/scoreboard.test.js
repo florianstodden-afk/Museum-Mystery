@@ -39,6 +39,7 @@ test('the better run: more points first, then less time; broken data never wins'
   assert.equal(betterRun(null, a), a);
   assert.equal(betterRun(a, { points: '99', timeMs: 1 }), a);
   assert.equal(betterRun({ points: 999, timeMs: 1 }, a), a);
+  assert.deepEqual(betterRun({ points: 80, max: 90, timeMs: 1000 }, { points: 76, max: 85, timeMs: 90000 }), { points: 76, max: 85, timeMs: 90000 }, 'different scoring scales use the share of available points');
 });
 
 test('the best run survives in storage and broken storage gives "no best run"', () => {
@@ -67,7 +68,8 @@ test('the scoreboard view shows one row per station and the best run', async () 
   assert.match(rows[1].textContent, /B · .*Solved.*20 \/ 20/);
   assert.match(rows[2].textContent, /Open/);
   assert.match(box.textContent, /Current run: 20 \/ 85 points/);
-  assert.match(box.textContent, /Best run: 75 \/ 90 points · time 1:01/);
+  assert.match(box.textContent, /Best run: 75 \/ 90 points \(earlier scoring\) · time 1:01/);
+  assert.match(box.textContent, /B: wrong answers and hints reduce points/);
 });
 
 test('Forgery time and reward appear on the scoreboard and legacy best runs retain their scale', async () => {

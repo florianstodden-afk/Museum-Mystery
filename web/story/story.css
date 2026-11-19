@@ -124,8 +124,8 @@ a.story-button { display: inline-block; text-decoration: none; }
 #dialog:has(.story-ending) .dialog-card>.eyebrow,#dialog:has(.story-ending) #dialog-title,#dialog:has(.story-ending) #dialog-actions{display:none}
 #dialog:has(.story-ending) #dialog-body,#dialog:has(.story-ending) .story-scene{height:100%}
 .story-ending{position:relative;width:100%;height:100%;overflow:hidden;background-size:cover;background-position:center;color:#f8e9c9}
-.story-ending.is-heist{background-image:url('../assets/ending-thief-background.png')}
-.story-ending.is-open-file{background-image:url('../assets/ending-not-thief-background.png')}
+.story-ending.is-heist{background-image:url('../assets/ending-thief-background.jpg')}
+.story-ending.is-open-file{background-image:url('../assets/ending-not-thief-background.jpg')}
 .story-ending-plaque{position:absolute;top:22%;left:30%;width:40%;height:27%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:1% 1.5%;box-sizing:border-box}
 .story-ending-plaque .story-eyebrow{margin:0 0 1%;font-size:clamp(.6rem,.9vw,.88rem);letter-spacing:.16em;color:#d5ad62}
 .story-ending-plaque .story-text{max-width:95%;margin:auto 0 0;font-size:clamp(.82rem,1.35vw,1.2rem);line-height:1.3;color:#f7e7cb;text-wrap:balance}
@@ -333,6 +333,7 @@ a.story-button { display: inline-block; text-decoration: none; }
 .scoreboard-table tr.is-solved td:nth-child(2) { color: #9fd3a8; }
 .scoreboard-total, .scoreboard-best { margin: 12px 0 0; }
 .scoreboard-best { color: #cbbfae; font-size: .9rem; }
+.scoreboard-rules { margin: 10px 0 0; color: #cbbfae; font-size: .8rem; line-height: 1.35; }
 @media (max-width: 420px) { .scoreboard-table { font-size: .8rem; } .scoreboard-table th, .scoreboard-table td { padding: 5px 4px; } }
 
 /* Station D keeps the full canvas visible in each column. Hit testing and

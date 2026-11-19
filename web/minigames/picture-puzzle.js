@@ -16,7 +16,7 @@ export function start(container, caseData, onSolved) {
   const status = el('p', { className: 'puzzle-status', attrs: { role: 'status' } });
   const help = button('?', showHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Puzzle instructions');
-  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s picture to uncover the hidden mark on the transport slip.' }), el('p', { text: 'Points are given based on speed' }), help]);
+  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s eight-piece picture to uncover the hidden mark on the transport slip.' }), el('p', { text: 'Finish within 30 / 45 / 60 seconds for 15 / 10 / 5 points.' }), help]);
   const controls = el('div', { className: 'story-actions puzzle-actions' });
   const startButton = shortcutButton('Start puzzle', begin, 'Enter');
   const back = shortcutButton('Back to museum', leave, 'Escape');

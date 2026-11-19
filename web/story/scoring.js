@@ -172,11 +172,12 @@ function stationTime(state, progress, id) {
   return null;
 }
 
-/** The better of two finished runs: more points wins, at equal points the shorter time. */
+/** Compare percentages across old and current scoring scales; on one scale, more points wins. */
 export function betterRun(best, run) {
   if (!validRun(run)) return validRun(best) ? best : null;
   if (!validRun(best)) return run;
-  if (run.points !== best.points) return run.points > best.points ? run : best;
+  const comparison = run.points * (best.max ?? 90) - best.points * (run.max ?? 90);
+  if (comparison !== 0) return comparison > 0 ? run : best;
   return (run.timeMs ?? Infinity) < (best.timeMs ?? Infinity) ? run : best;
 }
 

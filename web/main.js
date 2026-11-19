@@ -10,7 +10,7 @@ import * as landscapeStation from './minigames/landscape.js';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=art-cards-1';
-import { createStoryHost } from './story/host.js?v=speech-box-1';
+import { createStoryHost } from './story/host.js?v=npc-conversation-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
@@ -18,7 +18,7 @@ import { renderScoreboard } from './story/scoreboard-view.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { interactionFor, nudgeOffset } from './interaction.js';
-import { createSpeechBox } from './story/speech-box.js';
+import { createSpeechBox } from './story/speech-box.js?v=npc-conversation-1';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
 import { SESSION_KEY, registerLocalAccount, logInLocalAccount, profileStorageKey } from './local-auth.js';
 
@@ -45,7 +45,7 @@ const oldLandscapeKey = 'museum-nocturne-landscape-v1'; // from the prototype, n
 // Small synthesized sounds for story moments; the player remembers 'muted'.
 const sound = createSoundPlayer();
 
-// Imani and Vale start talking nearby; Leon waits for an E interaction.
+// Every person starts talking only after an E interaction.
 const PEOPLE = {guard:'leon', restorer:'imani', curator:'vale'}; // map object id → story character
 let nudgedAt = -Infinity;        // when the player last shook "nothing here" (interaction.js)
 let talkingTo = null;             // the character in the speech box right now
@@ -114,7 +114,7 @@ function guardFacingNow(){
   return guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
 }
 function guardWalking(){return Boolean(guardMotion) && talkingTo!=='leon';}
-// E opens Leon's conversation; Imani and Vale continue to speak nearby.
+// The nearby target determines which person E addresses.
 function interactTarget(){return nearbyObject(state,currentGuard());}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
@@ -393,7 +393,8 @@ function handleInteract(){
   if(speech.isOpen){speech.advance();return;}
   if(!dialog.classList.contains('hidden') || roomTransition)return;
   const object=interactTarget();
-  const action=interactionFor({atVaultDoor:atVaultDoor(state),target:object});
+  // Once open, the doorway is crossed by walking; E should not steal a nearby object's action.
+  const action=interactionFor({atVaultDoor:atVaultDoor(state) && !state.doorOpen,target:object});
   if(action==='vault'){
     if(state.doorOpen) showDialog('Vault unlocked','Walk right through the open doorway.');
     else story.openVault();

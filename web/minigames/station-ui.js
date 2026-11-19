@@ -15,10 +15,10 @@ export function shortcutButton(label, action, ...keys) {
 }
 
 /** The intro above a station: one task line, the gold speed line, a round "?" and the Start/Back buttons. */
-export function introPopup({ task, onStart, onBack, onHelp }) {
+export function introPopup({ task, pointsText, onStart, onBack, onHelp }) {
   const help = button('?', onHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Instructions');
-  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: task }), el('p', { text: 'Points are given based on speed' }), help]);
+  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: task }), el('p', { text: pointsText }), help]);
   const startButton = shortcutButton('Start', onStart, 'Enter');
   const backButton = shortcutButton('Back to museum', onBack, 'Escape');
   return { intro, help, startButton, backButton, controls: el('div', { className: 'story-actions puzzle-actions' }) };
