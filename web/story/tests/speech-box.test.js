@@ -58,7 +58,7 @@ test('Space shows the whole sentence at once; reduced motion skips typing', () =
   assert.equal(b.parts().text, conversation.greeting[0]);
 });
 
-test('a question plays its answer box by box, then the choices come back', () => {
+test('a question plays its answer box by box, then only unanswered choices come back', () => {
   const { box, run, parts, log } = setup({ reduced: true });
   box.show(conversation);
   box.handleKey(key('1'));
@@ -69,7 +69,43 @@ test('a question plays its answer box by box, then the choices come back', () =>
   assert.equal(parts().choices.length, 0);
   for (let i = 1; i < answer.length; i++) { box.handleKey(key('e')); run(); assert.equal(parts().text, answer[i]); }
   assert.equal(parts().more.hidden, true);
-  assert.equal(parts().choices.length, 3, 'back to the choices');
+  assert.deepEqual(parts().choices.map(c => c.textContent), [
+    'Quiet in here, isn’t it?', 'I’ll let you get back to it.',
+  ], 'the answered question stays hidden for this conversation');
+});
+
+test('Leon closes after both answers and starts fresh when addressed again', () => {
+  const { box, parts, log } = setup({ reduced: true });
+  box.show(conversation);
+  box.handleKey(key('1'));
+  while (!parts().choices.length) box.handleKey(key('e'));
+  assert.deepEqual(parts().choices.map(c => c.textContent), ['Quiet in here, isn’t it?', 'I’ll let you get back to it.']);
+  box.handleKey(key('1'));
+  for (let i = 1; i < conversation.questions[1].lines.length; i++) box.handleKey(key('e'));
+  assert.equal(box.isOpen, true, 'the final answer stays visible until the player advances');
+  assert.equal(parts().choices.length, 0, 'no question can repeat');
+  box.handleKey(key('e'));
+  assert.equal(box.isOpen, false);
+  assert.equal(log.closed, 1);
+  box.show(conversation);
+  assert.deepEqual(parts().choices.map(c => c.textContent), [
+    'Rough night so far?', 'Quiet in here, isn’t it?', 'I’ll let you get back to it.',
+  ]);
+});
+
+test('Imani closes after her lines and can be spoken to again', () => {
+  const { box, parts, log } = setup({ reduced: true });
+  const imani = conversationFor('imani', readMission(newGame()).state);
+  box.show(imani);
+  assert.equal(parts().choices.length, 0);
+  for (let i = 1; i < imani.greeting.length; i++) box.handleKey(key('e'));
+  assert.equal(parts().text, imani.greeting.at(-1));
+  assert.equal(box.isOpen, true);
+  box.handleKey(key('e'));
+  assert.equal(box.isOpen, false);
+  assert.equal(log.closed, 1);
+  box.show(imani);
+  assert.equal(parts().text, imani.greeting[0]);
 });
 
 test('goodbye says one line and the next key closes the box', () => {

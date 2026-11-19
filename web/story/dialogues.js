@@ -137,11 +137,13 @@ export function questionsFor(characterId, state) {
   return conversationFor(characterId, state)?.questions ?? [];
 }
 
-// Characters without their own questions just say their usual lines, then the player can leave.
+// Characters without their own questions say their usual lines. Imani ends when
+// the player has read all of hers; Vale keeps his existing goodbye choice.
 function simpleConversation(characterId) {
   return state => ({
     greeting: dialogueFor(characterId, state).lines,
     questions: [],
+    autoCloseAfterGreeting: characterId === 'imani',
     goodbye: { id: 'bye', label: 'Goodbye.', lines: [] },
   });
 }
