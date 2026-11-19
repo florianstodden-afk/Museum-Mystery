@@ -12,7 +12,7 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four stations (B, I, L, D) each give one letter. Together they open the vault.
-- In the vault, answer the final question. There are two endings and up to 90 points.
+- In the vault, answer the final question. There are two endings and up to 85 points.
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 
 ## Run locally
@@ -52,7 +52,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 | Station B – Landscape Gallery | Fabian Bergvall |
 | Station I – Portrait Hall | Florian Baumgartl |
 | Station L – Renoir picture puzzle | Leopold Heppe |
-| Station D – Frame Archive | open (placeholder) |
+| Station D – Frame Archive | Spot the Forgery — find any 3 of 5 differences |
 | Story engine | Florian Baumgartl |
 | Rooms and graphics | Fabian Bergvall |
 | Repository and setup | Florian Stodden |

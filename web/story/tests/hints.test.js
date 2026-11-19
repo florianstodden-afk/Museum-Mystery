@@ -63,5 +63,5 @@ test('asking for a hint never changes state or score', () => {
   const before = structuredClone(s);
   hintFor(s, 2);
   assert.deepEqual(s, before);
-  assert.equal(totalScore(s), 70); // Station I max is 15 now
+  assert.equal(totalScore(s), 65); // B gives 20; I, L and D give 15 each
 });

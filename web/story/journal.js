@@ -1,7 +1,7 @@
 // The investigation journal: first a pure data model, then a renderer for any container.
 import { CASE, noteById } from './case-1.js';
 import { nextStep } from './engine.js';
-import { totalScore, MAX_SCORE } from './scoring.js';
+import { totalScore, maximumScore } from './scoring.js';
 import { el } from './dom.js';
 
 // Which evidence points to Voss, in the fixed station order. Used by journal, accusation and endings.
@@ -32,7 +32,7 @@ export function journalModel(state) {
     }),
     notes: state.notes.map(id => noteById(id)),
     nextStep: nextStep(state),
-    score: { total: totalScore(state), max: MAX_SCORE },
+    score: { total: totalScore(state), max: maximumScore(state) },
   };
 }
 

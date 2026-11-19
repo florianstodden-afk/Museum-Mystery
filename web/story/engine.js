@@ -8,7 +8,7 @@
 //   A WRONG ANSWER at the safe or the final question is allowed: it is counted as an
 //   attempt, so `state` changes (attempts + 1) and ok is false.
 import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById } from './case-1.js';
-import { stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
+import { SPEED_MAX, stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
 
 export const ENDING_IDS = ['heist', 'open-file'];
 
@@ -70,7 +70,7 @@ export function solveStation(state, stationId, result = {}) {
   const mistakes = Math.max(state.stations[stationId].mistakes, toCount(result.mistakes));
   const hints = Math.max(state.stations[stationId].hints, toCount(result.hints));
   const next = copy(state);
-  next.stations[stationId] = { solved: true, mistakes, hints, points: stationPoints(mistakes, hints) };
+  next.stations[stationId] = { solved: true, mistakes, hints, points: stationId === 'archive' ? SPEED_MAX : stationPoints(mistakes, hints) };
   next.letters[STATION_IDS.indexOf(stationId)] = station.letter;
   next.evidence.push(station.evidenceId);
   return accept(next, `${station.room} solved: letter ${station.letter}. Evidence: ${station.evidence}`);

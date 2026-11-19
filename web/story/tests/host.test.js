@@ -83,8 +83,8 @@ test('a whole game runs through the host, including wrong answers', () => {
   click(page, 'Quit the mission');
   assert.equal(host.state.ending, 'open-file');
   assert.equal(page.title, 'Case closed');
-  // 17 + 15 (Station I max is now 15) + 15 + 20 + safe 5 + question 5
-  assert.match(page.panel.textContent, /77 \/ 90/);
+  // 17 + 15 (Station I max is now 15) + 15 + 15 + safe 5 + question 5
+  assert.match(page.panel.textContent, /72 \/ 85/);
 });
 
 test('the vault always opens the right step of the story', () => {

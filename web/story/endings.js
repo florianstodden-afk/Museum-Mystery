@@ -2,7 +2,7 @@
 import { CASE, workById } from './case-1.js';
 import { evidenceChain } from './journal.js';
 import { renderChain } from './accusation-ui.js';
-import { scoreBreakdown, totalScore, MAX_SCORE } from './scoring.js';
+import { scoreBreakdown, totalScore, maximumScore } from './scoring.js';
 import { el, button } from './dom.js';
 
 export const ENDINGS = {
@@ -44,7 +44,7 @@ export function endingModel(state) {
     chain: evidenceChain(state),
     breakdown: scoreBreakdown(state),
     total: totalScore(state),
-    max: MAX_SCORE,
+    max: maximumScore(state),
     disclaimer: CASE.disclaimer,
   };
 }

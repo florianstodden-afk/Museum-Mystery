@@ -47,12 +47,12 @@ test('adapter passes saved progress to the station', () => {
 
 test('adapter accepts the target format and ignores letter and points', () => {
   let result;
-  openStation(targetFormat, createContainer(), { stationId: 'archive', onSolved: r => { result = r; } });
+  openStation(targetFormat, createContainer(), { stationId: 'landscape', onSolved: r => { result = r; } });
   assert.deepEqual(result, { mistakes: 2, hints: 1 });
   // The engine decides the points from that: 20 - 6 - 5 = 9.
-  const s = solveStation(readMission(newGame()).state, 'archive', result).state;
-  assert.equal(s.stations.archive.points, 9);
-  assert.equal(s.letters[3], 'D');
+  const s = solveStation(readMission(newGame()).state, 'landscape', result).state;
+  assert.equal(s.stations.landscape.points, 9);
+  assert.equal(s.letters[0], 'B');
 });
 
 test('adapter falls back to zero for unknown reports', () => {

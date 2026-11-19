@@ -315,3 +315,74 @@ a.story-button { display: inline-block; text-decoration: none; }
 .scoreboard-total, .scoreboard-best { margin: 12px 0 0; }
 .scoreboard-best { color: #cbbfae; font-size: .9rem; }
 @media (max-width: 420px) { .scoreboard-table { font-size: .8rem; } .scoreboard-table th, .scoreboard-table td { padding: 5px 4px; } }
+
+/* Station D keeps the full canvas visible in each column. Hit testing and
+   overlays use exactly the footprint of the displayed forgery. */
+.forgery-pair figure { margin: 0; min-width: 0; }
+.forgery-pair figcaption { margin-bottom: 5px; font-weight: 600; color: var(--story-ink); }
+.forgery-image { position: relative; overflow: hidden; }
+.forgery-image img { display: block; width: 100%; height: auto; max-height: none; border-radius: 0; }
+.forgery-puzzle .forgery-target, .forgery-puzzle .forgery-target:hover {
+  position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0;
+  border: 0; border-radius: 0; margin: 0; padding: 0; background: transparent;
+  cursor: none; touch-action: manipulation;
+}
+.forgery-puzzle .forgery-target:focus-visible { outline-offset: -3px; }
+.forgery-mark, .forgery-lens { pointer-events: none; position: absolute; box-sizing: border-box; transform: translate(-50%, -50%); border-radius: 50%; }
+.forgery-mark { border: 2px solid #ffe39a; background: #edc3542b; box-shadow: 0 0 0 1px #283128; display: grid; place-items: center; }
+.forgery-mark b { border-radius: 50%; background: #26332d; color: #ffebba; min-width: 1.4em; line-height: 1.4; text-align: center; }
+.forgery-lens {
+  display: none; left: 50%; top: 50%; width: 18px; height: 18px;
+  border: 2px solid #fff3d6; box-shadow: 0 0 0 1px #283128;
+
+}
+.forgery-lens::after { content: ''; position: absolute; right: -7px; bottom: -4px; width: 8px; height: 3px; background: #fff3d6; box-shadow: 0 0 0 1px #283128; transform: rotate(45deg); }
+.forgery-lens.is-visible, .forgery-target:focus-visible .forgery-lens { display: block; }
+
+
+.forgery-miss {
+  pointer-events: none; position: absolute; transform: translate(-50%, -50%);
+  box-sizing: border-box; width: 18px; height: 18px; border-radius: 50%;
+  border: 1px solid #ff6868; background: #70202099;
+}
+.forgery-miss::before, .forgery-miss::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 100%; height: 1px; background: #ff6868;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.forgery-miss::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.forgery-countdown {
+  pointer-events: none; position: absolute; z-index: 3;
+  transform: translate(14px, -50%);
+  padding: 5px 8px; border: 1px solid #edb2a4; border-radius: 8px;
+  background: #322326; color: #fff0e8; white-space: nowrap; font: 12px/1.3 sans-serif;
+}
+.forgery-countdown::after {
+  content: ''; position: absolute; top: 50%; left: -5px; width: 8px; height: 8px;
+  background: #322326; border-left: 1px solid #edb2a4; border-bottom: 1px solid #edb2a4;
+  transform: translateY(-50%) rotate(45deg);
+}
+.forgery-countdown.is-left { transform: translate(calc(-100% - 14px), -50%); }
+.forgery-countdown.is-left::after { left: auto; right: -5px; transform: translateY(-50%) rotate(225deg); }
+.forgery-countdown[hidden] { display: none; }
+.forgery-lens.is-guiding { display: block; animation: forgery-guide 4s linear infinite; }
+@keyframes forgery-guide {
+  0% { transform: translate(calc(-50% + 0.00px), calc(-50% + 0.00px)); }
+  6.25% { transform: translate(calc(-50% + 13.78px), calc(-50% + 11.31px)); }
+  12.5% { transform: translate(calc(-50% + 25.46px), calc(-50% + 16.00px)); }
+  18.75% { transform: translate(calc(-50% + 33.26px), calc(-50% + 11.31px)); }
+  25% { transform: translate(calc(-50% + 36.00px), calc(-50% + 0.00px)); }
+  31.25% { transform: translate(calc(-50% + 33.26px), calc(-50% + -11.31px)); }
+  37.5% { transform: translate(calc(-50% + 25.46px), calc(-50% + -16.00px)); }
+  43.75% { transform: translate(calc(-50% + 13.78px), calc(-50% + -11.31px)); }
+  50% { transform: translate(calc(-50% + 0.00px), calc(-50% + -0.00px)); }
+  56.25% { transform: translate(calc(-50% + -13.78px), calc(-50% + 11.31px)); }
+  62.5% { transform: translate(calc(-50% + -25.46px), calc(-50% + 16.00px)); }
+  68.75% { transform: translate(calc(-50% + -33.26px), calc(-50% + 11.31px)); }
+  75% { transform: translate(calc(-50% + -36.00px), calc(-50% + 0.00px)); }
+  81.25% { transform: translate(calc(-50% + -33.26px), calc(-50% + -11.31px)); }
+  87.5% { transform: translate(calc(-50% + -25.46px), calc(-50% + -16.00px)); }
+  93.75% { transform: translate(calc(-50% + -13.78px), calc(-50% + -11.31px)); }
+  100% { transform: translate(calc(-50% + -0.00px), calc(-50% + -0.00px)); }
+}
+@media (prefers-reduced-motion: reduce) { .forgery-lens.is-guiding { animation: none; } }
