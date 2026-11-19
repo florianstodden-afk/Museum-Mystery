@@ -49,9 +49,9 @@ test('adapter accepts the target format and ignores letter and points', () => {
   let result;
   openStation(targetFormat, createContainer(), { stationId: 'landscape', onSolved: r => { result = r; } });
   assert.deepEqual(result, { mistakes: 2, hints: 1 });
-  // The engine decides the points from that: 20 - 6 - 5 = 9.
+  // The engine owns the reward; B starts at 15 until the host synchronizes its saved time.
   const s = solveStation(readMission(newGame()).state, 'landscape', result).state;
-  assert.equal(s.stations.landscape.points, 9);
+  assert.equal(s.stations.landscape.points, 15);
   assert.equal(s.letters[0], 'B');
 });
 

@@ -1,3 +1,5 @@
+import { CATALOGUE_ARTWORKS } from '../minigames/catalogue-data.js';
+
 // Case data for "Museum Nocturne" (case 1).
 // This file only contains data – no game rules. The engine reads it.
 // Museum and people are fictional. The artworks are real (The Met, Open Access).
@@ -49,8 +51,8 @@ export const CASE = deepFreeze({
       evidenceId: 'false-label',
       evidence: 'Voss approved the false wall label.',
       pointsToVoss: 'The false label went up with Voss’s approval – he wanted the swap to look official.',
-      task: 'Compare the wall label with the Met catalogue and correct the year and the material.',
-      metIds: [436535, 459193],
+      task: 'Play Curator’s Catalogue: match four labels to their artworks to uncover who approved the false wall label.',
+      metIds: CATALOGUE_ARTWORKS.map(work => work.id),
     },
     {
       id: 'portraits',
@@ -70,7 +72,7 @@ export const CASE = deepFreeze({
       evidenceId: 'hidden-mark',
       evidence: 'Hidden mark “V” on the fake transport slip.',
       pointsToVoss: 'Someone marked the fake slip with a hidden “V” to recognise their own paperwork.',
-      task: 'Station L hangs left of the wall label in the Gallery. Restore Renoir’s eight-piece picture to reveal a mark on the transport slip.',
+      task: 'Station L hangs left of Curator’s Catalogue in the Gallery. Restore Renoir’s eight-piece picture to reveal a mark on the transport slip.',
       metIds: [459111],
     },
     {
@@ -136,6 +138,7 @@ export const CASE = deepFreeze({
   // objectBeginDate/objectEndDate: frozen snapshot of the Met fields. Station I sorts by
   // objectBeginDate (for a range like 1883–84 the start year counts). Never use live data for the order.
   works: [
+    ...CATALOGUE_ARTWORKS.map(work => ({ ...work, artist: work.artistDisplayName })),
     {
       id: 436535, shortTitle: 'Wheat Field with Cypresses', title: 'Wheat Field with Cypresses',
       artist: 'Vincent van Gogh', date: '1889', medium: 'Oil on canvas',

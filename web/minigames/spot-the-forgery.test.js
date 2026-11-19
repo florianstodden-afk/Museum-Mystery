@@ -50,7 +50,7 @@ test('D uses L’s inclusive scoring boundaries, even after a miss', () => {
     const missed = guess(started(), 0, 0, 1001);
     const s = hit(hit(hit(missed, 2, 6001), 4, 6100), 3, 1000 + ms);
     const outcome = synchronizeScore(story, { archive: s });
-    assert.deepEqual(journalModel(outcome).score, { total: points, max: 85 });
+    assert.deepEqual(journalModel(outcome).score, { total: points, max: 80 });
     const row = scoreBreakdown(outcome).find(r => r.id === 'archive');
     assert.equal(row.max, 15);
     assert.equal(row.points, points);
@@ -73,7 +73,7 @@ test('the host recovers a final find once, and keeps legacy placeholder points a
   legacy.stations.archive.points = 20;
   storage.setItem(storageKey, JSON.stringify({ story: JSON.stringify(legacy), progress: { archive: { solved: true } } }));
   const restored = createStoryHost({ storage, storageKey }).state;
-  assert.deepEqual(journalModel(restored).score, { total: 20, max: 90 });
+  assert.deepEqual(journalModel(restored).score, { total: 20, max: 85 });
   assert.deepEqual(restored.evidence, ['frame-label']);
 });
 

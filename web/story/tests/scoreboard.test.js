@@ -22,7 +22,7 @@ test('mid-game: solved stations show their points, the total matches totalScore'
   state = { ...state, stations: { ...state.stations, portraits: { ...state.stations.portraits, timeMs: 18000 } } };
   const board = scoreboard(state);
   assert.equal(board.stations[0].solved, true);
-  assert.equal(board.stations[0].timeMs, null, 'B has no clock');
+  assert.equal(board.stations[0].timeMs, null, 'B without a saved completion time has no clock');
   assert.equal(board.stations[1].timeMs, 18000);
   assert.equal(board.points, totalScore(state));
   assert.equal(board.points, board.stations.reduce((sum, row) => sum + row.points, 0));
@@ -37,6 +37,7 @@ test('the better run: more points first, then less time; broken data never wins'
   assert.equal(betterRun(b, c), c);
   assert.equal(betterRun(c, b), c);
   assert.equal(betterRun(null, a), a);
+  assert.deepEqual(betterRun({ points: 84, max: 85, timeMs: 1000 }, { points: 80, max: 80, timeMs: 90000 }), { points: 80, max: 80, timeMs: 90000 }, 'a perfect catalogue run beats an imperfect earlier run');
   assert.equal(betterRun(a, { points: '99', timeMs: 1 }), a);
   assert.equal(betterRun({ points: 999, timeMs: 1 }, a), a);
   assert.deepEqual(betterRun({ points: 80, max: 90, timeMs: 1000 }, { points: 76, max: 85, timeMs: 90000 }), { points: 76, max: 85, timeMs: 90000 }, 'different scoring scales use the share of available points');
@@ -65,11 +66,11 @@ test('the scoreboard view shows one row per station and the best run', async () 
   renderScoreboard(box, scoreboard(state), { points: 75, timeMs: 61000 });
   const rows = findAll(box, node => node.tagName === 'TR');
   assert.equal(rows.length, 5, 'header + B, I, L, D');
-  assert.match(rows[1].textContent, /B · .*Solved.*20 \/ 20/);
+  assert.match(rows[1].textContent, /B · .*Solved.*15 \/ 15/);
   assert.match(rows[2].textContent, /Open/);
-  assert.match(box.textContent, /Current run: 20 \/ 85 points/);
+  assert.match(box.textContent, /Current run: 15 \/ 80 points/);
   assert.match(box.textContent, /Best run: 75 \/ 90 points \(earlier scoring\) · time 1:01/);
-  assert.match(box.textContent, /B: wrong answers and hints reduce points/);
+  assert.match(box.textContent, /B, I, L and D: faster completion earns more/);
 });
 
 test('Forgery time and reward appear on the scoreboard and legacy best runs retain their scale', async () => {
@@ -84,7 +85,7 @@ test('Forgery time and reward appear on the scoreboard and legacy best runs reta
   assert.equal(board.stations[3].points, 10);
   assert.equal(board.stations[3].max, 15);
   assert.equal(board.timeMs, 31000);
-  assert.equal(board.max, 85);
+  assert.equal(board.max, 80);
   assert.equal(validRun({ points: 90, timeMs: 1000 }), true);
   assert.equal(validRun({ points: 90, timeMs: 1000, max: 85 }), false);
   assert.equal(validRun({ points: 85, timeMs: 1000, max: 85 }), true);

@@ -29,6 +29,7 @@ import { hintFor } from './hints.js';
 import { examine as examineOffice } from './security-office/interactions.js';
 import { el, button } from './dom.js';
 import { synchronizeScore } from './scoring.js';
+import { validCatalogue } from '../minigames/catalogue-rules.js';
 import { validForgery } from '../minigames/forgery-rules.js';
 import { validPuzzle } from '../minigames/picture-rules.js';
 import { soundFor } from './sound.js';
@@ -56,7 +57,7 @@ export function createStoryHost(options) {
   let { state, progress } = load();
   state = synchronizeScore(state, progress, now());
   // Recover an interrupted award after the final placement or find was saved.
-  for (const [id, validate] of [['restoration', validPuzzle], ['archive', validForgery]]) {
+  for (const [id, validate] of [['landscape', validCatalogue], ['restoration', validPuzzle], ['archive', validForgery]]) {
     if (validate(progress[id]) && progress[id].solved && !state.stations[id].solved) {
       state = synchronizeScore(solveStation(state, id, progress[id]).state, progress);
     }
@@ -179,7 +180,7 @@ export function createStoryHost(options) {
     const station = CASE.stations.find(s => s.id === stationId);
     if (!station) return;
     const { content, actions } = scene(`${station.room} · Station ${station.letter}`);
-    const stationOwnsControls = ['restoration', 'archive'].includes(stationId) && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
+    const stationOwnsControls = ['landscape', 'restoration', 'archive'].includes(stationId) && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
     if (!stationOwnsControls) actions.append(closeButton('Back to the museum'));
     if (!state.missionRead) {
       content.append(el('p', { className: 'story-text', text: 'Read the message from M first.' }));
