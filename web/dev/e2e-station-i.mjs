@@ -67,7 +67,15 @@ for (const [width, height] of SIZES) {
 
   const images = await page.locator('.portrait-face img').evaluateAll(list => list.map(img => img.complete && img.naturalWidth > 0));
   ok(`${width}×${height} offline images`, images.length === 4 && images.every(Boolean));
-  await page.keyboard.press('Enter');                                   // Return to museum ↵
+  // Learn about the art: A opens the cards, → browses all four, Esc goes back to the museum.
+  ok(`${width}×${height} two buttons in the success popup`, await page.locator('.puzzle-popup button', { hasText: 'Learn about the art' }).count() === 1);
+  await page.keyboard.press('a');
+  const artists = [];
+  for (let i = 0; i < 4; i++) { artists.push(await page.locator('.art-card-artist').textContent()); await page.keyboard.press('ArrowRight'); }
+  ok(`${width}×${height} art cards show four works`, new Set(artists).size === 4, artists.join(', '));
+  ok(`${width}×${height} art cards do not scroll`, await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1));
+  await report('art card');
+  await page.keyboard.press('Escape');                                  // Back to museum Esc
   const body = await page.locator('body').innerText();
   ok(`${width}×${height} back in the museum with letter I`, !(await page.locator('dialog[open]').count()) && /Score: (15|10) \/ 90/.test(body));
   ok(`${width}×${height} no console errors`, errors.length === 0, errors.join(' | '));

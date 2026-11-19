@@ -23,7 +23,7 @@
     import * as portraits from '../minigames/portrait-timeline.js';
 
     const only = new URLSearchParams(location.search).get('only');
-    const stations = [['L', 'Gallery Picture Puzzle · Station L', picture], ['I', 'Portrait Hall · Station I', portraits]]
+    const stations = [['L', 'Gallery · Station L', picture], ['I', 'Portrait Hall · Station I', portraits]]
       .filter(([letter]) => !only || only === letter);
     document.documentElement.style.setProperty('--columns', String(stations.length));
     const memory = () => { const data = {}; return { getItem: k => data[k] ?? null, setItem: (k, v) => { data[k] = v; } }; };

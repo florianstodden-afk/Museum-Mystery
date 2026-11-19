@@ -1,5 +1,5 @@
-// A general stand-in for stations that are not built yet (Portrait Hall, Conservation Studio,
-// Frame Archive). It follows the same contract as a real station: start(container, caseData, onSolved).
+// A general stand-in for stations that are not built yet (today all stations
+// are real). It follows the same contract as a real station: start(container, caseData, onSolved).
 // caseData.stationId says which station it stands in for.
 import { stationById, workById } from './case-1.js';
 import { el, button, artworkImageUrl } from './dom.js';

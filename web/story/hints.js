@@ -4,7 +4,7 @@
 // Story hints cost no points. (Hints INSIDE a station are the station's own and cost −5 there.)
 // After two wrong tries at the safe or the final question, level 1 is already concrete:
 // the concept says no one may stay stuck.
-import { CASE } from './case-1.js';
+import { CASE, stationPlace } from './case-1.js';
 import { allStationsSolved } from './engine.js';
 
 export const HINT_GIVER = 'Imani';
@@ -15,7 +15,7 @@ export function hintFor(state, level = 1) {
     return hint('The case is closed. Start a new game if you want to see the other ending.');
   }
   if (!state.missionRead) {
-    return hint('Your phone buzzed in the Great Hall. Read the message from M first.');
+    return hint('Your phone buzzed in the Portrait Hall. Read the message from M first.');
   }
   if (!allStationsSolved(state)) return stationHint(state, concrete);
   if (!state.safe.open) return safeHint(state, concrete);
@@ -26,14 +26,14 @@ export function hintFor(state, level = 1) {
 function stationHint(state, concrete) {
   const open = CASE.stations.filter(station => !state.stations[station.id].solved);
   if (!concrete) {
-    return hint(`Four wings, four clues. Still open: ${open.map(s => s.room).join(', ')}. The order does not matter.`);
+    return hint(`Four wings, four clues. Still open: ${open.map(stationPlace).join('; ')}. The order does not matter.`);
   }
   const next = open[0];
   // Before the Portrait Hall, the security office gives useful background.
   if (next.id === 'portraits' && !state.notes.includes('duty-roster')) {
     return hint('Before the Portrait Hall, read the shift schedule in the security office. Then: ' + next.task);
   }
-  return hint(`Try the ${next.room}: ${next.task}`);
+  return hint(`Try the ${stationPlace(next)}: ${next.task}`);
 }
 
 function safeHint(state, concrete) {

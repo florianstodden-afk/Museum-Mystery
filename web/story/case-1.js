@@ -11,6 +11,14 @@ function deepFreeze(value) {
   return value;
 }
 
+// The rooms that really exist in the game, spelled as on the signs.
+export const ROOMS = ['Portrait Hall', 'Gallery', 'Security', 'Vault'];
+
+// Where a station is: the room, plus the spot when a room holds several stations.
+export function stationPlace(station) {
+  return station.spot ? `${station.room}, ${station.spot}` : station.room;
+}
+
 export const CASE_VERSION = 1;
 
 // The order of this list is the fixed order of the letters in the journal: B-I-L-D.
@@ -35,7 +43,8 @@ export const CASE = deepFreeze({
   stations: [
     {
       id: 'landscape',
-      room: 'Landscape Gallery',
+      room: 'Gallery',
+      spot: 'middle painting',
       letter: 'B',
       evidenceId: 'false-label',
       evidence: 'Voss approved the false wall label.',
@@ -55,7 +64,8 @@ export const CASE = deepFreeze({
     },
     {
       id: 'restoration',
-      room: 'Gallery Picture Puzzle',
+      room: 'Gallery',
+      spot: 'left painting',
       letter: 'L',
       evidenceId: 'hidden-mark',
       evidence: 'Hidden mark “V” on the fake transport slip.',
@@ -65,7 +75,8 @@ export const CASE = deepFreeze({
     },
     {
       id: 'archive',
-      room: 'Frame Archive',
+      room: 'Gallery',
+      spot: 'frame rack',
       letter: 'D',
       evidenceId: 'frame-label',
       evidence: 'Frame label: “Ordered by: A. Voss”.',
