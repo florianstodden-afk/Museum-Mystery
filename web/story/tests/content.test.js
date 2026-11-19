@@ -65,7 +65,7 @@ test('journal keeps letters in their fixed slots', () => {
   const model = journalModel(s);
   assert.deepEqual(model.slots.map(slot => slot.letter), ['B', '_', 'L', '_']);
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
-  assert.equal(model.score.total, 35);
+  assert.equal(model.score.total, 30);
   assert.match(model.nextStep, /Portrait Hall; Gallery, frame rack\./);
 });
 
@@ -95,15 +95,15 @@ test('ending model gives the right breakdown for both endings', () => {
   assert.equal(heist.title, 'I am a thief');
   assert.match(heist.paragraphs.join(' '), /deliver the original to Voss/);
   // Station I is a speedrun station now: at most 15 points (like L).
-  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 15, 15, 15, 5, 10]);
-  assert.equal(heist.total, 72);
+  assert.deepEqual(heist.breakdown.map(row => row.points), [15, 15, 15, 15, 5, 10]);
+  assert.equal(heist.total, 75);
   assert.match(heist.image.src, /assets\/met-436535\.jpg$/);
   assert.match(heist.disclaimer, /Fictional museum and characters/);
 
   const openFile = endingModel(finished('open-file', { wrongSuspect: 'vale' }));
   assert.equal(openFile.title, 'I am not a thief');
   assert.match(openFile.paragraphs.join(' '), /evidence exposes Voss/);
-  assert.equal(openFile.total, 80);
+  assert.equal(openFile.total, 75);
   assert.equal(openFile.chain.every(link => link.found), true);
 });
 
@@ -112,7 +112,7 @@ test('ending offers home and a new game while keeping score details', () => {
   const container = createContainer();
   let restarted = false, wentHome = false;
   renderEnding(container, endingModel(finished('open-file')), { onNewGame: () => { restarted = true; }, onHome: () => { wentHome = true; } });
-  assert.match(container.textContent, /85 \/ 85/);
+  assert.match(container.textContent, /80 \/ 80/);
   assert.match(container.textContent, /Dr\. Vale/);
   assert.equal(findAll(container, node => node.tagName === 'IMG').length, 1);
   findButton(container, 'Back to home').click();

@@ -24,6 +24,9 @@ export function button(label, onClick, className = 'story-button') {
 const LOCAL_IMAGES = [436535, 436121, 12127, 459111];
 
 export function artworkImageUrl(work) {
+  if ([45434, 9485, 23939, 503615].includes(work.id)) {
+    return new URL(`../assets/catalogue/met-${work.id}.jpg`, import.meta.url).href;
+  }
   if (LOCAL_IMAGES.includes(work.id)) {
     return new URL(`../assets/met-${work.id}.jpg`, import.meta.url).href;
   }

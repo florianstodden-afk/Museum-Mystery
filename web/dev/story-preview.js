@@ -8,7 +8,7 @@ import { createSoundPlayer } from '../story/sound.js';
 import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
-import * as landscapeStation from '../minigames/landscape.js';
+import * as catalogueStation from '../minigames/curators-catalogue.js';
 import * as forgeryStation from '../minigames/spot-the-forgery.js';
 import * as pictureStation from '../minigames/picture-puzzle.js';
 import * as portraitStation from '../minigames/portrait-timeline.js';
@@ -58,7 +58,7 @@ const story = createStoryHost({
     document.querySelector('#toast').textContent = message;
   },
   // Teammates replace the placeholder by adding their module here, e.g. portraits: portraitsStation.
-  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
+  stations: { landscape: catalogueStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
   storageKey: 'museum-nocturne-story-preview-v1',
 });
 

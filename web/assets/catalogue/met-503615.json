@@ -1,0 +1,87 @@
+{
+  "objectID": 503615,
+  "isHighlight": true,
+  "accessionNumber": "2003.150a–g",
+  "accessionYear": "2003",
+  "isPublicDomain": true,
+  "primaryImage": "https://images.metmuseum.org/CRDImages/mi/original/DP218094.jpg",
+  "primaryImageSmall": "https://images.metmuseum.org/CRDImages/mi/web-large/DP218094.jpg",
+  "additionalImages": [
+    "https://images.metmuseum.org/CRDImages/mi/original/DP222236.jpg"
+  ],
+  "constituents": [
+    {
+      "constituentID": 155385,
+      "role": "Maker",
+      "name": "Giosue Esposito",
+      "constituentULAN_URL": "",
+      "constituentWikidata_URL": "",
+      "gender": ""
+    }
+  ],
+  "department": "Musical Instruments",
+  "objectName": "Bassoon",
+  "title": "Bassoon",
+  "culture": "Italian",
+  "period": "",
+  "dynasty": "",
+  "reign": "",
+  "portfolio": "",
+  "artistRole": "Maker",
+  "artistPrefix": "",
+  "artistDisplayName": "Giosue Esposito",
+  "artistDisplayBio": "Naples, active late 19th century",
+  "artistSuffix": "",
+  "artistAlphaSort": "Esposito Giosue",
+  "artistNationality": "Naples",
+  "artistBeginDate": "1866",
+  "artistEndDate": "1899",
+  "artistGender": "",
+  "artistWikidata_URL": "",
+  "artistULAN_URL": "",
+  "objectDate": "1881",
+  "objectBeginDate": 1881,
+  "objectEndDate": 1881,
+  "medium": "Maple, nickel-silver",
+  "dimensions": "51 3/4 × 3 1/2 × 2 in. (131.4 × 8.9 × 5.1 cm)\r\nWidth (With bocal): 11 in. (27.9 cm)",
+  "measurements": [
+    {
+      "elementName": "Width",
+      "elementDescription": "With bocal",
+      "elementMeasurements": {
+        "Width": 27.940056
+      }
+    },
+    {
+      "elementName": "Overall",
+      "elementDescription": null,
+      "elementMeasurements": {
+        "Depth": 5.08001,
+        "Height": 131.44527,
+        "Width": 8.8900175
+      }
+    }
+  ],
+  "creditLine": "Purchase, Clara Mertens Bequest, in memory of André Mertens, 2003",
+  "geographyType": "",
+  "city": "Naples",
+  "state": "",
+  "county": "",
+  "country": "Italy",
+  "region": "",
+  "subregion": "",
+  "locale": "",
+  "locus": "",
+  "excavation": "",
+  "river": "",
+  "classification": "Aerophone-Reed Vibrated-double reed",
+  "rightsAndReproduction": "",
+  "linkResource": "",
+  "metadataDate": "2025-01-31T04:54:36.6Z",
+  "repository": "Metropolitan Museum of Art, New York, NY",
+  "objectURL": "https://www.metmuseum.org/art/collection/search/503615",
+  "tags": null,
+  "objectWikidata_URL": "https://www.wikidata.org/wiki/Q29385647",
+  "isTimelineWork": true,
+  "GalleryNumber": "684"
+}

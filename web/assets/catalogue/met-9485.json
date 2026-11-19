@@ -1,0 +1,93 @@
+{
+  "objectID": 9485,
+  "isHighlight": false,
+  "accessionNumber": "96.17.43",
+  "accessionYear": "1896",
+  "isPublicDomain": true,
+  "primaryImage": "https://images.metmuseum.org/CRDImages/ad/original/DP-42871-001.jpg",
+  "primaryImageSmall": "https://images.metmuseum.org/CRDImages/ad/web-large/DP-42871-001.jpg",
+  "additionalImages": [
+    "https://images.metmuseum.org/CRDImages/ad/original/DT289451.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/DT289452.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/DP-42871-005.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/DP-42871-004.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/DP-42871-003.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/DP-42871-002.jpg",
+    "https://images.metmuseum.org/CRDImages/ad/original/ADA2820.jpg"
+  ],
+  "constituents": [
+    {
+      "constituentID": 162542,
+      "role": "Designer",
+      "name": "Designed by Louis C. Tiffany",
+      "constituentULAN_URL": "http://vocab.getty.edu/page/ulan/500030415",
+      "constituentWikidata_URL": "https://www.wikidata.org/wiki/Q312950",
+      "gender": ""
+    },
+    {
+      "constituentID": 162540,
+      "role": "Maker",
+      "name": "Tiffany Glass and Decorating Company",
+      "constituentULAN_URL": "http://vocab.getty.edu/page/ulan/500331512",
+      "constituentWikidata_URL": "",
+      "gender": ""
+    }
+  ],
+  "department": "The American Wing",
+  "objectName": "Vase",
+  "title": "Vase",
+  "culture": "American",
+  "period": "",
+  "dynasty": "",
+  "reign": "",
+  "portfolio": "",
+  "artistRole": "Designer",
+  "artistPrefix": "Designed by",
+  "artistDisplayName": "Louis C. Tiffany",
+  "artistDisplayBio": "American, New York 1848–1933 New York",
+  "artistSuffix": "",
+  "artistAlphaSort": "Tiffany, Louis C.",
+  "artistNationality": "American",
+  "artistBeginDate": "1848",
+  "artistEndDate": "1933",
+  "artistGender": "",
+  "artistWikidata_URL": "https://www.wikidata.org/wiki/Q312950",
+  "artistULAN_URL": "http://vocab.getty.edu/page/ulan/500030415",
+  "objectDate": "1893–96",
+  "objectBeginDate": 1893,
+  "objectEndDate": 1896,
+  "medium": "Favrile glass",
+  "dimensions": "5 5/8 × 3 in. (14.3 × 7.6 cm)",
+  "measurements": [
+    {
+      "elementName": "Overall",
+      "elementDescription": null,
+      "elementMeasurements": {
+        "Diameter": 7.620015,
+        "Height": 14.3
+      }
+    }
+  ],
+  "creditLine": "Gift of H. O. Havemeyer, 1896",
+  "geographyType": "Made in",
+  "city": "New York",
+  "state": "New York",
+  "county": "Queens",
+  "country": "United States",
+  "region": "Mid-Atlantic",
+  "subregion": "",
+  "locale": "",
+  "locus": "",
+  "excavation": "",
+  "river": "",
+  "classification": "",
+  "rightsAndReproduction": "",
+  "linkResource": "",
+  "metadataDate": "2026-05-28T04:56:27.19Z",
+  "repository": "Metropolitan Museum of Art, New York, NY",
+  "objectURL": "https://www.metmuseum.org/art/collection/search/9485",
+  "tags": null,
+  "objectWikidata_URL": "https://www.wikidata.org/wiki/Q116341953",
+  "isTimelineWork": false,
+  "GalleryNumber": "454"
+}
