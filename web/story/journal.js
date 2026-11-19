@@ -39,15 +39,18 @@ export function journalModel(state) {
 
 export function renderJournal(container, model, evidenceContainer = null) {
   const slots = el('ol', { className: 'story-slots', attrs: { 'aria-label': 'Letters in fixed order' } });
+  const compactNames = { landscape: 'Wall label', portraits: 'Portraits', restoration: 'Picture', archive: 'Frame rack' };
   for (const slot of model.slots) {
     // Found: only the room. Not found yet: room plus spot, so three Gallery stations can be told apart.
     const where = !slot.solved && slot.spot ? `${slot.room}, ${slot.spot}` : slot.room;
     const label = slot.solved ? `${slot.room}: letter ${slot.letter}` : `${where}: not found yet`;
     slots.append(el('li', { className: slot.solved ? 'story-slot is-found' : 'story-slot', attrs: { 'aria-label': label } }, [
       el('span', { className: 'story-slot-letter', text: slot.letter, attrs: { 'aria-hidden': 'true' } }),
-      el('span', { className: 'story-slot-room', attrs: { 'aria-hidden': 'true' } }, slot.solved || !slot.spot
-        ? [slot.room]
-        : [`${slot.room}, `, el('span', { className: 'story-slot-spot', text: slot.spot }), ' – not found yet']),
+      el('span', { className: 'story-slot-room', attrs: { 'aria-hidden': 'true' } }, evidenceContainer
+        ? [compactNames[slot.stationId] ?? slot.room]
+        : slot.solved || !slot.spot
+          ? [slot.room]
+          : [`${slot.room}, `, el('span', { className: 'story-slot-spot', text: slot.spot }), ' – not found yet']),
     ]));
   }
 

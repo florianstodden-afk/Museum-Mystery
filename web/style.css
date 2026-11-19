@@ -156,3 +156,33 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .journal-sources{margin:25px 0 0;text-align:center;color:#cbbda5;font-size:.78rem}.journal-sources a{color:#edcf93}
 .sidebar button:focus-visible,.sidebar a:focus-visible,.game-journal-toggle:focus-visible,.home-journal:focus-visible{outline:3px solid #f7d38e;outline-offset:3px}
 @media(max-width:700px){.game-menu{padding:12px}.game-menu-card{max-height:calc(100dvh - 24px)}.game-menu button:not(.game-menu-toggle){min-height:56px}.game-menu-grid{gap:9px}.game-menu-actions{margin-top:16px}.game-journal-toggle{right:68px;font-size:.85rem}.game-journal-toggle kbd{display:none}.sidebar:not([hidden]){padding:8px}.journal-book{max-height:calc(100dvh - 16px);padding:20px 12px}.journal-book>h2{font-size:1.5rem;margin:8px 40px 15px}.journal-pages{grid-template-columns:1fr;gap:12px}.journal-page{padding:8px}.journal-page h3:not(:first-child){margin-top:22px;padding-top:18px}.journal-evidence-grid p,.journal-evidence-grid ul{min-height:80px}.journal-progress .story-slot{min-height:95px}.journal-progress .story-slot-room{font-size:.64rem}}
+
+/* Smaller open-book journal; the current home or game scene remains visible around it. */
+.sidebar:not([hidden]){padding:12px;background:#06101663;backdrop-filter:blur(2px)}
+.journal-book{width:min(850px,68vw,calc((100dvh - 48px)*1.5));height:auto;aspect-ratio:3/2;max-height:calc(100dvh - 48px);overflow:hidden;padding:24px 35px 30px;border:0;border-radius:10px;background:#12292c url('assets/investigation-journal-book.png') center/100% 100% no-repeat;box-shadow:0 24px 65px #000b;color:#f7ecd5}
+.journal-book::before,.journal-book::after{display:none}
+.journal-book>h2{font-size:clamp(1.3rem,2.4vw,2rem);margin:0 42px 8px;padding:0 0 7px;border-color:#b39a64}
+.journal-close{top:19px;right:27px;width:34px;height:34px;font-size:1.4rem}
+.journal-pages{height:calc(100% - 53px);grid-template-columns:1fr 1fr;gap:22px;overflow:hidden}
+.journal-page{min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:#b99a61 transparent;padding:4px 14px 8px}
+.journal-page h3{font-size:.88rem;margin-bottom:8px}
+.journal-page h3:not(:first-child){margin-top:14px;padding-top:11px}
+.journal-mission-title{font-size:clamp(1rem,1.7vw,1.45rem);margin:3px auto 10px}
+.journal-mission>button{padding:6px 12px;font-size:.8rem}
+.journal-evidence-grid{gap:8px}.journal-evidence-grid h4{font-size:.8rem;margin-bottom:6px}
+.journal-evidence-grid p,.journal-evidence-grid ul{min-height:72px;max-height:140px;overflow:auto;padding:9px;font-size:.77rem}
+.journal-progress .story-next{margin-bottom:10px;padding:8px;font-size:.79rem}
+.journal-progress .story-slots{gap:5px}.journal-progress .story-slot{min-height:67px;padding:4px 2px}
+.journal-progress .story-slot-letter{font-size:1.25rem}.journal-progress .story-slot-room{font-size:.58rem}
+.journal-stats{gap:5px}.journal-stats span{min-height:40px;padding:4px;font-size:.69rem}
+.journal-sources{margin:10px 0 0;font-size:.65rem}
+@media(max-width:700px){
+  .sidebar:not([hidden]){padding:8px}
+  .journal-book{width:min(94vw,510px);height:min(80dvh,690px);max-height:calc(100dvh - 16px);aspect-ratio:auto;padding:24px 29px 28px;background-image:url('assets/investigation-journal-page.png');background-size:100% 100%}
+  .journal-book>h2{font-size:clamp(1.1rem,4vw,1.5rem);margin:0 30px 8px}
+  .journal-close{top:16px;right:18px;width:30px;height:30px}
+  .journal-pages{height:calc(100% - 48px);grid-template-columns:1fr;gap:6px;overflow:auto}
+  .journal-page{overflow:visible;padding:3px 12px}
+  .journal-page h3:not(:first-child){margin-top:12px;padding-top:9px}
+  .journal-progress .story-slot{min-height:65px}
+}
