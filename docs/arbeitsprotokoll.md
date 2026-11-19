@@ -429,7 +429,7 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Auftrag:** Florian Stodden wollte die zuvor besprochenen Verbesserungen ohne neue Spiele oder Story umsetzen. Die Handyansicht hat ausdrücklich keine Priorität und ist für später vorgemerkt.
 - **Umsetzung:** Station B hat jetzt für beide Met-Werke lokale Bilder und lesbare Katalogdaten auch bei API-Ausfall. Die Live-API prüft weiterhin die Fakten. I, L, D und B erklären ihre Punkte klarer. Der E-Hinweis am Safe stimmt wieder mit der ausgelösten Aktion überein. Im Home-Scoreboard sind alte 90-Punkte-Bestwerte gekennzeichnet und werden nach erreichbarem Anteil mit der aktuellen 85-Punkte-Wertung verglichen. Die Ending-Hintergründe wurden als deutlich kleinere JPGs gespeichert.
 - **Dateien und Ablauf:** `docs/game-polish-pass.md` erklärt die Änderungen nach Bereich, die zuständigen Code-Stellen und die Prüfungen. `web/assets/met-459193-source.md` nennt Bild und Met-Quelle; `docs/ending-screens.md` verweist auf die neuen Dateinamen.
-- **Prüfung:** `cd web && node --test`: 277 bestanden, 0 fehlgeschlagen. Im Browser wurden M's Nachricht, beide Bilder und die Lösung von B sowie der Einstieg in I geprüft. Der vollständige Browserdurchlauf bleibt noch zu prüfen.
+- **Prüfung:** `cd web && node --test`: 279 bestanden, 0 fehlgeschlagen (mit der anschließenden Änderung zu Leon und Imani). Im lokalen Browser wurden M's Nachricht, B, I, L und D, das Codewort BILD, die Beweisfrage und beide Enden geprüft. Für das zweite Ende wurde der Speicherstand vor der Entscheidung erneut geöffnet.
 
 ## 2026-11-19 · Gespräche mit Leon und Imani enden (`codex/npc-conversation-once`)
 

@@ -22,8 +22,8 @@ Auftrag von Florian Stodden: Die vorhandenen Teile verbessern, ohne neue Story o
 
 ## Kontrolle
 
-- `cd web && node --test`: **277 bestanden, 0 fehlgeschlagen**.
-- Der Browserablauf wurde mit M's Nachricht, Station B (beide Met-Bilder, richtige Lösung) und dem Einstieg in Station I geprüft. Ein vollständiger Browserdurchlauf durch alle vier Rätsel und beide Enden steht noch aus; die Storyzustände und Enden werden von den bestehenden automatischen Tests geprüft.
+- `cd web && node --test`: **279 bestanden, 0 fehlgeschlagen** (einschließlich der bereits vorbereiteten Änderung an Leon und Imani).
+- Im lokalen Browser wurden M's Nachricht, B, I, L und D, das Codewort BILD, die Beweisfrage und beide möglichen Enden durchgespielt. Die beiden Ending-Hintergründe wurden geladen. Für das zweite Ende wurde der gespeicherte Zustand direkt vor der Entscheidung erneut geöffnet.
 - `git diff --check`: keine Formatfehler.
 
 ## Später
