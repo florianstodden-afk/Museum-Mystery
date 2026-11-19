@@ -390,3 +390,8 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
   - `cd web && node --test`: 260/260 grün.
   - Im echten Spiel mit headless Chrome bei 1440×900, 1280×720 und 390×844 gespielt: E, sofort Enter, Ablesezeit, Sortieren, Erfolg. Der Fokus lag auf Start, es öffnete sich kein Hilfe-Popup, es gab kein Scrollen, vier gleich große Karten, alle Bilder geladen, keine Konsolenfehler.
   - `web/dev/e2e-station-i.mjs` habe ich auf vier Bilder angepasst, aber nicht laufen lassen, weil Playwright nicht installiert ist.
+
+## 2026-11-19 · Alle NPCs per E, Station I an der Wand (`feature/npc-e-and-signs`)
+- **M1:** Imani und Dr. Vale sprechen wie Leon nur nach `E`. `handleInteract` nutzt für alle Personen denselben Weg über `PEOPLE` und `talkPartner`. Auto-Talk (`shouldOpenTalk`, `NEAR`, `talkWasNear`, `checkAutoTalk`) ist entfernt. Weggehen schließt die Box weiter (`checkTalkDistance`). Vale dreht sich beim Reden zur Figur (`facingToward`). Imani nicht, weil `gallery.js` sie zeichnet.
+- **M2:** Kasten und Oval in der Hall sind weg. Station I ist jetzt das Sargent-Porträt (Met 12127) an der Hallwand, mit Goldrahmen, Schild „I · PORTRAITS“ (`drawStationSign`, Stil wie in der Gallery) und E-Markierung. `ledger` steht auf x 6, y 3. Leon bleibt nie direkt vor einer Station stehen (`frontOfStation` in `guard.js`).
+- **Tests:** 269 bestanden. Screenshots `web/dev/shots/npc-*`.

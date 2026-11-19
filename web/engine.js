@@ -11,8 +11,9 @@ export const START = { x: 3, y: 9 };
 //   { examine: id } looks at something, { vault: true } continues at the safe.
 // Stations 2–4 use existing spots until their own rooms exist.
 export const OBJECTS = [
+  // Station I comes before Leon: standing at the wall, a tie in distance picks the painting.
+  { id: "ledger", x: 6, y: 3, label: "Portraits · Station I", story: { station: "portraits" } }, // Sargent portrait on the hall wall
   { id: "guard", x: 5, y: 5, label: "Leon (night guard)", story: { talk: "leon" } },
-  { id: "ledger", x: 5, y: 12, label: "Portrait timeline · Station I", story: { station: "portraits" } },
   { id: "painting", x: 14, y: 3, label: "Wall label · Station B", story: { station: "landscape" } },
   { id: "frames", x: 16, y: 3, label: "Frame rack · Station D", story: { station: "archive" } },
   { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },

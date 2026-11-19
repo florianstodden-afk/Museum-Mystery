@@ -5,7 +5,7 @@ import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=forgery-sign-3';
-import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=vault-interaction-2';
+import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-i-wall-1';
 import * as landscapeStation from './minigames/landscape.js';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
@@ -198,9 +198,8 @@ function drawHall(){
     if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
   }
-  const ledger=OBJECTS.find(o=>o.id==='ledger');
-  const desk=hallPosition(ledger.x,ledger.y);ctx.fillStyle='#5b4633';ctx.beginPath();ctx.ellipse(desk.x,desk.y+3,45,12,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#b79c71';ctx.fillRect(desk.x-28,desk.y-14,56,16);ctx.fillStyle='#f0e2bc';ctx.fillRect(desk.x-10,desk.y-17,20,12);
+  // Station I is Sargent's portrait on the wall (12127, one of the four station cards).
+  drawStationPortrait(interactTarget()?.id==='ledger');
   const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
   const guardFacing=guardFacingNow();
   drawPerson(person.x,person.y,'guard',guardFacing,animationTime,guardWalking());
@@ -226,6 +225,28 @@ function drawHall(){
   stonePlaque('GALLERY',800,201,100);
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=interactTarget(); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
+}
+// Gold frame around the hall's Sargent portrait, a sign below, and the gallery's E marker.
+const STATION_I_FRAME={x:650,y:247,width:40,height:59};
+function drawStationPortrait(active){
+  const {x,y,width,height}=STATION_I_FRAME, mid=x+width/2;
+  ctx.save();
+  ctx.strokeStyle='#5a3d16';ctx.lineWidth=7;ctx.strokeRect(x-4,y-4,width+8,height+8);
+  ctx.strokeStyle=active?'#ffe5a0':'#c9a35a';ctx.lineWidth=4;ctx.strokeRect(x-4,y-4,width+8,height+8);
+  ctx.strokeStyle='#f3dca4';ctx.lineWidth=1;ctx.strokeRect(x-1.5,y-1.5,width+3,height+3);
+  ctx.restore();
+  drawStationSign(ctx,mid,y+height+8,'I · PORTRAITS');
+  ctx.fillStyle=active?'#ffe5a0':'#bd985c';ctx.fillRect(mid-13,y+height+30,26,5);
+  if(active){ctx.beginPath();ctx.moveTo(mid,y+height+38);ctx.lineTo(mid+4,y+height+42);ctx.lineTo(mid,y+height+46);ctx.lineTo(mid-4,y+height+42);ctx.fill();}
+}
+// Same look as the gallery signs "L · PUZZLE" and "D · FORGERY" (gallery.js): dark plate, bold gold text.
+function drawStationSign(context,x,y,text){
+  context.save();
+  context.font='bold 11px sans-serif';context.textAlign='left';context.textBaseline='alphabetic';
+  const width=Math.ceil(context.measureText(text).width)+14;
+  context.fillStyle='#182a32';context.fillRect(x-width/2,y,width,19);
+  context.fillStyle='#f3dca4';context.fillText(text,x-width/2+7,y+13);
+  context.restore();
 }
 // The vault is a separate view behind the gallery's existing door.
 function drawTreasureRoom(){
