@@ -94,14 +94,14 @@ test('ending model gives the right breakdown for both endings', () => {
   const heist = endingModel(finished('heist', { wrongWord: true, stationResult: { landscape: { mistakes: 1, hints: 1 } } }));
   assert.equal(heist.title, 'I am a thief');
   // Station I is a speedrun station now: at most 15 points (like L).
-  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 15, 15, 20, 5, 10]);
-  assert.equal(heist.total, 77);
+  assert.deepEqual(heist.breakdown.map(row => row.points), [12, 15, 15, 15, 5, 10]);
+  assert.equal(heist.total, 72);
   assert.match(heist.image.src, /assets\/met-436535\.jpg$/);
   assert.match(heist.disclaimer, /Fictional museum and characters/);
 
   const openFile = endingModel(finished('open-file', { wrongSuspect: 'vale' }));
   assert.equal(openFile.title, 'I am not a thief');
-  assert.equal(openFile.total, 85);
+  assert.equal(openFile.total, 80);
   assert.equal(openFile.chain.every(link => link.found), true);
 });
 
@@ -110,7 +110,7 @@ test('ending offers home and a new game while keeping score details', () => {
   const container = createContainer();
   let restarted = false, wentHome = false;
   renderEnding(container, endingModel(finished('open-file')), { onNewGame: () => { restarted = true; }, onHome: () => { wentHome = true; } });
-  assert.match(container.textContent, /90 \/ 90/);
+  assert.match(container.textContent, /85 \/ 85/);
   findButton(container, 'Back to home').click();
   assert.equal(wentHome, true);
   findButton(container, 'New game').click();

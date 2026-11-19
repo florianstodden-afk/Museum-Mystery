@@ -9,6 +9,7 @@ import { CHARACTERS } from '../story/dialogues.js';
 import { journalModel, renderJournal } from '../story/journal.js';
 import { el, button, artworkImageUrl } from '../story/dom.js';
 import * as landscapeStation from '../minigames/landscape.js';
+import * as forgeryStation from '../minigames/spot-the-forgery.js';
 import * as pictureStation from '../minigames/picture-puzzle.js';
 import * as portraitStation from '../minigames/portrait-timeline.js';
 
@@ -57,7 +58,7 @@ const story = createStoryHost({
     document.querySelector('#toast').textContent = message;
   },
   // Teammates replace the placeholder by adding their module here, e.g. portraits: portraitsStation.
-  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
+  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
   storageKey: 'museum-nocturne-story-preview-v1',
 });
 
@@ -104,7 +105,7 @@ function renderRooms(state) {
       letter: station.letter,
       solved: progress.solved,
       locked: !state.missionRead,
-      image: artworkImageUrl(workById(station.metIds[0])),
+      image: station.id === 'archive' ? forgeryStation.originalUrl : artworkImageUrl(workById(station.metIds[0])),
       actions: [button(progress.solved ? `Solved · ${station.letter}` : 'Enter station', () => story.openStation(station.id))],
     }));
   }

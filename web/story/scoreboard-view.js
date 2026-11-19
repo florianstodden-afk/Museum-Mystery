@@ -19,6 +19,6 @@ export function renderScoreboard(container, board, best) {
       el('strong', { text: `${board.finished ? 'Finished run' : 'Current run'}: ${board.points} / ${board.max} points` }),
       ` · time ${clock(board.timeMs)}`,
     ]),
-    el('p', { className: 'scoreboard-best', text: best ? `Best run: ${best.points} / ${board.max} points · time ${clock(best.timeMs)}` : 'Best run: finish a run to set one.' }),
+    el('p', { className: 'scoreboard-best', text: best ? `Best run: ${best.points} / ${best.max ?? 90} points · time ${clock(best.timeMs)}` : 'Best run: finish a run to set one.' }),
   );
 }

@@ -4,9 +4,10 @@ import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
-import { createGalleryRenderer } from './gallery.js?v=gallery-plants-6';
+import { createGalleryRenderer } from './gallery.js?v=forgery-sign-3';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=vault-interaction-2';
 import * as landscapeStation from './minigames/landscape.js';
+import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js';
 import { createStoryHost } from './story/host.js?v=speech-box-1';
@@ -65,7 +66,7 @@ const story = createStoryHost({
   onHome: showHome,
   sound,
   speech,
-  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation },
+  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
   storageKey: 'museum-nocturne-story-v1',
   ...(vaultPreview ? {storage: previewStorage} : {}),
 });
@@ -686,7 +687,7 @@ function showHome(){
   const board=scoreboard(story.state,story.progress);
   const bestRun=bestRunStore((()=>{try{return localStorage;}catch{return null;}})());
   // A finished run may become the best run (stored on this device only).
-  const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs}):bestRun.get();
+  const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
   showSaveNotice();
   closeHomePanels();

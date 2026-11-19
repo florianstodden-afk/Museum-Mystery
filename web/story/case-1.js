@@ -70,7 +70,7 @@ export const CASE = deepFreeze({
       evidenceId: 'frame-label',
       evidence: 'Frame label: “Ordered by: A. Voss”.',
       pointsToVoss: 'The frame for the forgery was ordered by A. Voss – so the “V” is his, not Vale’s.',
-      task: 'Find the empty frame that matches the forgery and read who ordered it.',
+      task: 'Play Spot the Forgery at the Gallery frame rack. Find three changes to uncover the frame label.',
       metIds: [435882],
     },
   ],

@@ -33,9 +33,9 @@ test('safe and final question: 10 at first try, 5 after a mistake', () => {
   assert.equal(accusationPoints(2), 5);
 });
 
-test('a perfect game scores exactly 90 (two speedrun stations with 15 each)', () => {
-  assert.equal(MAX_SCORE, 90);
-  assert.equal(totalScore(play()), 90);
+test('a perfect game scores exactly 85 (three speedrun stations with 15 each)', () => {
+  assert.equal(MAX_SCORE, 85);
+  assert.equal(totalScore(play()), 85);
 });
 
 test('mistakes, hints and wrong answers are deducted correctly', () => {
@@ -44,11 +44,11 @@ test('mistakes, hints and wrong answers are deducted correctly', () => {
     wrongWords: 1,
     wrongSuspects: ['leon'],
   });
-  // 12 + 5 (minimum) + 20 + 20 + safe 5 + question 5 = 67
-  assert.equal(totalScore(s), 62);
+  // 12 + 5 + 15 + 15 + safe 5 + question 5 = 57
+  assert.equal(totalScore(s), 57);
   const rows = scoreBreakdown(s);
-  assert.deepEqual(rows.map(row => row.points), [12, 5, 15, 20, 5, 5]);
-  assert.equal(rows.reduce((sum, row) => sum + row.max, 0), 90);
+  assert.deepEqual(rows.map(row => row.points), [12, 5, 15, 15, 5, 5]);
+  assert.equal(rows.reduce((sum, row) => sum + row.max, 0), 85);
 });
 
 test('unsolved parts give 0 points', () => {

@@ -1,6 +1,5 @@
-// Points for "Museum Nocturne". Maximum: 2 stations × 20 + Portraits 15 + Renoir 15 + safe 10 + final question 10 = 90.
-// The two speedrun stations award points by time: Portraits (I) 15/10/5/0, Renoir (L) 15/10/5/0.
-// The other stations keep their standard rules (20 − mistakes − hints).
+// Station B awards up to 20, I/L/D up to 15 each, and the safe and accusation 10 each.
+import { validForgery } from '../minigames/forgery-rules.js';
 import { elapsedMs, validPuzzle } from '../minigames/picture-rules.js';
 import { elapsedMs as portraitElapsedMs, validTimeline, upgradeTimeline } from '../minigames/portrait-rules.js';
 import { CASE, STATION_IDS } from './case-1.js';
@@ -14,7 +13,7 @@ export const ACCUSATION_MAX = 10;
 export const POINTS_AFTER_MISTAKE = 5;
 export const SPEED_MAX = 15;                 // best time at a speedrun station
 export const PORTRAIT_UNTIMED_POINTS = 5;    // Station I solved in an old save without a time
-const SPEED_STATIONS = ['portraits', 'restoration'];
+const SPEED_STATIONS = ['portraits', 'restoration', 'archive'];
 export const MAX_SCORE = (STATION_IDS.length - SPEED_STATIONS.length) * STATION_MAX + SPEED_STATIONS.length * SPEED_MAX + SAFE_MAX + ACCUSATION_MAX;
 
 // Speedrun limits for Station I (four cards, still faster than Renoir's eight pieces).
@@ -52,13 +51,15 @@ export function accusationPoints(attempts) {
 export function scoreBreakdown(state) {
   const rows = CASE.stations.map(station => {
     const progress = state.stations[station.id];
-    const max = SPEED_STATIONS.includes(station.id) ? SPEED_MAX : STATION_MAX;
+    const legacy = station.id === 'archive' && legacyArchive(state);
+    const max = !legacy && SPEED_STATIONS.includes(station.id) ? SPEED_MAX : STATION_MAX;
     return {
       id: station.id,
-      label: `${station.room} (${station.letter})`,
+      label: station.id === 'archive' ? 'Spot the Forgery (D)' : `${station.room} (${station.letter})`,
       points: progress.solved ? Math.min(progress.points, max) : 0,
       max,
       detail: !progress.solved ? 'not solved'
+        : station.id === 'archive' ? (progress.timeMs == null ? 'Previous frame rack completion' : `Forgery time ${formatClock(progress.timeMs)}`)
         : station.id === 'portraits' ? portraitDetail(progress)
           : `${progress.mistakes} mistake(s), ${progress.hints} hint(s)`,
     };
@@ -85,6 +86,16 @@ function portraitDetail(progress) {
   return progress.timeMs == null ? 'Portrait timeline time: not recorded' : `Portrait timeline time ${formatClock(progress.timeMs)}`;
 }
 
+// Keep points already awarded under the old 20-point placeholder.
+function legacyArchive(state) {
+  const archive = state.stations.archive;
+  return archive.solved && archive.timeMs == null && archive.points > SPEED_MAX;
+}
+
+export function maximumScore(state) {
+  return MAX_SCORE + (legacyArchive(state) ? STATION_MAX - SPEED_MAX : 0);
+}
+
 export function totalScore(state) {
   let total = 0;
   for (const row of scoreBreakdown(state)) total += row.points;
@@ -96,7 +107,13 @@ export function emptyPenalties() { return Object.fromEntries([...STATION_IDS, 's
 export function pictureSpeedPoints(ms) { return ms <= 30000 ? 15 : ms <= 45000 ? 10 : ms <= 60000 ? 5 : 0; }
 /** Sets the time-based points of the speedrun stations from their saved progress. */
 export function synchronizeScore(state, progress = {}) {
-  return syncPortraits(syncRestoration(state, progress), progress);
+  let next = syncPortraits(syncRestoration(state, progress), progress);
+  const forgery = progress.archive;
+  if (next.stations.archive.solved && validForgery(forgery) && forgery.solved) {
+    const timeMs = elapsedMs(forgery);
+    next = withStation(next, 'archive', { timeMs, points: pictureSpeedPoints(timeMs) });
+  }
+  return next;
 }
 
 function withStation(state, id, changes) {
@@ -139,7 +156,7 @@ export function scoreboard(state, progress = {}) {
   return {
     stations,
     points: totalScore(state),
-    max: MAX_SCORE,
+    max: maximumScore(state),
     timeMs: times.length ? times.reduce((sum, ms) => sum + ms, 0) : null,   // only timed stations count
     finished: state.ending !== null,
   };
@@ -147,6 +164,7 @@ export function scoreboard(state, progress = {}) {
 
 // Only the speedrun stations have a clock; the others show no time.
 function stationTime(state, progress, id) {
+  if (id === 'archive') return state.stations.archive.timeMs ?? null;
   if (id === 'portraits') return state.stations.portraits.timeMs ?? null;
   if (id === 'restoration' && validPuzzle(progress.restoration) && progress.restoration.finishedAt !== null) {
     return elapsedMs(progress.restoration, progress.restoration.finishedAt);
@@ -162,10 +180,11 @@ export function betterRun(best, run) {
   return (run.timeMs ?? Infinity) < (best.timeMs ?? Infinity) ? run : best;
 }
 
-/** A saved best run: whole points 0…MAX_SCORE and a time in ms (or null). Anything else is ignored. */
+/** Preserve pre-Forgery best runs (90-point scale), and validate new runs against their saved maximum. */
 export function validRun(run) {
   return run !== null && typeof run === 'object'
-    && Number.isInteger(run.points) && run.points >= 0 && run.points <= MAX_SCORE
+    && Number.isInteger(run.points) && run.points >= 0 && run.points <= (run.max ?? 90)
+    && (run.max === undefined || run.max === MAX_SCORE || run.max === 90)
     && (run.timeMs === null || (Number.isFinite(run.timeMs) && run.timeMs >= 0));
 }
 

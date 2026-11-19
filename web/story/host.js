@@ -29,6 +29,7 @@ import { hintFor } from './hints.js';
 import { examine as examineOffice } from './security-office/interactions.js';
 import { el, button } from './dom.js';
 import { synchronizeScore } from './scoring.js';
+import { validForgery } from '../minigames/forgery-rules.js';
 import { validPuzzle } from '../minigames/picture-rules.js';
 import { soundFor } from './sound.js';
 
@@ -54,9 +55,11 @@ export function createStoryHost(options) {
   let discardedSave = false;
   let { state, progress } = load();
   state = synchronizeScore(state, progress, now());
-  // Recover if the page closed between saving the final placement and awarding L.
-  if (validPuzzle(progress.restoration) && progress.restoration.solved && !state.stations.restoration.solved) {
-    state = synchronizeScore(solveStation(state, 'restoration', progress.restoration).state, progress);
+  // Recover an interrupted award after the final placement or find was saved.
+  for (const [id, validate] of [['restoration', validPuzzle], ['archive', validForgery]]) {
+    if (validate(progress[id]) && progress[id].solved && !state.stations[id].solved) {
+      state = synchronizeScore(solveStation(state, id, progress[id]).state, progress);
+    }
   }
   save();
   let hintLevel = 1;          // first hint is gentle, asking again gives a concrete one
@@ -176,8 +179,8 @@ export function createStoryHost(options) {
     const station = CASE.stations.find(s => s.id === stationId);
     if (!station) return;
     const { content, actions } = scene(`${station.room} · Station ${station.letter}`);
-    const pictureOwnsControls = stationId === 'restoration' && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
-    if (!pictureOwnsControls) actions.append(closeButton('Back to the museum'));
+    const stationOwnsControls = ['restoration', 'archive'].includes(stationId) && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
+    if (!stationOwnsControls) actions.append(closeButton('Back to the museum'));
     if (!state.missionRead) {
       content.append(el('p', { className: 'story-text', text: 'Read the message from M first.' }));
       return;
@@ -198,7 +201,7 @@ export function createStoryHost(options) {
       },
       onSolved(result) {
         const outcome = act(solveStation(state, stationId, result), 'solveStation');
-        if (outcome.ok && !pictureOwnsControls) {
+        if (outcome.ok && !stationOwnsControls) {
           content.append(el('p', { className: 'story-feedback', text: `Letter ${station.letter} is now in your journal.` }));
         }
       },

@@ -66,6 +66,24 @@ test('the scoreboard view shows one row per station and the best run', async () 
   assert.equal(rows.length, 5, 'header + B, I, L, D');
   assert.match(rows[1].textContent, /B · .*Solved.*20 \/ 20/);
   assert.match(rows[2].textContent, /Open/);
-  assert.match(box.textContent, /Current run: 20 \/ 90 points/);
+  assert.match(box.textContent, /Current run: 20 \/ 85 points/);
   assert.match(box.textContent, /Best run: 75 \/ 90 points · time 1:01/);
+});
+
+test('Forgery time and reward appear on the scoreboard and legacy best runs retain their scale', async () => {
+  const { synchronizeScore, validRun } = await import('../scoring.js');
+  const { initialForgery, guess, regions } = await import('../../minigames/forgery-rules.js');
+  const { startPuzzle } = await import('../../minigames/picture-rules.js');
+  let progress = startPuzzle(initialForgery(), 1000);
+  for (const region of regions.slice(0, 3)) progress = guess(progress, region.x, region.y, 32000);
+  const state = synchronizeScore(solveStation(fresh(), 'archive').state, { archive: progress });
+  const board = scoreboard(state, { archive: progress });
+  assert.equal(board.stations[3].timeMs, 31000);
+  assert.equal(board.stations[3].points, 10);
+  assert.equal(board.stations[3].max, 15);
+  assert.equal(board.timeMs, 31000);
+  assert.equal(board.max, 85);
+  assert.equal(validRun({ points: 90, timeMs: 1000 }), true);
+  assert.equal(validRun({ points: 90, timeMs: 1000, max: 85 }), false);
+  assert.equal(validRun({ points: 85, timeMs: 1000, max: 85 }), true);
 });
