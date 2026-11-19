@@ -37,7 +37,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 | Path | Purpose |
 |---|---|
-| `web/index.html`, `web/style.css` | Page, home screen, menu, journal |
+| `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.png` | Page, home screen, menu and compact illustrated journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/engine.js` | Map and movement rules |
 | `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |
