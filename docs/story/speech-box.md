@@ -7,20 +7,19 @@ Alle Figuren (Leon, Imani, Dr. Vale) sprechen in einer kleinen Sprechblase unten
 | Datei | Aufgabe | DOM? |
 |---|---|---|
 | `web/story/dialogues.js` → `conversationFor(id, state)` | **Was** gesagt wird: Begrüßung, zwei Fragen mit Antworten, Verabschiedung. Hängt vom Spielstand ab. | nein |
-| `web/story/proximity.js` → `shouldOpenTalk(...)` | **Wann** das Gespräch von selbst startet und wieder endet. | nein |
+| `web/story/proximity.js` → `talkPartner(...)`, `shouldCloseTalk(...)` | **Wer** nach `E` spricht und **wann** die Box wieder schließt. | nein |
 | `web/story/speech-box.js` → `createSpeechBox(parent, ...)` | **Wie** es aussieht: Namensschild, Textbox, Schreibmaschinen-Effekt, Knöpfe, Tasten. | ja |
 
 Dazu: Styles mit Präfix `speech-` in `web/story/story.css`, Anschluss in `web/story/host.js` (`talkTo` nutzt die Box, wenn es ein Gespräch gibt) und in `web/main.js` (Abstandsprüfung im Spiel-Loop, Figur und Leon pausieren).
 
 ## Ablauf
 
-1. Jedes Bild prüft `main.js` (`checkAutoTalk`): Wie weit ist die Spielfigur von jeder Person im selben Raum entfernt? Gemessen wird auf dem Bildschirm (100 Pixel = 1 Schritt), weil der Boden perspektivisch gezeichnet ist und ein Feld nach unten viel kürzer aussieht als ein Feld nach rechts.
-2. Unter **1,0 Schritten** öffnet sich die Box von selbst (`shouldOpenTalk`). Ein `E` ist dafür nicht nötig, und über Personen steht kein „E“ mehr.
-3. Über **1,5 Schritten** schließt sie sich wieder (`shouldCloseTalk`). Man darf also einfach weggehen. Die Lücke zwischen 1,0 und 1,5 verhindert Flackern am Rand.
-4. Nach „Goodbye“ oder `Escape` öffnet sie erst wieder, wenn man einmal weggegangen ist.
-5. Leon bekommt Begrüßung, zwei Fragen und Verabschiedung. Imani und Dr. Vale sagen ihre bisherigen Sätze, darunter steht „Goodbye.“
+1. Alle Personen (Leon, Imani, Dr. Vale) sprechen nur nach **E**. Über der Person steht dann „E Name“. `main.js` (`handleInteract`) fragt `talkPartner(objekt, PEOPLE)`, welche Figur zum Kartenobjekt gehört, und öffnet ihre Box. Näherkommen allein öffnet nichts.
+2. Jedes Bild prüft `main.js` (`checkTalkDistance`), wie weit die Spielfigur von der sprechenden Person entfernt ist. Gemessen wird auf dem Bildschirm (100 Pixel = 1 Schritt), weil der Boden perspektivisch gezeichnet ist.
+3. Über **1,5 Schritten** schließt die Box (`shouldCloseTalk`). Man darf also einfach weggehen.
+4. Leon bekommt Begrüßung, zwei Fragen und Verabschiedung. Imani und Dr. Vale sagen ihre bisherigen Sätze, darunter steht „Goodbye.“
 
-Während Leon spricht, bleibt er stehen und schaut zur Figur.
+Während eine Person spricht, schaut sie zur Figur (`facingToward`). Leon bleibt dabei stehen. Imani schaut in der Gallery weiter nach vorn, weil `gallery.js` sie zeichnet und dort nicht geändert wurde.
 
 ## Bedienung
 

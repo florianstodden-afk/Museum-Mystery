@@ -19,7 +19,7 @@ import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js';
-import { shouldOpenTalk, shouldCloseTalk, distanceBetween } from './story/proximity.js';
+import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -45,7 +45,6 @@ const sound = createSoundPlayer();
 // Imani and Vale start talking nearby; Leon waits for an E interaction.
 const PEOPLE = {guard:'leon', restorer:'imani', curator:'vale'}; // map object id → story character
 let nudgedAt = -Infinity;        // when the player last shook "nothing here" (interaction.js)
-const talkWasNear = {};           // per character: true until the player walks away
 let talkingTo = null;             // the character in the speech box right now
 const speech = createSpeechBox(document.body, {
   onClose: () => { talkingTo = null; },
@@ -108,12 +107,12 @@ let vaultOpenedAt = null;
 function currentGuard(){return guardDisplay();}
 // While Leon talks he stands still and looks at the player.
 function guardFacingNow(){
-  if(talkingTo==='leon'){const g=guardDisplay(),dx=state.player.x-g.x,dy=state.player.y-g.y;return Math.abs(dx)>Math.abs(dy)?(dx<0?'left':'right'):(dy<0?'up':'down');}
+  if(talkingTo==='leon')return facingToward(guardDisplay(),state.player);
   return guardMotion ? (guardMotion.to.x<guardMotion.from.x?'left':guardMotion.to.x>guardMotion.from.x?'right':guardMotion.to.y<guardMotion.from.y?'up':'down') : guardLastFacing;
 }
 function guardWalking(){return Boolean(guardMotion) && talkingTo!=='leon';}
 // E opens Leon's conversation; Imani and Vale continue to speak nearby.
-function interactTarget(){const target=nearbyObject(state,currentGuard());return target && target.id!=='guard' && PEOPLE[target.id] ? null : target;}
+function interactTarget(){return nearbyObject(state,currentGuard());}
 function guardDisplay(){
   if (!guardMotion) return guardPosition;
   const t=Math.min(1,guardMotion.elapsed/guardMotion.duration);
@@ -242,7 +241,7 @@ function drawTreasureRoom(){
   const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}].sort((a,b)=>a.y-b.y);
   for(const figure of figures){
     const point=vaultPosition(figure.x,figure.y);
-    drawPerson(point.x,point.y,figure.kind,figure.kind==='rick'?facing:'down',animationTime,figure.kind==='rick'&&heldKeys.size>0);
+    drawPerson(point.x,point.y,figure.kind,figure.kind==='rick'?facing:talkingTo==='vale'?facingToward(curator,state.player):'down',animationTime,figure.kind==='rick'&&heldKeys.size>0);
   }
   const {x:px,y:py}=vaultPosition(displayPlayer.x,displayPlayer.y);
   const target=interactTarget();if(target){ctx.fillStyle='#17232be8';ctx.fillRect(px-85,py-92,170,26);ctx.fillStyle='#f4dfae';ctx.font='12px sans-serif';ctx.fillText('E · '+target.label,px-77,py-75);}
@@ -378,10 +377,12 @@ function handleInteract(){
   }
   // No object near: no popup, just a short shake and a quiet tap sound (see interaction.js).
   if(action==='nudge'){nudgedAt=performance.now();sound.play('nudge');return;}
-  if(object.id==='guard'){
-    talkingTo='leon';
+  // Every person talks the same way: only after E, box above or below the player.
+  const character=talkPartner(object.id,PEOPLE);
+  if(character){
+    talkingTo=character;
     speech.setPlacement(playerLow()?'top':'bottom');
-    story.talkTo('leon');
+    story.talkTo(character);
     return;
   }
   runStoryAction(object.story);
@@ -395,7 +396,7 @@ function runStoryAction(action){
 }
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
-  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();for(const id in talkWasNear)delete talkWasNear[id];
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();
   try{if(!vaultPreview)localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
@@ -452,7 +453,7 @@ function animate(now){
       if(now-lastStepAt>=STEP_INTERVAL_MS){sound.playStep(currentRoom());lastStepAt=now;}
     }
   }
-  checkAutoTalk();
+  checkTalkDistance();
   draw(); // Animate NPCs even while the player is idle.
   if(roomTransition){
     const progress=Math.min(1,(now-roomTransition.start)/320);
@@ -460,7 +461,7 @@ function animate(now){
   }
   requestAnimationFrame(animate);
 }
-// Imani and Vale open nearby; Leon is started by E. Open speech closes when walking away.
+// Everyone talks after E. Open speech closes when walking away.
 function personPosition(objectId){return objectId==='guard' ? guardDisplay() : OBJECTS.find(o=>o.id===objectId);}
 function personDistance(objectId){
   const room=state.room==='security' ? 'security' : state.player.x<9 ? 'guard' : state.player.x<18 ? 'restorer' : 'curator';
@@ -471,23 +472,11 @@ function personDistance(objectId){
   const person=personPosition(objectId);
   return distanceBetween(onScreen(state.player.x,state.player.y),onScreen(person.x,person.y))/100;
 }
-function checkAutoTalk(){
-  if(talkingTo){
-    const objectId=Object.keys(PEOPLE).find(id=>PEOPLE[id]===talkingTo);
-    if(shouldCloseTalk(personDistance(objectId))) speech.close();
-    else speech.setPlacement(playerLow()?'top':'bottom');
-  }
-  const blocked=!dialog.classList.contains('hidden') || Boolean(roomTransition) || speech.isOpen;
-  for(const [objectId,character] of Object.entries(PEOPLE)){
-    if(objectId==='guard')continue;
-    const talk=shouldOpenTalk({distance:personDistance(objectId),wasNear:talkWasNear[character]??false,blocked});
-    talkWasNear[character]=talk.wasNear || talkingTo===character;
-    if(talk.open){
-      talkingTo=character;
-      speech.setPlacement(playerLow()?'top':'bottom');
-      story.talkTo(character);
-    }
-  }
+function checkTalkDistance(){
+  if(!talkingTo)return;
+  const objectId=Object.keys(PEOPLE).find(id=>PEOPLE[id]===talkingTo);
+  if(shouldCloseTalk(personDistance(objectId))) speech.close();
+  else speech.setPlacement(playerLow()?'top':'bottom');
 }
 // Show the box at the top when the player stands low on the screen, so it never hides them.
 function playerLow(){return hallPosition(state.player.x,state.player.y).y/576>0.78;}

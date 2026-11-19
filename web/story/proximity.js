@@ -1,21 +1,15 @@
-// When should a character's speech box open or close? Pure logic, no DOM, easy to test.
+// Who talks when, and when does the speech box close? Pure logic, no DOM, easy to test.
 //
-// The box opens when the player comes closer than NEAR tiles
-// and closes again when the player walks further away than FAR tiles.
-// The gap between NEAR and FAR (hysteresis) stops the box from flickering at the edge.
-// After "Goodbye" the player has to walk away once before the box opens again.
+// Every character talks only after E (like Leon). Coming close opens nothing.
+// The open box closes when the player walks further away than FAR steps.
 
-export const NEAR = 1.0;
 export const FAR = 1.5;
 
-// distance: tiles between player and character
-// wasNear: true after a talk opened, until the player walks away
-// blocked: another window or minigame is open
-// → { open, wasNear }: open = start talking now; wasNear = value for the next frame
-export function shouldOpenTalk({ distance, wasNear, blocked = false }) {
-  const stillNear = wasNear && distance <= FAR;
-  const open = !stillNear && !blocked && distance < NEAR;
-  return { open, wasNear: open || stillNear };
+// objectId: the map object next to the player when E is pressed
+// people: map object id → story character, e.g. { guard: 'leon' }
+// → the character to talk to, or null if the object is no person
+export function talkPartner(objectId, people) {
+  return objectId && Object.hasOwn(people, objectId) ? people[objectId] : null;
 }
 
 // The open box closes as soon as the player is far enough away.
@@ -23,7 +17,13 @@ export function shouldCloseTalk(distance) {
   return distance > FAR;
 }
 
-// Straight-line distance in tiles.
+// Straight-line distance in steps.
 export function distanceBetween(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// Which way a character looks to face the player.
+export function facingToward(from, to) {
+  const dx = to.x - from.x, dy = to.y - from.y;
+  return Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
 }
