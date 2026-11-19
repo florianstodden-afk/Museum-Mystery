@@ -4,11 +4,13 @@
 // The station's root element needs the class "picture-puzzle" for those rules to apply.
 import { el, button } from '../story/dom.js';
 
+const KEY_BADGES = { Enter: '↵', Escape: 'Esc', ArrowLeft: '←', ArrowRight: '→' };
+
 /** A button with keyboard badges like L: "Start ↵", "Back to museum Esc". */
 export function shortcutButton(label, action, ...keys) {
   const control = button(label, action);
   control.setAttribute('aria-keyshortcuts', keys.join(' '));
-  control.append(...keys.map(key => el('kbd', { className: 'puzzle-key', text: key === 'Enter' ? '↵' : 'Esc', attrs: { 'aria-hidden': 'true' } })));
+  control.append(...keys.map(key => el('kbd', { className: 'puzzle-key', text: KEY_BADGES[key] ?? key, attrs: { 'aria-hidden': 'true' } })));
   return control;
 }
 
@@ -24,14 +26,19 @@ export function introPopup({ task, onStart, onBack, onHelp }) {
 
 /** Shows a popup like L's (help or success) inside `overlay`, makes `pane` inert, focuses the one button.
  *  Returns a close function; `close.action` is the popup's button. */
-export function showPopup({ overlay, pane, label, contents, actionLabel, onAction, keys = ['Enter', 'Escape'] }) {
+export function showPopup({ overlay, pane, label, contents, actionLabel, onAction, keys = ['Enter', 'Escape'], secondary = null }) {
   pane.inert = true;
   const action = shortcutButton(actionLabel, onAction, ...keys);
-  const dialog = el('div', { className: 'puzzle-popup', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': label } }, [...contents, action]);
+  // An optional second button with its own key (e.g. "Learn about the art A"). The main button keeps the focus and Enter.
+  const extra = secondary ? shortcutButton(secondary.label, secondary.onAction, secondary.key) : null;
+  const buttons = extra ? el('div', { className: 'story-actions station-popup-actions' }, [action, extra]) : action;
+  const dialog = el('div', { className: 'puzzle-popup', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': label } }, [...contents, buttons]);
   overlay.replaceChildren(el('div', { className: 'puzzle-overlay' }, [dialog]));
   action.focus?.();
   const close = () => { overlay.replaceChildren(); pane.inert = false; };
   close.action = action;   // so the station can press it with Enter or Esc
+  close.secondary = extra; // and this one with its key
+  close.secondaryKey = secondary?.key ?? null;
   return close;
 }
 
@@ -43,6 +50,45 @@ export function successPopup({ headline, letter, points, extra = null }) {
     el('p', { className: 'puzzle-earned', text: `+${points} points earned` }),
     extra ? el('p', { className: 'story-muted station-extra', text: extra }) : null,
   ].filter(Boolean);
+}
+
+/** "Learn about the art": one card per work (image, artist, title, year, a short text), ← → to browse.
+ *  works: [{ artist, title, date, image, text }]. Opens like showPopup and returns its close function;
+ *  `close.handleKey(event)` handles ← → (true if used). Any station can reuse it with its own texts. */
+export function artCards({ overlay, pane, works, onClose, closeLabel = 'Back to museum' }) {
+  let index = 0;
+  const img = el('img', { className: 'art-card-image' });
+  const artist = el('p', { className: 'art-card-artist' });
+  const title = el('h3', { className: 'art-card-title' });
+  const text = el('p', { className: 'art-card-text' });
+  const count = el('p', { className: 'story-muted art-card-count', attrs: { 'aria-live': 'polite' } });
+  const card = el('article', { className: 'art-card', attrs: { tabindex: '-1' } }, [img, el('div', { className: 'art-card-body' }, [artist, title, text, count])]);
+  const prev = shortcutButton('Previous', () => show(index - 1), 'ArrowLeft');
+  const next = shortcutButton('Next', () => show(index + 1), 'ArrowRight');
+  function show(i) {
+    index = (i + works.length) % works.length;
+    const work = works[index];
+    img.src = work.image;
+    img.alt = `${work.artist}, ${work.title}`;
+    artist.textContent = work.artist;
+    title.textContent = `${work.title}, ${work.date}`;
+    text.textContent = work.text;
+    count.textContent = `${index + 1} / ${works.length}`;
+  }
+  show(0);
+  const close = showPopup({
+    overlay, pane, label: 'Learn about the art', actionLabel: closeLabel, onAction: onClose, keys: ['Escape'],
+    contents: [el('div', { className: 'art-cards' }, [card, el('div', { className: 'story-actions art-card-nav' }, [prev, next])])],
+  });
+  card.focus?.();   // focus starts on the first card
+  close.handleKey = event => {
+    const step = { ArrowLeft: -1, ArrowRight: 1 }[event.key];
+    if (!step) return false;
+    show(index + step);
+    return true;
+  };
+  close.current = () => index;
+  return close;
 }
 
 /** One credit line like L: "Artist, Title, date · …. Public domain · The Metropolitan Museum of Art".
@@ -108,6 +154,6 @@ export function ensureStationStyles() {
   const link = document.createElement('link');
   link.id = 'station-ui-css';
   link.rel = 'stylesheet';
-  link.href = new URL('./station-ui.css?v=1', import.meta.url).href;
+  link.href = new URL('./station-ui.css?v=art-cards-2', import.meta.url).href;
   document.head.append(link);
 }

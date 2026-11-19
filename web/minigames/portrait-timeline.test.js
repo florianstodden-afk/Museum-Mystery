@@ -266,3 +266,67 @@ test('during the 10 s reading time the clock waits and the cards cannot be moved
   assert.deepEqual(s.last().order, RIGHT, 'after the reading time it works');
   s.cleanup();
 });
+
+import { ART_NOTES } from './portrait-timeline.js';
+import { portraitSpeedPoints } from '../story/scoring.js';
+import { elapsedMs } from './portrait-rules.js';
+
+test('art cards: every portrait has artist, title, year and a text of at most 2 sentences and 30 words', () => {
+  for (const artwork of PORTRAIT_ARTWORKS) {
+    assert.ok(artwork.artist && artwork.shortTitle && /\d{4}/.test(artwork.date), artwork.id);
+    const note = ART_NOTES[artwork.id];
+    assert.ok(note, `text for ${artwork.id}`);
+    assert.ok(note.split(/\s+/).length <= 30, `${artwork.id}: ${note.split(/\s+/).length} words`);
+    assert.ok((note.match(/[.!?](\s|$)/g) ?? []).length <= 2, `${artwork.id}: at most two sentences`);
+  }
+  assert.deepEqual(Object.keys(ART_NOTES).map(Number).sort(), [...PORTRAIT_IDS].sort());
+});
+
+function solvedRun() {
+  const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
+  s.key('Enter');
+  s.clock.ms = T0 + FLASH_MS + 6000;
+  s.key('2'); s.key('3'); s.key('Enter');
+  return s;
+}
+
+test('the success popup has "Learn about the art A"; Enter still returns to the museum', () => {
+  const s = solvedRun();
+  const learn = findButton(s.container, 'Learn about the art');
+  assert.ok(learn, 'second button');
+  assert.match(learn.textContent, /A$/);
+  assert.notEqual(document.activeElement, learn, 'the focus stays on Return to museum');
+  s.key('Enter');
+  assert.equal(s.closed(), 1);
+  s.cleanup();
+});
+
+test('A opens the art cards: ← → browse all four, alt texts, Esc closes; time and points stay the same', () => {
+  const s = solvedRun();
+  const before = { saves: s.saved.length, state: structuredClone(s.last()), reports: s.solvedReports.length };
+  const time = elapsedMs(s.last(), s.clock.ms);
+  s.clock.ms += 60_000;   // a minute of reading changes nothing
+  s.key('a');
+  const card = () => findAll(s.container, n => n.className === 'art-card')[0];
+  assert.ok(card(), 'cards are open');
+  assert.equal(document.activeElement, card(), 'focus on the first card');
+  const seen = [];
+  for (let i = 0; i < 4; i++) {
+    const img = findAll(card(), n => n.tagName === 'IMG')[0];
+    seen.push(img.getAttribute('alt') ?? img.alt);
+    s.key('ArrowRight');
+  }
+  assert.deepEqual(seen, PORTRAIT_ARTWORKS.map(a => `${a.artist}, ${a.shortTitle}`));
+  assert.match(s.text(), /1 \/ 4/, 'after four steps it wraps to the first');
+  s.key('ArrowLeft');
+  assert.match(s.text(), /4 \/ 4/);
+  assert.match(s.text(), new RegExp(ART_NOTES[CEZANNE].slice(0, 20)));
+  assert.equal(s.saved.length, before.saves, 'no new save');
+  assert.deepEqual(s.last(), before.state);
+  assert.equal(elapsedMs(s.last(), s.clock.ms), time, 'the clock stays stopped');
+  assert.equal(portraitSpeedPoints(elapsedMs(s.last(), s.clock.ms)), 15);
+  assert.equal(s.solvedReports.length, before.reports, 'no second report');
+  s.key('Escape');
+  assert.equal(s.closed(), 1, 'Back to museum');
+  s.cleanup();
+});

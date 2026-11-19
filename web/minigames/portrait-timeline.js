@@ -9,12 +9,21 @@ import {
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
 import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
-import { introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles } from './station-ui.js';
+import { introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles, artCards } from './station-ui.js?v=art-cards-1';
 import { cardView, timelineView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
 /** Station I's points by time, as tiers for the bar (same limits as portraitSpeedPoints). */
 export const PORTRAIT_TIERS = PORTRAIT_LIMITS_MS.reduce((tiers, ms, i) => [...tiers, { s: ms / 1000, p: [10, 5, 0][i] }], [{ s: 0, p: 15 }]);
 const TASK = 'Memorise the dates, then sort oldest to newest.';
+// "Learn about the art" after solving: at most two short sentences per work, ≤ 30 words.
+// Source for each: the Met object page (artwork.url), overview text, read 2026-11-19.
+export const ART_NOTES = Object.freeze({
+  436703: 'Ingres met the Leblancs in Florence in 1820 and painted husband and wife as a pair. Edgar Degas later bought both portraits.',
+  436121: 'The sitter is probably the wife of Degas’s school friend Paul Valpinçon. The late-summer bouquet takes the centre, while she sits off to the side, looking away.',
+  12127: 'Virginie Gautreau was a Paris society figure. After the 1884 Salon mocked her slipped dress strap, Sargent repainted it and kept the picture.',
+  435876: 'Cézanne painted his wife Hortense in this red dress four times; only here she sits in a furnished room. It is his Paris flat on the quai d’Anjou.',
+});
+export const ART_KEY = 'a';   // the "Learn about the art" key in the success popup
 const TICK_MS = 100;             // how often bar, dates and arrow are redrawn
 const BLINK_MS = 300;            // red blink after a penalty
 const FLIP_DELAY_MS = 60;        // let the browser draw the front before the cards turn
@@ -114,6 +123,7 @@ export function start(container, caseData, onSolved) {
     report();
     closePopup = showPopup({
       overlay, pane, label: 'Portraits sorted', actionLabel: 'Return to museum', onAction: leave,
+      secondary: { label: 'Learn about the art', onAction: showArt, key: ART_KEY.toUpperCase() },
       contents: successPopup({
         headline: 'Sorted! The night-shift log clears Leon. You receive:', letter: 'I', points: portraitSpeedPoints(time),
         extra: `Time ${formatClock(time)}${record === time ? ' · New best!' : ` · Best ${formatClock(record)}`}`,
@@ -128,6 +138,13 @@ export function start(container, caseData, onSolved) {
   }
 
   function leave() { if (!disposed) caseData.onClose?.(); }
+
+  // Optional and after solving: the clock already stopped, so nothing here changes time or points.
+  function showArt() {
+    closePopup?.();
+    const works = PORTRAIT_ARTWORKS.map(a => ({ artist: a.artist, title: a.shortTitle, date: a.date, image: cards[a.id].img.src || a.local, text: ART_NOTES[a.id] }));
+    closePopup = artCards({ overlay, pane, works, onClose: leave });
+  }
 
   function showHelp() {
     closePopup = showPopup({
@@ -174,6 +191,10 @@ export function start(container, caseData, onSolved) {
     if (disposed || event.repeat) return;
     const stop = () => { event.preventDefault(); event.stopImmediatePropagation?.(); };
     if (closePopup) {
+      if (closePopup.handleKey?.(event)) { stop(); return; }
+      if (closePopup.secondary && event.key.toLowerCase() === ART_KEY) { stop(); closePopup.secondary.click(); return; }
+      // Art cards and the two-button success popup: Tab moves between buttons; in the cards Enter presses the focused one.
+      if ((closePopup.handleKey && event.key === 'Enter') || (event.key === 'Tab' && (closePopup.handleKey || closePopup.secondary))) return;
       if (event.key === 'Enter' || event.key === 'Escape' || event.key === 'Tab') { stop(); if (event.key !== 'Tab') closePopup.action.click(); }
       return;
     }

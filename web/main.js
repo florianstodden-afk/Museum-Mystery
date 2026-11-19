@@ -9,7 +9,7 @@ import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObj
 import * as landscapeStation from './minigames/landscape.js';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
-import * as portraitStation from './minigames/portrait-timeline.js';
+import * as portraitStation from './minigames/portrait-timeline.js?v=art-cards-1';
 import { createStoryHost } from './story/host.js?v=speech-box-1';
 import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
