@@ -6,6 +6,17 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 **Play it:** <https://florianstodden-afk.github.io/Museum-Mystery/>
 
+## Team
+
+| Name | Student number | Main contributions |
+|---|---|---|
+| Florian Baumgartl | 78089 | Story engine (`web/story/`), Station I – Portrait Timeline, NPC talks |
+| Florian Stodden | 78574 | Repository & deployment, home/login screens, menu, journal, ending screens |
+| Fabian Oscar Bergvall | 78922 | Rooms & graphics, Station B – Landscape |
+| Leo Johannes Oskar Heppe | 79527 | Station L – Picture Puzzle, Station D – Spot the Forgery |
+
+In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `FlorianBaumgartl78086`, Florian Stodden also as `florianstodden-afk` and Leo as `leomasterofcode`.
+
 ![The museum at night](docs/screenshots/readme-game.png)
 
 ## How to play
@@ -47,18 +58,6 @@ GitHub Actions runs the same command for every pull request and after every merg
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
 | `web/dev/` | Preview pages, screenshots and browser checks |
 | `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
-
-## Stations and owners
-
-| Part | Owner |
-|---|---|
-| Station B – Gallery, middle painting | Fabian Bergvall |
-| Station I – Portrait Hall | Florian Baumgartl |
-| Station L – Renoir picture puzzle | Leopold Heppe |
-| Station D – Gallery, frame rack | Spot the Forgery — find any 3 of 5 differences |
-| Story engine | Florian Baumgartl |
-| Rooms and graphics | Fabian Bergvall |
-| Repository and setup | Florian Stodden |
 
 ## Credits
 
