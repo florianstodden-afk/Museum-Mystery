@@ -16,7 +16,7 @@ Die Entscheidung, Punkteberechnung, Beweiskette, Speicherung und Knöpfe für Ho
 
 Florian Stodden ließ zwei Abschlussbilder erstellen. Der Satz „The mystery remains“ auf dem ursprünglichen Nicht-Dieb-Bild widersprach der bestehenden Auflösung: Voss ist zu diesem Zeitpunkt bereits entlarvt. Deshalb wurden von beiden Bildern textfreie Varianten erstellt. Ihre Museumsszenen und ornamentalen Tafeln blieben erhalten; Titel und kurze, zur Entscheidung passende Folgen stehen nun als echte HTML-Texte darüber. Damit bleiben Text und Vorlesbarkeit unabhängig vom Bild.
 
-Die Bilder liegen als `web/assets/ending-thief-background.png` und `web/assets/ending-not-thief-background.png` im Repository. Sie zeigen **kein erfundenes Van-Gogh-Motiv**. Auf beiden Ending Screens erscheint das echte Met-Werk als kleine Bildkarte mit Quellenlink. Die Beweise und die genaue Punkteverteilung sind über **View evidence and score details** erreichbar.
+Die Bilder liegen als `web/assets/ending-thief-background.jpg` und `web/assets/ending-not-thief-background.jpg` im Repository. Sie zeigen **kein erfundenes Van-Gogh-Motiv**. Auf beiden Ending Screens erscheint das echte Met-Werk als kleine Bildkarte mit Quellenlink. Die Beweise und die genaue Punkteverteilung sind über **View evidence and score details** erreichbar.
 
 ## Technische Stellen
 

@@ -423,3 +423,10 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Umsetzung:** `web/story/endings.js` zeigt für den Diebstahl die Übergabe an Voss und die Fälschung an der Wand; beim Abbruch die Rückgabe an Dr. Vale und die Aufdeckung von Voss. `web/story/story.css` zeigt den passenden Nachthimmel beziehungsweise das Morgenlicht. Das echte Met-Bild 436535 mit Quelle, Punktzahl, Beweiskette, Home und New Game bleiben erreichbar. Die Endentscheidung, Story-Zustände und Speicherung wurden nicht geändert.
 - **Dokumentation:** `docs/ending-screens.md` erklärt Ablauf, Dateien und Bildentscheidung.
 - **Prüfung:** Beide Resultate und die Beweisansicht im lokalen Browser bei 1280 × 720 visuell geprüft. 276 Node-Tests bestanden; `git diff --check` ohne Fehler. Handyansicht und komplette Spielrunde bleiben zur Nachprüfung.
+
+## 2026-11-19 · Feinschliff des bestehenden Spiels (`codex/game-polish-pass`)
+
+- **Auftrag:** Florian Stodden wollte die zuvor besprochenen Verbesserungen ohne neue Spiele oder Story umsetzen. Die Handyansicht hat ausdrücklich keine Priorität und ist für später vorgemerkt.
+- **Umsetzung:** Station B hat jetzt für beide Met-Werke lokale Bilder und lesbare Katalogdaten auch bei API-Ausfall. Die Live-API prüft weiterhin die Fakten. I, L, D und B erklären ihre Punkte klarer. Der E-Hinweis am Safe stimmt wieder mit der ausgelösten Aktion überein. Im Home-Scoreboard sind alte 90-Punkte-Bestwerte gekennzeichnet und werden nach erreichbarem Anteil mit der aktuellen 85-Punkte-Wertung verglichen. Die Ending-Hintergründe wurden als deutlich kleinere JPGs gespeichert.
+- **Dateien und Ablauf:** `docs/game-polish-pass.md` erklärt die Änderungen nach Bereich, die zuständigen Code-Stellen und die Prüfungen. `web/assets/met-459193-source.md` nennt Bild und Met-Quelle; `docs/ending-screens.md` verweist auf die neuen Dateinamen.
+- **Prüfung:** `cd web && node --test`: 277 bestanden, 0 fehlgeschlagen. Im Browser wurden M's Nachricht, beide Bilder und die Lösung von B sowie der Einstieg in I geprüft. Der vollständige Browserdurchlauf bleibt noch zu prüfen.

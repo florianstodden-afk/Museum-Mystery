@@ -24,7 +24,7 @@ export function start(container, caseData, onSolved) {
   help.setAttribute('aria-label', 'Spot the Forgery instructions');
   const intro = el('div', { className: 'puzzle-intro' }, [
     el('p', { text: 'Find three differences in the forged version to reveal the frame label.' }),
-    el('p', { text: 'Points are given based on speed' }), help,
+    el('p', { text: 'Find any 3 of 5 changes. Finish within 30 / 45 / 60 seconds for 15 / 10 / 5 points.' }), help,
   ]);
   const begin = shortcutButton('Start', () => {
     if (!ready || disposed || popup || state.startedAt !== null) return;

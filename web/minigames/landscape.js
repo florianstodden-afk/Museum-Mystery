@@ -4,6 +4,12 @@ export const LANDSCAPE_WORKS = [
   { id: 459193, title: 'Road in Etten', artist: 'Vincent van Gogh', date: '1881', medium: 'Chalk, pastel and watercolor' },
 ];
 
+// Fixed catalogue facts keep the answer fair when the live API is unavailable.
+export function catalogueFacts(work, data) {
+  if (!data || data.objectID !== work.id || data.isPublicDomain !== true) return `${work.date} · ${work.medium}`;
+  return `${data.objectDate || work.date} · ${data.medium || work.medium}`;
+}
+
 export function initialLandscape() { return { mistakes: 0, hints: 0, solved: false }; }
 export function stationScore(state) { return state.solved ? Math.max(5, 20 - state.mistakes * 3 - state.hints * 5) : 0; }
 export function answer(state, year, medium) {
@@ -21,22 +27,24 @@ export function start(container, caseData, onSolved) {
   const save = () => caseData.onChange(state);
   container.replaceChildren();
   const intro = document.createElement('p');
-  intro.textContent = 'The fictional wall label claims “1881, watercolor.” Compare the Met catalogue data and correct it.';
+  intro.textContent = 'The fictional wall label claims “1881, watercolor.” Compare the Met works below and correct its year and material. Wrong answer −3 points; hint −5 points.';
   container.append(intro);
   const works = document.createElement('div'); works.className = 'station-works'; container.append(works);
   for (const work of LANDSCAPE_WORKS) {
     const card = document.createElement('div');
     const heading = document.createElement('strong'); heading.textContent = `${work.artist}: ${work.title}`;
-    const facts = document.createElement('p'); facts.textContent = `${work.date} · ${work.medium}`;
+    const image = document.createElement('img'); image.src = `./assets/met-${work.id}.jpg`; image.alt = `${work.title} by ${work.artist}`;
+    const facts = document.createElement('p'); facts.textContent = catalogueFacts(work);
+    const source = document.createElement('small'); source.textContent = 'Saved Met catalogue data';
     const link = document.createElement('a'); link.href = `https://www.metmuseum.org/art/collection/search/${work.id}`; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'View in the Met catalogue';
-    card.append(heading, facts, link); works.append(card);
-    fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${work.id}`)
+    card.append(image, heading, facts, source, link); works.append(card);
+    fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${work.id}`, { signal: globalThis.AbortSignal?.timeout?.(8000) })
       .then(response => { if (!response.ok) throw new Error('API'); return response.json(); })
-      .then(data => { if (data.isPublicDomain && data.primaryImageSmall) { const img = document.createElement('img'); img.src = data.primaryImageSmall; img.alt = work.title; card.prepend(img); } })
-      .catch(() => {});
+      .then(data => { if (data.objectID === work.id && data.isPublicDomain) { facts.textContent = catalogueFacts(work, data); source.textContent = 'Met catalogue checked live'; } })
+      .catch(() => { source.textContent = 'Met API unavailable · saved catalogue data shown'; });
   }
   const form = document.createElement('form');
-  form.innerHTML = '<label>Year created <select name="year"><option value="">Choose an option</option><option>1881</option><option>1889</option></select></label> <label>Material <select name="medium"><option value="">Choose an option</option><option value="watercolor">Watercolor</option><option value="oil">Oil on canvas</option></select></label> <button type="submit">Check label</button> <button type="button" data-hint>Hint (−5 points)</button><p aria-live="polite"></p>';
+  form.innerHTML = '<label>Year created <select name="year"><option value="">Choose an option</option><option>1881</option><option>1889</option></select></label> <label>Material <select name="medium"><option value="">Choose an option</option><option value="watercolor">Watercolor</option><option value="oil">Oil on canvas</option></select></label> <button type="submit">Check label</button> <button type="button" data-hint>Hint (−5 points)</button><p role="status" aria-live="polite"></p>';
   container.append(form); const feedback = form.querySelector('p');
   const render = () => { feedback.textContent = state.solved ? `Solved: B. Voss approved the false label. Station deduction: −${20 - stationScore(state)} points.` : `Incorrect attempts: ${state.mistakes} · Hints: ${state.hints}.`; form.querySelector('button[type=submit]').disabled = state.solved; form.querySelector('[data-hint]').disabled = state.solved || state.hints >= 1; };
   form.addEventListener('submit', event => { event.preventDefault(); const data = new FormData(form); if (!data.get('year') || !data.get('medium')) { feedback.textContent = 'Please choose both answers.'; return; } state = answer(state, data.get('year'), data.get('medium')); save(); render(); if (state.solved) onSolved({ letter: 'B', evidence: 'Voss approved the false wall label.', points: stationScore(state) }); else feedback.textContent = 'Not quite. Check the year and medium again. −3 points.'; });

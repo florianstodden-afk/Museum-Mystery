@@ -99,7 +99,7 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 150)); // the stat
 
 test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back to museum Esc – no cards yet', () => {
   const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
-  assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Points are given based on speed\?/);
+  assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Finish within 25 \/ 40 \/ 55 seconds for 15 \/ 10 \/ 5 points\.?/);
   assert.match(findButton(s.container, 'Start').textContent, /Start↵/);
   assert.match(findButton(s.container, 'Back to museum').textContent, /Back to museumEsc/);
   assert.equal(s.faces().length, 0, 'the cards appear after Start, like L’s board');

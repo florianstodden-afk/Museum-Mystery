@@ -393,7 +393,8 @@ function handleInteract(){
   if(speech.isOpen){speech.advance();return;}
   if(!dialog.classList.contains('hidden') || roomTransition)return;
   const object=interactTarget();
-  const action=interactionFor({atVaultDoor:atVaultDoor(state),target:object});
+  // Once open, the doorway is crossed by walking; E should not steal a nearby object's action.
+  const action=interactionFor({atVaultDoor:atVaultDoor(state) && !state.doorOpen,target:object});
   if(action==='vault'){
     if(state.doorOpen) showDialog('Vault unlocked','Walk right through the open doorway.');
     else story.openVault();

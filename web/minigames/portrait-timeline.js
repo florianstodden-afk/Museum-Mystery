@@ -51,7 +51,7 @@ export function start(container, caseData, onSolved) {
   const root = el('div', { className: 'picture-puzzle portrait-timeline' });
   const pane = el('div');
   const overlay = el('div');
-  const ui = introPopup({ task: TASK, onStart: begin, onBack: leave, onHelp: showHelp });
+  const ui = introPopup({ task: TASK, pointsText: `Finish within ${PORTRAIT_LIMITS_MS.map(ms => ms / 1000).join(' / ')} seconds for 15 / 10 / 5 points.`, onStart: begin, onBack: leave, onHelp: showHelp });
   const bar = speedBar({ tiers: PORTRAIT_TIERS, label: 'Portrait time' });
   const checkButton = shortcutButton('Check order', check, 'Enter');
   const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
@@ -153,7 +153,7 @@ export function start(container, caseData, onSolved) {
       contents: [
         el('h3', { text: 'Sort the portraits' }),
         el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press their numbers. Enter checks.' }),
-        el('p', { text: 'Peek shows one date (+5 s). A wrong check adds 5 s. Within 25 s: +15 points, 40 s: +10, 55 s: +5, later: 0.' }),
+        el('p', { text: `Peek shows one date (+5 s). A wrong check adds 5 s. Within ${PORTRAIT_LIMITS_MS[0] / 1000} s: +15 points, ${PORTRAIT_LIMITS_MS[1] / 1000} s: +10, ${PORTRAIT_LIMITS_MS[2] / 1000} s: +5, later: 0.` }),
       ],
     });
   }
