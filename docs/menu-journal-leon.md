@@ -9,7 +9,7 @@ Auftrag: Florian Stodden. Umsetzung mit Codex auf `codex/menu-journal-leon`, aus
 | Spiel | `Esc` oder Zahnrad | Spielmenü öffnen; Bewegung pausiert. `Esc` erneut schließt es. |
 | Spiel | `J` oder Journal-Knopf oben | Journal über dem Museum öffnen. `J`, `Esc` oder × schließt es. |
 | Home Screen | Journal-Knopf oder `J` | Journal öffnen und wieder zum Home Screen zurückkehren, ohne die Mission zu starten. Auch „Read M’s message“ führt nach dem Schließen zurück zum Home Screen. |
-| Spiel nahe Leon | `E` | Transparentes Gespräch mit Leon öffnen. Er beginnt nicht mehr von selbst beim Näherkommen. Imani und Vale sprechen weiterhin bei Annäherung. |
+| Spiel nahe Leon | `E` | Transparentes Gespräch mit Leon öffnen. Er beginnt nicht mehr von selbst beim Näherkommen. Seit `feature/npc-e-and-signs` gilt das auch für Imani und Dr. Vale. |
 
 ## Wo passiert was?
 

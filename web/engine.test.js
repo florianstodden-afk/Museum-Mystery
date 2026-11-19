@@ -68,10 +68,10 @@ test('the nearest object is found and labelled for the player',()=>{
   assert.equal(nearbyObject(at(initialState(),3,9)),null);
 });
 
-test('the Great Hall desk opens the portrait timeline (Station I)',()=>{
-  const desk=OBJECTS.find(o=>o.story.station==='portraits');
-  assert.equal(desk.label,'Portrait timeline · Station I');
-  assert.equal(nearbyObject(at(initialState(),desk.x,desk.y-1)).id,desk.id);
+test('the portrait on the Great Hall wall opens the portrait timeline (Station I)',()=>{
+  const portrait=OBJECTS.find(o=>o.story.station==='portraits');
+  assert.equal(portrait.label,'Portraits · Station I');
+  assert.equal(nearbyObject(at(initialState(),portrait.x,portrait.y+1)).id,portrait.id, 'standing right in front of the wall');
 });
 
 test('standing in front of the vault door is detected',()=>{

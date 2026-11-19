@@ -16,3 +16,25 @@ test('patrol stays in room and avoids player and occupied tiles',()=>{
   assert.equal(chooseGuardAction(s,guard,()=>0).kind,'wait');
   assert.equal(chooseGuardAction(s,guard,()=>0.8).kind,'walk');
 });
+
+import { OBJECTS as MAP_OBJECTS, canEnter as canStep } from './engine.js';
+import { frontOfStation } from './guard.js';
+test('Station I hangs on the hall wall: reachable from the floor, Leon never blocks that spot', () => {
+  const station = MAP_OBJECTS.find(o => o.id === 'ledger');
+  assert.equal(station.label, 'Portraits · Station I');
+  assert.ok(station.x < 9 && station.y === 3, 'on the hall wall row');
+  const world = { room: 'museum', player: { x: station.x, y: station.y + 2 }, doorOpen: false };
+  assert.equal(canStep(world, station.x, station.y + 1, { x: 2, y: 12 }), true, 'the spot in front is floor');
+  assert.equal(canStep(world, station.x, station.y, { x: 2, y: 12 }), false, 'the painting itself is wall');
+  assert.equal(frontOfStation({ x: station.x, y: station.y + 1 }), true);
+  for (const guard of [{ x: station.x, y: station.y + 2 }, { x: station.x - 1, y: station.y + 1 }, { x: station.x + 1, y: station.y + 1 }]) {
+    const options = guardOptions({ ...world, player: { x: 2, y: 14 } }, guard);
+    assert.equal(options.some(p => p.x === station.x && p.y === station.y + 1), false, JSON.stringify(guard));
+  }
+});
+
+test('in front of Station I, E opens the station even when Leon stands one step away', () => {
+  const station = MAP_OBJECTS.find(o => o.id === 'ledger');
+  const s = { ...initialState(), player: { x: station.x, y: station.y + 1 } };
+  assert.equal(nearbyObject(s, { x: station.x - 1, y: station.y + 2 }).id, 'ledger');
+});

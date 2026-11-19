@@ -1,10 +1,17 @@
-import { canEnter } from './engine.js';
+import { canEnter, OBJECTS } from './engine.js';
+
+// Leon never stops right in front of a station, so the player can always reach it.
+const STATIONS = OBJECTS.filter(object => object.story?.station);
+export function frontOfStation(p) {
+  return STATIONS.some(object => Math.abs(object.x - p.x) + Math.abs(object.y - p.y) <= 1);
+}
 
 // Choose a nearby reachable tile. Random pauses and choices make the patrol less predictable.
 export function guardOptions(state, guard) {
   return [[0,-1],[1,0],[0,1],[-1,0]].map(([dx,dy]) => ({x:guard.x+dx,y:guard.y+dy}))
     .filter(p => p.x >= 2 && p.x <= 7 && p.y >= 4 && p.y <= 14)
     .filter(p => !(Math.abs(p.x - state.player.x) < 0.45 && Math.abs(p.y - state.player.y) < 2.4))
+    .filter(p => !frontOfStation(p))
     .filter(p => canEnter(state,p.x,p.y,guard));
 }
 export function chooseGuardAction(state, guard, random=Math.random) {

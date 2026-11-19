@@ -1,25 +1,41 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldOpenTalk, shouldCloseTalk, distanceBetween, NEAR, FAR } from '../proximity.js';
+import { talkPartner, shouldCloseTalk, distanceBetween, facingToward, FAR } from '../proximity.js';
+import { OBJECTS, nearbyObject } from '../../engine.js';
 
-test('opens as soon as the player comes close', () => {
-  assert.deepEqual(shouldOpenTalk({ distance: NEAR - 0.1, wasNear: false }), { open: true, wasNear: true });
-  assert.equal(shouldOpenTalk({ distance: NEAR + 0.1, wasNear: false }).open, false);
+const PEOPLE = { guard: 'leon', restorer: 'imani', curator: 'vale' };
+const at = (x, y) => ({ room: 'museum', player: { x, y }, doorOpen: false });
+const spot = id => OBJECTS.find(o => o.id === id);
+
+test('coming close opens nothing: there is no automatic talk any more', async () => {
+  const module = await import('../proximity.js');
+  assert.equal('shouldOpenTalk' in module, false);
+  assert.equal('NEAR' in module, false);
+});
+
+test('E next to Imani, Vale or Leon starts their talk', () => {
+  for (const [id, character] of Object.entries(PEOPLE)) {
+    const person = spot(id);
+    const target = nearbyObject(at(person.x - 1, person.y), { x: spot('guard').x, y: spot('guard').y });
+    assert.equal(target?.id, id, `${id} is the E target`);
+    assert.equal(talkPartner(target.id, PEOPLE), character);
+  }
+});
+
+test('E at a station or painting starts no talk', () => {
+  for (const id of ['ledger', 'note', 'painting', 'frames', 'vault', null, 'toString']) assert.equal(talkPartner(id, PEOPLE), null, String(id));
+});
+
+test('walking away closes the box; a small step does not (no flicker)', () => {
+  assert.equal(shouldCloseTalk(FAR + 0.1), true);
+  assert.equal(shouldCloseTalk(FAR - 0.5), false);
+  assert.equal(shouldCloseTalk(Infinity), true, 'another room is far away');
   assert.equal(distanceBetween({ x: 0, y: 0 }, { x: 3, y: 4 }), 5);
 });
 
-test('closes as soon as the player walks away', () => {
-  assert.equal(shouldCloseTalk(FAR + 0.1), true);
-  assert.equal(shouldCloseTalk((NEAR + FAR) / 2), false, 'a small step does not close it (no flicker)');
-});
-
-test('after goodbye it stays closed while near, and opens again after walking away and back', () => {
-  assert.equal(shouldOpenTalk({ distance: 0.5, wasNear: true }).open, false);
-  const away = shouldOpenTalk({ distance: FAR + 0.5, wasNear: true });
-  assert.equal(away.wasNear, false);
-  assert.equal(shouldOpenTalk({ distance: NEAR - 0.1, wasNear: away.wasNear }).open, true, 'no waiting time');
-});
-
-test('never opens while something else is open', () => {
-  assert.deepEqual(shouldOpenTalk({ distance: 0.3, wasNear: false, blocked: true }), { open: false, wasNear: false });
+test('a talking person turns to the player', () => {
+  assert.equal(facingToward({ x: 5, y: 5 }, { x: 3, y: 5 }), 'left');
+  assert.equal(facingToward({ x: 5, y: 5 }, { x: 8, y: 5 }), 'right');
+  assert.equal(facingToward({ x: 5, y: 5 }, { x: 5, y: 9 }), 'down');
+  assert.equal(facingToward({ x: 5, y: 5 }, { x: 5, y: 2 }), 'up');
 });
