@@ -17,7 +17,7 @@ function deepFreeze(value) {
 export const ROOMS = ['Portrait Hall', 'Gallery', 'Security', 'Vault'];
 
 // Players see station NUMBERS, in walking order (Hall, then Gallery left → middle → right).
-// The letters B, I, L, D stay hidden until a station is solved, so the code word cannot be read off the signs.
+// The letters O, I, L, S stay hidden until a station is solved, so the code word cannot be read off the signs.
 export function stationsByNumber(stations = CASE.stations) {
   return [...stations].sort((a, b) => a.number - b.number);
 }
@@ -27,13 +27,13 @@ export function stationPlace(station) {
   return station.spot ? `${station.room}, ${station.spot}` : station.room;
 }
 
-export const CASE_VERSION = 1;
+export const CASE_VERSION = 2;   // 2: code word OILS (was BILD); older saves start fresh
 
-// The order of this list is the order of the code word (B-I-L-D). Players never see it:
+// The order of this list is the order of the code word (O-I-L-S). Players never see it:
 // journal, signs and scoreboard use the station `number` instead.
 export const STATION_IDS = ['landscape', 'portraits', 'restoration', 'archive'];
 
-export const CODEWORD = 'BILD';
+export const CODEWORD = 'OILS';
 
 export const CASE = deepFreeze({
   id: 'nocturne-1',
@@ -55,7 +55,7 @@ export const CASE = deepFreeze({
       number: 3,
       room: 'Gallery',
       spot: 'middle painting',
-      letter: 'B',
+      letter: 'O',
       evidenceId: 'false-label',
       evidence: 'Voss approved the false wall label.',
       pointsToVoss: 'The false label went up with Voss’s approval – he wanted the swap to look official.',
@@ -90,7 +90,7 @@ export const CASE = deepFreeze({
       number: 4,
       room: 'Gallery',
       spot: 'frame rack',
-      letter: 'D',
+      letter: 'S',
       evidenceId: 'frame-label',
       evidence: 'Frame label: “Ordered by: A. Voss”.',
       pointsToVoss: 'The frame for the forgery was ordered by A. Voss – so the “V” is his, not Vale’s.',

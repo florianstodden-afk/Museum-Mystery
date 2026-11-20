@@ -10,7 +10,7 @@ function play({ results = {}, wrongWords = 0, wrongSuspects = [] } = {}) {
   let s = readMission(newGame()).state;
   for (const id of STATIONS) s = solveStation(s, id, results[id] ?? { mistakes: 0, hints: 0 }).state;
   for (let i = 0; i < wrongWords; i++) s = tryOpenSafe(s, 'LIBD').state;
-  s = tryOpenSafe(s, 'BILD').state;
+  s = tryOpenSafe(s, 'OILS').state;
   for (const suspect of wrongSuspects) s = accuse(s, suspect).state;
   s = accuse(s, 'voss').state;
   return chooseEnding(s, 'open-file').state;

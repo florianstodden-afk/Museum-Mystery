@@ -69,7 +69,7 @@ Dann im Browser öffnen:
 3. „Talk to Leon“ – dann Portrait Hall lösen – noch einmal mit Leon sprechen (er ist entlastet).
 4. Landscape Gallery: echte Station 1. Einmal falsch (1881 + Oil), dann richtig (1889 + Oil).
 5. Das Bilderpuzzle L lösen; I und D verwenden noch Platzhalter. Im Journal stehen B‑I‑L‑D an festen Plätzen.
-6. Safe: zweimal ein falsches Wort (z. B. `DLIB`, `LIBD`), dann „💡 Hint“ (nennt jetzt die Buchstaben), dann `bild`.
+6. Safe: zweimal ein falsches Wort (z. B. `SLIO`, `LIOS`), dann „💡 Hint“ (nennt jetzt die Buchstaben), dann `oils`.
 7. „Look at the documents“: erst Leon oder Dr. Vale wählen (Feedback, welcher Beleg dagegen spricht), dann Adrien Voss.
 8. Ein Ende wählen, Punkte ansehen, „New game“ → bestätigen, zweites Ende spielen.
 

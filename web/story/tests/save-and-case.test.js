@@ -24,7 +24,7 @@ test('an old case version is rejected', () => {
 
 test('impossible states are rejected', () => {
   const cheat = newGame();
-  cheat.letters = ['B', null, null, null]; // letter without a solved station
+  cheat.letters = ['O', null, null, null]; // letter without a solved station
   assert.equal(deserialize(JSON.stringify(cheat)), null);
 
   const earlySafe = newGame();
@@ -44,7 +44,7 @@ test('impossible states are rejected', () => {
   assert.equal(deserialize(JSON.stringify(negative)), null);
 });
 
-test('case data: four stations spell BILD in the fixed order', () => {
+test('case data: four stations spell OILS in the fixed order', () => {
   assert.deepEqual(CASE.stations.map(s => s.id), STATION_IDS);
   assert.equal(CASE.stations.map(s => s.letter).join(''), CODEWORD);
   assert.equal(Object.isFrozen(CASE.stations[0]), true);

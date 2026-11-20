@@ -109,7 +109,7 @@ export function canOpenSafe(state) {
   return !isOver(state) && !state.safe.open && allStationsSolved(state);
 }
 
-// "bild", " B I L D " and "Bild" are all accepted.
+// "oils", " O I L S " and "Oils" are all accepted.
 export function normalizeWord(word) {
   return String(word ?? '').replace(/\s+/g, '').toUpperCase();
 }

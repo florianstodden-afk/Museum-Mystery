@@ -18,13 +18,13 @@ function withAllStations() {
 }
 
 function atFinalChoice() {
-  let s = must(tryOpenSafe(withAllStations(), 'BILD'));
+  let s = must(tryOpenSafe(withAllStations(), 'OILS'));
   return must(accuse(s, 'voss'));
 }
 
 test('a new game starts empty with four fixed letter slots', () => {
   const s = newGame();
-  assert.equal(s.caseVersion, 1);
+  assert.equal(s.caseVersion, 2);
   assert.equal(s.missionRead, false);
   assert.deepEqual(s.letters, [null, null, null, null]);
   assert.deepEqual(s.evidence, []);
@@ -42,9 +42,9 @@ test('stations can only be solved after reading the mission', () => {
 test('letters land in their fixed slot regardless of station order', () => {
   let s = must(readMission(newGame()));
   s = must(solveStation(s, 'archive', {}));
-  assert.deepEqual(s.letters, [null, null, null, 'D']);
+  assert.deepEqual(s.letters, [null, null, null, 'S']);
   s = must(solveStation(s, 'portraits', {}));
-  assert.deepEqual(s.letters, [null, 'I', null, 'D']);
+  assert.deepEqual(s.letters, [null, 'I', null, 'S']);
   assert.deepEqual(s.evidence, ['frame-label', 'shift-log']);
 });
 
@@ -71,7 +71,7 @@ test('unknown station, note, suspect and ending are rejected without change', ()
     assert.equal(result.ok, false);
     assert.equal(result.state, s);
   }
-  const safeOpen = must(tryOpenSafe(withAllStations(), 'BILD'));
+  const safeOpen = must(tryOpenSafe(withAllStations(), 'OILS'));
   const unknown = accuse(safeOpen, 'imani');
   assert.equal(unknown.ok, false);
   assert.equal(unknown.state, safeOpen);
@@ -91,13 +91,13 @@ test('the safe needs all four stations, even with the right word', () => {
   let s = must(readMission(newGame()));
   for (const id of ['landscape', 'portraits', 'restoration']) s = must(solveStation(s, id, {}));
   assert.equal(canOpenSafe(s), false);
-  const result = tryOpenSafe(s, 'BILD');
+  const result = tryOpenSafe(s, 'OILS');
   assert.equal(result.ok, false);
   assert.equal(result.state, s);
 });
 
-test('the safe accepts BILD in any case and with spaces', () => {
-  for (const word of ['BILD', 'bild', ' b i l d ', 'Bild']) {
+test('the safe accepts OILS in any case and with spaces', () => {
+  for (const word of ['OILS', 'oils', ' o i l s ', 'Oils']) {
     const result = tryOpenSafe(withAllStations(), word);
     assert.equal(result.ok, true, word);
     assert.equal(result.state.safe.open, true);
@@ -108,12 +108,12 @@ test('the safe accepts BILD in any case and with spaces', () => {
 test('a wrong word counts as an attempt and can be corrected', () => {
   const s = withAllStations();
   assert.equal(canOpenSafe(s), true);
-  const wrong = tryOpenSafe(s, 'DLIB');
+  const wrong = tryOpenSafe(s, 'SLIO');
   assert.equal(wrong.ok, false);
   assert.equal(wrong.message, 'The lock does not move. Check the order in your journal.');
   assert.equal(wrong.state.safe.attempts, 1);
   assert.equal(s.safe.attempts, 0, 'the old state is untouched');
-  const right = must(tryOpenSafe(wrong.state, 'bild'));
+  const right = must(tryOpenSafe(wrong.state, 'oils'));
   assert.equal(right.safe.open, true);
   assert.equal(right.safe.attempts, 1);
 });
@@ -133,7 +133,7 @@ test('the final question is only possible after the safe is open', () => {
 });
 
 test('a wrong accusation names the evidence against it and allows a new try', () => {
-  const open = must(tryOpenSafe(withAllStations(), 'BILD'));
+  const open = must(tryOpenSafe(withAllStations(), 'OILS'));
   const leon = accuse(open, 'leon');
   assert.equal(leon.ok, false);
   assert.match(leon.message, /night-shift log/);
@@ -146,7 +146,7 @@ test('a wrong accusation names the evidence against it and allows a new try', ()
 });
 
 test('endings are only possible after the right answer', () => {
-  const open = must(tryOpenSafe(withAllStations(), 'BILD'));
+  const open = must(tryOpenSafe(withAllStations(), 'OILS'));
   const early = chooseEnding(open, 'heist');
   assert.equal(early.ok, false);
   assert.equal(early.state, open);
@@ -165,7 +165,7 @@ test('after an ending every action is locked until newGame()', () => {
   const done = must(chooseEnding(atFinalChoice(), 'open-file'));
   const attempts = [
     readMission(done), solveStation(done, 'landscape', {}), addNote(done, 'duty-roster'),
-    tryOpenSafe(done, 'BILD'), accuse(done, 'voss'), chooseEnding(done, 'heist'),
+    tryOpenSafe(done, 'OILS'), accuse(done, 'voss'), chooseEnding(done, 'heist'),
   ];
   for (const result of attempts) {
     assert.equal(result.ok, false);
@@ -179,7 +179,7 @@ test('next step follows the story', () => {
   assert.match(nextStep(s), /Portrait Hall; Gallery, left painting; Gallery, middle painting; Gallery, frame rack\./);
   s = withAllStations();
   assert.match(nextStep(s), /Open the safe/);
-  s = must(tryOpenSafe(s, 'BILD'));
+  s = must(tryOpenSafe(s, 'OILS'));
   assert.match(nextStep(s), /final question/);
   s = must(accuse(s, 'voss'));
   assert.match(nextStep(s), /Decide/);
@@ -188,7 +188,7 @@ test('next step follows the story', () => {
 });
 
 test('the right answer explains who M is and why you were sent', () => {
-  const open = must(tryOpenSafe(withAllStations(), 'BILD'));
+  const open = must(tryOpenSafe(withAllStations(), 'OILS'));
   const result = accuse(open, 'voss');
   assert.match(result.message, /mécène/);
   assert.match(result.message, /sent you/);

@@ -40,7 +40,7 @@ function safeHint(state, concrete) {
   if (concrete || state.safe.attempts >= 2) {
     return hint(`Put the four letters from your journal in this order: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
   }
-  return hint('The dial wants one word. Your journal lists the letters by station number – rearrange them.');
+  return hint('Four letters, one word: what every painter in this museum worked with.');
 }
 
 function accusationHint(state, concrete) {

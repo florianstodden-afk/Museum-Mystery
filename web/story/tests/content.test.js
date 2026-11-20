@@ -17,8 +17,8 @@ function started() {
 function finished(endingId, { wrongWord = false, wrongSuspect = null, stationResult = {} } = {}) {
   let s = started();
   for (const id of ALL) s = solveStation(s, id, stationResult[id] ?? {}).state;
-  if (wrongWord) s = tryOpenSafe(s, 'BLID').state;
-  s = tryOpenSafe(s, 'BILD').state;
+  if (wrongWord) s = tryOpenSafe(s, 'OLIS').state;
+  s = tryOpenSafe(s, 'OILS').state;
   if (wrongSuspect) s = accuse(s, wrongSuspect).state;
   s = accuse(s, 'voss').state;
   return chooseEnding(s, endingId).state;
@@ -52,7 +52,7 @@ test('Dr. Vale only talks once the safe is open', () => {
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
   assert.equal(dialogueFor('vale', s).available, false);
-  s = tryOpenSafe(s, 'BILD').state;
+  s = tryOpenSafe(s, 'OILS').state;
   assert.equal(dialogueFor('vale', s).available, true);
   s = accuse(s, 'voss').state;
   assert.match(dialogueFor('vale', s).lines.join(' '), /choice is yours/);
@@ -64,7 +64,7 @@ test('journal lists slots by station number and shows a letter only after solvin
   s = solveStation(s, 'landscape', {}).state;
   const model = journalModel(s);
   assert.deepEqual(model.slots.map(slot => slot.number), [1, 2, 3, 4]);
-  assert.deepEqual(model.slots.map(slot => slot.letter), ['?', 'L', 'B', '?'], 'Portraits, Puzzle, Catalogue, Forgery');
+  assert.deepEqual(model.slots.map(slot => slot.letter), ['?', 'L', 'O', '?'], 'Portraits, Puzzle, Catalogue, Forgery');
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
   assert.equal(model.score.total, 30);
   assert.match(model.nextStep, /Portrait Hall; Gallery, frame rack\./);
@@ -79,8 +79,8 @@ test('journal renders slots, evidence and notes', () => {
   assert.match(text, /Ordered by: A\. Voss/);
   assert.match(text, /Shift schedule/);
   const slots = findAll(container, node => node.tagName === 'LI' && node.className.startsWith('story-slot'));
-  assert.deepEqual(slots.map(slot => slot.textContent.charAt(0)), ['?', '?', '?', 'D']);
-  assert.doesNotMatch(slots.slice(0, 3).map(slot => slot.textContent).join(' '), /Station [BILD]\b|\b[BILD] ·/);
+  assert.deepEqual(slots.map(slot => slot.textContent.charAt(0)), ['?', '?', '?', 'S']);
+  assert.doesNotMatch(slots.slice(0, 3).map(slot => slot.textContent).join(' '), /Station [OILS]\b|\b[OILS] ·/);
 });
 
 test('evidence chain marks what has been found', () => {
@@ -137,16 +137,16 @@ test('safe UI offers code entry and explains missing proofs', () => {
   renderSafe(container, { state: s }, word => { tried = word; });
   const [input] = findAll(container, node => node.tagName === 'INPUT');
   const [form] = findAll(container, node => node.tagName === 'FORM');
-  input.value = 'bild';
+  input.value = 'oils';
   form.dispatch('submit');
-  assert.equal(tried, 'bild');
+  assert.equal(tried, 'oils');
 });
 
 test('accusation UI offers three suspects and reports the choice', () => {
   installFakeDom();
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
-  s = tryOpenSafe(s, 'BILD').state;
+  s = tryOpenSafe(s, 'OILS').state;
   const container = createContainer();
   let chosen;
   renderAccusation(container, { state: s }, id => { chosen = id; });
@@ -168,7 +168,7 @@ test('the chain of evidence stays hidden after a wrong answer', () => {
   installFakeDom();
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
-  s = tryOpenSafe(s, 'BILD').state;
+  s = tryOpenSafe(s, 'OILS').state;
   s = accuse(s, 'leon').state;
   const container = createContainer();
   renderAccusation(container, { state: s, message: 'Not Leon.' }, () => {});
@@ -187,13 +187,13 @@ test('vault wheel selects letters, wraps around, and removes mistakes', () => {
   const turn=key=>dial.dispatch('keydown',{key});
   turn('ArrowLeft');hub.click();assert.equal(input.value,'Z');
   findButton(container,'Remove last letter').click();
-  turn('ArrowRight');turn('ArrowRight');hub.click();
-  for(let i=0;i<7;i++)turn('ArrowRight');hub.click();
+  for(let i=0;i<15;i++)turn('ArrowRight');hub.click();
+  for(let i=0;i<6;i++)turn('ArrowLeft');hub.click();
   for(let i=0;i<3;i++)turn('ArrowRight');hub.click();
-  for(let i=0;i<8;i++)turn('ArrowLeft');hub.click();
-  assert.equal(input.value,'BILD');
+  for(let i=0;i<7;i++)turn('ArrowRight');hub.click();
+  assert.equal(input.value,'OILS');
   findAll(container,node=>node.tagName==='FORM')[0].dispatch('submit');
-  assert.equal(submitted,'BILD');
+  assert.equal(submitted,'OILS');
 });
 
 test('dragging the wheel rotates the selected letter and snaps on release', () => {
@@ -220,7 +220,7 @@ test('vault wheel uses distinct clicks for turning, a correct letter, and a diff
   hub.click(); // A is not the first letter.
   assert.equal(sounds.at(-1),'vault-set');
   findButton(container,'Remove last letter').click();
-  dial.dispatch('keydown',{key:'ArrowRight'}); // B
+  for(let i=0;i<14;i++)dial.dispatch('keydown',{key:'ArrowRight'}); // O
   assert.equal(sounds.at(-1),'vault-tick');
   hub.click();
   assert.equal(sounds.at(-1),'vault-correct');

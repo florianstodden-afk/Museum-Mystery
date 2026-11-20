@@ -66,7 +66,7 @@ test('the host recovers a final find once, and keeps legacy placeholder points a
   for (let i = 0; i < 2; i++) {
     const host = createStoryHost({ storage, storageKey });
     assert.deepEqual(host.state.evidence, ['frame-label']);
-    assert.deepEqual(host.state.letters, [null, null, null, 'D']);
+    assert.deepEqual(host.state.letters, [null, null, null, 'S']);
     assert.equal(host.state.stations.archive.points, 15);
   }
   const legacy = solveStation(story, 'archive').state;

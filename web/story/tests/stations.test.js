@@ -14,8 +14,8 @@ const landscapeLike = {
     s = answer(s, '1881', 'watercolor'); caseData.onChange(s);
     s = hint(s); caseData.onChange(s);
     s = answer(s, '1889', 'oil'); caseData.onChange(s);
-    onSolved({ letter: 'B', evidence: 'Voss approved the false wall label.', points: 12 });
-    onSolved({ letter: 'B', evidence: 'twice', points: 12 }); // a buggy second call
+    onSolved({ letter: 'O', evidence: 'Voss approved the false wall label.', points: 12 });
+    onSolved({ letter: 'O', evidence: 'twice', points: 12 }); // a buggy second call
   },
 };
 
@@ -52,7 +52,7 @@ test('adapter accepts the target format and ignores letter and points', () => {
   // The engine owns the reward; B starts at 15 until the host synchronizes its saved time.
   const s = solveStation(readMission(newGame()).state, 'landscape', result).state;
   assert.equal(s.stations.landscape.points, 15);
-  assert.equal(s.letters[0], 'B');
+  assert.equal(s.letters[0], 'O');
 });
 
 test('adapter falls back to zero for unknown reports', () => {
