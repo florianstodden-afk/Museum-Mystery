@@ -27,10 +27,10 @@ Niemand kann dauerhaft feststecken.
 
 | Station | Raum | Buchstabe | Beleg |
 |---|---|---|---|
-| 1 | Landscape Gallery | B | Voss approved the false wall label. |
-| 2 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
-| 3 | Conservation Studio | L | Hidden mark “V” on the fake transport slip. |
-| 4 | Frame Archive | D | Frame label: “Ordered by: A. Voss”. |
+| 1 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
+| 2 | Gallery, left painting | L | Hidden mark “V” on the fake transport slip. |
+| 3 | Gallery, middle painting | O | Voss approved the false wall label. |
+| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. Voss”. |
 
 ## Punkte (max. 100, keine Zeitwertung)
 

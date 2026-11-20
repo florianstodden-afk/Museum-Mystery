@@ -198,7 +198,7 @@ const ODD_ON_MY_ROUND = {
   landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'Match the catalogue labels in the middle of the Gallery. They may reveal who approved it.'],
   portraits: ['Quiet, until you count the portraits.', 'Four ladies, and the cards beside them are all shuffled.'],
   restoration: ['Imani’s been muttering about a puzzle of Renoir’s cliffs.', 'Says it hides something on the back of a slip.'],
-  archive: ['The frame archive door was ajar on my last round.', 'Archives don’t open themselves.'],
+  archive: ['Someone moved the frames on the Gallery rack during my last round.', 'Frames don’t move themselves.'],
 };
 
 function leonRound(state) {
