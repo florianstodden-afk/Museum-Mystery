@@ -4,7 +4,8 @@ import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
-import { createGalleryRenderer } from './gallery.js?v=station-numbers-1';
+import { createGalleryRenderer } from './gallery.js?v=plaques-1';
+import { drawWallPlaque } from './wall-plaque.js?v=1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-numbers-1';
 import * as catalogueStation from './minigames/curators-catalogue.js?v=credits-1';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
@@ -239,18 +240,9 @@ function drawStationPortrait(active){
   ctx.strokeStyle=active?'#ffe5a0':'#c9a35a';ctx.lineWidth=4;ctx.strokeRect(x-4,y-4,width+8,height+8);
   ctx.strokeStyle='#f3dca4';ctx.lineWidth=1;ctx.strokeRect(x-1.5,y-1.5,width+3,height+3);
   ctx.restore();
-  drawStationSign(ctx,mid,y+height+8,'1 · PORTRAITS');
+  drawWallPlaque(ctx,mid,y+height+9,'PORTRAITS',{active});
   ctx.fillStyle=active?'#ffe5a0':'#bd985c';ctx.fillRect(mid-13,y+height+30,26,5);
   if(active){ctx.beginPath();ctx.moveTo(mid,y+height+38);ctx.lineTo(mid+4,y+height+42);ctx.lineTo(mid,y+height+46);ctx.lineTo(mid-4,y+height+42);ctx.fill();}
-}
-// Same look as the gallery signs "2 · PUZZLE" and "4 · FORGERY" (gallery.js): dark plate, bold gold text.
-function drawStationSign(context,x,y,text){
-  context.save();
-  context.font='bold 11px sans-serif';context.textAlign='left';context.textBaseline='alphabetic';
-  const width=Math.ceil(context.measureText(text).width)+14;
-  context.fillStyle='#182a32';context.fillRect(x-width/2,y,width,19);
-  context.fillStyle='#f3dca4';context.fillText(text,x-width/2+7,y+13);
-  context.restore();
 }
 // The vault is a separate view behind the gallery's existing door.
 function drawTreasureRoom(){
