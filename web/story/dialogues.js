@@ -76,7 +76,7 @@ function linesForImani(state) {
   }
   return talk([
     'The picture puzzle is on the left side of the Gallery, beside Curator’s Catalogue and the frame rack.',
-    'Restore Renoir’s Sea and Cliffs at Station L. I will then use the lamp to reveal the mark on the transport slip.',
+    'Restore Renoir’s Sea and Cliffs at Station 2. I will then use the lamp to reveal the mark on the transport slip.',
   ]);
 }
 

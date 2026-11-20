@@ -4,7 +4,7 @@
 // Story hints cost no points. (Hints INSIDE a station are the station's own and cost −5 there.)
 // After two wrong tries at the safe or the final question, level 1 is already concrete:
 // the concept says no one may stay stuck.
-import { CASE, stationPlace } from './case-1.js';
+import { CASE, stationPlace, stationsByNumber } from './case-1.js';
 import { allStationsSolved } from './engine.js';
 
 export const HINT_GIVER = 'Imani';
@@ -24,7 +24,7 @@ export function hintFor(state, level = 1) {
 }
 
 function stationHint(state, concrete) {
-  const open = CASE.stations.filter(station => !state.stations[station.id].solved);
+  const open = stationsByNumber().filter(station => !state.stations[station.id].solved);
   if (!concrete) {
     return hint(`Four wings, four clues. Still open: ${open.map(stationPlace).join('; ')}. The order does not matter.`);
   }
@@ -38,9 +38,9 @@ function stationHint(state, concrete) {
 
 function safeHint(state, concrete) {
   if (concrete || state.safe.attempts >= 2) {
-    return hint(`Read the four letters in your journal from left to right: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
+    return hint(`Put the four letters from your journal in this order: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
   }
-  return hint('The dial wants one word. Your journal keeps the four letters in a fixed order – not in the order you found them.');
+  return hint('The dial wants one word. Your journal lists the letters by station number – rearrange them.');
 }
 
 function accusationHint(state, concrete) {

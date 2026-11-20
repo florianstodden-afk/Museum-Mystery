@@ -1,5 +1,5 @@
 // The investigation journal: first a pure data model, then a renderer for any container.
-import { CASE, noteById } from './case-1.js';
+import { CASE, noteById, stationsByNumber } from './case-1.js';
 import { nextStep } from './engine.js';
 import { totalScore, maximumScore } from './scoring.js';
 import { el } from './dom.js';
@@ -19,13 +19,19 @@ export function evidenceChain(state) {
 export function journalModel(state) {
   return {
     mission: { title: CASE.mission.title, text: CASE.mission.text, read: state.missionRead },
-    slots: CASE.stations.map((station, index) => ({
-      stationId: station.id,
-      room: station.room,
-      spot: station.spot ?? null,
-      letter: state.letters[index] ?? '_',
-      solved: state.stations[station.id].solved,
-    })),
+    // By station number, not in code-word order: the gaps must not give the word away.
+    // A letter shows only once its station is solved; before that the slot shows "?".
+    slots: stationsByNumber().map(station => {
+      const solved = state.stations[station.id].solved;
+      return {
+        stationId: station.id,
+        number: station.number,
+        room: station.room,
+        spot: station.spot ?? null,
+        letter: solved ? state.letters[CASE.stations.indexOf(station)] ?? station.letter : '?',
+        solved,
+      };
+    }),
     // Evidence in the order it was found.
     evidence: state.evidence.map(id => {
       const station = CASE.stations.find(s => s.evidenceId === id);
@@ -38,19 +44,19 @@ export function journalModel(state) {
 }
 
 export function renderJournal(container, model, evidenceContainer = null) {
-  const slots = el('ol', { className: 'story-slots', attrs: { 'aria-label': 'Letters in fixed order' } });
+  const slots = el('ol', { className: 'story-slots', attrs: { 'aria-label': 'Letters by station number' } });
   const compactNames = { landscape: 'Catalogue', portraits: 'Portraits', restoration: 'Picture', archive: 'Frame rack' };
   for (const slot of model.slots) {
     // Found: only the room. Not found yet: room plus spot, so three Gallery stations can be told apart.
     const where = !slot.solved && slot.spot ? `${slot.room}, ${slot.spot}` : slot.room;
-    const label = slot.solved ? `${slot.room}: letter ${slot.letter}` : `${where}: not found yet`;
+    const label = slot.solved ? `Station ${slot.number}, ${slot.room}: letter ${slot.letter}` : `Station ${slot.number}, ${where}: not found yet`;
     slots.append(el('li', { className: slot.solved ? 'story-slot is-found' : 'story-slot', attrs: { 'aria-label': label } }, [
       el('span', { className: 'story-slot-letter', text: slot.letter, attrs: { 'aria-hidden': 'true' } }),
       el('span', { className: 'story-slot-room', attrs: { 'aria-hidden': 'true' } }, evidenceContainer
-        ? [compactNames[slot.stationId] ?? slot.room]
+        ? [`${slot.number} · ${compactNames[slot.stationId] ?? slot.room}`]
         : slot.solved || !slot.spot
-          ? [slot.room]
-          : [`${slot.room}, `, el('span', { className: 'story-slot-spot', text: slot.spot }), ' – not found yet']),
+          ? [`${slot.number} · ${slot.room}`]
+          : [`${slot.number} · ${slot.room}, `, el('span', { className: 'story-slot-spot', text: slot.spot }), ' – not found yet']),
     ]));
   }
 

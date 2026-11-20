@@ -179,7 +179,7 @@ export function createStoryHost(options) {
     tick();
     const station = CASE.stations.find(s => s.id === stationId);
     if (!station) return;
-    const { content, actions } = scene(`${station.room} · Station ${station.letter}`);
+    const { content, actions } = scene(`${station.room} · Station ${station.number}`);
     const stationOwnsControls = ['landscape', 'restoration', 'archive'].includes(stationId) && stations[stationId] && state.missionRead && !state.stations[stationId].solved;
     if (!stationOwnsControls) actions.append(closeButton('Back to the museum'));
     if (!state.missionRead) {

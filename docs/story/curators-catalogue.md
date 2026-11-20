@@ -2,7 +2,7 @@
 
 Built on GitHub `main` at `ca00e840019675144b826fbe9739820f2255d209` (checked 2026-11-19). The separate `curators-catalogue-main` checkout keeps the original working tree intact. No commit or push is needed to try it.
 
-Station B remains the middle Gallery painting at map position `(14, 3)`, approached from `(14, 4)` with **E**. Its sign says **B · CATALOGUE**. Both `main.js` and `dev/story-preview.js` register `curators-catalogue.js` under the existing `landscape` save ID. Its letter is still **B**; its evidence ID remains `false-label` and its clue remains **“Voss approved the false wall label.”** Matching the catalogue exposes the approval record.
+Station B remains the middle Gallery painting at map position `(14, 3)`, approached from `(14, 4)` with **E**. Its sign says **3 · CATALOGUE** (players see station numbers, the letter only after solving). Both `main.js` and `dev/story-preview.js` register `curators-catalogue.js` under the existing `landscape` save ID. Its letter is still **B**; its evidence ID remains `false-label` and its clue remains **“Voss approved the false wall label.”** Matching the catalogue exposes the approval record.
 
 ## Play
 

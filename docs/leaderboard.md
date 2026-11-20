@@ -12,6 +12,7 @@ Ein Ergebnis wird **nicht automatisch** gesendet: Erst nach einem Ende erscheint
 - Der Server nimmt nur abgeschlossene Ergebnisse auf der aktuellen 80-Punkte-Skala an. Alte Spielstände mit 85/90 möglichen Punkten bleiben lokal sichtbar, werden aber nicht in die gemeinsame Liste gemischt.
 - Pro Browser-Profil erzeugt das Spiel eine dauerhafte zufällige Kennung. Der Server behält pro Kennung den **höchsten Punktestand**. Gleiche Punktzahlen teilen sich denselben Platz. Zeit ist kein Sortierkriterium: Wiederholtes Lösen bekannter Rätsel verschafft dadurch keinen direkten Rangvorteil.
 - Ein lokaler Profilname wird als Anzeigename verwendet; Gäste erscheinen als `Guest-…`. Diese Namen sind vor der späteren Login-Verknüpfung **nicht verifiziert**.
+- **Grenzen:** Namen sind nicht verifiziert, und ein Ergebnis kann über die öffentliche Schnittstelle gefälscht werden. Der Worker prüft aber Format und Punkte-Obergrenze und lehnt alles andere ab.
 
 ## Wo es passiert
 

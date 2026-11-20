@@ -445,3 +445,10 @@ Porträt-Zeitleiste, Sound und JPG-Hintergründe integriert. Beide Kunstwerke (S
 - **Dokumentation:** `docs/art-credits.md` listet die aktiven Werke und direkten Met-Links. `docs/leaderboard.md` beschreibt Aufbau, Bereitstellung, Wertung und spätere Login-Anbindung. Alte Dokumente sind als historische Zustände markiert, damit die früheren Entscheidungen nachvollziehbar bleiben. Die Live-Schaltung benötigt ein Cloudflare-Konto und die öffentliche Worker-URL.
 - **Grenze:** Lokale Profile sind keine Online-Identität. Vor der späteren verifizierten Anmeldung sind öffentliche Namen und Ergebnisse nicht manipulationssicher.
 - **Prüfung:** 300 Browser-Spielmodul-Tests und vier Worker-Tests bestanden; `git diff --check` ohne Formatfehler. Ein Test über zwei echte Geräte ist erst nach Bereitstellung des Workers möglich.
+
+## 2026-11-20 · Gast-Button, Login-Meldungen, Stationsnummern, Credits (`feature/guest-rename-leaderboard`)
+- **M1:** „Continue as guest“ steht auf dem Startbildschirm unter Log In und Sign Up (dezent, Outline). Im Panel ist er weg, damit es ihn nur einmal gibt.
+- **M2:** Formular mit `novalidate`. `checkEntryInput` in `local-auth.js` prüft Name und Passwort; die Meldung steht in `#entry-message`, Fokus und `aria-invalid` auf dem Feld.
+- **M3:** Stationen heißen 1–4 in Laufrichtung: 1 Portraits (Hall), 2 Puzzle, 3 Catalogue, 4 Forgery (Gallery links → rechts). Buchstaben erscheinen erst nach dem Lösen. Journal und Scoreboard zeigen nach Stationsnummer, nicht B-I-L-D. Interne IDs und Speicherformat unverändert.
+- **M4:** Station 3 zeigt vor dem Lösen nur „Artwork 1 ↗“ … als Credits, danach die volle Zeile.
+- **M5:** offen. Node.js/npm fehlen auf dem Rechner, `npx wrangler login` geht nicht. Satz zu den Grenzen in README und `docs/leaderboard.md` ergänzt.

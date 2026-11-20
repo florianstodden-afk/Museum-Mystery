@@ -99,8 +99,8 @@ test('B shares L’s exact inclusive boundaries and scoreboard freezes the compl
     assert.equal(story.stations.landscape.points, pictureSpeedPoints(ms));
     assert.equal(story.stations.landscape.points, points);
     const board = scoreboard(story);
-    assert.equal(board.stations[0].timeMs, ms);
-    assert.equal(board.stations[0].max, 15);
+    assert.equal(board.stations.find(row => row.id === 'landscape').timeMs, ms);
+    assert.equal(board.stations.find(row => row.id === 'landscape').max, 15);
     assert.equal(board.max, 80);
     assert.equal(synchronizeScore(story, { landscape: progress }, 99999999), story);
   }
@@ -269,7 +269,7 @@ test('host recovers an interrupted final match exactly once and retains every le
     storage.setItem(storageKey, JSON.stringify({ story: JSON.stringify(legacy), progress: { landscape: { solved: true, mistakes: 1, hints: 1 } } }));
     const host = createStoryHost({ storage, storageKey });
     assert.equal(host.state.stations.landscape.points, points);
-    assert.equal(scoreboard(host.state).stations[0].points, points);
+    assert.equal(scoreboard(host.state).stations.find(row => row.id === 'landscape').points, points);
     assert.equal(maximumScore(host.state), 85);
     assert.deepEqual(host.state.evidence, ['false-label']);
   }
@@ -291,4 +291,25 @@ test('a correct match from an existing partial save is locked without resetting 
   assert.equal(p.saves.at(-1).startedAt, 1000);
   card(p.root, 1).click(); slots(p.root)[0].click();
   assert.deepEqual(p.saves.at(-1).slots, [0, null, null, null]);
+});
+
+test('before solving, the credits name no answer: only "Artwork 1 ↗" links to the Met pages', async t => {
+  const { root } = await page(t, { state: fresh() });   // started, nothing placed yet
+  const credit = findAll(root, n => (n.className ?? '').includes('catalogue-credits'))[0];
+  assert.ok(credit, 'credit area');
+  for (const work of works) {
+    for (const answer of [work.date, work.medium, work.culture, work.artistDisplayName, work.title]) {
+      assert.equal(credit.textContent.includes(answer), false, `credits must not show "${answer}"`);
+    }
+  }
+  const links = findAll(credit, n => n.tagName === 'A');
+  assert.deepEqual(links.map(a => a.textContent), ['Artwork 1 ↗', 'Artwork 2 ↗', 'Artwork 3 ↗', 'Artwork 4 ↗']);
+  assert.deepEqual(links.map(a => a.href), works.map(w => w.url));
+  assert.ok(links.every(a => a.target === '_blank' && a.rel.includes('noopener')));
+});
+
+test('after solving, the full credit line appears', async t => {
+  const { root } = await page(t, { state: finish(5000) });
+  const credit = findAll(root, n => (n.className ?? '').includes('catalogue-credits'))[0];
+  for (const work of works) assert.ok(credit.textContent.includes(work.artistDisplayName), work.artistDisplayName);
 });

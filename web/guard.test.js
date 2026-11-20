@@ -21,7 +21,7 @@ import { OBJECTS as MAP_OBJECTS, canEnter as canStep } from './engine.js';
 import { frontOfStation } from './guard.js';
 test('Station I hangs on the hall wall: reachable from the floor, Leon never blocks that spot', () => {
   const station = MAP_OBJECTS.find(o => o.id === 'ledger');
-  assert.equal(station.label, 'Portraits · Station I');
+  assert.equal(station.label, 'Portraits · Station 1');
   assert.ok(station.x < 9 && station.y === 3, 'on the hall wall row');
   const world = { room: 'museum', player: { x: station.x, y: station.y + 2 }, doorOpen: false };
   assert.equal(canStep(world, station.x, station.y + 1, { x: 2, y: 12 }), true, 'the spot in front is floor');

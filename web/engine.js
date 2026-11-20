@@ -11,13 +11,13 @@ export const START = { x: 3, y: 9 };
 //   { examine: id } looks at something, { vault: true } continues at the safe.
 // Stations 2–4 use existing spots until their own rooms exist.
 export const OBJECTS = [
-  // Station I comes before Leon: standing at the wall, a tie in distance picks the painting.
-  { id: "ledger", x: 4, y: 3, label: "Portraits · Station I", story: { station: "portraits" } }, // middle painting on the hall wall
+  // Station 1 comes before Leon: standing at the wall, a tie in distance picks the painting.
+  { id: "ledger", x: 4, y: 3, label: "Portraits · Station 1", story: { station: "portraits" } }, // middle painting on the hall wall
   { id: "guard", x: 5, y: 5, label: "Leon (night guard)", story: { talk: "leon" } },
-  { id: "painting", x: 14, y: 3, label: "Curator’s Catalogue · Station B", story: { station: "landscape" } },
-  { id: "frames", x: 16, y: 3, label: "Frame rack · Station D", story: { station: "archive" } },
+  { id: "painting", x: 14, y: 3, label: "Curator’s Catalogue · Station 3", story: { station: "landscape" } },
+  { id: "frames", x: 16, y: 3, label: "Frame rack · Station 4", story: { station: "archive" } },
   { id: "restorer", x: 15, y: 12, label: "Imani (conservator)", story: { talk: "imani" } },
-  { id: "note", x: 12, y: 3, label: "Picture puzzle · Station L", story: { station: "restoration" } },
+  { id: "note", x: 12, y: 3, label: "Picture puzzle · Station 2", story: { station: "restoration" } },
   { id: "vault", x: 23, y: 5, label: "The original painting", story: { vault: true } },
   { id: "curator", x: 21, y: 12, label: "Dr. Vale (curator)", story: { talk: "vale" } },
 ];
