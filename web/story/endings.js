@@ -18,7 +18,7 @@ export const ENDINGS = {
     ],
   },
   lost: {
-    kicker: 'CASE LOST',
+    kicker: 'BEFORE SUNRISE',
     title: 'Case lost',
     paragraphs: [
       'You named the wrong person three times. By sunrise, Voss and the original are gone. The museum will never know who planned it.',

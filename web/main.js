@@ -11,8 +11,8 @@ import * as catalogueStation from './minigames/curators-catalogue.js?v=credits-1
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=art-cards-1';
-import { createStoryHost } from './story/host.js?v=station-numbers-1';
-import { journalModel, renderJournal } from './story/journal.js';
+import { createStoryHost } from './story/host.js?v=oils-1';
+import { journalModel, renderJournal } from './story/journal.js?v=oils-1';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
