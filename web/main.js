@@ -4,9 +4,9 @@ import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
-import { createGalleryRenderer } from './gallery.js?v=forgery-sign-3';
+import { createGalleryRenderer } from './gallery.js?v=catalogue-sign-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-i-wall-2';
-import * as landscapeStation from './minigames/landscape.js';
+import * as catalogueStation from './minigames/curators-catalogue.js';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=art-cards-1';
@@ -68,7 +68,7 @@ const story = createStoryHost({
   onHome: showHome,
   sound,
   speech,
-  stations: { landscape: landscapeStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
+  stations: { landscape: catalogueStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
   storageKey: profileStorageKey('museum-nocturne-story-v1', activeProfile),
   ...(vaultPreview ? {storage: previewStorage} : {}),
 });

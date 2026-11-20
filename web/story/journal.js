@@ -39,7 +39,7 @@ export function journalModel(state) {
 
 export function renderJournal(container, model, evidenceContainer = null) {
   const slots = el('ol', { className: 'story-slots', attrs: { 'aria-label': 'Letters in fixed order' } });
-  const compactNames = { landscape: 'Wall label', portraits: 'Portraits', restoration: 'Picture', archive: 'Frame rack' };
+  const compactNames = { landscape: 'Catalogue', portraits: 'Portraits', restoration: 'Picture', archive: 'Frame rack' };
   for (const slot of model.slots) {
     // Found: only the room. Not found yet: room plus spot, so three Gallery stations can be told apart.
     const where = !slot.solved && slot.spot ? `${slot.room}, ${slot.spot}` : slot.room;

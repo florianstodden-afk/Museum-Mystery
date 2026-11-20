@@ -75,7 +75,7 @@ function linesForImani(state) {
     ]);
   }
   return talk([
-    'The picture puzzle is on the left side of the Gallery, beside the wall label and frame rack.',
+    'The picture puzzle is on the left side of the Gallery, beside Curator’s Catalogue and the frame rack.',
     'Restore Renoir’s Sea and Cliffs at Station L. I will then use the lamp to reveal the mark on the transport slip.',
   ]);
 }
@@ -195,7 +195,7 @@ function leonNight(state) {
 
 // Option 2: small talk about his round. What seemed odd to him points at the first open station.
 const ODD_ON_MY_ROUND = {
-  landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'The year looked wrong to me.'],
+  landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'Match the catalogue labels in the middle of the Gallery. They may reveal who approved it.'],
   portraits: ['Quiet, until you count the portraits.', 'Four ladies, and the cards beside them are all shuffled.'],
   restoration: ['Imani’s been muttering about a puzzle of Renoir’s cliffs.', 'Says it hides something on the back of a slip.'],
   archive: ['The frame archive door was ajar on my last round.', 'Archives don’t open themselves.'],

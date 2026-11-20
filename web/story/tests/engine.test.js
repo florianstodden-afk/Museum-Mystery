@@ -54,7 +54,7 @@ test('solving a station twice changes nothing', () => {
   const again = solveStation(s, 'landscape', { mistakes: 0, hints: 0 });
   assert.equal(again.ok, false);
   assert.equal(again.state, s);
-  assert.equal(s.stations.landscape.points, 17);
+  assert.equal(s.stations.landscape.points, 15);
 });
 
 test('actions never change the state object they receive', () => {

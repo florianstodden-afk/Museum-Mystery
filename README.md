@@ -6,6 +6,17 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 **Play it:** <https://florianstodden-afk.github.io/Museum-Mystery/>
 
+## Team
+
+| Name | Student number |
+|---|---|
+| Florian Baumgartl | 78089 |
+| Florian Stodden | 78574 |
+| Fabian Oscar Bergvall | 78922 |
+| Leo Johannes Oskar Heppe | 79527 |
+
+In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `FlorianBaumgartl78086`, Florian Stodden also as `florianstodden-afk` and Leo as `leomasterofcode`.
+
 ![The museum at night](docs/screenshots/readme-game.png)
 
 ## How to play
@@ -13,7 +24,8 @@ A small top-down detective game in the browser: walk through a museum at night, 
 - On the first screen, choose **Sign Up** to create a local profile, **Log In** to return to one, or **Continue as guest**. Profiles and their progress exist only in the browser on this device. They are not shared through GitHub or the online scoreboard. See [the login flow](docs/local-login.md).
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four stations (B, I, L, D) each give one letter. Together they open the vault.
-- In the vault, answer the final question. There are two endings and up to 85 points.
+- **Station B — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
+- In the vault, answer the final question. There are two endings and up to 80 points (older completed saves retain their original rewards).
 - The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 
@@ -47,18 +59,6 @@ GitHub Actions runs the same command for every pull request and after every merg
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
 | `web/dev/` | Preview pages, screenshots and browser checks |
 | `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
-
-## Stations and owners
-
-| Part | Owner |
-|---|---|
-| Station B – Gallery, middle painting | Fabian Bergvall |
-| Station I – Portrait Hall | Florian Baumgartl |
-| Station L – Renoir picture puzzle | Leopold Heppe |
-| Station D – Gallery, frame rack | Spot the Forgery — find any 3 of 5 differences |
-| Story engine | Florian Baumgartl |
-| Rooms and graphics | Fabian Bergvall |
-| Repository and setup | Florian Stodden |
 
 ## Credits
 

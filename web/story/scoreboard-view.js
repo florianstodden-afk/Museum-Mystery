@@ -22,6 +22,6 @@ export function renderScoreboard(container, board, best) {
       ` · time ${clock(board.timeMs)}`,
     ]),
     el('p', { className: 'scoreboard-best', text: best ? `Best run: ${best.points} / ${bestMaximum} points${earlierScale} · time ${clock(best.timeMs)}` : 'Best run: finish a run to set one.' }),
-    el('p', { className: 'scoreboard-rules', text: 'B: wrong answers and hints reduce points. I, L and D: faster completion earns more. The safe and final question also count.' }),
+    el('p', { className: 'scoreboard-rules', text: 'B, I, L and D: faster completion earns more. Earlier completed station rewards are retained. The safe and final question also count.' }),
   );
 }
