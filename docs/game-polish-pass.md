@@ -1,5 +1,7 @@
 # Feinschliff des bestehenden Spiels · 19.11.2026
 
+**Historischer Stand vor Station B „Curator’s Catalogue“ (PR #32).** Die folgenden Angaben zu zwei Landschaftswerken, Live-API, Antwortabzügen und 85 möglichen Punkten beschreiben den damaligen Stand. Aktuell nutzt das Spiel vier Met-Werke im [Curator’s Catalogue](story/curators-catalogue.md) und maximal 80 Punkte. Dieser Eintrag bleibt erhalten, damit die Entwicklung nachvollziehbar ist.
+
 Auftrag von Florian Stodden: Die vorhandenen Teile verbessern, ohne neue Story oder weitere Minispiele. Die Handyansicht ist ausdrücklich **später** dran.
 
 ## Was geändert wurde

@@ -21,13 +21,14 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 ## How to play
 
-- On the first screen, choose **Sign Up** to create a local profile, **Log In** to return to one, or **Continue as guest**. Profiles and their progress exist only in the browser on this device. They are not shared through GitHub or the online scoreboard. See [the login flow](docs/local-login.md).
+- On the first screen, choose **Sign Up** to create a local profile, **Log In** to return to one, or **Continue as guest**. Profiles and progress still exist only on this device. See [the login flow](docs/local-login.md).
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four stations (B, I, L, D) each give one letter. Together they open the vault.
 - **Station B — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question. There are two endings and up to 80 points (older completed saves retain their original rewards).
 - The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
+- The Home screen's **Scoreboard** shows your run and a transparent shared leaderboard. Finish a current run, then choose **Publish finished run** to submit its score. The online service must first be deployed and connected; [setup, scoring and login handoff](docs/leaderboard.md).
 
 ## Run locally
 
@@ -54,6 +55,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 | `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.png` | Page, home screen, menu and compact illustrated journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/local-auth.js` | Device-only username/password profiles and separate local saves |
+| `web/leaderboard.js`, `server/leaderboard/` | Shared score display and optional Cloudflare Worker/D1 service |
 | `web/engine.js` | Map and movement rules |
 | `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
@@ -62,7 +64,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 ## Credits
 
-Artworks and data: [The Metropolitan Museum of Art Collection API](https://metmuseum.github.io/), Open Access (Public Domain). The museum and all characters are fictional.
+Artworks and data: [The Metropolitan Museum of Art Collection API](https://metmuseum.github.io/), Open Access (Public Domain). [Every artwork and direct collection link](docs/art-credits.md). The museum and all characters are fictional.
 
 ## Course context
 

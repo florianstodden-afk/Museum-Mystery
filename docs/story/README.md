@@ -1,5 +1,7 @@
 # Story-Logik „Museum Nocturne“ (`web/story/`)
 
+**Historischer Architekturüberblick vom November 2026.** Die Tabellen unten nennen teilweise frühere Platzhalter und Punktwerte. Für den aktuellen Stand gelten [README](../../README.md), [Station B](curators-catalogue.md) und [Leaderboard](../leaderboard.md). Die alten Angaben bleiben als Entwicklungsgeschichte stehen.
+
 Die Story des Spiels als eigenständige, getestete Bausteine. Sie hängen **nicht** von der Karte ab. Seit dem 12.11.2026 sind sie im Hauptspiel eingebunden (`web/main.js` nutzt `createStoryHost`); wie das gemacht wurde: [integration-plan.md](integration-plan.md).
 
 ## Dateien

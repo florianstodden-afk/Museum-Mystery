@@ -15,6 +15,7 @@ import { journalModel, renderJournal } from './story/journal.js';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
+import { canPublish, loadLeaderboard, publicPlayer, publishRun, renderLeaderboard } from './leaderboard.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
@@ -588,6 +589,36 @@ const homeSettings=document.querySelector('#home-settings');
 const homeSettingsPanel=document.querySelector('#home-settings-panel');
 const homeScoreboard=document.querySelector('#home-scoreboard');
 const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
+const leaderboardStatus=document.querySelector('#leaderboard-status');
+const leaderboardResults=document.querySelector('#leaderboard-results');
+const leaderboardPublish=document.querySelector('#leaderboard-publish');
+let leaderboardBusy=false;
+async function refreshLeaderboard(){
+  leaderboardStatus.textContent='Loading shared results…';
+  try {
+    const data=await loadLeaderboard();
+    let ownId=null;
+    try { ownId=publicPlayer(localStorage,activeProfile).playerId; } catch {}
+    renderLeaderboard(leaderboardResults,data.entries,ownId);
+    leaderboardStatus.textContent='Results from all published players.';
+  } catch(error) {
+    leaderboardResults.replaceChildren();
+    leaderboardStatus.textContent=error.message;
+  }
+}
+document.querySelector('#leaderboard-refresh').addEventListener('click',refreshLeaderboard);
+leaderboardPublish.addEventListener('click',async()=>{
+  if(leaderboardBusy)return;
+  leaderboardBusy=true;leaderboardPublish.disabled=true;
+  leaderboardStatus.textContent='Publishing result…';
+  try {
+    const player=publicPlayer(localStorage,activeProfile);
+    await publishRun(scoreboard(story.state,story.progress),story.state.ending,player);
+    await refreshLeaderboard();
+    leaderboardStatus.textContent=`Published as ${player.name}. Your best score is kept.`;
+  } catch(error) { leaderboardStatus.textContent=error.message; }
+  finally { leaderboardBusy=false;leaderboardPublish.disabled=false; }
+});
 const homeConfirm=document.querySelector('#home-confirm');
 const journalOverlay=document.querySelector('#sidebar');
 const gameJournalToggle=document.querySelector('#game-journal-toggle');
@@ -740,6 +771,7 @@ function showHome(){
   // A finished run may become the best run (stored on this device only).
   const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
+  leaderboardPublish.hidden=!canPublish(board);
   showSaveNotice();
   closeHomePanels();
   (homeStart.disabled?homeNew:homeStart).focus();
@@ -779,7 +811,7 @@ document.querySelector('#home-switch-profile').addEventListener('click',()=>{
 homeScoreboard.addEventListener('click',()=>{
   const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
   homeScoreboard.setAttribute('aria-expanded',String(opening));
-  if(opening)homeScoreboardPanel.querySelector('button').focus();
+  if(opening){homeScoreboardPanel.querySelector('button').focus();refreshLeaderboard();}
 });
 homeScreen.querySelectorAll('[data-close-home-panel]').forEach(button=>button.addEventListener('click',()=>{
   const opener=button.closest('#home-settings-panel')?homeSettings:homeScoreboard;
