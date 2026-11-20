@@ -10,9 +10,9 @@ test('moving guard collision and interaction use his current position',()=>{
   assert.notEqual(nearbyObject(s,{x:7,y:6})?.id,'guard');
 });
 test('patrol stays in room and avoids player and occupied tiles',()=>{
-  const s={...initialState(),player:{x:4,y:5}}, guard={x:5,y:5};
+  const s={...initialState(),player:{x:4,y:8}}, guard={x:5,y:8};
   const options=guardOptions(s,guard);
-  assert.ok(options.length); assert.ok(options.every(p=>!(p.x===4&&p.y===5)));
+  assert.ok(options.length); assert.ok(options.every(p=>!(p.x===4&&p.y===8)));
   assert.equal(chooseGuardAction(s,guard,()=>0).kind,'wait');
   assert.equal(chooseGuardAction(s,guard,()=>0.8).kind,'walk');
 });
@@ -37,4 +37,13 @@ test('in front of Station I, E opens the station even when Leon stands one step 
   const station = MAP_OBJECTS.find(o => o.id === 'ledger');
   const s = { ...initialState(), player: { x: station.x, y: station.y + 1 } };
   assert.equal(nearbyObject(s, { x: station.x - 1, y: station.y + 2 }).id, 'ledger');
+});
+
+test('Leon patrols away from Station I and never takes its interaction', () => {
+  const player = {x: 4, y: 4.1};
+  const world = {...initialState(), player};
+  for(let x=2;x<=7;x++) for(let y=8;y<=14;y++) {
+    assert.equal(nearbyObject(world,{x,y})?.id,'ledger');
+    for (const next of guardOptions(world,{x,y})) assert.ok(next.y>=8);
+  }
 });
