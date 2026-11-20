@@ -17,6 +17,8 @@ import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wh
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
 import { canPublish, loadLeaderboard, publicPlayer, publishRun, renderLeaderboard } from './leaderboard.js';
+import { LEADERBOARD_URL } from './leaderboard-config.js';
+import { localRunsStore, renderLocalRuns } from './story/local-runs.js?v=1';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
@@ -57,6 +59,7 @@ const speech = createSpeechBox(document.body, {
 });
 
 // The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
+const localRuns=localRunsStore((()=>{try{return localStorage;}catch{return null;}})());
 const story = createStoryHost({
   openPanel(title) {
     showDialog(title, '', []);
@@ -68,6 +71,11 @@ const story = createStoryHost({
   onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
   onHome: showHome,
+  // Each finished run (won or lost) goes into the local list of this browser.
+  onFinished(finalState, progress) {
+    const board = scoreboard(finalState, progress);
+    localRuns.add({ name: activeProfile || 'Guest', points: board.points, max: board.max, timeMs: board.timeMs, status: board.status });
+  },
   sound,
   speech,
   stations: { landscape: catalogueStation, restoration: pictureStation, portraits: portraitStation, archive: forgeryStation },
@@ -585,6 +593,9 @@ const leaderboardStatus=document.querySelector('#leaderboard-status');
 const leaderboardResults=document.querySelector('#leaderboard-results');
 const leaderboardPublish=document.querySelector('#leaderboard-publish');
 let leaderboardBusy=false;
+// The online leaderboard stays hidden until server/leaderboard is deployed and LEADERBOARD_URL is set.
+const ONLINE=Boolean(LEADERBOARD_URL);
+document.querySelector('#leaderboard-online').hidden=!ONLINE;
 async function refreshLeaderboard(){
   leaderboardStatus.textContent='Loading shared results…';
   try {
@@ -768,7 +779,8 @@ function showHome(){
   // A finished run may become the best run (stored on this device only).
   const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max,status:board.status}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
-  leaderboardPublish.hidden=!canPublish(board);
+  renderLocalRuns(document.querySelector('#local-runs-results'),localRuns.top());
+  leaderboardPublish.hidden=!ONLINE || !canPublish(board);
   showSaveNotice();
   closeHomePanels();
   (homeStart.disabled?homeNew:homeStart).focus();
@@ -808,7 +820,7 @@ document.querySelector('#home-switch-profile').addEventListener('click',()=>{
 homeScoreboard.addEventListener('click',()=>{
   const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
   homeScoreboard.setAttribute('aria-expanded',String(opening));
-  if(opening){homeScoreboardPanel.querySelector('button').focus();refreshLeaderboard();}
+  if(opening){homeScoreboardPanel.querySelector('button').focus();if(ONLINE)refreshLeaderboard();}
 });
 homeScreen.querySelectorAll('[data-close-home-panel]').forEach(button=>button.addEventListener('click',()=>{
   const opener=button.closest('#home-settings-panel')?homeSettings:homeScoreboard;

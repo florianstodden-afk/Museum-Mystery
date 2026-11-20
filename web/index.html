@@ -57,7 +57,12 @@
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close scoreboard">×</button>
         <h2>Scoreboard</h2>
         <div id="home-scoreboard-result"></div>
-        <section class="leaderboard" aria-labelledby="leaderboard-title">
+        <section class="leaderboard local-runs" aria-labelledby="local-runs-title">
+          <h3 id="local-runs-title">Local results</h3>
+          <div id="local-runs-results"></div>
+          <p class="leaderboard-note">Finished runs of all profiles and guests in this browser. Nothing is sent online.</p>
+        </section>
+        <section id="leaderboard-online" class="leaderboard" aria-labelledby="leaderboard-title" hidden>
           <h3 id="leaderboard-title">Museum Leaderboard</h3>
           <p id="leaderboard-status" role="status" aria-live="polite">Loading shared results…</p>
           <div id="leaderboard-results"></div>
