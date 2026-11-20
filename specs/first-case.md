@@ -1,28 +1,28 @@
-# Aufgabe 1: Ein vollständiger lokaler Museum-Mystery-Fall
+# Task 1: A complete local Museum Mystery case
 
-## Warum?
+## Why?
 
-Wir brauchen einen kleinen, durchspielbaren Fall, dessen Regeln jedes Teammitglied erklären kann. Kunstwerke und Bilder sollen aus der Met Collection API kommen; der Spielstand soll einen App-Neustart überstehen.
+We need a small, playable case whose rules every team member can explain. Artworks and images should come from the Met Collection API; the game state should survive an app restart.
 
-## Was?
+## What?
 
-Sechs Met-Objekt-IDs: 436535 (Ziel), 459193, 436121, 12127, 435882 und 435876. Diese sechs wurden am 09.11.2026 mit `isPublicDomain=true`, öffentlichem Bild, Künstler, Datum und Medium überprüft. Die ursprünglich ausgewählten 437133 und 10393 waren ungeeignet und wurden nach einem App-Fehler ersetzt; siehe Arbeitsprotokoll. Das Ziel ist *Wheat Field with Cypresses* (1889) von Vincent van Gogh. Bilder und Metadaten werden beim Start über den Objekt-Endpunkt abgefragt und für 24 Stunden im laufenden Streamlit-Prozess zwischengespeichert.
+Six Met object IDs: 436535 (target), 459193, 436121, 12127, 435882 and 435876. These six were checked on 09.11.2026 for `isPublicDomain=true`, a public image, artist, date and medium. The originally chosen 437133 and 10393 were unsuitable and were replaced after an app error; see the work log. The target is *Wheat Field with Cypresses* (1889) by Vincent van Gogh. Images and metadata are requested from the object endpoint at startup and cached for 24 hours in the running Streamlit process.
 
-Ein kostenloser Hinweis beschreibt das Werk als Landschaft im Freien. Damit bleiben zunächst das Ziel und *Road in Etten* (1881) möglich. Der erste bezahlte Hinweis „nach 1885“ unterscheidet die beiden. Drei weitere Hinweise kosten je 15 von anfänglich 100 Punkten. Ein erster falscher Tipp kostet 25 Punkte und schließt das gewählte Werk aus. Ein zweiter falscher Tipp beendet den Fall; ein richtiger Tipp gewinnt. Ein ungültiger oder wiederholter Tipp sowie Aktionen nach Spielende werden abgelehnt. Der lokale Versuch wird in SQLite gespeichert. Nach Ende darf man einen neuen Übungsversuch beginnen.
+A free clue describes the work as an outdoor landscape. That leaves the target and *Road in Etten* (1881) possible at first. The first paid clue, “after 1885”, tells the two apart. Three further clues cost 15 each of the starting 100 points. A first wrong guess costs 25 points and rules out the chosen work. A second wrong guess ends the case; a right guess wins. An invalid or repeated guess and any action after the game has ended are rejected. The local attempt is stored in SQLite. After the end, a new practice attempt may be started.
 
-## Außerhalb dieser Aufgabe
+## Outside this task
 
-Echte Benutzerkonten, gewertete Versuche, Bestenliste, mehrere Fälle, Hosting und Live-Multiplayer. Die lokale Datenbank ist ein Demo-Spielstand für **einen** Rechner und keine geteilte Online-Datenbank.
+Real user accounts, scored attempts, a leaderboard, several cases, hosting and live multiplayer. The local database is a demo save for **one** computer and not a shared online database.
 
-## Fertig, wenn …
+## Done when …
 
-- `uv run pytest` die Regeln und einen erneuten Datenbankzugriff prüft.
-- Die App sechs echte Met-Bilder mit Quellenlink zeigt und bei API-Ausfall eine verständliche Fehlermeldung liefert.
-- Richtiges Raten gewinnt; erster Fehlversuch zieht 25 Punkte ab; zweiter Fehlversuch verliert.
-- Bezahlte Hinweise kosten je 15 Punkte und enden nach drei Käufen.
-- Ein abgeschlossener Versuch lässt keine weiteren Tipps oder Käufe zu.
-- Nach Beenden und Neustarten der App ist der lokale Spielstand noch da; nach „Neuen Übungsversuch starten“ ist er zurückgesetzt.
+- `uv run pytest` checks the rules and a second database access.
+- The app shows six real Met images with a source link and gives an understandable error message if the API fails.
+- A right guess wins; the first wrong guess deducts 25 points; the second wrong guess loses.
+- Paid clues cost 15 points each and stop after three purchases.
+- A finished attempt allows no further guesses or purchases.
+- After closing and restarting the app the local save is still there; after “Start new practice attempt” it is reset.
 
-## Verständnispfad
+## Path to understanding
 
-`app.py` zeigt Werke und Buttons; `game.py` berechnet ausschließlich gültige Zustandsänderungen; `storage.py` speichert und lädt den Zustand in SQLite. `tests/` prüft Regeln und Speicherung. Die Met API liefert Bild und sachliche Werkinformationen. Die Ziel-ID und Hinweise sind kuratiert, damit die Lösung geprüft werden kann.
+`app.py` shows the works and buttons; `game.py` computes only valid state changes; `storage.py` saves and loads the state in SQLite. `tests/` checks rules and storage. The Met API delivers the image and factual information about the work. The target ID and clues are curated so the solution can be checked.

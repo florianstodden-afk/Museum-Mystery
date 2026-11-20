@@ -16,6 +16,9 @@ export function evidenceChain(state) {
   }));
 }
 
+// Shown in the journal until M's message has been read, so an empty journal does not look broken.
+export const BLANK_JOURNAL = 'The pages are still blank. The night has not begun.';
+
 export const WHO_WAS_M = {
   id: 'who-was-m',
   title: 'Case notes · Who was M?',
@@ -73,6 +76,7 @@ export function renderJournal(container, model, evidenceContainer = null) {
       el('li', {}, [el('strong', { text: `${item.room}: ` }), item.text])))
     : el('p', { className: 'story-muted', text: 'No evidence yet.' });
 
+  const blank = model.mission.read ? null : el('p', { className: 'story-muted story-journal-blank', text: BLANK_JOURNAL });
   const allNotes = [...model.notes, ...(model.caseNotes ?? [])];
   const notes = allNotes.length
     ? el('ul', { className: 'story-list' }, allNotes.map(note =>
@@ -88,6 +92,7 @@ export function renderJournal(container, model, evidenceContainer = null) {
     );
     container.replaceChildren(
       el('section', { className: 'story-journal' }, [
+        ...(blank ? [blank] : []),
         el('div', { className: 'story-next' }, [el('strong', { text: 'Next: ' }), model.nextStep]),
         slots,
       ]),
@@ -98,6 +103,7 @@ export function renderJournal(container, model, evidenceContainer = null) {
   container.replaceChildren(
     el('section', { className: 'story-journal' }, [
       el('p', { className: 'story-eyebrow', text: 'INVESTIGATION JOURNAL' }),
+      ...(blank ? [blank] : []),
       el('div', { className: 'story-next' }, [el('strong', { text: 'Next step: ' }), model.nextStep]),
       el('h3', { className: 'story-heading', text: 'Letters' }),
       slots,

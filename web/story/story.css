@@ -126,9 +126,10 @@ a.story-button { display: inline-block; text-decoration: none; }
 .story-ending{position:relative;width:100%;height:100%;overflow:hidden;background-size:cover;background-position:center;color:#f8e9c9}
 .story-ending.is-heist{background-image:url('../assets/ending-thief-background.jpg')}
 .story-ending.is-open-file{background-image:url('../assets/ending-not-thief-background.jpg')}
-.story-ending-plaque{position:absolute;top:22%;left:30%;width:40%;height:27%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:1% 1.5%;box-sizing:border-box}
+/* The plaque art has two fields split by a gold line at 39% of the image height: title above, story text below. */
+.story-ending-plaque{position:absolute;top:23.5%;left:30%;width:40%;height:14.5%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1.5%;box-sizing:border-box}
 .story-ending-plaque .story-eyebrow{margin:0 0 1%;font-size:clamp(.6rem,.9vw,.88rem);letter-spacing:.16em;color:#d5ad62}
-.story-ending-plaque .story-text{max-width:95%;margin:auto 0 0;font-size:clamp(.82rem,1.35vw,1.2rem);line-height:1.3;color:#f7e7cb;text-wrap:balance}
+.story-ending-plaque .story-text{position:absolute;left:6%;right:6%;top:119%;height:62%;display:flex;align-items:center;justify-content:center;margin:0;font-size:clamp(.72rem,1.12vw,1.05rem);line-height:1.3;color:#f7e7cb;text-wrap:balance}
 .story-ending-bottom{position:absolute;left:4%;right:4%;bottom:2.5%;display:flex;align-items:end;justify-content:space-between;gap:20px}
 .story-ending-controls{text-align:right;min-width:0}
 .story-ending-total{font:700 clamp(1rem,1.6vw,1.45rem) Fraunces,Georgia,serif;color:#f5d18b;margin:0 0 7px;text-shadow:0 2px 5px #000}
@@ -145,7 +146,7 @@ a.story-button { display: inline-block; text-decoration: none; }
   .story-ending{background-position:68% center}
   .story-ending-plaque{top:13%;left:5%;width:90%;height:auto;min-height:160px;padding:16px 12px;border:1px solid #b99053;border-radius:10px;background:#081922ed;box-shadow:0 10px 35px #000a}
   .story-ending-title{font-size:clamp(1.6rem,7vw,2.4rem)}
-  .story-ending-plaque .story-text{margin:14px 0 0;font-size:.95rem}
+  .story-ending-plaque .story-text{position:static;height:auto;display:block;margin:14px 0 0;font-size:.95rem}
   .story-ending-bottom{left:5%;right:5%;bottom:max(3%,env(safe-area-inset-bottom));align-items:center;flex-direction:column;gap:10px;padding:12px;border:1px solid #b99053;border-radius:10px;background:#081922eb}
   .story-ending-figure{max-width:100%}.story-ending-figure img{width:54px !important;height:54px}
   .story-ending-controls{text-align:center}.story-ending-actions{justify-content:center}

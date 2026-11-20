@@ -1,32 +1,32 @@
-# In-game menu: Spielansicht aufräumen
+# In-game menu: tidying up the game view
 
-Stand: 17.11.2026. Auftrag von Florian Stodden; Umsetzung mit Codex auf Branch `codex/in-game-menu`. Die Bilddatei `Gemini_Generated_Image_wqqnhqwqqnhqwqqn.jpg` war eine **Gestaltungsreferenz**, kein fertiges Layout. Sie wurde nicht als Spielgrafik kopiert.
+Status: 17.11.2026. Assignment from Florian Stodden; implemented with Codex on branch `codex/in-game-menu`. The image file `Gemini_Generated_Image_wqqnhqwqqnhqwqqn.jpg` was a **design reference**, not a finished layout. It was not copied as a game graphic.
 
-## Gewünschter Ablauf
+## Wanted flow
 
-Nach Gast-Einstieg und Home Screen beginnt die Mission mit Ms Nachricht. Während des Spielens sieht man das Museum und oben rechts nur ein Zahnrad. Titel, WASD-Text und die bisherigen Sound-, Music-, Hint- und New-Game-Knöpfe stehen nicht mehr über der Szene. Ein Klick auf das Zahnrad öffnet das In-game-Menü. Dort stehen Sound, Music, Hint, Journal, Resume Game und Exit to Main Menu. Weder eine Steuerungsanleitung noch New Game stehen in diesem Menü. Einen neuen Spielstand startet man weiterhin über den Home Screen mit Bestätigung, falls schon Fortschritt vorhanden ist.
+After the guest entry and the home screen, the mission starts with M’s message. While playing you see the museum and only a gear icon at the top right. The title, the WASD text and the former Sound, Music, Hint and New Game buttons no longer sit above the scene. A click on the gear opens the in-game menu. It holds Sound, Music, Hint, Journal, Resume Game and Exit to Main Menu. Neither control instructions nor New Game are in this menu. A new game is still started from the home screen, with a confirmation if there is already progress.
 
-## Welche Datei macht was?
+## Which file does what?
 
-| Datei | Änderung und Grund |
+| File | Change and reason |
 |---|---|
-| `web/index.html` | Entfernt die alte Text- und Knopfleiste, setzt den Zahnradknopf vor die Spielszene und enthält das neue Menü als echte HTML-Schaltflächen. Die Schaltflächen behalten ihre IDs; vorhandene Ton- und Storyfunktionen können sie weiter benutzen. |
-| `web/style.css` | Zeichnet ein dunkles, halbtransparentes Menü mit Goldrand. Die laufende Museumsszene bleibt dahinter sichtbar. Größe und Abstände passen sich schmalen Bildschirmen an. |
-| `web/main.js` | Öffnet und schließt das Menü, hält die Figur währenddessen an, pausiert die Zeichenbewegung und unterbindet Bewegungstasten. Hint und Journal schließen das Menü zuerst. Resume setzt das Spiel fort; Exit öffnet den Home Screen. Das Zahnrad ist während Dialogen und auf den Einstiegsbildschirmen unsichtbar. |
+| `web/index.html` | Removes the old text and button bar, places the gear button in front of the game scene and contains the new menu as real HTML buttons. The buttons keep their IDs; existing sound and story functions can keep using them. |
+| `web/style.css` | Draws a dark, semi-transparent menu with a gold border. The running museum scene stays visible behind it. Size and spacing adapt to narrow screens. |
+| `web/main.js` | Opens and closes the menu, stops the character meanwhile, pauses drawing movement and blocks movement keys. Hint and Journal close the menu first. Resume continues the game; Exit opens the home screen. The gear is hidden during dialogues and on the entry screens. |
 
-Die Steuerung des Spiels bleibt funktionsfähig. Auf Geräten mit Touch-Eingabe bleiben die tatsächlichen Bewegungsknöpfe erhalten; nur die dauerhafte **Erklärung** der Steuerung in der Spielansicht und im Menü fällt weg. Die Kunstwerkquellen sind weiterhin im Journal aufgeführt.
+The game controls keep working. On touch devices the actual movement buttons remain; only the permanent **explanation** of the controls in the game view and in the menu is gone. The artwork sources are still listed in the journal.
 
-## So kann die Gruppe es nachvollziehen
+## How the group can follow it
 
-1. Spiel öffnen → „Log In“ oder „Sign Up“ → „Continue as guest“ → „Start New Game“ → Ms Nachricht akzeptieren.
-2. Prüfen: Im Museum ist nur das Zahnrad zu sehen. Titel, WASD-Hinweis und alte Knopfleiste fehlen.
-3. Zahnrad öffnen → Sound und Music umschalten. Die Zustände ändern sich direkt und werden wie bisher lokal gespeichert.
-4. Hint öffnen → Hinweisdialog; nach dem Schließen zurück zur Szene. Menü erneut öffnen → Journal → Journal erscheint über der Szene.
-5. Zahnrad → Resume Game → weiterlaufen. Zahnrad → Exit to Main Menu → Home Screen mit Resume Game. Ein Neustart bleibt dort möglich.
+1. Open the game → “Log In” or “Sign Up” → “Continue as guest” → “Start New Game” → accept M’s message.
+2. Check: in the museum only the gear is visible. Title, WASD hint and old button bar are gone.
+3. Open the gear → toggle Sound and Music. The states change immediately and are saved locally as before.
+4. Open Hint → hint dialog; after closing, back to the scene. Open the menu again → Journal → the journal appears over the scene.
+5. Gear → Resume Game → keep walking. Gear → Exit to Main Menu → home screen with Resume Game. A restart is still possible there.
 
-## Prüfung bei der Umsetzung
+## Checks during implementation
 
-- `node --test` im Ordner `web`: 217 bestanden, 0 fehlgeschlagen.
-- `node --check main.js` und `git diff --check`: ohne Fehler.
-- Lokaler Browser: Gast-Einstieg, Home Screen, Ms Missionsnachricht, Zahnradmenü, Ton- und Musikschalter, Hinweis, Journal, Resume und Exit to Main Menu durchgeklickt. Das Menü zeigte weder Steuerung noch New Game.
-- Noch von der Gruppe zu prüfen: vollständiger Spieldurchlauf bis zu beiden Enden und Ansicht auf einem echten Smartphone.
+- `node --test` in the `web` folder: 217 passed, 0 failed.
+- `node --check main.js` and `git diff --check`: no errors.
+- Local browser: clicked through guest entry, home screen, M’s mission message, gear menu, sound and music toggles, hint, journal, Resume and Exit to Main Menu. The menu showed neither controls nor New Game.
+- Still to be checked by the group: a complete playthrough to both endings and the view on a real smartphone.

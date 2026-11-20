@@ -18,7 +18,7 @@ function loadImage(path) {
   return image;
 }
 
-const hall = loadImage('../assets/great-hall-nyc.jpg');
+const hall = loadImage('../assets/great-hall-nyc.webp');
 const wheatField = loadImage('../assets/met-436535.jpg');
 const madameX = loadImage('../assets/met-12127.jpg');
 

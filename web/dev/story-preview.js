@@ -84,7 +84,7 @@ function renderRooms(state) {
   const cards = [];
   cards.push(roomCard({
     title: 'Great Hall',
-    image: new URL('../assets/great-hall-nyc.jpg', import.meta.url).href,
+    image: new URL('../assets/great-hall-nyc.webp', import.meta.url).href,
     text: state.missionRead ? 'M’s message is in your pocket. The wings are open.' : 'Your phone buzzes. A message from M.',
     actions: [button(state.missionRead ? 'Read M’s message again' : 'Read M’s message', () => story.showMission())],
   }));

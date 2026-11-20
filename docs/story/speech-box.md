@@ -1,39 +1,39 @@
-# Sprechblase (Speech Box)
+# Speech box
 
-Alle Figuren (Leon, Imani, Dr. Vale) sprechen in einer kleinen Sprechblase unten im Spielfeld, wie in klassischen Konsolen-RPGs. Die Welt bleibt dahinter sichtbar. Vorlage: `docs/screenshots/guard-speech-mockup.png`.
+All characters (Leon, Imani, Dr. Vale) talk in a small speech box at the bottom of the game view, as in classic console RPGs. The world stays visible behind it. Reference: `docs/screenshots/guard-speech-mockup.png`.
 
-## Drei Teile, drei Dateien
+## Three parts, three files
 
-| Datei | Aufgabe | DOM? |
+| File | Purpose | DOM? |
 |---|---|---|
-| `web/story/dialogues.js` → `conversationFor(id, state)` | **Was** gesagt wird: Leon hat Begrüßung, zwei Fragen und Verabschiedung; Imani und Dr. Vale haben ihre bisherigen Textzeilen. Hängt vom Spielstand ab. | nein |
-| `web/story/proximity.js` → `talkPartner(...)`, `shouldCloseTalk(...)` | **Wer** nach `E` spricht und **wann** die Box wieder schließt. | nein |
-| `web/story/speech-box.js` → `createSpeechBox(parent, ...)` | **Wie** es aussieht: Namensschild, Textbox, Schreibmaschinen-Effekt, Knöpfe, Tasten. | ja |
+| `web/story/dialogues.js` → `conversationFor(id, state)` | **What** is said: Leon has a greeting, two questions and a goodbye; Imani and Dr. Vale have their existing lines. Depends on the game state. | no |
+| `web/story/proximity.js` → `talkPartner(...)`, `shouldCloseTalk(...)` | **Who** talks after `E` and **when** the box closes again. | no |
+| `web/story/speech-box.js` → `createSpeechBox(parent, ...)` | **How** it looks: name tag, text box, typewriter effect, buttons, keys. | yes |
 
-Dazu: Styles mit Präfix `speech-` in `web/story/story.css`, Anschluss in `web/story/host.js` (`talkTo` nutzt die Box, wenn es ein Gespräch gibt) und in `web/main.js` (Abstandsprüfung im Spiel-Loop, Figur und Leon pausieren).
+Also: styles with the prefix `speech-` in `web/story/story.css`, the connection in `web/story/host.js` (`talkTo` uses the box when there is a conversation) and in `web/main.js` (distance check in the game loop, player and Leon pause).
 
-## Ablauf
+## Flow
 
-1. Alle Personen (Leon, Imani, Dr. Vale) sprechen nur nach **E**. Über der Person steht dann „E Name“. `main.js` (`handleInteract`) fragt `talkPartner(objekt, PEOPLE)`, welche Figur zum Kartenobjekt gehört, und öffnet ihre Box. Näherkommen allein öffnet nichts.
-2. Jedes Bild prüft `main.js` (`checkTalkDistance`), wie weit die Spielfigur von der sprechenden Person entfernt ist. Gemessen wird auf dem Bildschirm (100 Pixel = 1 Schritt), weil der Boden perspektivisch gezeichnet ist.
-3. Über **1,5 Schritten** schließt die Box (`shouldCloseTalk`). Man darf also einfach weggehen.
-4. Leon bekommt Begrüßung, zwei Fragen und eine freiwillige Verabschiedung. Eine beantwortete Frage verschwindet für das aktuelle Gespräch. Nach der zweiten Antwort endet das Gespräch beim nächsten Weiterklicken automatisch. Bei erneutem **E** sind beide Fragen wieder verfügbar.
-5. Imani sagt ihre bisherigen Sätze und schließt nach der letzten Zeile beim nächsten Weiterklicken automatisch. Ein neues **E** beginnt ihr Gespräch erneut. Dr. Vale behält den bisherigen „Goodbye.“-Knopf.
+1. All characters (Leon, Imani, Dr. Vale) talk only after **E**. Above the character it then says “E Name”. `main.js` (`handleInteract`) asks `talkPartner(object, PEOPLE)` which character belongs to the map object and opens their box. Coming close alone opens nothing.
+2. Every frame, `main.js` (`checkTalkDistance`) checks how far the player is from the speaking character. It is measured on screen (100 pixels = 1 step), because the floor is drawn in perspective.
+3. Beyond **1.5 steps** the box closes (`shouldCloseTalk`). So you can simply walk away.
+4. Leon has a greeting, two questions and an optional goodbye. An answered question disappears for the current conversation. After the second answer, the conversation ends automatically on the next click. With a new **E** both questions are available again.
+5. Imani says her existing lines and closes automatically on the next click after the last line. A new **E** starts her conversation again. Dr. Vale keeps the existing “Goodbye.” button.
 
-Während eine Person spricht, schaut sie zur Figur (`facingToward`). Leon bleibt dabei stehen. Imani schaut in der Gallery weiter nach vorn, weil `gallery.js` sie zeichnet und dort nicht geändert wurde.
+While a character talks, they look at the player (`facingToward`). Leon stands still meanwhile. In the Gallery Imani keeps looking forward, because `gallery.js` draws her and was not changed there.
 
-## Bedienung
+## Controls
 
-- Maus/Touch: Knöpfe anklicken, Klick in die Box = weiter.
-- Tastatur: `1` `2` `3` wählen, soweit Knöpfe vorhanden sind; `Tab` wechselt zwischen ihnen, `Enter` wählt. Nach Leons erster Frage rückt die andere Frage auf `1`.
-- `Leertaste` / `E`: Satz sofort ganz zeigen, dann weiter.
-- `Escape`: schließen. Laufen (`W A S D`, Pfeile) geht weiter; wer weggeht, schließt die Box.
-- Text erscheint mit 35 Zeichen pro Sekunde; bei `prefers-reduced-motion` sofort ganz. `aria-live="polite"` liest den Text vor.
-- Steht die Figur unten im Bild, rückt die Box nach oben (`setPlacement('top')`).
+- Mouse/touch: click the buttons, click in the box = continue.
+- Keyboard: `1` `2` `3` choose, as far as buttons exist; `Tab` switches between them, `Enter` chooses. After Leon’s first question the other question moves to `1`.
+- `Space` / `E`: show the sentence in full at once, then continue.
+- `Escape`: close. Walking (`W A S D`, arrows) keeps working; walking away closes the box.
+- Text appears at 35 characters per second; with `prefers-reduced-motion` all at once. `aria-live="polite"` reads the text aloud.
+- If the player stands at the bottom of the view, the box moves to the top (`setPlacement('top')`).
 
-## Eigene Fragen für eine weitere Figur (z. B. Imani)
+## Own questions for another character (e.g. Imani)
 
-1. In `dialogues.js` eine Funktion `imaniConversation(state)` schreiben, die `{ greeting, questions, goodbye }` zurückgibt, und sie in `conversationFor` eintragen: `{ leon: leonConversation, imani: imaniConversation }`. Regeln: Fragen klingen wie Smalltalk, höchstens zwei kurze Sätze pro Box, keine Lösung verraten.
-2. Tests in `web/story/tests/conversation.test.js` ergänzen.
+1. In `dialogues.js` write a function `imaniConversation(state)` that returns `{ greeting, questions, goodbye }`, and register it in `conversationFor`: `{ leon: leonConversation, imani: imaniConversation }`. Rules: questions sound like small talk, at most two short sentences per box, never give away a solution.
+2. Add tests in `web/story/tests/conversation.test.js`.
 
-Eine ganz neue Person kommt in `PEOPLE` in `main.js` dazu (Kartenobjekt → Figur), plus ihr Raum in `personDistance`.
+A completely new character is added to `PEOPLE` in `main.js` (map object → character), plus their room in `personDistance`.

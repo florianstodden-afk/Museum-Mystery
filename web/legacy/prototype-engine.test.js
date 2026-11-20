@@ -74,7 +74,7 @@ test('a real walking route reaches both endings',()=>{
   }
   assert.equal(hasAllEvidence(state),true);
   assert.equal(state.pass,true);
-  // Von der Galerie aus ist das Depot erst nach Interaktion an der Tür erreichbar.
+  // From the gallery, the storage room is reachable only after interacting with the door.
   state=at(state,17,9);
   assert.equal(move(state,1,0),state);
   assert.equal(openVault(state,'0000').state.vaultOpen,false);

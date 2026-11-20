@@ -1,53 +1,53 @@
-# Gemeinsames Leaderboard · 20.11.2026
+# Shared leaderboard · 20.11.2026
 
-**Aktueller Stand:** Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed. Solange `LEADERBOARD_URL` in `web/leaderboard-config.js` leer ist, zeigt die Tafel nur die lokale Liste (bis zu 10 beendete Läufe aller Profile und Gäste dieses Browsers, sortiert nach Punkten, bei Gleichstand nach kürzerer Zeit, Status Won/Lost). Die Online-Abschnitte, **Refresh** und **Publish finished run** bleiben ausgeblendet. Der folgende Text beschreibt die Online-Version für später.
+**Current status:** Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed. As long as `LEADERBOARD_URL` in `web/leaderboard-config.js` is empty, the board shows only the local list (up to 10 finished runs of all profiles and guests in this browser, sorted by points, then by shorter time, status Won/Lost). The online sections, **Refresh** and **Publish finished run** stay hidden. The text below describes the online version for later.
 
-## Was der Spieler sieht
+## What the player sees
 
-Im Home Screen öffnet **Scoreboard** eine halbtransparente Museumstafel. Oben steht der eigene laufende Spielstand; darunter erscheinen bis zu 25 veröffentlichte Ergebnisse aller Geräte. Die Schrift für Überschriften und Knöpfe ist dieselbe Fraunces-Schrift wie in den vorhandenen Menüs. Der Hintergrund des Home Screens bleibt sichtbar.
+On the home screen, **Scoreboard** opens a semi-transparent museum board. At the top is the player’s own current run; below it appear up to 25 published results from all devices. The font for headings and buttons is the same Fraunces font as in the existing menus. The home screen background stays visible.
 
-Ein Ergebnis wird **nicht automatisch** gesendet: Erst nach einem Ende erscheint **Publish finished run**. Der Spieler entscheidet dann, ob sein Name, Punktestand und Ende öffentlich auf der Tafel stehen. Passwörter, Spielstände, Notizen, Kunstantworten und Bewegungsdaten werden nicht übertragen. **Refresh** lädt die Liste erneut. Wenn der Dienst fehlt oder ausfällt, bleibt das lokale Scoreboard benutzbar und zeigt eine klare Meldung.
+A result is **not sent automatically**: only after an ending does **Publish finished run** appear. The player then decides whether their name, score and ending appear publicly on the board. Passwords, saves, notes, art answers and movement data are not sent. **Refresh** loads the list again. If the service is missing or down, the local scoreboard stays usable and shows a clear message.
 
-## Regeln
+## Rules
 
-- Die vier Stationen geben zusammen höchstens 60 Punkte, Safe und Schlussfrage je 10: **80 Punkte**.
-- Der Server nimmt nur abgeschlossene Ergebnisse auf der aktuellen 80-Punkte-Skala an. Alte Spielstände mit 85/90 möglichen Punkten bleiben lokal sichtbar, werden aber nicht in die gemeinsame Liste gemischt.
-- Pro Browser-Profil erzeugt das Spiel eine dauerhafte zufällige Kennung. Der Server behält pro Kennung den **höchsten Punktestand**. Gleiche Punktzahlen teilen sich denselben Platz. Zeit ist kein Sortierkriterium: Wiederholtes Lösen bekannter Rätsel verschafft dadurch keinen direkten Rangvorteil.
-- Ein lokaler Profilname wird als Anzeigename verwendet; Gäste erscheinen als `Guest-…`. Diese Namen sind vor der späteren Login-Verknüpfung **nicht verifiziert**.
-- **Grenzen:** Namen sind nicht verifiziert, und ein Ergebnis kann über die öffentliche Schnittstelle gefälscht werden. Der Worker prüft aber Format und Punkte-Obergrenze und lehnt alles andere ab.
+- The four stations give at most 60 points together, the safe and the final question 10 each: **80 points**.
+- The server accepts only finished results on the current 80-point scale. Old saves with 85/90 possible points stay visible locally but are not mixed into the shared list.
+- For each browser profile the game creates a permanent random ID. The server keeps the **highest score** per ID. Equal scores share the same place. Time is not a sorting criterion, so solving known puzzles again gives no direct ranking advantage.
+- A local profile name is used as the display name; guests appear as `Guest-…`. These names are **not verified** until a later login connection.
+- **Limits:** Names are not verified, and a result can be faked through the public interface. The Worker still checks the format and the points cap and rejects everything else.
 
-## Wo es passiert
+## Where it happens
 
-| Datei | Aufgabe |
+| File | Purpose |
 | --- | --- |
-| `web/index.html`, `web/story/story.css` | Tafel, Knöpfe, transparente Darstellung und Journal-Quellen |
-| `web/main.js`, `web/leaderboard.js` | Laden, Anzeigen, freiwilliges Veröffentlichen und lokale Spielerkennung |
-| `web/leaderboard-config.js` | Öffentliche URL des Online-Dienstes nach der Bereitstellung |
-| `server/leaderboard/worker.js` | Öffentliche Lese- und Schreibschnittstelle, Eingabeprüfung, Platzierung |
-| `server/leaderboard/migrations/0001_leaderboard.sql` | Datenbanktabelle, ein Bestwert je Spielerkennung |
-| `server/leaderboard/wrangler.jsonc` | Cloudflare-Worker-Konfiguration |
+| `web/index.html`, `web/story/story.css` | Board, buttons, transparent look and journal sources |
+| `web/main.js`, `web/leaderboard.js` | Loading, showing, voluntary publishing and local player ID |
+| `web/leaderboard-config.js` | Public URL of the online service after deployment |
+| `server/leaderboard/worker.js` | Public read and write interface, input checks, ranking |
+| `server/leaderboard/migrations/0001_leaderboard.sql` | Database table, one best score per player ID |
+| `server/leaderboard/wrangler.jsonc` | Cloudflare Worker configuration |
 
-GitHub Pages kann selbst keine gemeinsamen Ergebnisse speichern. Die Datenbank liegt deshalb bei Cloudflare D1 und wird durch einen Worker angesprochen. **Der Worker ist erst online, nachdem jemand mit einem Cloudflare-Konto die folgenden Schritte ausgeführt hat.** Bis dahin meldet die Tafel, dass sie noch nicht verbunden ist. Eine Cloudflare-URL oder Datenbankkennung ist kein Passwort; geheime Zugangsdaten gehören niemals in `web/` oder ins Repository.
+GitHub Pages cannot store shared results itself. So the database lives in Cloudflare D1 and is accessed through a Worker. **The Worker is online only after someone with a Cloudflare account has carried out the following steps.** Until then the board reports that it is not connected yet. A Cloudflare URL or database ID is not a password; secret credentials never belong in `web/` or in the repository.
 
-## Einmalige Bereitstellung
+## One-time deployment
 
-Die Schritte werden im Ordner `server/leaderboard` ausgeführt. Node.js und ein Cloudflare-Konto sind nötig.
+The steps are run in the `server/leaderboard` folder. Node.js and a Cloudflare account are needed.
 
-1. `npx wrangler login` öffnet die Cloudflare-Anmeldung.
-2. `npx wrangler d1 create museum-mystery-leaderboard` erstellt die Datenbank und zeigt ihre `database_id`. Diese ID in `wrangler.jsonc` statt `REPLACE_WITH_D1_DATABASE_ID` einsetzen.
-3. `npx wrangler d1 migrations apply museum-mystery-leaderboard --remote` legt die Tabelle an.
-4. `npx wrangler deploy` veröffentlicht den Worker und zeigt eine `https://…workers.dev`-URL.
-5. Diese URL als `LEADERBOARD_URL` in `web/leaderboard-config.js` einsetzen und die Änderung über einen Pull Request in `main` bringen. GitHub Pages lädt danach die verbundene Version.
-6. Auf zwei Geräten die Seite öffnen. Auf Gerät A einen aktuellen Lauf beenden und veröffentlichen; auf Gerät B **Scoreboard → Refresh** wählen. Das Ergebnis muss dort erscheinen.
+1. `npx wrangler login` opens the Cloudflare sign-in.
+2. `npx wrangler d1 create museum-mystery-leaderboard` creates the database and shows its `database_id`. Put this ID into `wrangler.jsonc` instead of `REPLACE_WITH_D1_DATABASE_ID`.
+3. `npx wrangler d1 migrations apply museum-mystery-leaderboard --remote` creates the table.
+4. `npx wrangler deploy` publishes the Worker and shows an `https://…workers.dev` URL.
+5. Put this URL as `LEADERBOARD_URL` into `web/leaderboard-config.js` and bring the change into `main` through a pull request. GitHub Pages then loads the connected version.
+6. Open the site on two devices. On device A finish a current run and publish it; on device B choose **Scoreboard → Refresh**. The result must appear there.
 
-Der Worker erlaubt derzeit die GitHub-Pages-Adresse und lokale Entwicklung auf Port 8000. Wird eine andere Spieladresse verwendet, diese in `ALLOWED_ORIGINS` der `wrangler.jsonc` ergänzen und neu deployen. Die Origin-Liste verhindert versehentliche Aufrufe von anderen Webseiten; sie ersetzt **keine Anmeldung**.
+The Worker currently allows the GitHub Pages address and local development on port 8000. If another game address is used, add it to `ALLOWED_ORIGINS` in `wrangler.jsonc` and deploy again. The origin list prevents accidental calls from other websites; it does **not replace a sign-in**.
 
-## Spätere Login-Verknüpfung
+## Later login connection
 
-Das jetzige lokale Passwort beweist dem Worker nicht, wer eine Anfrage sendet. Jeder mit Kenntnis der öffentlichen Schnittstelle könnte vor der Login-Verknüpfung einen Namen oder Punktestand vortäuschen. Die Tafel ist deshalb für die Spielgruppe brauchbar, aber noch keine manipulationssichere Wettbewerbswertung. Bei der späteren Anbindung muss der Worker eine serverseitig prüfbare Anmeldung verlangen und die Spielerkennung aus der geprüften Identität ableiten, statt `playerId` und `name` aus der Anfrage zu übernehmen. Erst dann sind Namen eindeutig. Auch ein signierter Login allein beweist noch nicht, dass der Spielstand ehrlich erspielt wurde; falls das wichtig wird, müsste der Server zusätzlich Spielereignisse oder einen plausiblen Ergebnisnachweis prüfen.
+The current local password does not prove to the Worker who sends a request. Before the login connection, anyone who knows the public interface could fake a name or score. The board is therefore usable for the game group, but not yet a tamper-proof competition ranking. For the later connection the Worker must require a sign-in that the server can check, and derive the player ID from the checked identity instead of taking `playerId` and `name` from the request. Only then are names unique. Even a signed login alone does not prove that the score was earned honestly; if that becomes important, the server would also have to check game events or a plausible proof of the result.
 
-## Prüfung
+## Checks
 
-`cd web && node --test` prüft die Spielmodule. `node --test server/leaderboard/worker.test.js` prüft die Regeln und Antworten des Workers ohne Cloudflare-Konto. Der echte Austausch über zwei Geräte kann erst nach Schritt 5 geprüft werden.
+`cd web && node --test` checks the game modules. `node --test server/leaderboard/worker.test.js` checks the Worker’s rules and responses without a Cloudflare account. The real exchange across two devices can only be checked after step 5.
 
-Technische Grundlage: [Cloudflare D1 Worker API](https://developers.cloudflare.com/d1/worker-api/), [D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) und [Wrangler-Konfiguration](https://developers.cloudflare.com/workers/wrangler/configuration/).
+Technical basis: [Cloudflare D1 Worker API](https://developers.cloudflare.com/d1/worker-api/), [D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) and [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/).

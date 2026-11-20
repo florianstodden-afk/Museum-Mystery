@@ -1,28 +1,28 @@
-# Integrationsplan: Story-Engine ins Hauptspiel
+# Integration plan: story engine into the main game
 
-> **Stand 15.11.2026:** Integration ist auf `main` (PR #6). Seitdem hat Fabian einen begehbaren Sicherheitsraum und neue Positionen auf der Karte ergänzt; Station I ist als echtes Minispiel fertig (Branch `feature/portrait-timeline`). Die Kartenobjekte und ihre Story-Aktionen stehen in `web/engine.js` (Feld `story`). Der Plan unten ist das Protokoll, wie die Integration gemacht wurde.
+> **Status 15.11.2026:** The integration is on `main` (PR #6). Since then Fabian has added a walkable security room and new positions on the map; Station I is finished as a real mini-game (branch `feature/portrait-timeline`). The map objects and their story actions are in `web/engine.js` (field `story`). The plan below is the record of how the integration was done.
 >
-> **Status 12.11.2026: umgesetzt** auf Branch `feature/story-integration` (nach Absprache mit Fabian), über den „Kurzen Weg“ mit `host.js`. Abweichungen vom Plan: Die Kartenobjekte tragen ihre Story-Aktion als Daten (`story`-Feld in `web/engine.js`), statt einer Tabelle in `main.js`. Die Depottür ist der Safe. Stationen 2–4 liegen vorerst an vorhandenen Kartenpunkten (Night-shift log in der Great Hall, Transport slip und neues Frame rack in der Galerie). Details im Arbeitsprotokoll.
+> **Status 12.11.2026: implemented** on branch `feature/story-integration` (after agreement with Fabian), via the “short way” with `host.js`. Differences from the plan: the map objects carry their story action as data (`story` field in `web/engine.js`) instead of a table in `main.js`. The storage door is the safe. Stations 2–4 sit at existing map points for now (night-shift log in the Great Hall, transport slip and a new frame rack in the gallery). Details in the work log.
 
-**Stand:** 12.11.2026, Branch `feature/story-logic`. **Wer:** Florian B. mit Fabian, **nach** Fabians Merge von Grafik und Räumen.
-**Ziel:** Das Hauptspiel (`web/index.html` + `web/main.js`) nutzt die neue Story aus `web/story/` statt der alten Prototyp-Story in `web/engine.js`.
+**Status:** 12.11.2026, branch `feature/story-logic`. **Who:** Florian B. with Fabian, **after** Fabian’s merge of graphics and rooms.
+**Goal:** The main game (`web/index.html` + `web/main.js`) uses the new story from `web/story/` instead of the old prototype story in `web/engine.js`.
 
-Bis jetzt wurde **keine bestehende Datei geändert**. Alle Schritte unten ändern bestehende Dateien und dürfen deshalb erst nach Absprache mit Fabian passieren – am besten in einem eigenen Branch `feature/story-integration`, wenn niemand sonst an `main.js` arbeitet.
+So far **no existing file has been changed**. All steps below change existing files and may therefore happen only after agreement with Fabian – ideally in a separate branch `feature/story-integration`, when nobody else is working on `main.js`.
 
-## Grundidee: Wer macht was?
+## Basic idea: who does what?
 
-| Bereich | Heute | Nach der Integration |
+| Area | Today | After the integration |
 |---|---|---|
-| Bewegung, Kollision, Karte, Wachmann | `web/engine.js` (`canEnter`, `move`, `nearbyObject`), `motion.js`, `guard.js` | **bleibt bei Fabian**, unverändert |
-| Story (Belege, Ausweis, Code 2114, Enden) | `web/engine.js` (`interact`, `openVault`, `chooseEnding`, `clues`, `pass`, `vaultOpen`, `ending`) | `web/story/engine.js` |
-| Journal, Dialoge, Safe, Schlussfrage, Enden (Anzeige) | `updateSidebar()`, `showDialog()`, `end()` in `main.js` | Bausteine aus `web/story/*.js` in Fabians Seitenleiste/Dialog |
-| Speichern | `localStorage` in `main.js` (`museum-mystery-walk-v1`, `museum-nocturne-landscape-v1`) | `main.js` speichert Spielerposition **und** `serialize(storyState)` |
+| Movement, collision, map, guard | `web/engine.js` (`canEnter`, `move`, `nearbyObject`), `motion.js`, `guard.js` | **stays with Fabian**, unchanged |
+| Story (evidence, badge, code 2114, endings) | `web/engine.js` (`interact`, `openVault`, `chooseEnding`, `clues`, `pass`, `vaultOpen`, `ending`) | `web/story/engine.js` |
+| Journal, dialogues, safe, final question, endings (display) | `updateSidebar()`, `showDialog()`, `end()` in `main.js` | Building blocks from `web/story/*.js` in Fabian’s sidebar/dialog |
+| Saving | `localStorage` in `main.js` (`museum-mystery-walk-v1`, `museum-nocturne-landscape-v1`) | `main.js` saves the player position **and** `serialize(storyState)` |
 
-Wichtig: Die Karte bleibt der „Host“. Sie entscheidet, **wo** etwas passiert (welches Objekt in der Nähe ist). Die Story-Engine entscheidet, **was** passiert.
+Important: the map stays the “host”. It decides **where** something happens (which object is nearby). The story engine decides **what** happens.
 
-## Kurzer Weg: mit `web/story/host.js` (empfohlen)
+## Short way: with `web/story/host.js` (recommended)
 
-Seit dem 12.11.2026 gibt es `createStoryHost` in `web/story/host.js`. Der Host erledigt Laden/Speichern, Stationen, Gespräche, Safe → Schlussfrage → Entscheidung → Abspann, Hinweise und „New game“. `main.js` muss ihm nur einen Dialog leihen. So sieht der ganze Story-Teil in `main.js` aus:
+Since 12.11.2026 there is `createStoryHost` in `web/story/host.js`. The host takes care of loading/saving, stations, conversations, safe → final question → decision → closing screen, hints and “New game”. `main.js` only has to lend it a dialog. This is the whole story part in `main.js`:
 
 ```js
 import { createStoryHost } from './story/host.js';
@@ -33,12 +33,12 @@ const story = createStoryHost({
   openPanel(title) { showDialog(title, ''); return document.querySelector('#dialog-body'); },
   closePanel: closeDialog,
   onChange() { renderJournal(document.querySelector('#journal'), journalModel(story.state)); },
-  stations: { landscape },                      // später: portraits, restoration, archive
+  stations: { landscape },                      // later: portraits, restoration, archive
   storageKey: 'museum-nocturne-story-v1',
 });
-story.start();                                  // zeigt beim ersten Besuch die Nachricht von M
+story.start();                                  // shows the message from M on the first visit
 
-// in handleInteract(), je nach Objekt in der Nähe:
+// in handleInteract(), depending on the object nearby:
 const STORY_OBJECTS = {
   painting:   () => story.openStation('landscape'),
   portraitLog:() => story.openStation('portraits'),
@@ -52,36 +52,36 @@ const STORY_OBJECTS = {
 };
 STORY_OBJECTS[object.id]?.();
 
-// Knöpfe oben rechts:
-//   „New Game“ → story.confirmNewGame()     „Hint“ → story.showHint()
+// Buttons at the top right:
+//   "New Game" → story.confirmNewGame()     "Hint" → story.showHint()
 ```
 
-Die Story-Bausteine zeichnen ihre Knöpfe selbst. `#dialog-actions` wird für Story-Szenen also leer gelassen. Die Objekt-ids sind Vorschläge; Fabian legt sie fest.
+The story building blocks draw their own buttons. So `#dialog-actions` stays empty for story scenes. The object ids are suggestions; Fabian decides them.
 
-**Der Beweis, dass das funktioniert:** `web/dev/story-preview.js` benutzt genau diesen Host (mit einem `<dialog>` statt `#dialog`), und `web/story/tests/host.test.js` spielt über den Host ein ganzes Spiel durch.
+**The proof that this works:** `web/dev/story-preview.js` uses exactly this host (with a `<dialog>` instead of `#dialog`), and `web/story/tests/host.test.js` plays a whole game through the host.
 
-Mit dem Host schrumpfen die Schritte 2, 4 und 5 unten auf die Zeilen oben. Schritte 1, 3, 6 und 7 bleiben nötig. **Geschätzter Aufwand mit Host: ca. 2–3 Stunden statt 5–6.**
+With the host, steps 2, 4 and 5 below shrink to the lines above. Steps 1, 3, 6 and 7 are still needed. **Estimated effort with the host: about 2–3 hours instead of 5–6.**
 
-Die ausführlichen Schritte unten beschreiben, was der Host intern tut. Sie helfen, wenn ihr bewusst ohne Host integrieren wollt.
+The detailed steps below describe what the host does internally. They help if you deliberately want to integrate without the host.
 
-## Schritt für Schritt (ausführlich)
+## Step by step (detailed)
 
-### Schritt 1 – Alte Story-Logik sichern (ca. 30 min)
-1. Neuen Ordner `web/legacy/` anlegen.
-2. Die Story-Teile der alten `web/engine.js` nach `web/legacy/prototype-story.js` kopieren: `EVIDENCE`, `interact` (Story-Texte), `openVault`, `chooseEnding`, `hasAllEvidence`, die Felder `clues`, `pass`, `vaultOpen`, `ending` aus `initialState`/`validState`.
-3. Die passenden Tests aus `web/engine.test.js` nach `web/legacy/prototype-story.test.js` verschieben, damit `node --test` weiter alles prüft.
-4. In `web/engine.js` bleiben nur Karte und Bewegung: `WIDTH`, `HEIGHT`, `START`, `OBJECTS` (Positionen), `canEnter`, `move`, `nearbyObject`, `interactionDistance`, plus ein verkleinertes `initialState`/`validState` mit `player` und `steps`.
-5. Alle Tests grün → Commit „Move prototype story into legacy“.
+### Step 1 – Secure the old story logic (about 30 min)
+1. Create a new folder `web/legacy/`.
+2. Copy the story parts of the old `web/engine.js` to `web/legacy/prototype-story.js`: `EVIDENCE`, `interact` (story texts), `openVault`, `chooseEnding`, `hasAllEvidence`, the fields `clues`, `pass`, `vaultOpen`, `ending` from `initialState`/`validState`.
+3. Move the matching tests from `web/engine.test.js` to `web/legacy/prototype-story.test.js`, so that `node --test` still checks everything.
+4. Only map and movement stay in `web/engine.js`: `WIDTH`, `HEIGHT`, `START`, `OBJECTS` (positions), `canEnter`, `move`, `nearbyObject`, `interactionDistance`, plus a smaller `initialState`/`validState` with `player` and `steps`.
+5. All tests green → commit “Move prototype story into legacy”.
 
-**Risiko:** `canEnter` nutzt heute `state.vaultOpen` für die Depottür (`x === 18 && y === 9`). → Schritt 3.
+**Risk:** `canEnter` today uses `state.vaultOpen` for the storage door (`x === 18 && y === 9`). → Step 3.
 
-### Schritt 2 – Zwei Zustände nebeneinander in `main.js` (ca. 1 h)
+### Step 2 – Two states side by side in `main.js` (about 1 h)
 ```js
 import { newGame, readMission, solveStation, addNote, tryOpenSafe, accuse, chooseEnding, canOpenSafe } from './story/engine.js';
 import { serialize, deserialize } from './story/save.js';
 
-let world = …;                 // wie heute: { player, steps } aus engine.js
-let story = loadStory();       // neu
+let world = …;                 // as today: { player, steps } from engine.js
+let story = loadStory();       // new
 
 function loadStory() {
   try { return deserialize(localStorage.getItem('museum-nocturne-story-v1')) ?? newGame(); }
@@ -91,25 +91,25 @@ function saveStory() {
   try { localStorage.setItem('museum-nocturne-story-v1', serialize(story)); } catch {}
 }
 ```
-- Jede Story-Aktion folgt demselben Muster: `const r = action(story, …); story = r.state; saveStory(); showMessage(r.message);`
-- Beim ersten Start (`!story.missionRead`) den Dialog von „M“ zeigen (`dialogueFor('m', story)` + `renderDialogue`), Knopf „Accept the mission“ → `readMission`.
+- Every story action follows the same pattern: `const r = action(story, …); story = r.state; saveStory(); showMessage(r.message);`
+- On the first start (`!story.missionRead`) show the dialog from “M” (`dialogueFor('m', story)` + `renderDialogue`), button “Accept the mission” → `readMission`.
 
-### Schritt 3 – Tür/Safe an die Story koppeln (ca. 30 min)
-- `canEnter(state, x, y, guard)` bekommt statt `state.vaultOpen` einen zusätzlichen Parameter `doorOpen` (oder Fabian liest `story.safe.open`). Vorschlag: `canEnter(world, x, y, guard, { vaultOpen: story.safe.open })`.
-- Am Safe-Objekt: `renderSafe(dialogBody, { state: story, message }, word => { … tryOpenSafe … })`.
-- Nach `safe.open`: `renderAccusation(…)`, danach `renderEndingChoice(…)` und `renderEnding(…, { onNewGame: reset })`.
+### Step 3 – Couple the door/safe to the story (about 30 min)
+- Instead of `state.vaultOpen`, `canEnter(state, x, y, guard)` gets an extra parameter `doorOpen` (or Fabian reads `story.safe.open`). Suggestion: `canEnter(world, x, y, guard, { vaultOpen: story.safe.open })`.
+- At the safe object: `renderSafe(dialogBody, { state: story, message }, word => { … tryOpenSafe … })`.
+- After `safe.open`: `renderAccusation(…)`, then `renderEndingChoice(…)` and `renderEnding(…, { onNewGame: reset })`.
 
-### Schritt 4 – Stationen in Räume hängen (ca. 1 h + je Station 15 min)
-In `handleInteract()` ersetzt eine Tabelle die heutigen Sonderfälle (`object.id === 'painting'`):
+### Step 4 – Hang the stations into rooms (about 1 h + 15 min per station)
+In `handleInteract()` a table replaces today’s special cases (`object.id === 'painting'`):
 
 ```js
 import { openStation } from './story/stations.js';
 import * as placeholder from './story/placeholder-station.js';
 import * as landscape from './minigames/landscape.js';
 
-const STATION_AT_OBJECT = {          // Objekt-id auf der Karte → Station
+const STATION_AT_OBJECT = {          // object id on the map → station
   painting: { stationId: 'landscape', module: landscape },
-  portraitLog: { stationId: 'portraits', module: placeholder },   // später ./minigames/portraits.js
+  portraitLog: { stationId: 'portraits', module: placeholder },   // later ./minigames/portraits.js
   workbench: { stationId: 'restoration', module: placeholder },
   frameRack: { stationId: 'archive', module: placeholder },
 };
@@ -126,48 +126,48 @@ if (entry) {
   return;
 }
 ```
-- Die Objekt-ids (`portraitLog`, `workbench`, `frameRack`) sind Vorschläge; Fabian legt sie in seinen Räumen fest.
-- Der heutige Schlüssel `museum-nocturne-landscape-v1` kann als `stationProgress.landscape` weiterverwendet werden.
+- The object ids (`portraitLog`, `workbench`, `frameRack`) are suggestions; Fabian decides them in his rooms.
+- Today’s key `museum-nocturne-landscape-v1` can be reused as `stationProgress.landscape`.
 
-### Schritt 5 – Journal, Dialoge, Security Office (ca. 1 h)
-- Seitenleiste: `#journal` → `renderJournal(document.querySelector('#journal'), journalModel(story))` in `updateSidebar()`. `#progress` zeigt dann `story.letters`, `#pass` entfällt.
-- `web/story/story.css` in `index.html` einbinden (`<link rel="stylesheet" href="story/story.css">`). Klassen haben das Präfix `story-`, es gibt keine Kollision mit `style.css`. Achtung: `story.css` setzt Variablen auf `:root` mit eigenem Präfix `--story-*`.
-- Personen auf der Karte: Leon (heute `guard`), Imani (heute `restorer`), Dr. Vale (neu) → `renderDialogue(dialogBody, dialogueFor(id, story))`.
-- Security Office: siehe `docs/story/security-office.md`.
-- Hinweis „Fictional museum and characters · Artworks: The Met, Open Access“ sichtbar lassen (steht im Ende-Bildschirm und sollte auch in der Seitenleiste stehen).
+### Step 5 – Journal, dialogues, security office (about 1 h)
+- Sidebar: `#journal` → `renderJournal(document.querySelector('#journal'), journalModel(story))` in `updateSidebar()`. `#progress` then shows `story.letters`, `#pass` goes away.
+- Include `web/story/story.css` in `index.html` (`<link rel="stylesheet" href="story/story.css">`). Classes have the prefix `story-`, so there is no collision with `style.css`. Note: `story.css` sets variables on `:root` with its own prefix `--story-*`.
+- People on the map: Leon (today `guard`), Imani (today `restorer`), Dr. Vale (new) → `renderDialogue(dialogBody, dialogueFor(id, story))`.
+- Security office: see `docs/story/security-office.md`.
+- Keep the note “Fictional museum and characters · Artworks: The Met, Open Access” visible (it is on the ending screen and should also be in the sidebar).
 
-### Schritt 6 – Alte Spielstände (ca. 20 min)
-- Alter Schlüssel `museum-mystery-walk-v1` enthält Position **und** alte Story-Felder. Beim Laden nur `player` und `steps` übernehmen (wenn gültig), alles andere ignorieren.
-- Story startet bei altem Stand immer mit `newGame()`. Es gibt bewusst **keine** Umrechnung „3 alte Belege → neue Buchstaben“, weil die Stories nicht zusammenpassen.
-- `deserialize` liefert `null` für alte/kaputte Stände (`caseVersion`-Prüfung). Wenn wir die Falldaten später ändern, `CASE_VERSION` in `case-1.js` erhöhen.
-- „New Game“ löscht beide Schlüssel und alle Stationsfortschritte.
+### Step 6 – Old saves (about 20 min)
+- The old key `museum-mystery-walk-v1` holds the position **and** old story fields. On loading, take only `player` and `steps` (if valid) and ignore everything else.
+- With an old save the story always starts with `newGame()`. There is deliberately **no** conversion “3 old pieces of evidence → new letters”, because the stories do not fit together.
+- `deserialize` returns `null` for old/broken saves (`caseVersion` check). If we change the case data later, increase `CASE_VERSION` in `case-1.js`.
+- “New Game” deletes both keys and all station progress.
 
-### Schritt 7 – Prüfen (ca. 1 h)
-- `cd web && node --test` (alte Bewegungs-Tests, Legacy-Tests, Story-Tests).
-- Komplett durchspielen wie in `web/dev/story.html`: ein falscher Safe-Code, eine falsche Anklage, beide Enden.
-- Neustart-Test: Browser schließen, wieder öffnen, Stand ist noch da.
-- Screenshots in den PR.
+### Step 7 – Checks (about 1 h)
+- `cd web && node --test` (old movement tests, legacy tests, story tests).
+- Play through completely as in `web/dev/story.html`: one wrong safe code, one wrong accusation, both endings.
+- Restart test: close the browser, open it again, the state is still there.
+- Screenshots into the PR.
 
-## Aufwand und Risiken
+## Effort and risks
 
-| | Aufwand |
+| | Effort |
 |---|---|
-| Schritte 1–7 ohne Host | **ca. 5–6 Stunden**, zu zweit an einem Nachmittag |
-| Mit `host.js` (Schritte 1, 3, 6, 7 + kurzer Weg) | **ca. 2–3 Stunden** |
+| Steps 1–7 without the host | **about 5–6 hours**, two people in one afternoon |
+| With `host.js` (steps 1, 3, 6, 7 + short way) | **about 2–3 hours** |
 
-| Risiko | Gegenmaßnahme |
+| Risk | Countermeasure |
 |---|---|
-| Konflikte in `main.js`, wenn Fabian parallel arbeitet | Integration erst nach Fabians Merge; kleiner eigener Branch; Fabian reviewt. |
-| Tür-Logik hängt an altem `vaultOpen` | Schritt 3: Tür-Status als Parameter übergeben. |
-| Alte Spielstände führen zu unmöglichen Zuständen | Schritt 6: Story immer frisch; Position validieren. |
-| Stationen 2–4 sind noch nicht fertig | Platzhalter bleibt eingehängt; Austausch ist eine Zeile in `STATION_AT_OBJECT`. |
-| CSS-Kollision | Alle Story-Klassen haben `story-`; im Hauptspiel braucht nur der Dialog etwas Platz für längere Inhalte (Ende-Bildschirm ist scrollbar). |
-| Dialog in `index.html` ist hell (Papier-Look), Story-Bausteine sind dunkel | Entweder einen dunklen Dialog-Stil für Story-Szenen ergänzen oder in `story.css` eine Variante `.dialog-card .story-*` mit dunkler Schrift. Mit Fabian entscheiden. |
+| Conflicts in `main.js` if Fabian works in parallel | Integration only after Fabian’s merge; small separate branch; Fabian reviews. |
+| Door logic depends on the old `vaultOpen` | Step 3: pass the door state as a parameter. |
+| Old saves lead to impossible states | Step 6: the story always starts fresh; validate the position. |
+| Stations 2–4 are not finished yet | The placeholder stays connected; swapping is one line in `STATION_AT_OBJECT`. |
+| CSS collision | All story classes have `story-`; in the main game only the dialog needs some room for longer content (the ending screen can scroll). |
+| The dialog in `index.html` is light (paper look), the story building blocks are dark | Either add a dark dialog style for story scenes, or a variant `.dialog-card .story-*` with dark text in `story.css`. Decide with Fabian. |
 
-## Was dafür an bestehenden Dateien geändert werden muss (Liste für die Absprache)
+## What has to change in existing files (list for the agreement)
 
-- `web/engine.js`: Story-Teile entfernen (→ `web/legacy/`), `canEnter` Tür-Parameter.
-- `web/engine.test.js`: Story-Tests nach `web/legacy/`.
-- `web/main.js`: Story-Zustand, Speichern, `handleInteract`, `updateSidebar`, `end`, `reset`.
-- `web/index.html`: `story.css` einbinden, Missionstext im `.case`-Panel durch Journal-Baustein ersetzen.
-- `README.md` und `docs/arbeitsprotokoll.md`: neuer Stand.
+- `web/engine.js`: remove the story parts (→ `web/legacy/`), door parameter for `canEnter`.
+- `web/engine.test.js`: story tests to `web/legacy/`.
+- `web/main.js`: story state, saving, `handleInteract`, `updateSidebar`, `end`, `reset`.
+- `web/index.html`: include `story.css`, replace the mission text in the `.case` panel with the journal building block.
+- `README.md` and `docs/work-log.md`: new state.

@@ -1,36 +1,36 @@
-# Aufgabe: Begehbares Museum Mystery
+# Task: Walkable Museum Mystery
 
-## Warum?
+## Why?
 
-Der erste Prototyp war ein statisches Bilderrätsel und für die Gruppe zu einfach und langweilig. Das gewünschte Spielgefühl ist eine eigenständige 2D-Draufsicht mit Bewegung durch ein Museum, einer Mystery-Quest und mindestens zwei unterschiedlichen Enden. Harvest Moon und Pokémon dienen nur als Orientierung für Perspektive und Steuerung; wir verwenden keine Grafiken oder Figuren dieser Spiele.
+The first prototype was a static picture puzzle and too simple and boring for the group. The game feel we want is an original 2D top-down view with movement through a museum, a mystery quest and at least two different endings. Harvest Moon and Pokémon serve only as orientation for perspective and controls; we use no graphics or characters from these games.
 
-## Kleinster spielbarer Rundgang
+## Smallest playable walk
 
-Die Spielfigur bewegt sich mit WASD oder Pfeiltasten durch Empfang, Galerie und Restaurierungsraum. `E` untersucht ein Objekt oder spricht mit einer nahen Person. Die Journalanzeige nennt das nächste Ziel. Die Spielerin sammelt drei Belege: ein verdächtiges Besucherprotokoll, eine Beobachtung am ausgetauschten Gemälde und eine Restaurierungsnotiz. Nach dem Protokoll gibt der Wachmann einen Zugangsausweis. An der Depottür braucht man drei Belege, den Ausweis und den vierstelligen Code aus der Uhrzeit des verdächtigen Protokolleintrags (21:14 → `2114`). Dort wird das Original entdeckt.
+The player character moves with WASD or the arrow keys through the reception, the gallery and the restoration room. `E` examines an object or talks to a nearby person. The journal shows the next goal. The player collects three pieces of evidence: a suspicious visitor log, an observation at the swapped painting and a restoration note. After the log, the guard hands over an access badge. The storage door needs three pieces of evidence, the badge and the four-digit code from the time of the suspicious log entry (21:14 → `2114`). The original is discovered there.
 
-Am Ende entscheidet die Spielerin zwischen zwei **verschiedenen, erreichbaren** Ausgängen: Das Original still zurückbringen oder die Fälschung öffentlich aufdecken. Der Abspann nennt die Konsequenz der Wahl. Ein Neustart setzt den Fall zurück. Ein Spielstand wird im Browser gespeichert, damit ein Neuladen nicht alles löscht.
+At the end the player chooses between two **different, reachable** outcomes: quietly return the original or publicly expose the forgery. The closing text names the consequence of the choice. A restart resets the case. A save is kept in the browser so that a reload does not erase everything.
 
-Das ausgestellte Bild und überprüfbare Werkangaben stammen aus der Met Collection API für Objekt 436535, *Wheat Field with Cypresses*. Nur öffentlich freigegebene Bilddaten werden verwendet. Bei Netzfehlern bleibt das Spiel mit einer Textdarstellung spielbar. Die Kunstquelle wird sichtbar genannt.
+The displayed painting and verifiable details come from the Met Collection API for object 436535, *Wheat Field with Cypresses*. Only publicly released image data is used. On network errors the game stays playable with a text display. The art source is named visibly.
 
-## Regeln und Grenzen
+## Rules and limits
 
-- Bewegung nur auf begehbaren Feldern; Wände und Depot-Tür blockieren den Weg.
-- Interaktion nur mit einem Objekt direkt neben der Spielfigur.
-- Belege zählen je nur einmal; der Wachmann gibt den Ausweis nach dem Fund des Protokolls.
-- Die Depot-Tür öffnet nur mit drei Belegen, Ausweis und richtigem Zahlencode. Ein falscher Code lässt sie verschlossen.
-- Eine Endentscheidung ist erst beim Original im Depot möglich.
-- Zwei Enden müssen in einem vollständigen Durchgang auswählbar sein.
-- Keine echten Konten, gemeinsamen Online-Spielstände, Gegner, Kämpfe oder weiteren Räume in dieser Aufgabe.
+- Movement only on walkable tiles; walls and the storage door block the way.
+- Interaction only with an object directly next to the player character.
+- Each piece of evidence counts only once; the guard hands over the badge after the log has been found.
+- The storage door opens only with three pieces of evidence, the badge and the right number code. A wrong code keeps it locked.
+- An ending can only be chosen at the original in the storage room.
+- Both endings must be selectable in one complete run.
+- No real accounts, shared online saves, enemies, fights or further rooms in this task.
 
-## Fertig, wenn …
+## Done when …
 
-- Bewegungs-, Interaktions-, Code- und Türregeln automatisiert getestet sind.
-- Beide Enden durch Tests erreichbar sind.
-- Der Browser das Museum mit Spielfigur, Objekten, Dialog und Journal zeigt.
-- Met-Daten geladen werden oder ein verständlicher Offline-Ersatz erscheint.
-- Neuladen einen laufenden Fall wiederherstellt und „Neues Spiel“ zurücksetzt.
-- Ein Mensch den gesamten Spielweg selbst durchläuft und die Lesbarkeit bewertet.
+- Movement, interaction, code and door rules are tested automatically.
+- Both endings are reachable through tests.
+- The browser shows the museum with player character, objects, dialogue and journal.
+- Met data loads or an understandable offline replacement appears.
+- A reload restores a running case and “New game” resets it.
+- A person plays the whole route themselves and rates its readability.
 
-## Verständnispfad
+## Path to understanding
 
-`web/engine.js` enthält reine Regeln und speicherbaren Zustand. `web/main.js` zeichnet das Museum, verarbeitet Tasten und ruft die Met API ab. `web/index.html` und `web/style.css` sind Aufbau und Gestaltung. `web/engine.test.js` prüft die Regeln mit Node. Dieser Browser-Prototyp ist eine Richtungsänderung; die frühere Streamlit-Version bleibt als Zwischenstand im Repository und ist nicht die neue Startseite.
+`web/engine.js` contains pure rules and a savable state. `web/main.js` draws the museum, handles keys and calls the Met API. `web/index.html` and `web/style.css` are structure and styling. `web/engine.test.js` checks the rules with Node. This browser prototype is a change of direction; the earlier Streamlit version stays in the repository as an intermediate stage and is not the new start page.

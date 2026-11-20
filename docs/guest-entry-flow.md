@@ -1,32 +1,32 @@
-# Gast-Einstieg vor dem Home Screen
+# Guest entry before the home screen
 
-**Historischer Stand vom 17.11.2026.** Für den später ergänzten lokalen Profilzugang siehe [Lokale Profile: Anmeldung und Spielstart](local-login.md). Die folgenden Angaben dokumentieren die damalige Umsetzung und beschreiben nicht mehr den aktuellen Anmeldebildschirm.
+**Historical status from 17.11.2026.** For the local profile access added later, see [Local profiles: sign-in and game start](local-login.md). The following notes document the implementation at that time and no longer describe the current sign-in screen.
 
-**Stand: 17.11.2026, Branch `codex/guest-entry-flow`.** Dies ist der vorbereitete Ablauf für den nächsten Pull Request. Bis zum Merge startet das öffentliche Spiel weiterhin direkt im Home Screen.
+**Status: 17.11.2026, branch `codex/guest-entry-flow`.** This is the prepared flow for the next pull request. Until the merge, the public game still starts directly on the home screen.
 
-## Ablauf für Spieler
+## Flow for players
 
-1. Beim Öffnen erscheint Florians Bildvorlage mit den gezeichneten Knöpfen **Log In** und **Sign Up**. Die echte Klickfläche liegt genau darüber; auf kleinen Bildschirmen werden die Knöpfe zusätzlich lesbar dargestellt.
-2. Beide Knöpfe öffnen jeweils eine eigene Zwischenansicht mit passender Überschrift. Dort steht ausdrücklich, dass Konten noch nicht verfügbar sind. **Continue as guest** führt ohne Benutzername oder Passwort weiter. **Back** führt zur Auswahl zurück.
-3. Der vorhandene Home Screen erscheint. **Start New Game** öffnet das Museum und zeigt Ms Missionsnachricht. Bei einem begonnenen Fall ist **Resume Game** möglich.
-4. Im Spiel führt **Home** zurück zum Home Screen. Beim erneuten Laden der Seite erscheint die Eingangsseite wieder.
+1. On opening, Florian’s artwork appears with the drawn buttons **Log In** and **Sign Up**. The real click area sits exactly on top; on small screens the buttons are also shown as readable text.
+2. Each button opens its own intermediate view with a matching heading. It says clearly that accounts are not available yet. **Continue as guest** continues without a username or password. **Back** returns to the choice.
+3. The existing home screen appears. **Start New Game** opens the museum and shows M’s mission message. For a case already started, **Resume Game** is possible.
+4. In the game, **Home** leads back to the home screen. When the page is loaded again, the entry page appears again.
 
-**Es findet keine Anmeldung statt.** Die Spielstände bleiben wie bisher nur im Browser dieses Geräts gespeichert. Alle Gäste auf demselben Browser nutzen denselben lokalen Spielstand. Der Scoreboard-Knopf zeigt keinen gemeinsamen Online-Vergleich.
+**No sign-in takes place.** Saves stay, as before, only in the browser of this device. All guests on the same browser share the same local save. The Scoreboard button shows no shared online comparison.
 
-## Was im Code geschieht
+## What happens in the code
 
-| Datei | Aufgabe |
+| File | Purpose |
 | --- | --- |
-| `web/assets/login-screen-reference.jpg` | Von Florian bereitgestellte Bildvorlage für den ersten Bildschirm. |
-| `web/index.html` | Eingangsseite, zwei Zwischenansichten und der vorhandene Home Screen. Der Home Screen ist bis **Continue as guest** nicht bedienbar. |
-| `web/style.css` | Klickflächen über den gezeichneten Knöpfen, Zwischenansicht und mobiles Layout. |
-| `web/main.js` | Verbindet die Klicks: Auswahl → Zwischenansicht → Home Screen. Das Spiel und Ms Nachricht starten weiterhin erst über den Home Screen. |
+| `web/assets/login-screen-reference.jpg` | Artwork provided by Florian for the first screen. |
+| `web/index.html` | Entry page, two intermediate views and the existing home screen. The home screen cannot be used until **Continue as guest**. |
+| `web/style.css` | Click areas on top of the drawn buttons, intermediate view and mobile layout. |
+| `web/main.js` | Connects the clicks: choice → intermediate view → home screen. The game and M’s message still start only from the home screen. |
 
-Es wurde **kein** Clerk-, GitHub- oder anderer Anmeldedienst eingebaut. Eine spätere Anmeldung kann an der Stelle von **Continue as guest** angeschlossen werden; dafür braucht das Team erneut eine bewusste technische Entscheidung.
+**No** Clerk, GitHub or other sign-in service was built in. A later sign-in can be connected in place of **Continue as guest**; the team needs a deliberate technical decision for that again.
 
-## Prüfung
+## Checks
 
-- `node --test` im Ordner `web`: 217 bestanden, 0 fehlgeschlagen.
-- `node --check main.js` und `git diff --check`: ohne Fehler.
-- Lokaler Browserdurchlauf: **Log In → Continue as guest → Home → Start New Game → „A message from M“**. **Sign Up** und **Back** ebenfalls geprüft.
-- Die erste Ansicht und die Sign-Up-Zwischenansicht wurden im Browser mit Florians Vorlage verglichen. Ein Test der fertigen GitHub-Pages-Version folgt nach dem Merge.
+- `node --test` in the `web` folder: 217 passed, 0 failed.
+- `node --check main.js` and `git diff --check`: no errors.
+- Local browser run: **Log In → Continue as guest → Home → Start New Game → “A message from M”**. **Sign Up** and **Back** also checked.
+- The first view and the Sign Up intermediate view were compared with Florian’s artwork in the browser. A test of the finished GitHub Pages version follows after the merge.
