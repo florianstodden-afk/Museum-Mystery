@@ -292,3 +292,24 @@ test('a correct match from an existing partial save is locked without resetting 
   card(p.root, 1).click(); slots(p.root)[0].click();
   assert.deepEqual(p.saves.at(-1).slots, [0, null, null, null]);
 });
+
+test('before solving, the credits name no answer: only "Artwork 1 ↗" links to the Met pages', async t => {
+  const { root } = await page(t, { state: fresh() });   // started, nothing placed yet
+  const credit = findAll(root, n => (n.className ?? '').includes('catalogue-credits'))[0];
+  assert.ok(credit, 'credit area');
+  for (const work of works) {
+    for (const answer of [work.date, work.medium, work.culture, work.artistDisplayName, work.title]) {
+      assert.equal(credit.textContent.includes(answer), false, `credits must not show "${answer}"`);
+    }
+  }
+  const links = findAll(credit, n => n.tagName === 'A');
+  assert.deepEqual(links.map(a => a.textContent), ['Artwork 1 ↗', 'Artwork 2 ↗', 'Artwork 3 ↗', 'Artwork 4 ↗']);
+  assert.deepEqual(links.map(a => a.href), works.map(w => w.url));
+  assert.ok(links.every(a => a.target === '_blank' && a.rel.includes('noopener')));
+});
+
+test('after solving, the full credit line appears', async t => {
+  const { root } = await page(t, { state: finish(5000) });
+  const credit = findAll(root, n => (n.className ?? '').includes('catalogue-credits'))[0];
+  for (const work of works) assert.ok(credit.textContent.includes(work.artistDisplayName), work.artistDisplayName);
+});

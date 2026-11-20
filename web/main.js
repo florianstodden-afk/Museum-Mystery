@@ -6,7 +6,7 @@ import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=station-numbers-1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-numbers-1';
-import * as catalogueStation from './minigames/curators-catalogue.js';
+import * as catalogueStation from './minigames/curators-catalogue.js?v=credits-1';
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=art-cards-1';

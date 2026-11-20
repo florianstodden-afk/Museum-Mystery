@@ -56,7 +56,15 @@ export function start(container, caseData, onSolved) {
     indicator.hidden = true; resizeObserver?.disconnect();
     if (!state.demoDismissed) { state = { ...state, demoDismissed: true }; save(); }
   }
-  const credit = el('details', { className: 'puzzle-credit catalogue-credits' }, [
+  // Before solving, the credits must not show the answers (artist, title, date, medium, origin):
+  // one short line plus "Artwork 1 ↗" … links to the Met pages. After solving, the full credits.
+  const shortCredit = el('p', { className: 'puzzle-credit catalogue-credits' }, [
+    'Artworks: The Metropolitan Museum of Art · Public domain · ',
+    ...works.flatMap((work, i) => [i ? ' · ' : '', el('a', { text: `Artwork ${i + 1} ↗`, props: {
+      href: work.url, target: '_blank', rel: 'noopener noreferrer',
+    }, attrs: { 'aria-label': `Artwork ${i + 1}, object page at The Met (opens in a new tab)` } })]).filter(Boolean),
+  ]);
+  const fullCredit = el('details', { className: 'puzzle-credit catalogue-credits' }, [
     el('summary', { text: 'Artwork credits · The Met · Public domain' }),
     ...works.map(work => el('p', {}, [
       el('a', { text: `${work.artistDisplayName}, ${work.title}, ${work.date}`, props: {
@@ -188,7 +196,7 @@ export function start(container, caseData, onSolved) {
     status.textContent = selected === null ? '' : `${works[selected].artistDisplayName} selected. Choose a label slot or an empty tray space.`;
     indicator.hidden = state.demoDismissed === true || state.solved || state.slots.some(label => label !== null);
     controls.replaceChildren(back);
-    pane.replaceChildren(intro, clock, layout, status, credit, controls);
+    pane.replaceChildren(intro, clock, layout, status, state.solved ? fullCredit : shortCredit, controls);
     if (!indicator.hidden) { positionIndicator(); resizeObserver?.observe(layout); }
   }
   function keydown(event) {
