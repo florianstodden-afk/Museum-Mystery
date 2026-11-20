@@ -253,3 +253,16 @@ test('the choice explains why stealing is still possible, and every ending text 
   for (const ending of Object.values(ENDINGS)) assert.ok(ending.paragraphs.join(' ').split(/\s+/).length <= 40, ending.title);
   assert.match(ENDINGS['open-file'].paragraphs[0], /Vale/);
 });
+
+test('an empty journal before the mission shows one quiet sentence, which goes once the mission is read', async () => {
+  const { BLANK_JOURNAL } = await import('../journal.js');
+  installFakeDom();
+  assert.ok(BLANK_JOURNAL.split(/\s+/).length <= 15);
+  for (const compact of [false, true]) {
+    const box = createContainer(), side = compact ? createContainer() : null;
+    renderJournal(box, journalModel(newGame()), side);
+    assert.match(box.textContent, /The pages are still blank/);
+    renderJournal(box, journalModel(started()), side);
+    assert.doesNotMatch(box.textContent, /The pages are still blank/);
+  }
+});
