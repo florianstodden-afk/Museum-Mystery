@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
   <link rel="stylesheet" href="style.css?v=game-polish-1">
-  <link rel="stylesheet" href="story/story.css?v=catalogue-main-4">
+  <link rel="stylesheet" href="story/story.css?v=leaderboard-1">
 </head>
 <body>
   <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
@@ -57,7 +57,14 @@
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close scoreboard">×</button>
         <h2>Scoreboard</h2>
         <div id="home-scoreboard-result"></div>
-        <p class="home-panel-note">This device only. Online leaderboard is coming later.</p>
+        <section class="leaderboard" aria-labelledby="leaderboard-title">
+          <h3 id="leaderboard-title">Museum Leaderboard</h3>
+          <p id="leaderboard-status" role="status" aria-live="polite">Loading shared results…</p>
+          <div id="leaderboard-results"></div>
+          <button id="leaderboard-refresh" type="button">Refresh</button>
+          <button id="leaderboard-publish" type="button" hidden>Publish finished run</button>
+          <p class="leaderboard-note">Best score per player. Ties share a place. A public name and score appear only after you publish.</p>
+        </section>
       </div>
       <div id="home-confirm" class="home-panel" hidden>
         <h2>Start a new game?</h2>
@@ -98,8 +105,8 @@
           <h3>Investigation Progress</h3>
           <div id="journal"></div>
           <h3>Stats &amp; Credit</h3>
-          <div class="journal-stats"><span id="progress">0 / 4 letters</span><span id="pass">0 / 90 points</span><span id="steps">0 steps</span></div>
-          <p class="journal-sources">Art sources: <a href="https://www.metmuseum.org/art/collection/search/436121" target="_blank" rel="noopener">Degas</a> · <a href="https://www.metmuseum.org/art/collection/search/436535" target="_blank" rel="noopener">Van Gogh</a> · <a href="https://www.metmuseum.org/art/collection/search/12127" target="_blank" rel="noopener">Sargent</a> (The Metropolitan Museum of Art, Open Access)</p>
+          <div class="journal-stats"><span id="progress">0 / 4 letters</span><span id="pass">0 / 80 points</span><span id="steps">0 steps</span></div>
+          <p class="journal-sources">Artworks: The Metropolitan Museum of Art, Open Access · <a href="https://github.com/florianstodden-afk/Museum-Mystery/blob/main/docs/art-credits.md" target="_blank" rel="noopener">Full artwork credits</a></p>
         </section>
       </div>
     </div>
@@ -122,6 +129,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=station-i-patrol-1"></script>
+  <script type="module" src="main.js?v=leaderboard-1"></script>
 </body>
 </html>

@@ -1,5 +1,7 @@
 # Text audit
 
+**Historical audit of the former Station B (`landscape.js`).** The current game uses `curators-catalogue.js`; see [Curator’s Catalogue](story/curators-catalogue.md) for current text and art sources.
+
 All visible game texts (English) with word count, collected on 17 Nov 2026 with a small script over `web/story/`, `web/index.html`, `web/main.js` and the station files. Goal: ≤ 25 words per visible block, one calm voice (museum at night, slightly mysterious), no spoilers (safe code, years, Voss) before the final question, and everyone treats the player as the new restoration assistant.
 
 ## Changed in this branch (my files: story, home screen, Station I)

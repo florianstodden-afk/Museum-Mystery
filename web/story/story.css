@@ -322,8 +322,21 @@ a.story-button { display: inline-block; text-decoration: none; }
  .picture-puzzle .puzzle-slot, .picture-puzzle .puzzle-piece { min-height: 0; }
 }
 
-/* Home screen scoreboard: same panel look as Station L's popups (.puzzle-popup). */
-.scoreboard-panel { width: min(520px, 92%); max-height: 92%; padding: 22px; }
+/* The scoreboard is a translucent museum display over the painted home screen. */
+.scoreboard-panel { width: min(720px, 92%); max-width: 720px; max-height: 90%; padding: 24px 28px; background: rgba(12,31,39,.76); border: 2px solid #d1aa67; box-shadow: 0 20px 70px #000b, inset 0 0 0 1px #f4dca444; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.scoreboard-panel h2,.scoreboard-panel h3 { font-family: Fraunces,Georgia,serif; color: #f8e9c9; text-shadow: 0 2px 4px #000; }
+.scoreboard-panel h3 { margin: 22px 0 8px; font-size: 1.45rem; }
+.leaderboard { border-top: 1px solid #d1aa6780; margin-top: 20px; }
+.leaderboard-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.leaderboard-table caption { text-align: left; padding: 2px 0 8px; color: #d9bd83; }
+.leaderboard-table th,.leaderboard-table td { padding: 9px 7px; border-bottom: 1px solid #d1aa6747; text-align: left; }
+.leaderboard-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .09em; color: #e2c58c; }
+.leaderboard-table th:first-child,.leaderboard-table td:first-child { width: 12%; }
+.leaderboard-table td:nth-child(3) { white-space: nowrap; }
+.leaderboard-table tr.is-own-run { background: #a9844936; }
+.leaderboard-note,.leaderboard-empty,#leaderboard-status { color: #e1d3b9; font-size: .82rem; line-height: 1.4; }
+.leaderboard-note { margin: 7px 0 0; }
+.scoreboard-panel #leaderboard-refresh,.scoreboard-panel #leaderboard-publish { margin: 12px 8px 0 0; font-family: Fraunces,Georgia,serif; border-color: #d1aa67; background: #243e46c9; }
 .scoreboard-panel h2 { margin: 0 0 10px; }
 .scoreboard-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
 .scoreboard-table th, .scoreboard-table td { padding: 6px 8px; border-bottom: 1px solid #c3a76a44; text-align: left; }
