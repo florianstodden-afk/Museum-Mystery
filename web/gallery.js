@@ -1,4 +1,5 @@
 import { drawCameraLights } from './camera-lights.js';
+import { drawWallPlaque } from './wall-plaque.js?v=1';
 import { foliageOpacity } from './plant-mask.js?v=1';
 import { GALLERY_CAMERAS, GALLERY_OBSTACLES, galleryPosition } from './gallery-layout.js';
 
@@ -48,10 +49,8 @@ export function createGalleryRenderer() {
       const active=target?.id===id;ctx.fillStyle=active?'#ffe5a0':'#bd985c';
       ctx.fillRect(x-13,199,26,5);
       if(active){ctx.beginPath();ctx.moveTo(x,207);ctx.lineTo(x+4,211);ctx.lineTo(x,215);ctx.lineTo(x-4,211);ctx.fill();}
-      if(id==='note' || id==='painting' || id==='frames'){
-        ctx.fillStyle='#182a32';ctx.fillRect(x-38,177,id==='painting' ? 106 : id==='frames' ? 88 : 76,19);
-        ctx.fillStyle='#f3dca4';ctx.font='bold 11px sans-serif';ctx.fillText(id==='note' ? '2 · PUZZLE' : id==='painting' ? '3 · CATALOGUE' : '4 · FORGERY',x-31,190);
-      }
+      // A small brass plaque names the station; no number or letter (they would hint at the code word).
+      drawWallPlaque(ctx,x,183,{note:'PUZZLE',painting:'CATALOGUE',frames:'FORGERY'}[id],{active});
     }
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
     ctx.save();ctx.beginPath();ctx.rect(20,150,856,400);ctx.clip();

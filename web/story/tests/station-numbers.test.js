@@ -43,9 +43,11 @@ test('nothing the player sees before solving names a station letter', () => {
   assert.doesNotMatch(board.textContent, LEAK);
 });
 
-test('the wall signs show numbers, never letters', () => {
-  const signs = [...web('gallery.js').matchAll(/'(\w) · [A-Z]+'/g), ...web('main.js').matchAll(/'(\w) · [A-Z]+'/g)].map(m => m[1]);
-  assert.deepEqual(signs.sort(), ['1', '2', '3', '4']);
+test('the wall plaques show only the station name: no number, no code-word letter', () => {
+  const gallery = web('gallery.js'), hall = web('main.js');
+  assert.match(gallery, /\{note:'PUZZLE',painting:'CATALOGUE',frames:'FORGERY'\}/);
+  assert.match(hall, /drawWallPlaque\(ctx,mid,y\+height\+9,'PORTRAITS'/);
+  assert.doesNotMatch(gallery + hall, /'\w · [A-Z]+'/, 'no "2 · PUZZLE" style labels left');
 });
 
 test('after solving, the letter appears in the journal', () => {
