@@ -22,10 +22,30 @@ async function verifier(password, salt, cryptoApi) {
   return new Uint8Array(bits);
 }
 
+// Checks the form before anything is stored. The page shows `message` and marks `field`.
+// Same rules for Log In and Sign Up: 3–24 characters a–z 0–9 _ -, password 8–128 characters.
+export const ENTRY_MESSAGES = Object.freeze({
+  empty: 'Enter a username and a password.',
+  emptyName: 'Enter a username.',
+  emptyPassword: 'Enter a password.',
+  name: 'Use 3–24 letters, numbers, _ or - for your username.',
+  password: 'Use a password with 8–128 characters.',
+});
+export function checkEntryInput(username, password) {
+  const name = normalizedName(username ?? '');
+  const secret = String(password ?? '');
+  if (!name && !secret) return { ok: false, field: 'username', message: ENTRY_MESSAGES.empty };
+  if (!name) return { ok: false, field: 'username', message: ENTRY_MESSAGES.emptyName };
+  if (!validName(name)) return { ok: false, field: 'username', message: ENTRY_MESSAGES.name };
+  if (!secret) return { ok: false, field: 'password', message: ENTRY_MESSAGES.emptyPassword };
+  if (secret.length < 8 || secret.length > 128) return { ok: false, field: 'password', message: ENTRY_MESSAGES.password };
+  return { ok: true };
+}
+
 export async function registerLocalAccount(storage, username, password, cryptoApi = globalThis.crypto) {
   const name = normalizedName(username);
-  if (!validName(name)) return { ok: false, message: 'Use 3–24 letters, numbers, _ or - for your username.' };
-  if (password.length < 8 || password.length > 128) return { ok: false, message: 'Use a password with 8–128 characters.' };
+  const input = checkEntryInput(username, password);
+  if (!input.ok) return input;
   try {
     const accounts = readAccounts(storage);
     if (accounts.some(account => account.name === name)) return { ok: false, message: 'This username already exists on this device.' };
@@ -40,6 +60,8 @@ export async function registerLocalAccount(storage, username, password, cryptoAp
 
 export async function logInLocalAccount(storage, username, password, cryptoApi = globalThis.crypto) {
   const name = normalizedName(username);
+  const input = checkEntryInput(username, password);
+  if (!input.ok) return input;
   try {
     const account = readAccounts(storage).find(item => item.name === name);
     if (!account) return { ok: false, message: 'Username or password does not match on this device.' };

@@ -32,3 +32,27 @@ test('bad input or unavailable storage does not create an account', async () => 
   const blocked = { getItem() { throw new Error('blocked'); } };
   assert.equal((await registerLocalAccount(blocked, 'player', 'password-one')).ok, false);
 });
+
+import { checkEntryInput, ENTRY_MESSAGES } from './local-auth.js';
+test('the form check names the wrong field with a short message, and nothing is stored', async () => {
+  const storage = memoryStorage();
+  const cases = [
+    ['', '', 'username', ENTRY_MESSAGES.empty],
+    ['', 'password-one', 'username', ENTRY_MESSAGES.emptyName],
+    ['player', '', 'password', ENTRY_MESSAGES.emptyPassword],
+    ['ab', 'password-one', 'username', ENTRY_MESSAGES.name],
+    ['bad name!', 'password-one', 'username', ENTRY_MESSAGES.name],
+    ['x'.repeat(25), 'password-one', 'username', ENTRY_MESSAGES.name],
+    ['player', 'short', 'password', ENTRY_MESSAGES.password],
+    ['player', 'p'.repeat(129), 'password', ENTRY_MESSAGES.password],
+  ];
+  for (const [name, password, field, message] of cases) {
+    assert.deepEqual(checkEntryInput(name, password), { ok: false, field, message }, `${name}/${password.length}`);
+    const signUp = await registerLocalAccount(storage, name, password);
+    assert.equal(signUp.ok, false);
+    assert.equal(signUp.message, message, 'Sign Up shows the same message');
+    assert.equal((await logInLocalAccount(storage, name, password)).message, message, 'Log In too');
+  }
+  assert.equal(storage.getItem(ACCOUNTS_KEY), null, 'no account was created');
+  assert.deepEqual(checkEntryInput('Player_1', 'password-one'), { ok: true });
+});

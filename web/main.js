@@ -21,7 +21,7 @@ import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js?v=npc-conversation-1';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
-import { SESSION_KEY, registerLocalAccount, logInLocalAccount, profileStorageKey } from './local-auth.js';
+import { SESSION_KEY, registerLocalAccount, logInLocalAccount, profileStorageKey, checkEntryInput } from './local-auth.js?v=entry-check-1';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -641,7 +641,7 @@ function openEntryPanel(mode, opener){
   entryBackdrop.src=signingUp?'assets/signup-screen-reference.jpg':'assets/login-form-reference.jpg';
   document.querySelector('#entry-password').autocomplete=signingUp?'new-password':'current-password';
   document.querySelector('#entry-forgot').hidden=signingUp;
-  entryForm.reset();entryMessage.textContent='';
+  entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
   entryChoices.hidden=true;
   entryPanel.hidden=false;
   document.querySelector('#entry-username').focus();
@@ -650,7 +650,7 @@ function closeEntryPanel(){
   entryPanel.hidden=true;
   entryChoices.hidden=false;
   entryBackdrop.src='assets/login-screen-reference.jpg';
-  entryForm.reset();entryMessage.textContent='';
+  entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
   entryOpener.focus();
 }
 entryLogin.addEventListener('click',()=>openEntryPanel('login',entryLogin));
@@ -658,6 +658,11 @@ entrySignup.addEventListener('click',()=>openEntryPanel('signup',entrySignup));
 document.querySelector('#entry-back').addEventListener('click',closeEntryPanel);
 entryForm.addEventListener('submit',async event=>{
   event.preventDefault();
+  // Our own check instead of the browser's bubble: message in #entry-message, focus and aria-invalid on the field.
+  const fields={username:document.querySelector('#entry-username'),password:document.querySelector('#entry-password')};
+  for(const field of Object.values(fields))field.removeAttribute('aria-invalid');
+  const input=checkEntryInput(fields.username.value,fields.password.value);
+  if(!input.ok){entryMessage.textContent=input.message;fields[input.field].setAttribute('aria-invalid','true');fields[input.field].focus();return;}
   const submit=document.querySelector('#entry-submit');
   submit.disabled=true;
   entryMessage.textContent='Checking…';
