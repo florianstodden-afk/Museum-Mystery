@@ -130,7 +130,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `minigames/portrait-timeline.js` | Time ${formatClock(time)}${record === time ? ' · New best!' : | 10 |
 | `minigames/portrait-timeline.js` | Back to station | 3 |
 | `minigames/portrait-timeline.js` | Sort the portraits | 3 |
-| `minigames/portrait-timeline.js` | The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press 1, 2, 3. Enter checks. | 25 |
+| `minigames/portrait-timeline.js` | The dates show for 4 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press 1, 2, 3. Enter checks. | 25 |
 | `minigames/portrait-timeline.js` | Peek shows one date (+5 s). A wrong check adds 5 s. Within 20 s: +15 points, 35 s: +10, 50 s: +5, later: 0. | 25 |
 | `minigames/portrait-timeline.js` | Back to museum | 3 |
 | `minigames/portrait-timeline.js` | Dates vanish in ${Math.ceil((state.flashUntil - t) / 1000)} s | 9 |

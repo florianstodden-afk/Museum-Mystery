@@ -1,5 +1,5 @@
 // Station I (Portrait Hall) – a speedrun in the look and flow of Station L:
-// intro → Start ↵ → 10 s reading time with the dates (clock waits) → sort oldest to newest with the points bar → success popup with letter I.
+// intro → Start ↵ → 4 s reading time with the dates (clock waits) → sort oldest to newest with the points bar → success popup with letter I.
 // Contract (docs/story/minigame-contract.md): start(container, caseData, onSolved).
 // The host saves progress through caseData.onChange; the engine gives letter, evidence and points (by time, like L).
 import { el } from '../story/dom.js';
@@ -152,7 +152,7 @@ export function start(container, caseData, onSolved) {
       onAction: () => { closePopup?.(); closePopup = null; focusMain(); },
       contents: [
         el('h3', { text: 'Sort the portraits' }),
-        el('p', { text: 'The dates show for 10 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press their numbers. Enter checks.' }),
+        el('p', { text: 'The dates show for 4 seconds, then the clock runs. Sort oldest to newest: drag, click two cards or press their numbers. Enter checks.' }),
         el('p', { text: `Peek shows one date (+5 s). A wrong check adds 5 s. Within ${PORTRAIT_LIMITS_MS[0] / 1000} s: +15 points, ${PORTRAIT_LIMITS_MS[1] / 1000} s: +10, ${PORTRAIT_LIMITS_MS[2] / 1000} s: +5, later: 0.` }),
       ],
     });

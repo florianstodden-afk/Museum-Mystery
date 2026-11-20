@@ -10,7 +10,7 @@ A small top-down detective game in the browser: walk through a museum at night, 
 
 | Name | Student number |
 |---|---|
-| Florian Baumgartl | 78089 |
+| Florian Baumgartl | 78086 |
 | Florian Stodden | 78574 |
 | Fabian Oscar Bergvall | 78922 |
 | Leo Johannes Oskar Heppe | 79527 |

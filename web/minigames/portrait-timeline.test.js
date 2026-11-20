@@ -140,13 +140,13 @@ test('"?" opens the instructions popup; Enter closes it again', () => {
   s.cleanup();
 });
 
-test('Enter starts; the dates show for 10 s, then vanish; a wrong check adds 5 s on the bar', async () => {
+test('Enter starts; the dates show for 4 s, then vanish; a wrong check adds 5 s on the bar', async () => {
   const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
   assert.equal(s.last().startedAt, T0);
   assert.deepEqual(s.chips(), ['1823', '1883–84', '1865', '1888–90']);
   assert.match(s.text(), /\+15 points\+10 points\+5 points\+0 points/);
-  assert.match(s.text(), /Dates vanish in 10 s/);
+  assert.match(s.text(), /Dates vanish in 4 s/);
   s.clock.ms = T0 + FLASH_MS;
   await tick();
   assert.deepEqual(s.chips(), []);
@@ -253,10 +253,10 @@ test('a broken save starts fresh; an old solved save shows the log and reports o
   old.cleanup();
 });
 
-test('during the 10 s reading time the clock waits and the cards cannot be moved or checked', () => {
+test('during the 4 s reading time the clock waits and the cards cannot be moved or checked', () => {
   const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
   s.key('Enter');
-  s.clock.ms = T0 + 5000;
+  s.clock.ms = T0 + 3000;
   s.key('2'); s.key('3');
   assert.deepEqual(s.last().order, [INGRES, SARGENT, DEGAS, CEZANNE], 'no swapping while reading');
   s.key('Enter');

@@ -44,7 +44,7 @@ for (const [width, height] of SIZES) {
   const years = await page.locator('.portrait-chip').allTextContents();
   ok(`${width}×${height} flash shows four dates`, years.length === 4, years.join(', '));
   await report('flash');
-  await page.waitForTimeout(10100);                                     // 10 s reading time, then the arrow appears
+  await page.waitForTimeout(4100);                                      // 4 s reading time, then the arrow appears
   ok(`${width}×${height} drag hint arrow`, await page.locator('.portrait-timeline .puzzle-drag-demo').isVisible());
   await page.keyboard.press('Enter');                                   // still shuffled → wrong, +5 s
   ok(`${width}×${height} wrong check says "Not yet"`, (await page.locator('.puzzle-status').textContent()).includes('Not yet'));
