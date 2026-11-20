@@ -16,7 +16,7 @@ import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wh
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
-import { chooseGuardAction } from './guard.js';
+import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js?v=npc-conversation-1';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
@@ -99,7 +99,7 @@ let movementAnimation = null;
 let facing = 'down';
 let animationTime = 0;
 // Old saves may start near the guard; choose a safe starting tile without moving the player.
-const guardStarts=[{x:5,y:5},{x:7,y:8},{x:2,y:12}];
+const guardStarts=[{x:5,y:8},{x:7,y:8},{x:2,y:12}];
 let guardPosition = guardStarts.find(p=>Math.abs(p.x-state.player.x)>=0.45 || Math.abs(p.y-state.player.y)>=2.4) || guardStarts[0];
 let guardMotion = null;
 let guardDelay = 1200;
@@ -421,7 +421,7 @@ function runStoryAction(action){
 }
 // Called by the story host when the player confirms "New game".
 function resetWorld(){
-  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:5};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();
+  state=initialState();displayPlayer={...state.player};movementAnimation=null;roomTransition=null;guardPosition={x:5,y:8};guardMotion=null;guardDelay=1200;guardLastFacing='down';heldKeys.clear();speech.close();
   try{if(!vaultPreview)localStorage.removeItem(oldLandscapeKey);}catch{}
   savePosition();
 }
