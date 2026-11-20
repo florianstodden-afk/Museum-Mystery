@@ -225,3 +225,20 @@ test('vault wheel uses distinct clicks for turning, a correct letter, and a diff
   hub.click();
   assert.equal(sounds.at(-1),'vault-correct');
 });
+
+test('journal reveals "Who was M?" only after the right accusation', () => {
+  installFakeDom();
+  let s = started();
+  for (const id of ALL) s = solveStation(s, id, {}).state;
+  s = tryOpenSafe(s, 'OILS').state;
+  s = accuse(s, 'vale').state;
+  const before = createContainer();
+  renderJournal(before, journalModel(s));
+  assert.doesNotMatch(before.textContent, /Who was M|mécène/);
+  s = accuse(s, 'voss').state;
+  const after = createContainer();
+  renderJournal(after, journalModel(s));
+  assert.match(after.textContent, /Case notes · Who was M\?: M was Adrien Voss\..*mécène.*Mara Vale/);
+  const words = journalModel(s).caseNotes[0].text.split(/\s+/).length;
+  assert.ok(words <= 40, `${words} words`);
+});
