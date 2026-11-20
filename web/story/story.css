@@ -327,7 +327,7 @@ a.story-button { display: inline-block; text-decoration: none; }
 .scoreboard-panel h2,.scoreboard-panel h3 { font-family: Fraunces,Georgia,serif; color: #f8e9c9; text-shadow: 0 2px 4px #000; }
 .scoreboard-panel h3 { margin: 22px 0 8px; font-size: 1.45rem; }
 .leaderboard { border-top: 1px solid #d1aa6780; margin-top: 20px; }
-.leaderboard-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.leaderboard-table { width: 100%; border-collapse: collapse; font: 600 .94rem Fraunces,Georgia,serif; }
 .leaderboard-table caption { text-align: left; padding: 2px 0 8px; color: #d9bd83; }
 .leaderboard-table th,.leaderboard-table td { padding: 9px 7px; border-bottom: 1px solid #d1aa6747; text-align: left; }
 .leaderboard-table th { font-size: .78rem; text-transform: uppercase; letter-spacing: .09em; color: #e2c58c; }
