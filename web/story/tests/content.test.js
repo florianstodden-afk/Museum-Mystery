@@ -95,7 +95,7 @@ test('ending model has no ending before the decision', () => {
 test('ending model gives the right breakdown for both endings', () => {
   const heist = endingModel(finished('heist', { wrongWord: true, stationResult: { landscape: { mistakes: 1, hints: 1 } } }));
   assert.equal(heist.title, 'I am a thief');
-  assert.match(heist.paragraphs.join(' '), /deliver the original to Voss/);
+  assert.match(heist.paragraphs.join(' '), /not for Voss, for yourself/);
   // Station I is a speedrun station now: at most 15 points (like L).
   assert.deepEqual(heist.breakdown.map(row => row.points), [15, 15, 15, 15, 5, 10]);
   assert.equal(heist.total, 75);
@@ -241,4 +241,15 @@ test('journal reveals "Who was M?" only after the right accusation', () => {
   assert.match(after.textContent, /Case notes · Who was M\?: M was Adrien Voss\..*mécène.*Mara Vale/);
   const words = journalModel(s).caseNotes[0].text.split(/\s+/).length;
   assert.ok(words <= 40, `${words} words`);
+});
+
+test('the choice explains why stealing is still possible, and every ending text stays short', async () => {
+  const { CHOICE_TEXT, ENDINGS, renderEndingChoice } = await import('../endings.js');
+  installFakeDom();
+  const box = createContainer();
+  renderEndingChoice(box, () => {});
+  assert.match(box.textContent, /used you as his thief/);
+  assert.ok(CHOICE_TEXT.split(/\s+/).length <= 45);
+  for (const ending of Object.values(ENDINGS)) assert.ok(ending.paragraphs.join(' ').split(/\s+/).length <= 40, ending.title);
+  assert.match(ENDINGS['open-file'].paragraphs[0], /Vale/);
 });

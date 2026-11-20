@@ -5,13 +5,16 @@ import { renderChain } from './accusation-ui.js';
 import { scoreBreakdown, totalScore, maximumScore, scoreboard, formatClock } from './scoring.js';
 import { el, button } from './dom.js';
 
+// Shown before the two buttons, so the player knows why stealing is still an option.
+export const CHOICE_TEXT = 'Voss planned everything and used you as his thief. The safe is open, the Van Gogh in reach. Take it for yourself, or walk away and let Vale return it to the wall?';
+
 export const ENDINGS = {
   heist: {
     kicker: 'STEAL THE ARTWORK',
     title: 'I am a thief',
     choiceLabel: 'Steal the artwork',
     paragraphs: [
-      'You deliver the original to Voss. His forgery stays on the wall.',
+      'You keep the painting, not for Voss, for yourself. He will hunt you; Vale will remember you. Some nights end with a choice, not a reward.',
     ],
   },
   lost: {
@@ -26,7 +29,7 @@ export const ENDINGS = {
     title: 'I am not a thief',
     choiceLabel: 'Quit the mission',
     paragraphs: [
-      'You return the original to Dr. Vale. Your evidence exposes Voss.',
+      'You walk away and leave the painting with Dr. Vale. By morning it hangs on its wall again, and your evidence exposes Voss as the man behind M.',
     ],
   },
 };
@@ -69,7 +72,7 @@ export function endingModel(state, progress = {}) {
 export function renderEndingChoice(container, onChoose) {
   container.replaceChildren(el('section', { className: 'story-ending-choice' }, [
     el('p', { className: 'story-eyebrow', text: 'ONE FINAL CHOICE' }),
-    el('p', { className: 'story-text', text: 'You have the original. What do you do?' }),
+    el('p', { className: 'story-text', text: CHOICE_TEXT }),
     el('div', { className: 'story-choices' }, [
       button(`${ENDINGS.heist.choiceLabel} · I am a thief`, () => onChoose('heist'), 'story-choice'),
       button(`${ENDINGS['open-file'].choiceLabel} · I am not a thief`, () => onChoose('open-file'), 'story-choice'),

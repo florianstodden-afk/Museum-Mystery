@@ -168,8 +168,8 @@ export function chooseEnding(state, endingId) {
   const next = copy(state);
   next.ending = endingId;
   const message = endingId === 'heist'
-    ? 'You hand the painting to Voss. The Heist.'
-    : 'You bring the painting and the evidence to Dr. Vale. The Open File.';
+    ? 'You keep the painting for yourself.'
+    : 'You leave the painting and the evidence with Dr. Vale.';
   return accept(next, message);
 }
 

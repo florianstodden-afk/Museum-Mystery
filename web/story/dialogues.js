@@ -24,7 +24,7 @@ function linesForM(state) {
     return away(['You dial the number from M’s message.', '“The number you have called is no longer in service.”']);
   }
   if (state.ending === 'heist') {
-    return talk(['Pleasure doing business. The car is already gone.', 'No one will ever know you were here.']);
+    return talk(['You kept it for yourself? Bold.', 'Run fast. I know your face now.']);
   }
   if (state.ending === 'open-file') {
     return away(['You dial the number from M’s message.', '“The number you have called is no longer in service.”']);
