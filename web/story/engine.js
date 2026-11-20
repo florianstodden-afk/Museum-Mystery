@@ -7,7 +7,7 @@
 //   stations, anything after the ending), `state` is the unchanged input state.
 //   A WRONG ANSWER at the safe or the final question is allowed: it is counted as an
 //   attempt, so `state` changes (attempts + 1) and ok is false.
-import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById, stationPlace } from './case-1.js';
+import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById, stationPlace, stationsByNumber } from './case-1.js';
 import { SPEED_MAX, stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
 
 export const ENDING_IDS = ['heist', 'open-file'];
@@ -166,7 +166,7 @@ export function nextStep(state) {
   if (state.ending !== null) return 'Case closed. Start a new game to play again.';
   if (!state.missionRead) return 'Read the message from M.';
   if (!allStationsSolved(state)) {
-    const open = CASE.stations.filter(s => !state.stations[s.id].solved).map(stationPlace);
+    const open = stationsByNumber().filter(s => !state.stations[s.id].solved).map(stationPlace);
     return `Find the remaining stations: ${open.join('; ')}.`;
   }
   if (!state.safe.open) return 'All four letters found. Open the safe with the word in your journal.';

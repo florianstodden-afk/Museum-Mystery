@@ -176,7 +176,7 @@ test('after an ending every action is locked until newGame()', () => {
 
 test('next step follows the story', () => {
   let s = must(readMission(newGame()));
-  assert.match(nextStep(s), /Gallery, middle painting; Portrait Hall; Gallery, left painting; Gallery, frame rack\./);
+  assert.match(nextStep(s), /Portrait Hall; Gallery, left painting; Gallery, middle painting; Gallery, frame rack\./);
   s = withAllStations();
   assert.match(nextStep(s), /Open the safe/);
   s = must(tryOpenSafe(s, 'BILD'));

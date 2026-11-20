@@ -28,7 +28,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - In the vault, answer the final question. There are two endings and up to 80 points (older completed saves retain their original rewards).
 - The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
-- The Home screen's **Scoreboard** shows your run and a transparent shared leaderboard. Finish a current run, then choose **Publish finished run** to submit its score. The online service must first be deployed and connected; [setup, scoring and login handoff](docs/leaderboard.md).
+- The Home screen's **Scoreboard** shows your run and a transparent shared leaderboard. Finish a current run, then choose **Publish finished run** to submit its score. The online service must first be deployed and connected; [setup, scoring and login handoff](docs/leaderboard.md). Limits: names are not verified, and a result can be faked through the public API; the Worker still checks the format and the points cap.
 
 ## Run locally
 
