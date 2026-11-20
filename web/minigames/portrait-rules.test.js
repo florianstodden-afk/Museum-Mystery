@@ -42,7 +42,7 @@ test('a shuffle is never already solved and the clock has not started', () => {
   }
 });
 
-test('Start shows all dates for 10 s of reading time; only then the clock runs', () => {
+test('Start shows all dates for 4 s of reading time; only then the clock runs', () => {
   const before = timeline([INGRES, CEZANNE, DEGAS, SARGENT], {}, false);
   assert.equal(moveCard(before, DEGAS, 0), before, 'cards stay put before Start');
   assert.equal(checkOrder(before, T0), before);
@@ -50,9 +50,10 @@ test('Start shows all dates for 10 s of reading time; only then the clock runs',
   assert.equal(s.flashUntil, T0 + FLASH_MS);
   assert.deepEqual(revealedDates(s, T0 + 100), PORTRAIT_IDS);
   assert.deepEqual(revealedDates(s, T0 + FLASH_MS), [], 'dates vanish after the flash');
-  assert.equal(elapsedMs(s, T0 + 7000), 0, 'reading time does not count');
+  assert.equal(elapsedMs(s, T0 + 3000), 0, 'reading time does not count');
+  assert.equal(FLASH_MS, 4000);
   assert.equal(elapsedMs(s, T0 + FLASH_MS + 7000), 7000);
-  assert.equal(checkOrder({ ...s, order: RIGHT }, T0 + 5000).solved, false, 'no checking while reading');
+  assert.equal(checkOrder({ ...s, order: RIGHT }, T0 + 3000).solved, false, 'no checking while reading');
 });
 
 test('reopening (Start again) never gives a second free flash', () => {

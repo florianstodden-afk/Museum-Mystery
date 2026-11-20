@@ -6,7 +6,7 @@ import { CASE, workById } from '../story/case-1.js';
 
 export const PORTRAIT_IDS = Object.freeze([...CASE.stations.find(station => station.id === 'portraits').metIds]);
 
-export const FLASH_MS = 10000;    // reading time after Start: task and dates show, the clock waits
+export const FLASH_MS = 4000;     // reading time after Start: task and dates show, the clock waits
 export const PEEK_MS = 1500;      // how long one date shows after Peek
 export const PENALTY_MS = 5000;   // added to the clock for a peek or a wrong check
 
