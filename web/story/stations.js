@@ -6,7 +6,7 @@
 //
 // Two formats are supported:
 // 1. Target format: onSolved({ mistakes, hints })
-// 2. Today's landscape.js: onSolved({ letter, evidence, points }) and the progress
+// 2. The older station format: onSolved({ letter, evidence, points }) and the progress
 //    { mistakes, hints, solved } arrives earlier through caseData.onChange(progress).
 
 export function openStation(stationModule, container, options) {
@@ -22,8 +22,8 @@ export function openStation(stationModule, container, options) {
   const stationCaseData = {
     ...caseData,
     stationId,
-    state: savedProgress ?? undefined,   // landscape.js reads its saved progress from here
-    onChange(next) {                      // landscape.js reports every change here
+    state: savedProgress ?? undefined,   // older stations read their saved progress from here
+    onChange(next) {                      // older stations report every change here
       if (!active) return;
       progress = next;
       if (onProgress) onProgress(next);

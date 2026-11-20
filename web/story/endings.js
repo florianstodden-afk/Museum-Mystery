@@ -2,8 +2,11 @@
 import { CASE, workById } from './case-1.js';
 import { evidenceChain } from './journal.js';
 import { renderChain } from './accusation-ui.js';
-import { scoreBreakdown, totalScore, maximumScore } from './scoring.js';
+import { scoreBreakdown, totalScore, maximumScore, scoreboard, formatClock } from './scoring.js';
 import { el, button } from './dom.js';
+
+// Shown before the two buttons, so the player knows why stealing is still an option.
+export const CHOICE_TEXT = 'Voss planned everything and used you as his thief. The safe is open, the Van Gogh in reach. Take it for yourself, or walk away and let Vale return it to the wall?';
 
 export const ENDINGS = {
   heist: {
@@ -11,7 +14,14 @@ export const ENDINGS = {
     title: 'I am a thief',
     choiceLabel: 'Steal the artwork',
     paragraphs: [
-      'You deliver the original to Voss. His forgery stays on the wall.',
+      'You keep the painting, not for Voss, for yourself. He will hunt you; Vale will remember you. Some nights end with a choice, not a reward.',
+    ],
+  },
+  lost: {
+    kicker: 'BEFORE SUNRISE',
+    title: 'Case lost',
+    paragraphs: [
+      'You named the wrong person three times. By sunrise, Voss and the original are gone. The museum will never know who planned it.',
     ],
   },
   'open-file': {
@@ -19,19 +29,28 @@ export const ENDINGS = {
     title: 'I am not a thief',
     choiceLabel: 'Quit the mission',
     paragraphs: [
-      'You return the original to Dr. Vale. Your evidence exposes Voss.',
+      'You walk away and leave the painting with Dr. Vale. By morning it hangs on its wall again, and your evidence exposes Voss as the man behind M.',
     ],
   },
 };
 
 const PAINTING = workById(436535);
 
+const DETAIL_INTRO = {
+  heist: 'You keep the original. The forgery remains in the Gallery.',
+  'open-file': 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.',
+  lost: 'Three wrong names. The evidence you found is listed below.',
+};
+
 // Everything the end screen needs, or null while the game has no ending.
-export function endingModel(state) {
+// `progress` (optional) is the saved station progress; it adds the Renoir time to the run time.
+export function endingModel(state, progress = {}) {
   const ending = ENDINGS[state.ending];
   if (!ending) return null;
   return {
     id: state.ending,
+    status: state.ending === 'lost' ? 'Lost' : 'Won',
+    timeMs: scoreboard(state, progress).timeMs,
     kicker: ending.kicker,
     title: ending.title,
     paragraphs: ending.paragraphs,
@@ -53,7 +72,7 @@ export function endingModel(state) {
 export function renderEndingChoice(container, onChoose) {
   container.replaceChildren(el('section', { className: 'story-ending-choice' }, [
     el('p', { className: 'story-eyebrow', text: 'ONE FINAL CHOICE' }),
-    el('p', { className: 'story-text', text: 'You have the original. What do you do?' }),
+    el('p', { className: 'story-text', text: CHOICE_TEXT }),
     el('div', { className: 'story-choices' }, [
       button(`${ENDINGS.heist.choiceLabel} · I am a thief`, () => onChoose('heist'), 'story-choice'),
       button(`${ENDINGS['open-file'].choiceLabel} · I am not a thief`, () => onChoose('open-file'), 'story-choice'),
@@ -88,16 +107,15 @@ export function renderEnding(container, model, options = {}) {
 
   const details = el('details', { className: 'story-ending-details' }, [
     el('summary', { text: 'View evidence and score details' }),
-    el('p', { className: 'story-ending-detail-intro', text: model.id === 'heist'
-      ? 'Voss gets the original and pays you. The forgery remains in the Gallery.'
-      : 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.' }),
+    el('p', { className: 'story-ending-detail-intro', text: DETAIL_INTRO[model.id] }),
     renderChain(model.chain),
     table,
     el('p', { className: 'story-disclaimer', text: model.disclaimer }),
   ]);
   const actions = el('div', { className: 'story-ending-actions' });
-  if (options.onHome) actions.append(button('Back to home', options.onHome));
-  if (options.onNewGame) actions.append(button('New game', options.onNewGame));
+  const lost = model.id === 'lost';
+  if (options.onHome) actions.append(button(lost ? 'Back to menu' : 'Back to home', options.onHome));
+  if (options.onNewGame) actions.append(button(lost ? 'Try again' : 'New game', options.onNewGame));
   const parts = [
     el('div', { className: 'story-ending-plaque' }, [
       el('p', { className: 'story-eyebrow', text: model.kicker }),
@@ -108,6 +126,7 @@ export function renderEnding(container, model, options = {}) {
       figure,
       el('div', { className: 'story-ending-controls' }, [
         el('p', { className: 'story-ending-total', text: `${model.total} / ${model.max} points` }),
+        el('p', { className: 'story-ending-status', text: `${model.status} · time ${model.timeMs == null ? '–' : formatClock(model.timeMs)}` }),
         actions,
         details,
       ]),

@@ -20,8 +20,11 @@ export function dialogueFor(characterId, state) {
 }
 
 function linesForM(state) {
+  if (state.ending === 'lost') {
+    return away(['You dial the number from M’s message.', '“The number you have called is no longer in service.”']);
+  }
   if (state.ending === 'heist') {
-    return talk(['Pleasure doing business. The car is already gone.', 'No one will ever know you were here.']);
+    return talk(['You kept it for yourself? Bold.', 'Run fast. I know your face now.']);
   }
   if (state.ending === 'open-file') {
     return away(['You dial the number from M’s message.', '“The number you have called is no longer in service.”']);
@@ -83,6 +86,9 @@ function linesForImani(state) {
 function linesForVale(state) {
   if (!state.safe.open) {
     return away(['Dr. Vale’s office is dark.', 'A card on the door: “Back after the gala. – M. V.”']);
+  }
+  if (state.ending === 'lost') {
+    return away(['Dr. Vale stands in front of the open safe.', 'The original is gone. So is the patron who planned it.']);
   }
   if (state.ending === 'open-file') {
     return talk(['The file is open. Tomorrow the painting goes back on its wall – the real one.']);
@@ -198,7 +204,7 @@ const ODD_ON_MY_ROUND = {
   landscape: ['Too quiet. That new wall label in the gallery – someone hung it in a hurry.', 'Match the catalogue labels in the middle of the Gallery. They may reveal who approved it.'],
   portraits: ['Quiet, until you count the portraits.', 'Four ladies, and the cards beside them are all shuffled.'],
   restoration: ['Imani’s been muttering about a puzzle of Renoir’s cliffs.', 'Says it hides something on the back of a slip.'],
-  archive: ['The frame archive door was ajar on my last round.', 'Archives don’t open themselves.'],
+  archive: ['Someone moved the frames on the Gallery rack during my last round.', 'Frames don’t move themselves.'],
 };
 
 function leonRound(state) {

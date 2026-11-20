@@ -64,7 +64,7 @@ export function start(container, caseData, onSolved) {
       puzzlePopup(pane, overlay, 'Forgery identified', [
         el('h3', { text: 'Forgery identified!' }),
         el('p', { text: CASE.stations.find(s => s.id === 'archive').evidence }),
-        ...puzzleReward('D', pictureSpeedPoints(elapsedMs(state))),
+        ...puzzleReward('S', pictureSpeedPoints(elapsedMs(state))),
       ], { actionLabel: 'Return to museum', onAction: leave, keys: ['Enter', 'Escape'] });
     }
   }, 'forgery-target');

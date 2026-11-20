@@ -12,7 +12,7 @@ import { renderScoreboard } from '../scoreboard-view.js';
 import { OBJECTS } from '../../engine.js';
 import { installFakeDom, createContainer } from './fake-dom.js';
 
-const LEAK = /Station [BILD]\b|\b[BILD] ·|\([BILD]\)/;
+const LEAK = /Station [OILS]\b|\b[OILS] ·|\([OILS]\)/;
 const fresh = () => readMission(newGame()).state;
 const web = path => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
 
@@ -37,7 +37,7 @@ test('nothing the player sees before solving names a station letter', () => {
   const journal = createContainer();
   renderJournal(journal, journalModel(s));
   assert.doesNotMatch(journal.textContent, LEAK);
-  assert.doesNotMatch(journal.textContent, /(?:^|\s)[BILD](?:\s|$)/, 'no single letter in an open slot');
+  assert.doesNotMatch(journal.textContent, /(?:^|\s)[OILS](?:\s|$)/, 'no single letter in an open slot');
   const board = createContainer();
   renderScoreboard(board, scoreboard(s), null);
   assert.doesNotMatch(board.textContent, LEAK);

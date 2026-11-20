@@ -102,7 +102,7 @@ export function start(container, caseData, onSolved) {
     puzzlePopup(pane, overlay, 'Catalogue matched', [
       el('h3', { text: 'Catalogue matched!' }),
       el('p', { text: `The corrected catalogue reveals the approval record: ${stationById('landscape').evidence}` }),
-      ...puzzleReward('B', pictureSpeedPoints(elapsedMs(state, now()))),
+      ...puzzleReward('O', pictureSpeedPoints(elapsedMs(state, now()))),
     ], { actionLabel: 'Return to museum', onAction: leave, keys: ['Enter', 'Escape'] });
   }
   function canPlay() { return art && !disposed && !popup && state.startedAt !== null && !state.solved; }

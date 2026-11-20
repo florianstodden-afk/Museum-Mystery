@@ -204,14 +204,14 @@ test('internal dragging returns to a specific tray space; locked matches reject 
   assert.deepEqual(p.saves.at(-1).slots, [0, null, null, null]);
 });
 
-test('completion reports once, displays the unchanged B clue, and freezes reward', async t => {
+test('completion reports once, displays the O clue, and freezes reward', async t => {
   let time = 1000, closed = 0;
   const p = await page(t, { now: () => time, onClose: () => closed++ });
   document.pressKey('Enter'); time = 46000;
   for (let id = 0; id < 4; id++) { card(p.root, id).click(); slots(p.root)[id].click(); }
   assert.equal(p.awards.length, 1);
   assert.match(p.root.textContent, /Voss approved the false wall label/);
-  assert.match(p.root.textContent, /Badded to journal/);
+  assert.match(p.root.textContent, /Oadded to journal/);
   assert.match(p.root.textContent, /\+10 points earned/);
   slots(p.root)[0].click(); time = 999999;
   assert.equal(p.awards.length, 1);
@@ -244,7 +244,7 @@ test('host persists unfinished matches, elapsed time and a single award across n
   slots(root)[2].click(); slots(root)[0].click();
   for (const id of [1, 2, 3]) { card(root, id).click(); slots(root)[id].click(); }
   assert.equal(host.state.stations.landscape.points, 10);
-  assert.deepEqual(host.state.letters, ['B', null, null, null]);
+  assert.deepEqual(host.state.letters, ['O', null, null, null]);
   assert.deepEqual(host.state.evidence, ['false-label']);
   host.leaveStation(); time = 999999;
   host = createStoryHost(opts); host.openStation('landscape');
@@ -261,7 +261,7 @@ test('host recovers an interrupted final match exactly once and retains every le
     const host = createStoryHost({ storage, storageKey });
     assert.deepEqual(host.state.evidence, ['false-label']);
     assert.equal(host.state.stations.landscape.points, 0);
-    assert.equal(host.state.letters[0], 'B');
+    assert.equal(host.state.letters[0], 'O');
   }
   for (const points of [5, 12, 15, 17, 20]) {
     const legacy = solveStation(story, 'landscape').state;

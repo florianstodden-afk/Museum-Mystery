@@ -2,20 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { openStation, toEngineResult } from '../stations.js';
 import * as placeholder from '../placeholder-station.js';
-import { initialLandscape, answer, hint } from '../../minigames/landscape.js';
 import { newGame, readMission, solveStation } from '../engine.js';
 import { installFakeDom, createContainer, findButton, findAll } from './fake-dom.js';
 
-// A fake station in today's landscape.js format: progress through onChange,
-// then onSolved({ letter, evidence, points }). It uses the real landscape rules.
+// A fake station in the old progress format: progress through onChange,
+// then onSolved({ letter, evidence, points }). One wrong answer, one hint, then solved.
 const landscapeLike = {
   start(container, caseData, onSolved) {
-    let s = caseData.state || initialLandscape();
-    s = answer(s, '1881', 'watercolor'); caseData.onChange(s);
-    s = hint(s); caseData.onChange(s);
-    s = answer(s, '1889', 'oil'); caseData.onChange(s);
-    onSolved({ letter: 'B', evidence: 'Voss approved the false wall label.', points: 12 });
-    onSolved({ letter: 'B', evidence: 'twice', points: 12 }); // a buggy second call
+    caseData.onChange({ ...(caseData.state || {}), mistakes: 1, hints: 0, solved: false });
+    caseData.onChange({ mistakes: 1, hints: 1, solved: false });
+    caseData.onChange({ mistakes: 1, hints: 1, solved: true });
+    onSolved({ letter: 'O', evidence: 'Voss approved the false wall label.', points: 12 });
+    onSolved({ letter: 'O', evidence: 'twice', points: 12 }); // a buggy second call
   },
 };
 
@@ -26,7 +24,7 @@ const targetFormat = {
   },
 };
 
-test('adapter reads mistakes and hints from landscape.js progress', () => {
+test('adapter reads mistakes and hints from station progress', () => {
   const progressLog = [];
   const solved = [];
   openStation(landscapeLike, createContainer(), {
@@ -52,7 +50,7 @@ test('adapter accepts the target format and ignores letter and points', () => {
   // The engine owns the reward; B starts at 15 until the host synchronizes its saved time.
   const s = solveStation(readMission(newGame()).state, 'landscape', result).state;
   assert.equal(s.stations.landscape.points, 15);
-  assert.equal(s.letters[0], 'B');
+  assert.equal(s.letters[0], 'O');
 });
 
 test('adapter falls back to zero for unknown reports', () => {

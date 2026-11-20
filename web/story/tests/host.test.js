@@ -66,13 +66,13 @@ test('a whole game runs through the host, including wrong answers', () => {
     host.openStation(id);
     click(page, 'Solve station (placeholder)');
   }
-  assert.deepEqual(host.state.letters, ['B', 'I', 'L', 'D']);
+  assert.deepEqual(host.state.letters, ['O', 'I', 'L', 'S']);
   assert.equal(host.state.stations.landscape.points, 15);
 
   host.openVault();
-  submitWord(page, 'DLIB');
+  submitWord(page, 'SLIO');
   assert.match(page.panel.textContent, /Check the order in your journal/);
-  submitWord(page, 'bild');
+  submitWord(page, 'oils');
   assert.equal(host.state.safe.open, true);
 
   click(page, 'Look at the documents');
@@ -106,7 +106,7 @@ test('a saved game comes back in a new host', () => {
 
   const second = fakePage(storage);
   const again = createStoryHost({ ...second.options });
-  assert.deepEqual(again.state.letters, [null, null, null, 'D']);
+  assert.deepEqual(again.state.letters, [null, null, null, 'S']);
 });
 
 test('broken storage starts a fresh game instead of crashing', () => {
@@ -259,8 +259,8 @@ test('the host plays a sound for each story moment and stays silent without a pl
   host.showHint();
   host.openVault();
   submitWord(page, '   ');   // rejected: silent
-  submitWord(page, 'DLIB');  // wrong
-  submitWord(page, 'bild');  // opens
+  submitWord(page, 'SLIO');  // wrong
+  submitWord(page, 'oils');  // opens
   click(page, 'Look at the documents');
   click(page, 'Leon');       // wrong
   click(page, 'Adrien Voss');

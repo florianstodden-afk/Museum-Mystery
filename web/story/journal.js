@@ -16,6 +16,12 @@ export function evidenceChain(state) {
   }));
 }
 
+export const WHO_WAS_M = {
+  id: 'who-was-m',
+  title: 'Case notes · Who was M?',
+  text: 'M was Adrien Voss. He signs private letters with “M”, for mécène, the old word for patron. Everyone thought it meant Mara Vale.',
+};
+
 export function journalModel(state) {
   return {
     mission: { title: CASE.mission.title, text: CASE.mission.text, read: state.missionRead },
@@ -38,6 +44,8 @@ export function journalModel(state) {
       return { id, room: station.room, text: station.evidence };
     }),
     notes: state.notes.map(id => noteById(id)),
+    // Revealed only after the right accusation, so it never spoils the answer.
+    caseNotes: state.accusation.solved ? [WHO_WAS_M] : [],
     nextStep: nextStep(state),
     score: { total: totalScore(state), max: maximumScore(state) },
   };
@@ -65,8 +73,9 @@ export function renderJournal(container, model, evidenceContainer = null) {
       el('li', {}, [el('strong', { text: `${item.room}: ` }), item.text])))
     : el('p', { className: 'story-muted', text: 'No evidence yet.' });
 
-  const notes = model.notes.length
-    ? el('ul', { className: 'story-list' }, model.notes.map(note =>
+  const allNotes = [...model.notes, ...(model.caseNotes ?? [])];
+  const notes = allNotes.length
+    ? el('ul', { className: 'story-list' }, allNotes.map(note =>
       el('li', {}, [el('strong', { text: `${note.title}: ` }), note.text])))
     : el('p', { className: 'story-muted', text: 'No notes yet.' });
 

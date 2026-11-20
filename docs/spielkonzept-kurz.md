@@ -18,7 +18,7 @@ Personen (alle fiktiv):
 2. Museum erkunden
 3. **Vier Stationen in beliebiger Reihenfolge**, jede gibt einen Buchstaben und einen Beleg
 4. Das Journal ordnet die Buchstaben fest zu **B‑I‑L‑D** (Landschaft → Porträt → Restaurierung → Archiv)
-5. **Safe** öffnet nur mit allen vier Stationsnachweisen **und** dem Wort `BILD` (falsche Eingabe: „Check the order in your journal“, korrigierbar)
+5. **Safe** öffnet nur mit allen vier Stationsnachweisen **und** dem Wort `OILS` (Ölfarben; Buchstaben in der Reihenfolge Station 3, 1, 2, 4) (falsche Eingabe: „Check the order in your journal“, korrigierbar)
 6. Im Safe: Original + Dokumente
 7. **Schlussfrage** „Who planned the false label and the transport slip, and lured you to the safe?“ – Leon / Dr. Vale / Adrien Voss, richtig ist **Voss**; falsche Antwort gibt Feedback, welcher Beleg dagegen spricht, neuer Versuch möglich
 8. **Zwei Enden:** **A „The Heist“** (Bild an Voss, Betrug bleibt verborgen, dunkles Ende, kein Game Over) und **B „The Open File“** (Bild und Belege zu Dr. Vale, Voss wird entlarvt, Werk kehrt zurück)
@@ -27,10 +27,10 @@ Niemand kann dauerhaft feststecken.
 
 | Station | Raum | Buchstabe | Beleg |
 |---|---|---|---|
-| 1 | Landscape Gallery | B | Voss approved the false wall label. |
-| 2 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
-| 3 | Conservation Studio | L | Hidden mark “V” on the fake transport slip. |
-| 4 | Frame Archive | D | Frame label: “Ordered by: A. Voss”. |
+| 1 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
+| 2 | Gallery, left painting | L | Hidden mark “V” on the fake transport slip. |
+| 3 | Gallery, middle painting | O | Voss approved the false wall label. |
+| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. Voss”. |
 
 ## Punkte (max. 100, keine Zeitwertung)
 

@@ -25,7 +25,7 @@ test('mid-game: solved stations show their points, the total matches totalScore'
   const board = scoreboard(state);
   const row = id => board.stations.find(r => r.id === id);
   assert.equal(row('landscape').solved, true);
-  assert.equal(row('landscape').timeMs, null, 'B without a saved completion time has no clock');
+  assert.equal(row('landscape').timeMs, null, 'Station 3 without a saved completion time has no clock');
   assert.equal(row('portraits').timeMs, 18000);
   assert.equal(board.points, totalScore(state));
   assert.equal(board.points, board.stations.reduce((sum, row) => sum + row.points, 0));
@@ -74,7 +74,7 @@ test('the scoreboard view shows one row per station and the best run', async () 
   assert.match(box.textContent, /Current run: 15 \/ 80 points/);
   assert.match(box.textContent, /Best run: 75 \/ 90 points \(earlier scoring\) · time 1:01/);
   assert.match(box.textContent, /Stations 1–4: faster completion earns more/);
-  assert.doesNotMatch(box.textContent, /\b[BILD] ·|Station [BILD]\b/);
+  assert.doesNotMatch(box.textContent, /\b[OILS] ·|Station [OILS]\b/);
 });
 
 test('Forgery time and reward appear on the scoreboard and legacy best runs retain their scale', async () => {

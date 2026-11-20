@@ -1,5 +1,7 @@
 # Gemeinsames Leaderboard · 20.11.2026
 
+**Aktueller Stand:** Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed. Solange `LEADERBOARD_URL` in `web/leaderboard-config.js` leer ist, zeigt die Tafel nur die lokale Liste (bis zu 10 beendete Läufe aller Profile und Gäste dieses Browsers, sortiert nach Punkten, bei Gleichstand nach kürzerer Zeit, Status Won/Lost). Die Online-Abschnitte, **Refresh** und **Publish finished run** bleiben ausgeblendet. Der folgende Text beschreibt die Online-Version für später.
+
 ## Was der Spieler sieht
 
 Im Home Screen öffnet **Scoreboard** eine halbtransparente Museumstafel. Oben steht der eigene laufende Spielstand; darunter erscheinen bis zu 25 veröffentlichte Ergebnisse aller Geräte. Die Schrift für Überschriften und Knöpfe ist dieselbe Fraunces-Schrift wie in den vorhandenen Menüs. Der Hintergrund des Home Screens bleibt sichtbar.

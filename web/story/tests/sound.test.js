@@ -36,10 +36,10 @@ test('each story action gets the right sound', () => {
   assert.equal(soundFor('solveStation', solveStation(read, 'portraits', {}), read), 'letter');
 
   const ready = allSolved();
-  assert.equal(soundFor('tryOpenSafe', tryOpenSafe(ready, 'DLIB'), ready), 'wrong');
-  assert.equal(soundFor('tryOpenSafe', tryOpenSafe(ready, 'BILD'), ready), 'unlock');
+  assert.equal(soundFor('tryOpenSafe', tryOpenSafe(ready, 'SLIO'), ready), 'wrong');
+  assert.equal(soundFor('tryOpenSafe', tryOpenSafe(ready, 'OILS'), ready), 'unlock');
 
-  const open = tryOpenSafe(ready, 'BILD').state;
+  const open = tryOpenSafe(ready, 'OILS').state;
   assert.equal(soundFor('accuse', accuse(open, 'leon'), open), 'wrong');
   const solved = accuse(open, 'voss').state;
   assert.equal(soundFor('accuse', accuse(open, 'voss'), open), 'letter');

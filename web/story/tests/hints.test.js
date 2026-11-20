@@ -17,7 +17,7 @@ test('there is a hint for every step of the story', () => {
   const steps = [s];
   s = readMission(s).state; steps.push(s);
   s = allSolved(); steps.push(s);
-  s = tryOpenSafe(s, 'BILD').state; steps.push(s);
+  s = tryOpenSafe(s, 'OILS').state; steps.push(s);
   s = accuse(s, 'voss').state; steps.push(s);
   s = chooseEnding(s, 'heist').state; steps.push(s);
   for (const step of steps) {
@@ -44,14 +44,14 @@ test('station hints name the open rooms and become concrete on level 2', () => {
 
 test('the safe hint gives the letters after two wrong words', () => {
   let s = allSolved();
-  assert.doesNotMatch(hintFor(s).text, /B – I – L – D/);
-  s = tryOpenSafe(s, 'DLIB').state;
+  assert.doesNotMatch(hintFor(s).text, /O – I – L – S/);
+  s = tryOpenSafe(s, 'SLIO').state;
   s = tryOpenSafe(s, 'LIBD').state;
-  assert.match(hintFor(s).text, /B – I – L – D/);
+  assert.match(hintFor(s).text, /O – I – L – S/);
 });
 
 test('the accusation hint points to the frame label after two wrong answers', () => {
-  let s = tryOpenSafe(allSolved(), 'BILD').state;
+  let s = tryOpenSafe(allSolved(), 'OILS').state;
   assert.doesNotMatch(hintFor(s).text, /frame label/);
   s = accuse(s, 'leon').state;
   s = accuse(s, 'vale').state;

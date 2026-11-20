@@ -2,6 +2,7 @@
 // renderAccusation(container, { state, message }, onAccuse) – onAccuse(suspectId) on click.
 import { CASE } from './case-1.js';
 import { evidenceChain } from './journal.js';
+import { accusationsLeft } from './engine.js';
 import { el, button } from './dom.js';
 
 export function renderAccusation(container, { state, message = '' }, onAccuse) {
@@ -10,7 +11,7 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
     el('h3', { className: 'story-title', text: CASE.accusationQuestion }),
   ];
 
-  if (!state.accusation.solved) {
+  if (!state.accusation.solved && state.ending === null) {
     const choices = el('div', { className: 'story-choices' });
     for (const suspect of CASE.suspects) {
       const choice = button('', () => onAccuse(suspect.id), 'story-choice');
@@ -22,6 +23,10 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
       choices.append(choice);
     }
     parts.push(choices);
+    if (state.ending === null) {
+      const left = accusationsLeft(state);
+      parts.push(el('p', { className: 'story-attempts', text: `Attempts left: ${left}` }));
+    }
   }
 
   parts.push(el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } }));

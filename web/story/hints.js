@@ -40,12 +40,12 @@ function safeHint(state, concrete) {
   if (concrete || state.safe.attempts >= 2) {
     return hint(`Put the four letters from your journal in this order: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
   }
-  return hint('The dial wants one word. Your journal lists the letters by station number – rearrange them.');
+  return hint('Four letters, one word: what every painter in this museum worked with.');
 }
 
 function accusationHint(state, concrete) {
   if (concrete || state.accusation.attempts >= 2) {
-    return hint('Look at the frame label from the archive: whose name is on it? And who would book a “patron visit”?');
+    return hint('Look at the frame label from the Gallery frame rack: whose name is on it? And who would book a “patron visit”?');
   }
   return hint('Line up the four pieces of evidence. One name keeps coming back – and the “V” is not who you might think.');
 }

@@ -28,7 +28,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - In the vault, answer the final question. There are two endings and up to 80 points (older completed saves retain their original rewards).
 - The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
-- The Home screen's **Scoreboard** shows your run and a transparent shared leaderboard. Finish a current run, then choose **Publish finished run** to submit its score. The online service must first be deployed and connected; [setup, scoring and login handoff](docs/leaderboard.md). Limits: names are not verified, and a result can be faked through the public API; the Worker still checks the format and the points cap.
+- The Home screen's **Scoreboard** shows your current run and the ten best finished runs (Won or Lost) of all local profiles and guests in this browser. Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed ([details](docs/leaderboard.md)). Lost runs never count as a best run.
 
 ## Run locally
 
@@ -46,7 +46,7 @@ Then open <http://localhost:8000>.
 cd web && node --test
 ```
 
-GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The Python files (`app.py`, `game.py`, `storage.py`, `tests/`) belong to the first Streamlit prototype. They are legacy and not part of the game; `uv run pytest` still runs them.
+GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
 ## Project structure
 

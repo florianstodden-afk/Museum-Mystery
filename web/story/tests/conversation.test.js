@@ -82,7 +82,7 @@ test('Leon never gives away a solution', () => {
   const s = states();
   for (const [name, state] of Object.entries(s)) {
     const text = allText(conversationFor('leon', state));
-    assert.doesNotMatch(text, /1889|BILD|\bcode\b|safe/i, name);
+    assert.doesNotMatch(text, /1889|OILS|\bcode\b|safe/i, name);
     if (name !== 'solved') assert.doesNotMatch(text, /Voss/, name);
   }
 });
