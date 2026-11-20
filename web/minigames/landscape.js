@@ -33,7 +33,7 @@ export function start(container, caseData, onSolved) {
   for (const work of LANDSCAPE_WORKS) {
     const card = document.createElement('div');
     const heading = document.createElement('strong'); heading.textContent = `${work.artist}: ${work.title}`;
-    const image = document.createElement('img'); image.src = `./assets/met-${work.id}.jpg`; image.alt = `${work.title} by ${work.artist}`;
+    const image = document.createElement('img'); image.src = new URL(`../assets/met-${work.id}.jpg`, import.meta.url).href; image.alt = `${work.title} by ${work.artist}`;
     const facts = document.createElement('p'); facts.textContent = catalogueFacts(work);
     const source = document.createElement('small'); source.textContent = 'Saved Met catalogue data';
     const link = document.createElement('a'); link.href = `https://www.metmuseum.org/art/collection/search/${work.id}`; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'View in the Met catalogue';

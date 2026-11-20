@@ -23,7 +23,7 @@ Auftrag von Florian Stodden: Die vorhandenen Teile verbessern, ohne neue Story o
 ## Kontrolle
 
 - `cd web && node --test`: **279 bestanden, 0 fehlgeschlagen** (einschließlich der bereits vorbereiteten Änderung an Leon und Imani).
-- Im lokalen Browser wurden M's Nachricht, B, I, L und D, das Codewort BILD, die Beweisfrage und beide möglichen Enden durchgespielt. Die beiden Ending-Hintergründe wurden geladen. Für das zweite Ende wurde der gespeicherte Zustand direkt vor der Entscheidung erneut geöffnet.
+- Im lokalen Browser wurden M's Nachricht, B, I, L und D, das Codewort BILD, die Beweisfrage und beide möglichen Enden durchgespielt. Die beiden Ending-Hintergründe wurden geladen. Für das zweite Ende wurde der gespeicherte Zustand direkt vor der Entscheidung erneut geöffnet. Beide lokalen Bilder in B wurden danach zusätzlich in der internen Story-Vorschau auf vollständiges Laden geprüft; ihre Pfade werden vom Rätselmodul aus gebildet und funktionieren dadurch im Hauptspiel und in der Vorschau.
 - `git diff --check`: keine Formatfehler.
 
 ## Später
