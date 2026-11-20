@@ -52,7 +52,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 | Path | Purpose |
 |---|---|
-| `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.png` | Page, home screen, menu and compact illustrated journal |
+| `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.webp` | Page, home screen, menu and compact illustrated journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/local-auth.js` | Device-only username/password profiles and separate local saves |
 | `web/story/local-runs.js` | Local scoreboard: finished runs of this browser |

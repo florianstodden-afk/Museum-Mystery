@@ -641,7 +641,7 @@ function openEntryPanel(mode, opener){
   entryOpener=opener;
   const signingUp=mode==='signup';
   document.querySelector('#entry-panel-title').textContent=signingUp?'Sign Up':'Log In';
-  entryBackdrop.src=signingUp?'assets/signup-screen-reference.jpg':'assets/login-form-reference.jpg';
+  entryBackdrop.src=signingUp?'assets/signup-screen-reference.webp':'assets/login-form-reference.webp';
   document.querySelector('#entry-password').autocomplete=signingUp?'new-password':'current-password';
   document.querySelector('#entry-forgot').hidden=signingUp;
   entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
@@ -652,7 +652,7 @@ function openEntryPanel(mode, opener){
 function closeEntryPanel(){
   entryPanel.hidden=true;
   entryChoices.hidden=false;
-  entryBackdrop.src='assets/login-screen-reference.jpg';
+  entryBackdrop.src='assets/login-screen-reference.webp';
   entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
   entryOpener.focus();
 }
