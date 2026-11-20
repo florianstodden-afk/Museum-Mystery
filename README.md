@@ -23,8 +23,8 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 - On the first screen, choose **Sign Up** to create a local profile, **Log In** to return to one, or **Continue as guest**. Profiles and progress still exist only on this device. See [the login flow](docs/local-login.md).
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
-- Four stations (B, I, L, D) each give one letter. Together they open the vault.
-- **Station B — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
+- Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. Rearrange the four letters to open the vault.
+- **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question. There are two endings and up to 80 points (older completed saves retain their original rewards).
 - The chosen ending has its own illustrated result screen. The real Met painting, evidence and score remain accessible. See [ending flow and implementation](docs/ending-screens.md).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.

@@ -16,6 +16,12 @@ function deepFreeze(value) {
 // The rooms that really exist in the game, spelled as on the signs.
 export const ROOMS = ['Portrait Hall', 'Gallery', 'Security', 'Vault'];
 
+// Players see station NUMBERS, in walking order (Hall, then Gallery left → middle → right).
+// The letters B, I, L, D stay hidden until a station is solved, so the code word cannot be read off the signs.
+export function stationsByNumber(stations = CASE.stations) {
+  return [...stations].sort((a, b) => a.number - b.number);
+}
+
 // Where a station is: the room, plus the spot when a room holds several stations.
 export function stationPlace(station) {
   return station.spot ? `${station.room}, ${station.spot}` : station.room;
@@ -23,7 +29,8 @@ export function stationPlace(station) {
 
 export const CASE_VERSION = 1;
 
-// The order of this list is the fixed order of the letters in the journal: B-I-L-D.
+// The order of this list is the order of the code word (B-I-L-D). Players never see it:
+// journal, signs and scoreboard use the station `number` instead.
 export const STATION_IDS = ['landscape', 'portraits', 'restoration', 'archive'];
 
 export const CODEWORD = 'BILD';
@@ -45,6 +52,7 @@ export const CASE = deepFreeze({
   stations: [
     {
       id: 'landscape',
+      number: 3,
       room: 'Gallery',
       spot: 'middle painting',
       letter: 'B',
@@ -56,6 +64,7 @@ export const CASE = deepFreeze({
     },
     {
       id: 'portraits',
+      number: 1,
       room: 'Portrait Hall',
       letter: 'I',
       evidenceId: 'shift-log',
@@ -66,17 +75,19 @@ export const CASE = deepFreeze({
     },
     {
       id: 'restoration',
+      number: 2,
       room: 'Gallery',
       spot: 'left painting',
       letter: 'L',
       evidenceId: 'hidden-mark',
       evidence: 'Hidden mark “V” on the fake transport slip.',
       pointsToVoss: 'Someone marked the fake slip with a hidden “V” to recognise their own paperwork.',
-      task: 'Station L hangs left of Curator’s Catalogue in the Gallery. Restore Renoir’s eight-piece picture to reveal a mark on the transport slip.',
+      task: 'Station 2 hangs left of Curator’s Catalogue in the Gallery. Restore Renoir’s eight-piece picture to reveal a mark on the transport slip.',
       metIds: [459111],
     },
     {
       id: 'archive',
+      number: 4,
       room: 'Gallery',
       spot: 'frame rack',
       letter: 'D',

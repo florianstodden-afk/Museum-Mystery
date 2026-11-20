@@ -38,9 +38,9 @@ function stationHint(state, concrete) {
 
 function safeHint(state, concrete) {
   if (concrete || state.safe.attempts >= 2) {
-    return hint(`Read the four letters in your journal from left to right: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
+    return hint(`Put the four letters from your journal in this order: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
   }
-  return hint('The dial wants one word. Your journal keeps the four letters in a fixed order – not in the order you found them.');
+  return hint('The dial wants one word. Your journal lists the letters by station number – rearrange them.');
 }
 
 function accusationHint(state, concrete) {

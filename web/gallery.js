@@ -50,7 +50,7 @@ export function createGalleryRenderer() {
       if(active){ctx.beginPath();ctx.moveTo(x,207);ctx.lineTo(x+4,211);ctx.lineTo(x,215);ctx.lineTo(x-4,211);ctx.fill();}
       if(id==='note' || id==='painting' || id==='frames'){
         ctx.fillStyle='#182a32';ctx.fillRect(x-38,177,id==='painting' ? 106 : id==='frames' ? 88 : 76,19);
-        ctx.fillStyle='#f3dca4';ctx.font='bold 11px sans-serif';ctx.fillText(id==='note' ? 'L · PUZZLE' : id==='painting' ? 'B · CATALOGUE' : 'D · FORGERY',x-31,190);
+        ctx.fillStyle='#f3dca4';ctx.font='bold 11px sans-serif';ctx.fillText(id==='note' ? '2 · PUZZLE' : id==='painting' ? '3 · CATALOGUE' : '4 · FORGERY',x-31,190);
       }
     }
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);

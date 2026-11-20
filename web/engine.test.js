@@ -64,13 +64,13 @@ test('all gallery objects can be reached on foot; storage only with the door ope
 test('the nearest object is found and labelled for the player',()=>{
   const s=at(initialState(),14,4);
   assert.equal(nearbyObject(s).id,'painting');
-  assert.match(nearbyObject(s).label,/Station B/);
+  assert.match(nearbyObject(s).label,/Station 3/);
   assert.equal(nearbyObject(at(initialState(),3,9)),null);
 });
 
 test('the portrait on the Great Hall wall opens the portrait timeline (Station I)',()=>{
   const portrait=OBJECTS.find(o=>o.story.station==='portraits');
-  assert.equal(portrait.label,'Portraits · Station I');
+  assert.equal(portrait.label,'Portraits · Station 1');
   assert.equal(nearbyObject(at(initialState(),portrait.x,portrait.y+1)).id,portrait.id, 'standing right in front of the wall');
 });
 

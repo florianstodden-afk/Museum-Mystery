@@ -3,7 +3,7 @@ import { validCatalogue } from '../minigames/catalogue-rules.js';
 import { validForgery } from '../minigames/forgery-rules.js';
 import { elapsedMs, validPuzzle } from '../minigames/picture-rules.js';
 import { elapsedMs as portraitElapsedMs, validTimeline, upgradeTimeline } from '../minigames/portrait-rules.js';
-import { CASE, STATION_IDS } from './case-1.js';
+import { CASE, STATION_IDS, stationsByNumber } from './case-1.js';
 
 export const STATION_MAX = 20;
 export const STATION_MIN = 5;
@@ -56,7 +56,7 @@ export function scoreBreakdown(state) {
     const max = !legacy && SPEED_STATIONS.includes(station.id) ? SPEED_MAX : STATION_MAX;
     return {
       id: station.id,
-      label: station.id === 'landscape' ? 'Curator’s Catalogue (B)' : station.id === 'archive' ? 'Spot the Forgery (D)' : `${station.room} (${station.letter})`,
+      label: station.id === 'landscape' ? 'Curator’s Catalogue (3)' : station.id === 'archive' ? 'Spot the Forgery (4)' : `${station.room} (${station.number})`,
       points: progress.solved ? Math.min(progress.points, max) : 0,
       max,
       detail: !progress.solved ? 'not solved'
@@ -154,11 +154,12 @@ function syncPortraits(state, progress) {
 // ---------- Scoreboard on the home screen ----------
 // It only reads the existing numbers (scoreBreakdown, saved times); no second points logic.
 
-/** One row per station (B, I, L, D) with status, time and points, plus the run's totals. */
+/** One row per station (by number 1–4) with status, time and points, plus the run's totals. */
 export function scoreboard(state, progress = {}) {
   const points = Object.fromEntries(scoreBreakdown(state).map(row => [row.id, row]));
-  const stations = CASE.stations.map(station => ({
-    letter: station.letter,
+  const stations = stationsByNumber().map(station => ({
+    id: station.id,
+    number: station.number,
     room: station.room,
     solved: state.stations[station.id].solved,
     timeMs: state.stations[station.id].solved ? stationTime(state, progress, station.id) : null,

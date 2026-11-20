@@ -58,12 +58,13 @@ test('Dr. Vale only talks once the safe is open', () => {
   assert.match(dialogueFor('vale', s).lines.join(' '), /choice is yours/);
 });
 
-test('journal keeps letters in their fixed slots', () => {
+test('journal lists slots by station number and shows a letter only after solving', () => {
   let s = started();
   s = solveStation(s, 'restoration', {}).state;
   s = solveStation(s, 'landscape', {}).state;
   const model = journalModel(s);
-  assert.deepEqual(model.slots.map(slot => slot.letter), ['B', '_', 'L', '_']);
+  assert.deepEqual(model.slots.map(slot => slot.number), [1, 2, 3, 4]);
+  assert.deepEqual(model.slots.map(slot => slot.letter), ['?', 'L', 'B', '?'], 'Portraits, Puzzle, Catalogue, Forgery');
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
   assert.equal(model.score.total, 30);
   assert.match(model.nextStep, /Portrait Hall; Gallery, frame rack\./);
@@ -78,7 +79,8 @@ test('journal renders slots, evidence and notes', () => {
   assert.match(text, /Ordered by: A\. Voss/);
   assert.match(text, /Shift schedule/);
   const slots = findAll(container, node => node.tagName === 'LI' && node.className.startsWith('story-slot'));
-  assert.deepEqual(slots.map(slot => slot.textContent.charAt(0)), ['_', '_', '_', 'D']);
+  assert.deepEqual(slots.map(slot => slot.textContent.charAt(0)), ['?', '?', '?', 'D']);
+  assert.doesNotMatch(slots.slice(0, 3).map(slot => slot.textContent).join(' '), /Station [BILD]\b|\b[BILD] ·/);
 });
 
 test('evidence chain marks what has been found', () => {

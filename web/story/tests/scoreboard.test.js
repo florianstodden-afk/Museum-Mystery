@@ -8,7 +8,9 @@ const fresh = () => readMission(newGame()).state;
 
 test('an empty run: four open stations, 0 points, no time', () => {
   const board = scoreboard(fresh());
-  assert.deepEqual(board.stations.map(row => row.letter), ['B', 'I', 'L', 'D']);
+  assert.deepEqual(board.stations.map(row => row.number), [1, 2, 3, 4]);
+  assert.deepEqual(board.stations.map(row => row.id), ['portraits', 'restoration', 'landscape', 'archive']);
+  assert.equal(board.stations.some(row => 'letter' in row), false, 'no letters on the scoreboard');
   assert.ok(board.stations.every(row => !row.solved && row.points === 0 && row.timeMs === null));
   assert.equal(board.points, 0);
   assert.equal(board.max, MAX_SCORE);
@@ -21,9 +23,10 @@ test('mid-game: solved stations show their points, the total matches totalScore'
   state = solveStation(state, 'portraits', { mistakes: 0, hints: 0 }).state;
   state = { ...state, stations: { ...state.stations, portraits: { ...state.stations.portraits, timeMs: 18000 } } };
   const board = scoreboard(state);
-  assert.equal(board.stations[0].solved, true);
-  assert.equal(board.stations[0].timeMs, null, 'B without a saved completion time has no clock');
-  assert.equal(board.stations[1].timeMs, 18000);
+  const row = id => board.stations.find(r => r.id === id);
+  assert.equal(row('landscape').solved, true);
+  assert.equal(row('landscape').timeMs, null, 'B without a saved completion time has no clock');
+  assert.equal(row('portraits').timeMs, 18000);
   assert.equal(board.points, totalScore(state));
   assert.equal(board.points, board.stations.reduce((sum, row) => sum + row.points, 0));
   assert.equal(board.timeMs, 18000);
@@ -65,12 +68,13 @@ test('the scoreboard view shows one row per station and the best run', async () 
   const state = solveStation(fresh(), 'landscape', { mistakes: 0, hints: 0 }).state;
   renderScoreboard(box, scoreboard(state), { points: 75, timeMs: 61000 });
   const rows = findAll(box, node => node.tagName === 'TR');
-  assert.equal(rows.length, 5, 'header + B, I, L, D');
-  assert.match(rows[1].textContent, /B · .*Solved.*15 \/ 15/);
-  assert.match(rows[2].textContent, /Open/);
+  assert.equal(rows.length, 5, 'header + stations 1–4');
+  assert.match(rows[3].textContent, /3 · Gallery.*Solved.*15 \/ 15/);
+  assert.match(rows[1].textContent, /1 · Portrait Hall.*Open/);
   assert.match(box.textContent, /Current run: 15 \/ 80 points/);
   assert.match(box.textContent, /Best run: 75 \/ 90 points \(earlier scoring\) · time 1:01/);
-  assert.match(box.textContent, /B, I, L and D: faster completion earns more/);
+  assert.match(box.textContent, /Stations 1–4: faster completion earns more/);
+  assert.doesNotMatch(box.textContent, /\b[BILD] ·|Station [BILD]\b/);
 });
 
 test('Forgery time and reward appear on the scoreboard and legacy best runs retain their scale', async () => {

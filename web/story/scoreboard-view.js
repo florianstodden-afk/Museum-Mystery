@@ -10,7 +10,7 @@ export function renderScoreboard(container, board, best) {
   const earlierScale = best && bestMaximum !== board.max ? ' (earlier scoring)' : '';
   const head = el('tr', {}, ['Station', 'Status', 'Time', 'Points'].map(text => el('th', { text, attrs: { scope: 'col' } })));
   const rows = board.stations.map(row => el('tr', { className: row.solved ? 'is-solved' : '' }, [
-    el('th', { text: `${row.letter} · ${row.room}`, attrs: { scope: 'row' } }),
+    el('th', { text: `${row.number} · ${row.room}`, attrs: { scope: 'row' } }),
     el('td', { text: row.solved ? 'Solved' : 'Open' }),
     el('td', { text: row.solved ? clock(row.timeMs) : '–' }),
     el('td', { text: `${row.points} / ${row.max}` }),
@@ -22,6 +22,6 @@ export function renderScoreboard(container, board, best) {
       ` · time ${clock(board.timeMs)}`,
     ]),
     el('p', { className: 'scoreboard-best', text: best ? `Best run: ${best.points} / ${bestMaximum} points${earlierScale} · time ${clock(best.timeMs)}` : 'Best run: finish a run to set one.' }),
-    el('p', { className: 'scoreboard-rules', text: 'B, I, L and D: faster completion earns more. Earlier completed station rewards are retained. The safe and final question also count.' }),
+    el('p', { className: 'scoreboard-rules', text: 'Stations 1–4: faster completion earns more. Earlier completed station rewards are retained. The safe and final question also count.' }),
   );
 }

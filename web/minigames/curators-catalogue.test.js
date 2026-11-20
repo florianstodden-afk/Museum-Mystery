@@ -99,8 +99,8 @@ test('B shares L’s exact inclusive boundaries and scoreboard freezes the compl
     assert.equal(story.stations.landscape.points, pictureSpeedPoints(ms));
     assert.equal(story.stations.landscape.points, points);
     const board = scoreboard(story);
-    assert.equal(board.stations[0].timeMs, ms);
-    assert.equal(board.stations[0].max, 15);
+    assert.equal(board.stations.find(row => row.id === 'landscape').timeMs, ms);
+    assert.equal(board.stations.find(row => row.id === 'landscape').max, 15);
     assert.equal(board.max, 80);
     assert.equal(synchronizeScore(story, { landscape: progress }, 99999999), story);
   }
@@ -269,7 +269,7 @@ test('host recovers an interrupted final match exactly once and retains every le
     storage.setItem(storageKey, JSON.stringify({ story: JSON.stringify(legacy), progress: { landscape: { solved: true, mistakes: 1, hints: 1 } } }));
     const host = createStoryHost({ storage, storageKey });
     assert.equal(host.state.stations.landscape.points, points);
-    assert.equal(scoreboard(host.state).stations[0].points, points);
+    assert.equal(scoreboard(host.state).stations.find(row => row.id === 'landscape').points, points);
     assert.equal(maximumScore(host.state), 85);
     assert.deepEqual(host.state.evidence, ['false-label']);
   }
