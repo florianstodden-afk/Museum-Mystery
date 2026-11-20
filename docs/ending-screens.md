@@ -1,35 +1,35 @@
-# Die beiden Ending Screens
+# The two ending screens
 
-**Stand: 19.11.2026, Branch `codex/ending-screen-art`.** Die Änderung gilt im öffentlichen Spiel erst nach dem Merge des Pull Requests und der Veröffentlichung durch GitHub Pages.
+**Status: 19.11.2026, branch `codex/ending-screen-art`.** The change applies to the public game only after the pull request is merged and GitHub Pages has published it.
 
-## Weg zum Ende
+## The way to the end
 
-1. M verlangt zu Beginn das Van-Gogh-Gemälde *Wheat Field with Cypresses* aus dem Museum.
-2. Vier Stationen liefern die Buchstaben B–I–L–D. Mit dem Codewort öffnet der Spieler den Safe.
-3. Die Beweise zeigen, dass Voss die Fälschung und den Transport geplant hat. Nach der richtigen Antwort entscheidet der Spieler selbst.
-4. **Steal the artwork:** Der Spieler gibt das Original an Voss. Die Fälschung bleibt an der Wand. Der nächtliche Ending Screen zeigt „I am a thief“.
-5. **Quit the mission:** Der Spieler gibt das Original an Dr. Vale zurück. Die Beweise entlarven Voss. Der Ending Screen mit Morgenlicht zeigt „I am not a thief“.
+1. At the start, M asks for the Van Gogh painting *Wheat Field with Cypresses* from the museum.
+2. Four stations deliver the letters B–I–L–D. With the code word the player opens the safe.
+3. The evidence shows that Voss planned the forgery and the transport. After the right answer the player decides.
+4. **Steal the artwork:** The player gives the original to Voss. The forgery stays on the wall. The night-time ending screen shows “I am a thief”.
+5. **Quit the mission:** The player returns the original to Dr. Vale. The evidence exposes Voss. The ending screen in morning light shows “I am not a thief”.
 
-Die Entscheidung, Punkteberechnung, Beweiskette, Speicherung und Knöpfe für Home oder ein neues Spiel bleiben in der bestehenden Story-Logik. Ein gespeicherter abgeschlossener Fall öffnet beim Fortsetzen wieder sein gewähltes Ende.
+The decision, scoring, chain of evidence, saving and the buttons for Home or a new game stay in the existing story logic. A saved finished case reopens its chosen ending when resumed.
 
-## Warum die Bilder angepasst wurden
+## Why the images were changed
 
-Florian Stodden ließ zwei Abschlussbilder erstellen. Der Satz „The mystery remains“ auf dem ursprünglichen Nicht-Dieb-Bild widersprach der bestehenden Auflösung: Voss ist zu diesem Zeitpunkt bereits entlarvt. Deshalb wurden von beiden Bildern textfreie Varianten erstellt. Ihre Museumsszenen und ornamentalen Tafeln blieben erhalten; Titel und kurze, zur Entscheidung passende Folgen stehen nun als echte HTML-Texte darüber. Damit bleiben Text und Vorlesbarkeit unabhängig vom Bild.
+Florian Stodden had two closing images made. The sentence “The mystery remains” on the original not-a-thief image contradicted the existing solution: by then Voss has already been exposed. So text-free versions of both images were made. Their museum scenes and ornamental plaques were kept; the title and short consequences that fit the decision now sit on top as real HTML text. This keeps the text readable and accessible to screen readers independently of the image.
 
-Die Bilder liegen als `web/assets/ending-thief-background.jpg` und `web/assets/ending-not-thief-background.jpg` im Repository. Sie zeigen **kein erfundenes Van-Gogh-Motiv**. Auf beiden Ending Screens erscheint das echte Met-Werk als kleine Bildkarte mit Quellenlink. Die Beweise und die genaue Punkteverteilung sind über **View evidence and score details** erreichbar.
+The images are in the repository as `web/assets/ending-thief-background.jpg` and `web/assets/ending-not-thief-background.jpg`. They show **no invented Van Gogh motif**. On both ending screens the real Met work appears as a small image card with a source link. The evidence and the exact points are available under **View evidence and score details**.
 
-## Technische Stellen
+## Technical places
 
-| Datei | Aufgabe |
+| File | Purpose |
 | --- | --- |
-| `web/story/endings.js` | Ordnet jedem gewählten Ende die passende Geschichte zu und setzt Bildkarte, Punkte und Knöpfe zusammen. |
-| `web/story/story.css` | Zeigt je nach Ende den passenden Hintergrund und ordnet die Spieltexte darüber an. |
-| `web/index.html` | Lädt die neue CSS-Version, damit GitHub Pages keinen alten Stil aus dem Browsercache zeigt. |
-| `web/story/tests/content.test.js` | Prüft den Bezug zu Voss und Dr. Vale sowie das echte Met-Bild im Ergebnis. |
+| `web/story/endings.js` | Gives each chosen ending its story and assembles the image card, points and buttons. |
+| `web/story/story.css` | Shows the right background for each ending and places the game text on top. |
+| `web/index.html` | Loads the new CSS version so GitHub Pages does not show an old style from the browser cache. |
+| `web/story/tests/content.test.js` | Checks the reference to Voss and Dr. Vale and the real Met image in the result. |
 
-## Prüfung
+## Checks
 
-- Beide Ending Screens im lokalen Browser bei 1280 × 720 angesehen; Text, Met-Werk, Punkte und Knöpfe waren sichtbar.
-- Die ausklappbare Beweis- und Punkteansicht im Browser geöffnet und geprüft.
-- `cd web && node --test`: 276 Tests bestanden. `git diff --check`: ohne Fehler.
-- Eine echte Handyansicht und der vollständige Spieldurchlauf sollten nach dem Merge noch geprüft werden.
+- Both ending screens viewed in a local browser at 1280 × 720; text, Met work, points and buttons were visible.
+- The expandable evidence and score view opened and checked in the browser.
+- `cd web && node --test`: 276 tests passed. `git diff --check`: no errors.
+- A real phone view and a complete playthrough should still be checked after the merge.

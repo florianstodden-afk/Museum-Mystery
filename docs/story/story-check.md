@@ -1,38 +1,38 @@
-# Story-Check „Museum Nocturne“ (12.11.2026)
+# Story check “Museum Nocturne” (12.11.2026)
 
-Gegengelesen wurden alle Texte in `web/story/` (Auftrag, Stationen, Notizen, Dialoge, Feedback, Enden). Frage: Ist die Geschichte in sich schlüssig, und kann ein Spieler die Lösung **herleiten**?
+All texts in `web/story/` were proofread (mission, stations, notes, dialogues, feedback, endings). Question: is the story consistent, and can a player **work out** the solution?
 
-## Zeigen alle Belege logisch auf Voss?
+## Does all evidence point logically to Voss?
 
-| Buchstabe | Beleg | Zeigt auf Voss, weil … | Ausreichend allein? |
+| Letter | Evidence | Points to Voss because … | Enough on its own? |
 |---|---|---|---|
-| B | Voss approved the false wall label. | nennt ihn direkt als den, der das falsche Schild freigab. | Ja, aber nur „hat genehmigt“ – könnte ein Versehen sein. |
-| I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | entlastet Leon; „patron visit“ führt zum Förderer (Voss). | Nein, braucht das Wissen „Voss = Förderer“ (steht bei den Verdächtigen). |
-| L | Hidden mark “V” on the fake transport slip. | „V“ passt zu **V**oss – aber auch zu **V**ale. Bewusste falsche Fährte. | Nein. |
-| D | Frame label: “Ordered by: A. Voss”. | löst das „V“ eindeutig auf. | Ja, zusammen mit L. |
+| B | Voss approved the false wall label. | names him directly as the one who approved the false label. | Yes, but only “approved” – could be a mistake. |
+| I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | clears Leon; “patron visit” leads to the patron (Voss). | No, needs the knowledge “Voss = patron” (listed with the suspects). |
+| L | Hidden mark “V” on the fake transport slip. | “V” fits **V**oss – but also **V**ale. A deliberate false trail. | No. |
+| D | Frame label: “Ordered by: A. Voss”. | resolves the “V” clearly. | Yes, together with L. |
 
-**Ergebnis:** Die Kette ist schlüssig. Erst alle vier zusammen schließen Leon (I) und Vale (D erklärt L) aus. Das passt zum Konzept „vier Stationen, ein Ergebnis“.
+**Result:** The chain is consistent. Only all four together rule out Leon (I) and Vale (D explains L). This fits the concept “four stations, one result”.
 
-## Wird Leon klar entlastet?
+## Is Leon clearly cleared?
 
-Ja, an drei Stellen:
-1. Notiz **Monitor wall** (Security Office): Leon sah den Wagen, aber nicht den Inhalt – er meldet selbst, was er sah.
-2. Beleg **I** (Night-shift log): Er war woanders; der Transport lief als „patron visit“.
-3. Feedback bei falscher Anklage: „The night-shift log shows Leon was on his round elsewhere …“.
-Danach ändert sich auch sein Dialog („The log proves it …“, nach der Lösung: „Thank you for checking the log before you checked me.“).
+Yes, in three places:
+1. Note **Monitor wall** (security office): Leon saw the cart, but not its contents – he reports himself what he saw.
+2. Evidence **I** (night-shift log): he was elsewhere; the transport was booked as a “patron visit”.
+3. Feedback after a wrong accusation: “The night-shift log shows Leon was on his round elsewhere …”.
+After that his dialogue changes too (“The log proves it …”, after the solution: “Thank you for checking the log before you checked me.”).
 
-## Gefundene Lücken und was geändert wurde
+## Gaps found and what was changed
 
-| Lücke | Änderung |
+| Gap | Change |
 |---|---|
-| **Wer ist „M“?** Das Spiel sagte nach der richtigen Antwort nur „M was Voss“, ohne Grund. „M“ wirkt sogar wie **M**ara Vale. | Nach der richtigen Antwort: „M“ steht für *mécène* (altes Wort für Förderer). Dr. Vale sagt das auch im Dialog („Everyone here thinks it means Mara.“). Die Verwechslung ist damit eine bewusste zweite falsche Fährte, die aufgelöst wird. |
-| **Warum lockt Voss die Spielerfigur zum Safe?** Wurde nicht erklärt. | Nach der richtigen Antwort und im Vale-Dialog: Voss konnte Vales Safe nicht selbst öffnen und brauchte jemanden, der ihren Hinweisen folgt. |
-| **Beweiskette verriet die Lösung** nach einer falschen Antwort (jede Zeile erwähnt Voss). | Beweiskette erscheint erst nach der richtigen Antwort (M4, mit Test). |
-| Verdächtigen-Text für Voss: „Signs his messages with a single letter.“ | Bleibt bewusst als fairer Hinweis für aufmerksame Spieler (Auftrag ist mit „M“ unterschrieben). |
+| **Who is “M”?** After the right answer the game only said “M was Voss”, without a reason. “M” even looks like **M**ara Vale. | After the right answer: “M” stands for *mécène* (old word for patron). Dr. Vale says so in her dialogue too (“Everyone here thinks it means Mara.”). The mix-up is thus a deliberate second false trail that gets resolved. |
+| **Why does Voss lure the player character to the safe?** Was not explained. | After the right answer and in Vale’s dialogue: Voss could not open Vale’s safe himself and needed someone who follows her clues. |
+| **The chain of evidence gave the solution away** after a wrong answer (every line mentions Voss). | The chain of evidence appears only after the right answer (M4, with a test). |
+| Suspect text for Voss: “Signs his messages with a single letter.” | Stays on purpose as a fair hint for attentive players (the mission is signed with “M”). |
 
-## Offene Punkte für das Team
+## Open points for the team
 
-- **Stationen 2–4:** Die Rätsel müssen den Beleg wirklich *zeigen*, nicht nur am Ende einblenden (z. B. Portrait Hall: Log lesen und Leons Position finden; Archiv: Rahmen mit dem richtigen Maß finden und das Etikett lesen). Sonst fühlt sich die Beweiskette geschenkt an.
-- **Wann wurde das Original vertauscht?** Die Texte sagen: Vale hat das Original weggeschlossen, „the night the false label went up“. Das Konzept sollte festlegen, ob die Fälschung schon vorher an der Wand hing (Voss’ Plan) – im aktuellen Text ist das so angedeutet und widerspruchsfrei.
-- **Ende A** ist bewusst dunkel und kein Game Over. Die Punktzahl ist bei beiden Enden gleich (Konzept: 0 Zusatzpunkte).
-- Alle Personen und das Museum sind fiktiv; der Hinweis steht im Abspann und im Fuß der Vorschau.
+- **Stations 2–4:** The puzzles must really *show* the evidence, not just display it at the end (e.g. Portrait Hall: read the log and find Leon’s position; archive: find the frame with the right size and read the label). Otherwise the chain of evidence feels handed out.
+- **When was the original swapped?** The texts say: Vale locked the original away “the night the false label went up”. The concept should decide whether the forgery hung on the wall before that (Voss’s plan) – the current text hints at this and is free of contradictions.
+- **Ending A** is dark on purpose and not a game over. The score is the same for both endings (concept: 0 extra points).
+- All characters and the museum are fictional; the note is in the closing screen and the footer of the preview.

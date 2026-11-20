@@ -1,35 +1,35 @@
-# Lokale Profile: Anmeldung und Spielstart
+# Local profiles: sign-in and game start
 
-**Stand: 19.11.2026, Branch `codex/local-login-screens`.** Dieser Text beschreibt die Änderung für den Pull Request. Auf der veröffentlichten Seite gilt sie erst nach dem Merge und der Veröffentlichung durch GitHub Pages.
+**Status: 19.11.2026, branch `codex/local-login-screens`.** This text describes the change for the pull request. On the published site it applies only after the merge and publication by GitHub Pages.
 
-## Ablauf für Spieler
+## Flow for players
 
-1. Beim Öffnen erscheint die Auswahl **Log In** / **Sign Up** auf der bisherigen Bildvorlage.
-2. **Sign Up** zeigt Florians neues Sign-Up-Bild mit echten Eingabefeldern für Benutzername und Passwort. Der Benutzername besteht aus 3 bis 24 Buchstaben, Zahlen, `_` oder `-`. Das Passwort hat 8 bis 128 Zeichen. **SUBMIT** erstellt ein Profil in diesem Browser und öffnet den Home Screen.
-3. **Log In** zeigt die separate Log-In-Bildvorlage. **SUBMIT** prüft die auf diesem Gerät gespeicherten Daten und öffnet den Home Screen. Ein falsches Passwort lässt den Spieler auf dem Formular.
-4. Im Home Screen startet **Start New Game** den Fall mit Ms Nachricht; **Resume Game** setzt einen vorhandenen Spielstand dieses Profils fort. Unter **Settings → Switch profile** gelangt man zur Anmeldung zurück.
-5. **Continue as guest** ist weiterhin möglich. Gäste verwenden den bisherigen gemeinsamen lokalen Gast-Spielstand.
+1. On opening, the **Log In** / **Sign Up** choice appears on the existing artwork.
+2. **Sign Up** shows Florian’s new Sign Up image with real input fields for username and password. The username has 3 to 24 letters, digits, `_` or `-`. The password has 8 to 128 characters. **SUBMIT** creates a profile in this browser and opens the home screen.
+3. **Log In** shows the separate Log In artwork. **SUBMIT** checks the data stored on this device and opens the home screen. A wrong password keeps the player on the form.
+4. On the home screen, **Start New Game** starts the case with M’s message; **Resume Game** continues an existing save of this profile. **Settings → Switch profile** leads back to the sign-in.
+5. **Continue as guest** is still possible. Guests use the existing shared local guest save.
 
-## Wo die Daten liegen und was nicht möglich ist
+## Where the data lives and what is not possible
 
-Die Profile liegen im `localStorage` dieses Browsers. Das Passwort wird vor dem Speichern mit PBKDF2/SHA-256 und einem zufälligen Salt in einen Prüfwert umgewandelt; der Klartext wird nicht gespeichert. Die aktive Profilauswahl liegt im `sessionStorage`. Jeder Benutzername erhält einen separaten lokalen Spielstand, eine separate Position und einen separaten Bestwert. Sound- und Musikeinstellungen gelten für den Browser.
+The profiles live in this browser’s `localStorage`. Before saving, the password is turned into a check value with PBKDF2/SHA-256 and a random salt; the plain text is not stored. The active profile choice lives in `sessionStorage`. Each username gets its own local save, its own position and its own best run. Sound and music settings apply to the browser.
 
-Diese Lösung ist **nur eine lokale Spielprofil-Funktion, kein Online-Login**. Sie bietet keine Konten auf mehreren Geräten, keine zentrale Passwort-Zurücksetzung und keinen gemeinsamen Multiplayer-Spielstand. Browserdaten löschen oder ein anderes Gerät verwenden entfernt beziehungsweise verbirgt die lokalen Profile und Spielstände. **Forgot Password?** erklärt im Spiel, dass eine automatische Wiederherstellung nicht möglich ist. Benutzer sollten kein wichtiges Passwort wiederverwenden.
+This is **only a local game profile feature, not an online login**. It offers no accounts across several devices, no central password reset and no shared multiplayer save. Deleting browser data or using another device removes or hides the local profiles and saves. **Forgot Password?** explains in the game that automatic recovery is not possible. Users should not reuse an important password.
 
-GitHub Pages liefert statische Dateien aus. Die Seite kann neue Registrierungen nicht direkt in das GitHub-Repository schreiben. Es wurden deshalb keine Zugangsdaten in GitHub eingecheckt. Ein geräteübergreifendes Konto oder eine echte gemeinsame Rangliste erfordert später einen Dienst mit Datenbank und serverseitiger Anmeldung.
+GitHub Pages serves static files. The site cannot write new registrations directly into the GitHub repository. So no credentials were committed to GitHub. An account that works across devices or a real shared leaderboard needs a service with a database and server-side sign-in later.
 
-## Umsetzung
+## Implementation
 
-| Datei | Aufgabe |
+| File | Purpose |
 | --- | --- |
-| `web/assets/login-form-reference.jpg`, `web/assets/signup-screen-reference.jpg` | Von Florian Stodden bereitgestellte Bildvorlagen für die beiden Formulare. |
-| `web/index.html`, `web/style.css` | Formularfelder und Knöpfe über den Bildern; auf kleinen Bildschirmen eine lesbare, bedienbare Formularkarte. |
-| `web/local-auth.js` | Lokale Konten anlegen und prüfen, Passwort-Prüfwerte speichern, Speicher-Schlüssel je Profil bilden. |
-| `web/main.js` | Auswahl → Formular → Home Screen → Spiel, Profilwechsel und getrennte Spielstände. |
-| `web/local-auth.test.js` | Prüft Registrierung, Anmeldung, falsche Daten und getrennte Profil-Schlüssel. |
+| `web/assets/login-form-reference.jpg`, `web/assets/signup-screen-reference.jpg` | Artwork provided by Florian Stodden for the two forms. |
+| `web/index.html`, `web/style.css` | Form fields and buttons on top of the images; on small screens a readable, usable form card. |
+| `web/local-auth.js` | Creates and checks local accounts, stores password check values, builds storage keys per profile. |
+| `web/main.js` | Choice → form → home screen → game, profile switch and separate saves. |
+| `web/local-auth.test.js` | Checks registration, sign-in, wrong data and separate profile keys. |
 
-## Prüfung vor dem Pull Request
+## Checks before the pull request
 
-- Im lokalen Browser: Sign Up → Home Screen, Profilwechsel → Log In, falsches Passwort, korrektes Passwort → Home Screen.
-- Beide bereitgestellten Formulargrafiken bei Desktopgröße visuell geprüft.
-- `cd web && node --test`, `node --check web/main.js` und `git diff --check` geprüft; endgültige Testzahl steht im Pull Request.
+- In a local browser: Sign Up → home screen, profile switch → Log In, wrong password, correct password → home screen.
+- Both provided form graphics checked visually at desktop size.
+- `cd web && node --test`, `node --check web/main.js` and `git diff --check` checked; the final number of tests is in the pull request.

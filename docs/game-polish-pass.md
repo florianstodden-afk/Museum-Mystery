@@ -1,33 +1,33 @@
-# Feinschliff des bestehenden Spiels · 19.11.2026
+# Polish pass on the existing game · 19.11.2026
 
-**Historischer Stand vor Station B „Curator’s Catalogue“ (PR #32).** Die folgenden Angaben zu zwei Landschaftswerken, Live-API, Antwortabzügen und 85 möglichen Punkten beschreiben den damaligen Stand. Aktuell nutzt das Spiel vier Met-Werke im [Curator’s Catalogue](story/curators-catalogue.md) und maximal 80 Punkte. Dieser Eintrag bleibt erhalten, damit die Entwicklung nachvollziehbar ist.
+**Historical status before Station B “Curator’s Catalogue” (PR #32).** The following notes on two landscape works, the live API, answer deductions and 85 possible points describe the state at that time. The game now uses four Met works in the [Curator’s Catalogue](story/curators-catalogue.md) and at most 80 points. This entry is kept so the development can be followed.
 
-Auftrag von Florian Stodden: Die vorhandenen Teile verbessern, ohne neue Story oder weitere Minispiele. Die Handyansicht ist ausdrücklich **später** dran.
+Assignment from Florian Stodden: improve the existing parts, without a new story or more mini-games. The phone view is explicitly for **later**.
 
-## Was geändert wurde
+## What changed
 
-| Bereich | Vorher | Jetzt |
+| Area | Before | Now |
 | --- | --- | --- |
-| Station B / Met | Das zweite Werk erschien nur, wenn die Live-API sein Bild lieferte. Bei einem Fehler fehlte es. | Beide echten Met-Werke liegen als öffentliche Kunstbilder im Projekt. Die API prüft weiterhin die Katalogdaten live. Bei Ausfall stehen Bild und gespeicherte Fakten bereit; ein kurzer Status nennt die Quelle. Die feste Lösung bleibt für alle gleich. |
-| Erklärungen | Die Zeitwertung war teils nur allgemein beschrieben. | Die Startansichten von I, L und D nennen ihre jeweiligen Zeitgrenzen und Punkte. B nennt die Abzüge für falsche Antworten und Hinweise. Die ausführliche Hilfe von I verwendet dieselben Grenzwerte wie die Wertungsfunktion. |
-| Interaktion am Safe | Wenn ein anderer Gegenstand nahe an der geschlossenen Safetür lag, konnte der E-Hinweis dessen Namen zeigen, obwohl E den Safe öffnet. | Der sichtbare Hinweis nennt „Enter vault code“, wenn die verschlossene Tür Vorrang hat. Nach dem Öffnen bleibt E für nahe Objekte frei; durch die Tür geht man weiterhin zu Fuß. |
-| Scoreboard | Alte Bestwerte mit 90 möglichen Punkten standen neben neuen mit 85, ohne Erklärung; ein direkter Zahlenvergleich benachteiligte die alte oder neue Skala. | Alte Werte sind als frühere Wertung gekennzeichnet. Für den Vergleich zählt der Anteil der erreichbaren Punkte; bei Gleichstand entscheidet die Zeit. Eine kurze Zeile erklärt die Punktquellen. |
-| Endbilder | Die beiden großen PNG-Hintergründe luden zusammen rund 3,8 MB. | Die textfreien Hintergründe liegen als JPG vor und laden zusammen rund 0,46 MB. Die sichtbaren Storytexte bleiben echtes HTML. |
+| Station B / Met | The second work appeared only if the live API delivered its image. On an error it was missing. | Both real Met works are stored in the project as public art images. The API still checks the catalogue data live. If it fails, the image and stored facts are ready; a short status names the source. The fixed solution stays the same for everyone. |
+| Explanations | The time scoring was sometimes described only in general terms. | The start views of I, L and D name their time limits and points. B names the deductions for wrong answers and hints. The detailed help of I uses the same limits as the scoring function. |
+| Interaction at the safe | If another object lay close to the closed safe door, the E hint could show its name even though E opens the safe. | The visible hint says “Enter vault code” when the locked door has priority. After opening, E is free for nearby objects; you still walk through the door. |
+| Scoreboard | Old best runs with 90 possible points stood next to new ones with 85, without explanation; a direct comparison of numbers was unfair to the old or the new scale. | Old values are marked as earlier scoring. The comparison uses the share of reachable points; on a tie, time decides. A short line explains where points come from. |
+| Ending images | The two large PNG backgrounds loaded about 3.8 MB together. | The text-free backgrounds are JPGs and load about 0.46 MB together. The visible story text stays real HTML. |
 
-## Wo das im Code passiert
+## Where this happens in the code
 
-- `web/minigames/landscape.js`: Station B, lokale Bilder und Live-Katalogdaten. `web/assets/met-459193-source.md` dokumentiert das neue Met-Bild.
-- `web/minigames/portrait-timeline.js`, `picture-puzzle.js`, `spot-the-forgery.js`, `station-ui.js`: Hinweise der vier bestehenden Rätsel.
-- `web/gallery.js` und `web/main.js`: E-Hinweis und Interaktionsvorrang an der Safetür.
-- `web/story/scoring.js` und `scoreboard-view.js`: Bestwertvergleich und Anzeige.
-- `web/story/story.css`, `web/assets/ending-*.jpg`: Abschlussbilder. `web/index.html` lädt aktualisierte CSS- und Spielversionen.
+- `web/minigames/landscape.js`: Station B, local images and live catalogue data. `web/assets/met-459193-source.md` documents the new Met image.
+- `web/minigames/portrait-timeline.js`, `picture-puzzle.js`, `spot-the-forgery.js`, `station-ui.js`: hints of the four existing puzzles.
+- `web/gallery.js` and `web/main.js`: E hint and interaction priority at the safe door.
+- `web/story/scoring.js` and `scoreboard-view.js`: best run comparison and display.
+- `web/story/story.css`, `web/assets/ending-*.jpg`: closing images. `web/index.html` loads updated CSS and game versions.
 
-## Kontrolle
+## Checks
 
-- `cd web && node --test`: **279 bestanden, 0 fehlgeschlagen** (einschließlich der bereits vorbereiteten Änderung an Leon und Imani).
-- Im lokalen Browser wurden M's Nachricht, B, I, L und D, das Codewort BILD, die Beweisfrage und beide möglichen Enden durchgespielt. Die beiden Ending-Hintergründe wurden geladen. Für das zweite Ende wurde der gespeicherte Zustand direkt vor der Entscheidung erneut geöffnet.
-- `git diff --check`: keine Formatfehler.
+- `cd web && node --test`: **279 passed, 0 failed** (including the already prepared change to Leon and Imani).
+- In a local browser, M’s message, B, I, L and D, the code word BILD, the evidence question and both possible endings were played through. Both ending backgrounds loaded. For the second ending, the saved state right before the decision was opened again.
+- `git diff --check`: no formatting errors.
 
-## Später
+## Later
 
-- Handyansicht auf schmalen Bildschirmen prüfen und bei Bedarf verbessern. Sie gehörte ausdrücklich nicht zu diesem Arbeitspaket.
+- Check the phone view on narrow screens and improve it if needed. It was explicitly not part of this work package.

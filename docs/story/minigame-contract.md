@@ -1,42 +1,42 @@
-# Vertrag für Stationen (Minispiele) – Museum Nocturne
+# Contract for stations (mini-games) – Museum Nocturne
 
-Dieser Vertrag gilt für die Stationen 2–4 (**Portrait Hall**, **Conservation Studio**, **Frame Archive**) und beschreibt, wie jede Station an die Story-Engine in `web/story/` angeschlossen wird. Station 1 (`web/minigames/landscape.js`) erfüllt ihn bereits.
+This contract applies to stations 2–4 (**Portrait Hall**, **Conservation Studio**, **Frame Archive**) and describes how each station is connected to the story engine in `web/story/`. Station 1 (`web/minigames/landscape.js`) already fulfils it.
 
-## Kurz gesagt
+## In short
 
-1. Deine Datei liegt in `web/minigames/<name>.js` (z. B. `portraits.js`, `restoration.js`, `archive.js`). Diese Namen gehören euch; die Story-Logik legt sie nicht an.
-2. Sie exportiert **eine** Funktion:
+1. Your file lives in `web/minigames/<name>.js` (e.g. `portraits.js`, `restoration.js`, `archive.js`). These names belong to you; the story logic does not create them.
+2. It exports **one** function:
 
    ```js
    export function start(container, caseData, onSolved) { … }
    ```
 
-3. Wenn die Station gelöst ist, rufst du **einmal** auf:
+3. When the station is solved, you call **once**:
 
    ```js
    onSolved({ mistakes, hints });
    ```
 
-   Das ist alles. **Buchstabe, Beleg und Punkte vergibt die Engine**, nicht die Station. Wenn du zusätzlich `letter`, `evidence` oder `points` mitschickst, werden sie ignoriert.
+   That is all. **The engine hands out the letter, evidence and points**, not the station. If you also send `letter`, `evidence` or `points`, they are ignored.
 
-## Was du bekommst
+## What you get
 
-| Parameter | Bedeutung |
+| Parameter | Meaning |
 |---|---|
-| `container` | Ein leeres HTML-Element. Zeichne deine Station nur hier hinein (`container.replaceChildren(…)`). |
-| `caseData.stationId` | `"portraits"`, `"restoration"` oder `"archive"`. |
-| `caseData.state` | Dein gespeicherter Zwischenstand oder `undefined` beim ersten Start. |
-| `caseData.onChange(progress)` | Rufe das nach **jeder** Änderung auf (Fehlversuch, Hinweis). Der Host speichert `progress`. Empfohlenes Format: `{ mistakes, hints, solved }`. |
-| `onSolved(result)` | Einmal aufrufen, wenn die Station gelöst ist. |
+| `container` | An empty HTML element. Draw your station only into it (`container.replaceChildren(…)`). |
+| `caseData.stationId` | `"portraits"`, `"restoration"` or `"archive"`. |
+| `caseData.state` | Your saved progress, or `undefined` on the first start. |
+| `caseData.onChange(progress)` | Call this after **every** change (wrong try, hint). The host saves `progress`. Recommended format: `{ mistakes, hints, solved }`. |
+| `onSolved(result)` | Call once when the station is solved. |
 
-## Was du NICHT tun sollst
+## What you should NOT do
 
-- kein `localStorage` – das Speichern macht der Host über `onChange`;
-- keine Punkte berechnen, die irgendwo anders gezählt werden (eine Anzeige „−3 points“ für Spielende ist in Ordnung);
-- keine Elemente außerhalb von `container` verändern;
-- keine eigenen Fenster/Overlays öffnen – der Host öffnet die Station bereits in einem Dialog.
+- no `localStorage` – the host saves through `onChange`;
+- no points calculation that is counted somewhere else (a display “−3 points” for players is fine);
+- no changes to elements outside `container`;
+- no own windows/overlays – the host already opens the station in a dialog.
 
-## Minimalbeispiel
+## Minimal example
 
 ```js
 // web/minigames/archive.js
@@ -74,45 +74,45 @@ export function start(container, caseData, onSolved) {
 }
 ```
 
-## Ausprobieren ohne Hauptspiel
+## Trying it out without the main game
 
-In `web/dev/story.html` werden Stationen 2–4 mit dem Platzhalter `web/story/placeholder-station.js` geöffnet. Um deine Station dort zu testen, reicht eine Zeile in `web/dev/story-preview.js`: dein Modul importieren und bei `createStoryHost({ stations: { … } })` eintragen, z. B. `stations: { landscape: landscapeStation, archive: archiveStation }`. Stationen ohne Eintrag bekommen automatisch den Platzhalter.
+In `web/dev/story.html`, stations 2–4 open with the placeholder `web/story/placeholder-station.js`. To test your station there, one line in `web/dev/story-preview.js` is enough: import your module and add it to `createStoryHost({ stations: { … } })`, e.g. `stations: { landscape: landscapeStation, archive: archiveStation }`. Stations without an entry automatically get the placeholder.
 
-Der Adapter `openStation` in `web/story/stations.js` übersetzt deine Rückmeldung. Er akzeptiert:
+The adapter `openStation` in `web/story/stations.js` translates your report. It accepts:
 
-- **Zielformat:** `onSolved({ mistakes, hints })`
-- **Altes Format** (wie `landscape.js`): `onSolved({ letter, evidence, points })` + Fortschritt über `caseData.onChange({ mistakes, hints, … })`
+- **Target format:** `onSolved({ mistakes, hints })`
+- **Old format** (like `landscape.js`): `onSolved({ letter, evidence, points })` + progress through `caseData.onChange({ mistakes, hints, … })`
 
-Ein zweiter Aufruf von `onSolved` wird ignoriert.
+A second call of `onSolved` is ignored.
 
-## Checkliste „Wann ist meine Station fertig?“
+## Checklist “When is my station done?”
 
-- [ ] Datei exportiert `start(container, caseData, onSolved)`.
-- [ ] Die Regeln (richtig/falsch, Hinweis) sind **reine Funktionen** ohne DOM und haben Tests in `web/minigames/<name>.test.js`; `cd web && node --test` ist grün.
-- [ ] Nach jedem Fehlversuch und Hinweis wird `caseData.onChange(progress)` aufgerufen.
-- [ ] Ein gespeicherter Zwischenstand aus `caseData.state` wird beim Start wieder angezeigt.
-- [ ] `onSolved({ mistakes, hints })` wird genau einmal aufgerufen.
-- [ ] Man kann nicht dauerhaft feststecken (z. B. Hinweis-Knopf, unbegrenzte Versuche).
-- [ ] Alle Texte auf Englisch; Kunstdaten stammen aus der Met (ID in `web/story/case-1.js`).
-- [ ] Die Station funktioniert in einem schmalen Container (Handy-Breite, ca. 360 px).
-- [ ] Bedienbar mit Tastatur (Knöpfe sind echte `<button>`, Formulare echte `<label>`).
-- [ ] In `web/dev/story.html` einmal durchgespielt: Buchstabe erscheint im Journal an der richtigen Stelle.
+- [ ] The file exports `start(container, caseData, onSolved)`.
+- [ ] The rules (right/wrong, hint) are **pure functions** without DOM and have tests in `web/minigames/<name>.test.js`; `cd web && node --test` is green.
+- [ ] `caseData.onChange(progress)` is called after every wrong try and hint.
+- [ ] Saved progress from `caseData.state` is shown again at the start.
+- [ ] `onSolved({ mistakes, hints })` is called exactly once.
+- [ ] Nobody can get stuck for good (e.g. hint button, unlimited tries).
+- [ ] All texts in English; art data comes from the Met (ID in `web/story/case-1.js`).
+- [ ] The station works in a narrow container (phone width, about 360 px).
+- [ ] Usable with the keyboard (buttons are real `<button>`, forms real `<label>`).
+- [ ] Played through once in `web/dev/story.html`: the letter appears in the right place in the journal.
 
-## Inhalt der Stationen (aus dem Konzept)
+## Content of the stations (from the concept)
 
-| Station | id | Buchstabe | Beleg (vergibt die Engine) | Werke (Met-ID) |
+| Station | id | Letter | Evidence (handed out by the engine) | Works (Met ID) |
 |---|---|---|---|---|
-| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**fertig:** `web/minigames/portrait-timeline.js`) |
+| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**done:** `web/minigames/portrait-timeline.js`) |
 | Gallery, left painting | `restoration` | L | Hidden mark “V” on the fake transport slip. | 435882 |
-| Gallery, frame rack | `archive` | D | Frame label: “Ordered by: A. Voss”. | 435882 (seit 15.11.2026; vorher 436121, das jetzt Station I nutzt) |
+| Gallery, frame rack | `archive` | D | Frame label: “Ordered by: A. Voss”. | 435882 (since 15.11.2026; before that 436121, which Station I now uses) |
 
-Station I (Portrait Hall) erfüllt diesen Vertrag als zweites Beispiel nach Station B: drei Dateien (`portrait-rules.js` reine Regeln, `portrait-artwork.js` Met-API mit Prüfung und Offline-Kopie, `portrait-timeline.js` Oberfläche) plus `portrait-timeline.test.js`. Die richtige Reihenfolge kommt aus den eingefrorenen Feldern `objectBeginDate`/`objectEndDate` in `case-1.js`, nie aus Live-Daten.
+Station I (Portrait Hall) fulfils this contract as the second example after Station B: three files (`portrait-rules.js` pure rules, `portrait-artwork.js` Met API with checks and offline copy, `portrait-timeline.js` interface) plus `portrait-timeline.test.js`. The right order comes from the frozen fields `objectBeginDate`/`objectEndDate` in `case-1.js`, never from live data.
 
-**Hinweis für Station L:** Station D nutzt jetzt 435882 (Cézanne, Still Life). Wenn Station L ein eigenes Werk bekommt, bitte das neue Werk in `works` **ergänzen** und 435882 dort stehen lassen. Sonst zeigt Station D ins Leere; der Test „every station artwork exists in the work list“ meldet das.
+**Note for Station L:** Station D now uses 435882 (Cézanne, Still Life). If Station L gets its own work, please **add** the new work to `works` and leave 435882 there. Otherwise Station D points to nothing; the test “every station artwork exists in the work list” reports that.
 
-Die Zuordnung der Werke zu den Stationen 2–4 ist eine Annahme der Story-Logik (das Konzept nennt nur die Werkliste). Wenn ihr andere Werke nehmt, bitte `metIds` in `web/story/case-1.js` anpassen.
+The assignment of works to stations 2–4 is an assumption of the story logic (the concept only names the list of works). If you use other works, please adjust `metIds` in `web/story/case-1.js`.
 
 
 Station L integration: host preserves cleanup and saved progress. Renoir completion time awards 15 (<=30s), 10 (<=45s), 5 (<=60s), or 0 points. Other stations keep standard scoring; total maximum is 90 (since Station I is timed too). Saved completed legacy L rewards are capped at 15; unfinished puzzles award nothing.
 
-**Station I als Speedrun (17.11.2026):** Wie Station L meldet Station I nur `onSolved({ mistakes, hints })` und speichert ihre Zeit im Fortschritt (`startedAt`, `finishedAt`, `penaltyMs`). Die Punkte setzt `synchronizeScore` in `scoring.js` aus dieser Zeit: `portraitSpeedPoints` gibt 15 (≤ 20 s), 10 (≤ 35 s), 5 (≤ 50 s) oder 0. Gelöst ohne gespeicherte Zeit (alter Spielstand) → 5. Die Uhr startet mit „Start“, läuft beim Schließen weiter und stoppt beim Lösen; Peek und falsches Prüfen kosten je 5 s. `hints` zählt die Peeks.
+**Station I as a speedrun (17.11.2026):** Like Station L, Station I only reports `onSolved({ mistakes, hints })` and saves its time in the progress (`startedAt`, `finishedAt`, `penaltyMs`). `synchronizeScore` in `scoring.js` sets the points from this time: `portraitSpeedPoints` gives 15 (≤ 20 s), 10 (≤ 35 s), 5 (≤ 50 s) or 0. Solved without a saved time (old save) → 5. The clock starts with “Start”, keeps running when closed and stops when solved; Peek and a wrong check cost 5 s each. `hints` counts the peeks.
