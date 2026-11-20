@@ -766,7 +766,7 @@ function showHome(){
   const board=scoreboard(story.state,story.progress);
   const bestRun=bestRunStore((()=>{try{return localStorage;}catch{return null;}})(),profileStorageKey('museum-nocturne-best-run-v1',activeProfile));
   // A finished run may become the best run (stored on this device only).
-  const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max}):bestRun.get();
+  const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max,status:board.status}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
   leaderboardPublish.hidden=!canPublish(board);
   showSaveNotice();

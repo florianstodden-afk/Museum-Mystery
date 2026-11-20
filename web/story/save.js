@@ -1,7 +1,7 @@
 // Turns the story state into text and back.
 // No localStorage here – the page that uses this decides where the text is stored.
 import { CASE, CASE_VERSION, STATION_IDS } from './case-1.js';
-import { ENDING_IDS } from './engine.js';
+import { ENDING_IDS, MAX_ACCUSATIONS } from './engine.js';
 import { synchronizeScore, emptyPenalties } from './scoring.js';
 
 export function serialize(state) {
@@ -71,7 +71,11 @@ export function isValidState(value) {
   const allSolved = STATION_IDS.every(id => value.stations[id].solved);
   if (value.safe.open && !allSolved) return false;
   if (value.accusation.solved && !value.safe.open) return false;
-  if (value.ending !== null && !value.accusation.solved) return false;
+  // A chosen ending needs the right answer; "lost" needs three wrong ones and no right one.
+  if (value.ending === 'lost') {
+    if (value.accusation.solved || value.accusation.attempts < MAX_ACCUSATIONS || !value.safe.open) return false;
+  } else if (value.ending !== null && !value.accusation.solved) return false;
+  if (!value.accusation.solved && value.ending === null && value.accusation.attempts >= MAX_ACCUSATIONS) return false;
   return true;
 }
 

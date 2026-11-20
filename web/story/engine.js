@@ -10,7 +10,15 @@
 import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById, stationPlace, stationsByNumber } from './case-1.js';
 import { SPEED_MAX, stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
 
-export const ENDING_IDS = ['heist', 'open-file'];
+// The two endings the player chooses, plus "lost" after too many wrong accusations.
+export const CHOICE_IDS = ['heist', 'open-file'];
+export const ENDING_IDS = [...CHOICE_IDS, 'lost'];
+export const MAX_ACCUSATIONS = 3;   // the third wrong name ends the case
+
+/** How many names the player may still try at the final question. */
+export function accusationsLeft(state) {
+  return Math.max(0, MAX_ACCUSATIONS - state.accusation.attempts);
+}
 
 function emptyStation() {
   return { solved: false, mistakes: 0, hints: 0, points: 0 };
@@ -29,7 +37,7 @@ export function newGame() {
     notes: [],                         // story notes without a letter
     safe: { open: false, attempts: 0 },
     accusation: { solved: false, attempts: 0 },
-    ending: null,                      // null | "heist" | "open-file"
+    ending: null,                      // null | "heist" | "open-file" | "lost"
   };
 }
 
@@ -142,6 +150,10 @@ export function accuse(state, suspectId) {
   const next = copy(state);
   if (suspectId !== CASE.culpritId) {
     next.accusation.attempts += 1;
+    if (accusationsLeft(next) === 0) {
+      next.ending = 'lost';
+      return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. That was your last chance. Case lost.` };
+    }
     return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. ${suspect.counterText} Try again.` };
   }
   next.accusation.solved = true;
@@ -152,7 +164,7 @@ export function accuse(state, suspectId) {
 export function chooseEnding(state, endingId) {
   if (isOver(state)) return reject(state, CLOSED_MESSAGE);
   if (!state.accusation.solved) return reject(state, 'Answer the final question before you decide.');
-  if (!ENDING_IDS.includes(endingId)) return reject(state, `Unknown ending: ${endingId}.`);
+  if (!CHOICE_IDS.includes(endingId)) return reject(state, `Unknown ending: ${endingId}.`);
   const next = copy(state);
   next.ending = endingId;
   const message = endingId === 'heist'

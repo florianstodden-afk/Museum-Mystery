@@ -2,7 +2,7 @@
 import { CASE, workById } from './case-1.js';
 import { evidenceChain } from './journal.js';
 import { renderChain } from './accusation-ui.js';
-import { scoreBreakdown, totalScore, maximumScore } from './scoring.js';
+import { scoreBreakdown, totalScore, maximumScore, scoreboard, formatClock } from './scoring.js';
 import { el, button } from './dom.js';
 
 export const ENDINGS = {
@@ -12,6 +12,13 @@ export const ENDINGS = {
     choiceLabel: 'Steal the artwork',
     paragraphs: [
       'You deliver the original to Voss. His forgery stays on the wall.',
+    ],
+  },
+  lost: {
+    kicker: 'CASE LOST',
+    title: 'Case lost',
+    paragraphs: [
+      'You named the wrong person three times. By sunrise, Voss and the original are gone. The museum will never know who planned it.',
     ],
   },
   'open-file': {
@@ -26,12 +33,21 @@ export const ENDINGS = {
 
 const PAINTING = workById(436535);
 
+const DETAIL_INTRO = {
+  heist: 'You keep the original. The forgery remains in the Gallery.',
+  'open-file': 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.',
+  lost: 'Three wrong names. The evidence you found is listed below.',
+};
+
 // Everything the end screen needs, or null while the game has no ending.
-export function endingModel(state) {
+// `progress` (optional) is the saved station progress; it adds the Renoir time to the run time.
+export function endingModel(state, progress = {}) {
   const ending = ENDINGS[state.ending];
   if (!ending) return null;
   return {
     id: state.ending,
+    status: state.ending === 'lost' ? 'Lost' : 'Won',
+    timeMs: scoreboard(state, progress).timeMs,
     kicker: ending.kicker,
     title: ending.title,
     paragraphs: ending.paragraphs,
@@ -88,16 +104,15 @@ export function renderEnding(container, model, options = {}) {
 
   const details = el('details', { className: 'story-ending-details' }, [
     el('summary', { text: 'View evidence and score details' }),
-    el('p', { className: 'story-ending-detail-intro', text: model.id === 'heist'
-      ? 'Voss gets the original and pays you. The forgery remains in the Gallery.'
-      : 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.' }),
+    el('p', { className: 'story-ending-detail-intro', text: DETAIL_INTRO[model.id] }),
     renderChain(model.chain),
     table,
     el('p', { className: 'story-disclaimer', text: model.disclaimer }),
   ]);
   const actions = el('div', { className: 'story-ending-actions' });
-  if (options.onHome) actions.append(button('Back to home', options.onHome));
-  if (options.onNewGame) actions.append(button('New game', options.onNewGame));
+  const lost = model.id === 'lost';
+  if (options.onHome) actions.append(button(lost ? 'Back to menu' : 'Back to home', options.onHome));
+  if (options.onNewGame) actions.append(button(lost ? 'Try again' : 'New game', options.onNewGame));
   const parts = [
     el('div', { className: 'story-ending-plaque' }, [
       el('p', { className: 'story-eyebrow', text: model.kicker }),
@@ -108,6 +123,7 @@ export function renderEnding(container, model, options = {}) {
       figure,
       el('div', { className: 'story-ending-controls' }, [
         el('p', { className: 'story-ending-total', text: `${model.total} / ${model.max} points` }),
+        el('p', { className: 'story-ending-status', text: `${model.status} · time ${model.timeMs == null ? '–' : formatClock(model.timeMs)}` }),
         actions,
         details,
       ]),

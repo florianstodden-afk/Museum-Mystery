@@ -173,6 +173,8 @@ export function scoreboard(state, progress = {}) {
     max: maximumScore(state),
     timeMs: times.length ? times.reduce((sum, ms) => sum + ms, 0) : null,   // only timed stations count
     finished: state.ending !== null,
+    ending: state.ending,
+    status: state.ending === null ? null : state.ending === 'lost' ? 'Lost' : 'Won',
   };
 }
 
@@ -211,6 +213,7 @@ export function bestRunStore(storage, key = 'museum-nocturne-best-run-v1') {
       try { const run = JSON.parse(storage?.getItem(key)); return validRun(run) ? run : null; } catch { return null; }
     },
     record(run) {
+      if (run?.status === 'Lost') return this.get();   // a lost run is never a best run
       const best = betterRun(this.get(), run);
       if (best === run) { try { storage?.setItem(key, JSON.stringify(run)); } catch { /* no saving, still fine */ } }
       return best;

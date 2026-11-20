@@ -466,3 +466,7 @@ a.story-button { display: inline-block; text-decoration: none; }
   .catalogue-puzzle .catalogue-card { font-size: .76rem; }
 }
 .story-slot-spot { color: var(--story-gold); }
+.story-attempts{margin:10px 0 0;font-size:.82rem;letter-spacing:.04em;color:var(--story-muted)}
+.story-ending-status{margin:0 0 7px;font-size:clamp(.78rem,1vw,.95rem);color:#eadbbb;text-shadow:0 2px 4px #000}
+.story-ending.is-lost{background-image:linear-gradient(rgba(3,7,11,.62),rgba(3,7,11,.62)),url('../assets/ending-not-thief-background.jpg')}
+.story-ending.is-lost .story-ending-figure img{filter:grayscale(1) brightness(.6)}

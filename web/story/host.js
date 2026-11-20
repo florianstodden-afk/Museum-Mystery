@@ -44,6 +44,7 @@ export function createStoryHost(options) {
     onVaultUnlocked = null,
     onReset = () => {},       // optional: the page resets its own things (e.g. player position)
     onHome = null,            // optional: return from an ending to the home screen
+    onFinished = () => {},    // optional: called once when a run ends (won or lost), e.g. for the local scoreboard
     sound = null,             // optional: a player from sound.js; without it the story is silent
     speech = null,            // optional: a box from speech-box.js; then Leon talks in it instead of the panel
     stations = {},
@@ -234,7 +235,8 @@ export function createStoryHost(options) {
     const { content, actions } = scene('The final question');
     renderAccusation(content, { state, message }, suspectId => {
       const result = act(accuse(state, suspectId), 'accuse');
-      showAccusation(result.message);
+      if (state.ending === 'lost') { onFinished(state, progress); showEnding(); }
+      else showAccusation(result.message);
     });
     actions.append(state.accusation.solved
       ? button('Decide what happens', () => showEndingChoice())
@@ -244,14 +246,15 @@ export function createStoryHost(options) {
   function showEndingChoice() {
     const { content, actions } = scene('Before sunrise');
     renderEndingChoice(content, endingId => {
-      act(chooseEnding(state, endingId), 'chooseEnding');
+      const result = act(chooseEnding(state, endingId), 'chooseEnding');
+      if (result.ok) onFinished(state, progress);
       showEnding();
     });
     actions.append(closeButton('Not yet'));
   }
 
   function showEnding() {
-    const model = endingModel(state);
+    const model = endingModel(state, progress);
     if (!model) return;
     const { content } = scene('Case closed');
     renderEnding(content, model, { onNewGame: confirmNewGame, onHome });

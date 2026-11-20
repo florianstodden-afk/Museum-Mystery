@@ -20,6 +20,9 @@ export function dialogueFor(characterId, state) {
 }
 
 function linesForM(state) {
+  if (state.ending === 'lost') {
+    return away(['You dial the number from M’s message.', '“The number you have called is no longer in service.”']);
+  }
   if (state.ending === 'heist') {
     return talk(['Pleasure doing business. The car is already gone.', 'No one will ever know you were here.']);
   }
@@ -83,6 +86,9 @@ function linesForImani(state) {
 function linesForVale(state) {
   if (!state.safe.open) {
     return away(['Dr. Vale’s office is dark.', 'A card on the door: “Back after the gala. – M. V.”']);
+  }
+  if (state.ending === 'lost') {
+    return away(['Dr. Vale stands in front of the open safe.', 'The original is gone. So is the patron who planned it.']);
   }
   if (state.ending === 'open-file') {
     return talk(['The file is open. Tomorrow the painting goes back on its wall – the real one.']);
