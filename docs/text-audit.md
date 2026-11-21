@@ -151,11 +151,11 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/case-1.js` | Museum Nocturne, New York | 4 |
 | `story/case-1.js` | Fictional museum and characters · Artworks: The Met, Open Access | 10 |
 | `story/case-1.js` | A message from M | 4 |
-| `story/case-1.js` | The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. Four stations hide the way in. Bring it to me tonight. – M | 28 |
+| `story/case-1.js` | The Van Gogh in the Gallery is a copy. The real ‘Wheat Field with Cypresses’ is locked in the curator’s safe. She hid four clues in the museum – together they open it. Everyone thinks you are the new conservation temp. Bring me the painting tonight. – M | 48 |
 | `story/case-1.js` | Voss approved the false wall label. | 6 |
 | `story/case-1.js` | The false label went up with Voss’s approval – he wanted the swap to look official. | 16 |
 | `story/case-1.js` | Compare the wall label with the Met catalogue and correct the year and the material. | 15 |
-| `story/case-1.js` | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 13 |
+| `story/case-1.js` | Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’. | 22 |
 | `story/case-1.js` | Leon was on his round; the cart was booked as a “patron visit” – and Voss is the patron. | 19 |
 | `story/case-1.js` | Put the three portraits in the order they were painted, oldest first – their backs hold the night-shift log. | 19 |
 | `story/case-1.js` | Gallery Picture Puzzle | 3 |
@@ -165,13 +165,13 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/case-1.js` | Frame label: “Ordered by: A. Voss”. | 6 |
 | `story/case-1.js` | The frame for the forgery was ordered by A. Voss – so the “V” is his, not Vale’s. | 18 |
 | `story/case-1.js` | Find the empty frame that matches the forgery and read who ordered it. | 13 |
-| `story/case-1.js` | Leon saw a transport cart at the delivery exit at 21:14. He could not see what was inside. | 18 |
+| `story/case-1.js` | A covered transport cart left the delivery exit at 21:14. No delivery was announced. | 14 |
 | `story/case-1.js` | Leon on the night round, Imani in the studio until 22:00. One line says only “21:00 – patron visit”. The Portrait Hall log should say more. | 26 |
-| `story/case-1.js` | Saw a transport cart at the delivery exit, but not the painting. Nervous since the alarm. | 16 |
-| `story/case-1.js` | The night-shift log shows Leon was on his round elsewhere – and the transport was booked as a patron visit, not by a guard. | 24 |
+| `story/case-1.js` | Night guard. Saw a covered cart leave at 21:14 – and was on duty all night. | 16 |
+| `story/case-1.js` | The night-shift log puts Leon on the east stairs at 21:14, and a guard cannot book a patron visit. | 19 |
 | `story/case-1.js` | Dr. Mara Vale | 3 |
 | `story/case-1.js` | Locked the original in the safe and left four clues. Her initial is also a “V”. | 16 |
-| `story/case-1.js` | The “V” is not Vale: the frame label says “Ordered by: A. Voss”. Vale hid the original to protect it. | 20 |
+| `story/case-1.js` | The ‘V’ is not Vale. The frame label names ‘A. V.’, not M. V. – and Vale hid the original to protect it. | 21 |
 | `story/case-1.js` | Generous donor of the museum. Signs his messages with a single letter. | 12 |
 | `story/case-1.js` | Who planned the false label and the transport slip, and lured you to the safe? | 15 |
 | `story/case-1.js` | Wheat Field with Cypresses | 4 |
@@ -206,42 +206,41 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/dialogues.js` | “The number you have called is no longer in service.” | 10 |
 | `story/dialogues.js` | You found it? Good. | 4 |
 | `story/dialogues.js` | Bring it to the loading dock. Come alone, and do not talk to the curator. | 15 |
-| `story/dialogues.js` | Keep moving. Four wings, four clues. | 6 |
-| `story/dialogues.js` | The curator thinks she is clever. Her clues will spell the way into the safe. | 15 |
+| `story/dialogues.js` | Four stations, four letters. Put them together and the safe is yours. | 12 |
 | `story/dialogues.js` | Voss? He shook my hand at the gala and called me “our loyal Leon”. | 14 |
 | `story/dialogues.js` | Thank you for checking the log before you checked me. | 10 |
 | `story/dialogues.js` | The log proves it, doesn’t it? I was on the east stairs at 21:14. | 14 |
 | `story/dialogues.js` | Someone booked that cart as a “patron visit”. Not me – guards cannot book anything. | 15 |
-| `story/dialogues.js` | I know how it looks. I was on duty, and a painting is missing. | 14 |
+| `story/dialogues.js` | At 21:14 a covered transport cart left the delivery exit. | 10 |
 | `story/dialogues.js` | At 21:14 I saw a transport cart at the delivery exit. I never saw what was inside. | 17 |
 | `story/dialogues.js` | If you don’t believe me, look at the monitor wall in the security office. | 14 |
 | `story/dialogues.js` | The night-shift log is in the Portrait Hall. It will show where I really was. | 15 |
 | `story/dialogues.js` | The original was in the safe all along? Then the one on the wall … | 15 |
-| `story/dialogues.js` | I will test its varnish in the morning. Fresh varnish never lies. | 12 |
+| `story/dialogues.js` | The original was in the safe? Then Dr. Vale had doubts too. | 12 |
 | `story/dialogues.js` | That “V” was written in an ink that only shows under the lamp. | 13 |
 | `story/dialogues.js` | Someone wanted to recognise their own paperwork. A “V” – that could be more than one person here. | 18 |
-| `story/dialogues.js` | The picture puzzle is on the left side of the Gallery, beside the wall label and frame rack. | 18 |
+| `story/dialogues.js` | Between us – have you looked at the Van Gogh in the Gallery? The varnish is still sticky. | 18 |
 | `story/dialogues.js` | Restore Renoir’s Sea and Cliffs at Station L. I will then use the lamp to reveal the mark on the transport slip. | 22 |
 | `story/dialogues.js` | Dr. Vale’s office is dark. | 5 |
 | `story/dialogues.js` | A card on the door: “Back after the gala. – M. V.” | 12 |
 | `story/dialogues.js` | The file is open. Tomorrow the painting goes back on its wall – the real one. | 16 |
 | `story/dialogues.js` | Dr. Vale stands in front of the empty safe. | 9 |
 | `story/dialogues.js` | She says nothing. She only starts writing a new report. | 10 |
-| `story/dialogues.js` | Voss. I suspected him for weeks, but I needed proof that was not mine. | 14 |
+| `story/dialogues.js` | Voss. That label had his taste all over it – but I needed proof that wasn’t mine. | 17 |
 | `story/dialogues.js` | He signs his private letters with “M” – for mécène, the old word for patron. Everyone here thinks it means Mara. | 21 |
 | `story/dialogues.js` | He could not open my safe, so he needed someone who would follow my clues. You. | 16 |
 | `story/dialogues.js` | You hold the painting and the evidence. The choice is yours now. | 12 |
-| `story/dialogues.js` | You opened it. Good. I locked the original away the night the false label went up. | 16 |
+| `story/dialogues.js` | You opened it. That new wall label in the Gallery never looked right to me – so I locked the original in here, just in case. | 26 |
 | `story/dialogues.js` | I could not tell anyone – not even Leon. So I left four clues and hoped the right person would follow them. | 22 |
 | `story/dialogues.js` | Now tell me: who is behind this? | 7 |
 | `story/dialogues.js` | Rough night so far? | 4 |
 | `story/dialogues.js` | Quiet in here, isn’t it? | 5 |
 | `story/dialogues.js` | I’ll let you get back to it. | 7 |
-| `story/dialogues.js` | Mind the cameras. | 3 |
+| `story/dialogues.js` | Gloves on before you touch anything. | 6 |
 | `story/dialogues.js` | There you are. The whole building is talking. | 8 |
 | `story/dialogues.js` | The vault was open? Nobody tells me anything. | 8 |
 | `story/dialogues.js` | Ah. You again. I suppose you’ve read the log. | 9 |
-| `story/dialogues.js` | Evening. Keep your voice down – the cameras have ears tonight. | 11 |
+| `story/dialogues.js` | Evening. You must be the new conservation temp. Quiet night – mostly. | 12 |
 | `story/dialogues.js` | East stairs at 21:14. It’s in the log now, black on white. | 12 |
 | `story/dialogues.js` | And the cart? Booked as a “patron visit”. | 8 |
 | `story/dialogues.js` | I can’t book a coffee, let alone a cart. | 9 |
@@ -358,3 +357,15 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/security-office/security-office.js` | rgba(160,210,255,${flicker.toFixed(3)}) | 1 |
 | `story/security-office/security-office.js` | 600 ${Math.max(8, screen.h * 0.09)}px ui-monospace, Menlo, monospace | 8 |
 | `story/security-office/security-office.js` | rgba(127,182,216,${pulse.toFixed(3)}) | 1 |
+
+
+## Story clarity update (21.11.2026)
+
+The texts above now tell one story without prior knowledge: the Van Gogh in the Gallery is a copy, Dr. Vale locked the original in her safe out of caution, the 21:14 cart left empty, Leon is an honest guard, Imani quietly spots the fake, and only the player and M know about the theft. Changed in `story/case-1.js` and `story/dialogues.js` (full old → new table in the PR):
+
+- M’s message and M’s line while the safe is closed; hint “Four stations, four letters.”
+- Leon: greeting, goodbye, his three story stages (also used for “Rough night so far?”), suspect description and counter text.
+- Imani: before Station 2 she notices the sticky varnish; after Station 2 the hidden ‘V’; after the safe “Then Dr. Vale had doubts too.”
+- Dr. Vale: her lines at the open safe, the first line after the right accusation, description and counter text. On the lost ending the original is still in the safe.
+- Note “Monitor wall, 21:14” and the Station 1 evidence (Leon on the east stairs when the cart left).
+- Removed leftovers: “a painting is missing”, “Nervous since the alarm”, “the cameras have ears”.

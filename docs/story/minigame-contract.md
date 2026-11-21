@@ -102,7 +102,7 @@ A second call of `onSolved` is ignored.
 
 | Station | id | Letter | Evidence (handed out by the engine) | Works (Met ID) |
 |---|---|---|---|---|
-| Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**done:** `web/minigames/portrait-timeline.js`) |
+| Portrait Hall | `portraits` | I | Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’. | 436121, 12127, 435876 (**done:** `web/minigames/portrait-timeline.js`) |
 | Gallery, left painting | `restoration` | L | Hidden mark “V” on the fake transport slip. | 435882 |
 | Gallery, frame rack | `archive` | D | Frame label: “Ordered by: A. V.” | 435882 (since 15.11.2026; before that 436121, which Station I now uses) |
 

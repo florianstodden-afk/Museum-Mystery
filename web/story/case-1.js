@@ -69,7 +69,7 @@ export const CASE = deepFreeze({
       room: 'Portrait Hall',
       letter: 'I',
       evidenceId: 'shift-log',
-      evidence: 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.',
+      evidence: 'Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’.',
       pointsToVoss: 'Leon was on his round; the cart was booked as a “patron visit” – and Voss is the patron.',
       task: 'Put the four portraits in the order they were painted, oldest first – their backs hold the night-shift log.',
       metIds: [436703, 436121, 12127, 435876],
@@ -105,7 +105,7 @@ export const CASE = deepFreeze({
     {
       id: 'transport-cart',
       title: 'Monitor wall, 21:14',
-      text: 'Leon saw a transport cart at the delivery exit at 21:14. He could not see what was inside.',
+      text: 'A covered transport cart left the delivery exit at 21:14. No delivery was announced.',
     },
     {
       id: 'duty-roster',

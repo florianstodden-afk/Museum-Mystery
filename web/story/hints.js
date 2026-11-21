@@ -26,7 +26,7 @@ export function hintFor(state, level = 1) {
 function stationHint(state, concrete) {
   const open = stationsByNumber().filter(station => !state.stations[station.id].solved);
   if (!concrete) {
-    return hint(`Four wings, four clues. Still open: ${open.map(stationPlace).join('; ')}. The order does not matter.`);
+    return hint(`Four stations, four letters. Still open: ${open.map(stationPlace).join('; ')}. The order does not matter.`);
   }
   const next = open[0];
   // Before the Portrait Hall, the security office gives useful background.
