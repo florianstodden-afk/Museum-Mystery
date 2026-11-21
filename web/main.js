@@ -221,14 +221,13 @@ function drawHall(){
     ctx.drawImage(hallBackdrop,0,top,896,height);
   }
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
-  // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[0,405,244,88,55],[2,650,247,40,59]]) {
+  // Use the artwork itself, excluding the dark margins in the Met photographs.
+  for (const [index, x, y, width, height, crop] of [
+    [0,413,254,72,44,[.04,.045,.92,.91]],
+    [2,657,253,34,46,[.09,.04,.82,.91]],
+  ]) {
     const image = hallPaintings[index];
-    if(image.complete && image.naturalWidth) {
-      const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
-      const sw=width/scale, sh=height/scale;
-      ctx.drawImage(image,(image.naturalWidth-sw)/2,(image.naturalHeight-sh)/2,sw,sh,x,y,width,height);
-    }
+    if(image.complete && image.naturalWidth) drawFramedArtwork(image,x,y,width,height,crop);
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
   }
   // Station 1 (portraits) is the large painting in the middle of the hall wall.
@@ -259,15 +258,18 @@ function drawHall(){
   const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
   const target=interactTarget(); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
-// Gold frame around the middle hall painting, a sign below, and the gallery's E marker.
-const STATION_I_FRAME={x:405,y:244,width:88,height:55};
+// The frames are already part of the hall background; keep their gold edges visible.
+const STATION_I_FRAME={x:413,y:254,width:72,height:44};
+function drawFramedArtwork(image,x,y,width,height,[cx,cy,cw,ch]){
+  const sourceWidth=image.naturalWidth*cw, sourceHeight=image.naturalHeight*ch;
+  const scale=Math.max(width/sourceWidth,height/sourceHeight);
+  const sw=width/scale, sh=height/scale;
+  const sx=image.naturalWidth*cx+(sourceWidth-sw)/2;
+  const sy=image.naturalHeight*cy+(sourceHeight-sh)/2;
+  ctx.drawImage(image,sx,sy,sw,sh,x,y,width,height);
+}
 function drawStationPortrait(active){
   const {x,y,width,height}=STATION_I_FRAME, mid=x+width/2;
-  ctx.save();
-  ctx.strokeStyle='#5a3d16';ctx.lineWidth=7;ctx.strokeRect(x-4,y-4,width+8,height+8);
-  ctx.strokeStyle=active?'#ffe5a0':'#c9a35a';ctx.lineWidth=4;ctx.strokeRect(x-4,y-4,width+8,height+8);
-  ctx.strokeStyle='#f3dca4';ctx.lineWidth=1;ctx.strokeRect(x-1.5,y-1.5,width+3,height+3);
-  ctx.restore();
   drawWallPlaque(ctx,mid,y+height+9,'PORTRAITS',{active});
   ctx.fillStyle=active?'#ffe5a0':'#bd985c';ctx.fillRect(mid-13,y+height+30,26,5);
   if(active){ctx.beginPath();ctx.moveTo(mid,y+height+38);ctx.lineTo(mid+4,y+height+42);ctx.lineTo(mid,y+height+46);ctx.lineTo(mid-4,y+height+42);ctx.fill();}
@@ -281,13 +283,8 @@ function drawTreasureRoom(){
   }
   else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the vault…',350,288);}
   // The genuine artwork is part of the case, displayed in the central frame.
-  if(hallPaintings[1].complete && hallPaintings[1].naturalWidth) {
-    const image=hallPaintings[1], x=434, y=164, width=64, height=55;
-    // Cover the placeholder inside the existing frame without stretching the work.
-    const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
-    const sw=width/scale, sh=height/scale;
-    ctx.drawImage(image,(image.naturalWidth-sw)/2,(image.naturalHeight-sh)/2,sw,sh,x,y,width,height);
-  }
+  if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)
+    drawFramedArtwork(hallPaintings[1],435.5,165,61,52,[.03,.04,.94,.92]);
   const curator=OBJECTS.find(o=>o.id==='curator');
   const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}].sort((a,b)=>a.y-b.y);
   for(const figure of figures){
