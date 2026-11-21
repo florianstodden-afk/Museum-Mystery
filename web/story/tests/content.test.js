@@ -86,13 +86,13 @@ test('Dr. Vale only talks once the safe is open', () => {
   assert.match(dialogueFor('vale', s).lines.join(' '), /choice is yours/);
 });
 
-test('journal lists slots by station number and shows a letter only after solving', () => {
+test('journal lists slots in code-word order and shows a letter only after solving', () => {
   let s = started();
   s = solveStation(s, 'restoration', {}).state;
   s = solveStation(s, 'landscape', {}).state;
   const model = journalModel(s);
-  assert.deepEqual(model.slots.map(slot => slot.number), [1, 2, 3, 4]);
-  assert.deepEqual(model.slots.map(slot => slot.letter), ['?', 'L', 'O', '?'], 'Portraits, Puzzle, Catalogue, Forgery');
+  assert.deepEqual(model.slots.map(slot => slot.number), [3, 1, 2, 4]);
+  assert.deepEqual(model.slots.map(slot => slot.letter), ['O', '?', 'L', '?'], 'Catalogue, Portraits, Puzzle, Forgery');
   assert.deepEqual(model.evidence.map(item => item.id), ['hidden-mark', 'false-label']);
   assert.equal(model.score.total, 30);
   assert.match(model.nextStep, /Portrait Hall; Gallery, frame rack\./);
@@ -309,10 +309,10 @@ test('M explains the setup and, while the safe is closed, the four letters', () 
   assert.match(dialogueFor('m', newGame()).lines[0], /is a copy.*curator’s safe.*four clues.*new conservation temp/);
 });
 
-test('after the safe opens the journal spells the code word OILS; before that it keeps station order', () => {
+test('the journal spells the code word OILS as soon as all letters are found', () => {
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
-  assert.equal(journalModel(s).slots.map(slot => slot.letter).join(''), 'ILOS', 'closed safe: by station number, the word stays hidden');
+  assert.equal(journalModel(s).slots.map(slot => slot.letter).join(''), 'OILS');
   s = tryOpenSafe(s, 'OILS').state;
   assert.equal(journalModel(s).slots.map(slot => slot.letter).join(''), 'OILS');
   assert.deepEqual(journalModel(s).slots.map(slot => slot.number), [3, 1, 2, 4], 'each letter keeps its station label');
