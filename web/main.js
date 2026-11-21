@@ -222,9 +222,13 @@ function drawHall(){
   }
   else {ctx.fillStyle='#c8bba3';ctx.fillRect(0,0,896,576);}
   // Public-domain Met works are stored locally so every frame works offline.
-  for (const [index, x, y, width, height] of [[1,405,244,88,55],[2,650,247,40,59]]) {
+  for (const [index, x, y, width, height] of [[0,405,244,88,55],[2,650,247,40,59]]) {
     const image = hallPaintings[index];
-    if(image.complete && image.naturalWidth) ctx.drawImage(image,x,y,width,height);
+    if(image.complete && image.naturalWidth) {
+      const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
+      const sw=width/scale, sh=height/scale;
+      ctx.drawImage(image,(image.naturalWidth-sw)/2,(image.naturalHeight-sh)/2,sw,sh,x,y,width,height);
+    }
     else {ctx.fillStyle='#394e46';ctx.fillRect(x,y,width,height);}
   }
   // Station 1 (portraits) is the large painting in the middle of the hall wall.
@@ -277,7 +281,13 @@ function drawTreasureRoom(){
   }
   else {ctx.fillStyle='#ead3a4';ctx.font='18px Georgia';ctx.fillText('Opening the vault…',350,288);}
   // The genuine artwork is part of the case, displayed in the central frame.
-  if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)ctx.drawImage(hallPaintings[1],438,169,47,43);
+  if(hallPaintings[1].complete && hallPaintings[1].naturalWidth) {
+    const image=hallPaintings[1], x=434, y=164, width=64, height=55;
+    // Cover the placeholder inside the existing frame without stretching the work.
+    const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
+    const sw=width/scale, sh=height/scale;
+    ctx.drawImage(image,(image.naturalWidth-sw)/2,(image.naturalHeight-sh)/2,sw,sh,x,y,width,height);
+  }
   const curator=OBJECTS.find(o=>o.id==='curator');
   const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}].sort((a,b)=>a.y-b.y);
   for(const figure of figures){
