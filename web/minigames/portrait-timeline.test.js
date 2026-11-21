@@ -99,7 +99,7 @@ const tick = () => new Promise(resolve => setTimeout(resolve, 150)); // the stat
 
 test('intro like L: one task line, the gold speed line, "?", Start ↵ and Back to museum Esc – no cards yet', () => {
   const s = openStation(timeline([INGRES, SARGENT, DEGAS, CEZANNE]));
-  assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Finish within 25 \/ 40 \/ 55 seconds for 15 \/ 10 \/ 5 points\.?/);
+  assert.match(s.text(), /Memorise the dates, then sort oldest to newest\.Points are given based on speed\./);
   assert.match(findButton(s.container, 'Start').textContent, /Start↵/);
   assert.match(findButton(s.container, 'Back to museum').textContent, /Back to museumEsc/);
   assert.equal(s.faces().length, 0, 'the cards appear after Start, like L’s board');
@@ -328,5 +328,17 @@ test('A opens the art cards: ← → browse all four, alt texts, Esc closes; tim
   assert.equal(s.solvedReports.length, before.reports, 'no second report');
   s.key('Escape');
   assert.equal(s.closed(), 1, 'Back to museum');
+  s.cleanup();
+});
+
+
+test('Enter on artwork details does not check the portrait order or add a penalty', () => {
+  const s = openStation(timeline([SARGENT, INGRES, DEGAS, CEZANNE], { startedAt: T0 - FLASH_MS - 1000 }));
+  const summary = findAll(s.container, node => node.tagName === 'SUMMARY')[0];
+  assert.equal(summary.textContent, 'Artwork details');
+  const saves = s.saved.length;
+  summary.focus();
+  s.key('Enter');
+  assert.equal(s.saved.length, saves);
   s.cleanup();
 });

@@ -1,3 +1,4 @@
+import { artworkDetails } from './station-ui.js';
 // Station L. The host owns persistence and scoring; this component owns presentation.
 import { el, button } from '../story/dom.js';
 import { initialPuzzle, validPuzzle, startPuzzle, placePiece, elapsedMs } from './picture-rules.js';
@@ -16,7 +17,7 @@ export function start(container, caseData, onSolved) {
   const status = el('p', { className: 'puzzle-status', attrs: { role: 'status' } });
   const help = button('?', showHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Puzzle instructions');
-  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s eight-piece picture to uncover the hidden mark on the transport slip.' }), el('p', { text: 'Finish within 30 / 45 / 60 seconds for 15 / 10 / 5 points.' }), help]);
+  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s eight-piece picture to uncover the hidden mark on the transport slip.' }), el('p', { text: 'Points are given based on speed.' }), help]);
   const controls = el('div', { className: 'story-actions puzzle-actions' });
   const startButton = shortcutButton('Start puzzle', begin, 'Enter');
   const back = shortcutButton('Back to museum', leave, 'Escape');
@@ -31,8 +32,8 @@ export function start(container, caseData, onSolved) {
     el('div', { className: 'puzzle-time-rewards' }, [el('span', { text: '+15 points' }), el('span', { text: '+10 points' }), el('span', { text: '+5 points' }), el('span', { text: '+0 points' })]), meter,
     el('div', { className: 'puzzle-time-marks' }, [el('span', { text: '0s' }), el('span', { text: '30s' }), el('span', { text: '45s' }), el('span', { text: '60s' })]),
   ]);
-  const credit = el('p', { className: 'story-muted puzzle-credit' }, [`${ARTWORK.artist}, ${ARTWORK.title}, ${ARTWORK.date}. Public domain · `,
-    el('a', { text: 'The Metropolitan Museum of Art', props: { href: ARTWORK.url, target: '_blank', rel: 'noopener noreferrer' } })]);
+  const credit = artworkDetails(el('p', { className: 'story-muted puzzle-credit' }, [`${ARTWORK.artist}, ${ARTWORK.title}, ${ARTWORK.date}. Public domain · `,
+    el('a', { text: 'The Metropolitan Museum of Art', props: { href: ARTWORK.url, target: '_blank', rel: 'noopener noreferrer' } })]));
   area.append(pane, overlay); container.replaceChildren(area);
   save();
 

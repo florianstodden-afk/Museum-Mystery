@@ -1,3 +1,4 @@
+import { artworkDetails } from './station-ui.js';
 import { el, button } from '../story/dom.js';
 import { pictureSpeedPoints } from '../story/scoring.js';
 import { CASE } from '../story/case-1.js';
@@ -23,8 +24,8 @@ export function start(container, caseData, onSolved) {
   const help = button('?', showHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Spot the Forgery instructions');
   const intro = el('div', { className: 'puzzle-intro' }, [
-    el('p', { text: 'Find three differences in the forged version to reveal the frame label.' }),
-    el('p', { text: 'Find any 3 of 5 changes. Finish within 30 / 45 / 60 seconds for 15 / 10 / 5 points.' }), help,
+    el('p', { text: 'Find three of five changes in the forged version to reveal the frame label.' }),
+    el('p', { text: 'Points are given based on speed.' }), help,
   ]);
   const begin = shortcutButton('Start', () => {
     if (!ready || disposed || popup || state.startedAt !== null) return;
@@ -78,12 +79,12 @@ export function start(container, caseData, onSolved) {
   const layout = el('div', { className: 'puzzle-layout forgery-pair' }, [
     figure('Original', [original]), figure('Forgery', [forgery, target]),
   ]);
-  const credit = el('p', { className: 'story-muted puzzle-credit' }, [
+  const credit = artworkDetails(el('p', { className: 'story-muted puzzle-credit' }, [
     'Vincent van Gogh, Olive Trees. Public domain · ',
     el('a', { text: 'The Metropolitan Museum of Art', props: {
       href: 'https://www.metmuseum.org/art/collection/search/437998', target: '_blank', rel: 'noopener noreferrer',
     } }),
-  ]);
+  ]));
   container.replaceChildren(el('div', { className: 'picture-puzzle forgery-puzzle' }, [pane, overlay]));
 
   function pointerPosition(event) {

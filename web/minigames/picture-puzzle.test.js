@@ -151,7 +151,7 @@ test('both image sources failing gives Retry; retry does not start the clock', a
 
 test('opening screen keeps details behind help and has no board, timer or credit', async t => {
   const { root, saves } = await puzzlePage(t);
-  assert.match(root.textContent, /30 \/ 45 \/ 60 seconds for 15 \/ 10 \/ 5 points/);
+  assert.match(root.textContent, /Points are given based on speed\./);
   assert.equal(slots(root).length, 0);
   assert.equal(findAll(root, n => n.getAttribute('role') === 'progressbar').length, 0);
   assert.doesNotMatch(root.textContent, /Public domain|Wrong placements/);

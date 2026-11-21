@@ -78,3 +78,5 @@
   .portrait-cards.is-flashing::after, .portrait-chip { animation: none; }
   .portrait-timeline .puzzle-drag-demo { opacity: 1; transform: translate(var(--drag-end-x), var(--drag-end-y)); }
 }
+/* Live announcements stay outside the visual layout, including its scroll bounds. */
+.portrait-sr { top: 0; left: 0; margin: 0; padding: 0; }

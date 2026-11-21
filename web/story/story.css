@@ -317,6 +317,8 @@ a.story-button { display: inline-block; text-decoration: none; }
 .picture-puzzle .puzzle-clock { margin: 18px 0 12px; }
 .picture-puzzle .puzzle-credit { margin: 8px 0; font-size: .78rem; }
 .picture-puzzle .puzzle-intro p { margin: 0 0 6px; }
+/* Give the Start button’s focus outline more breathing room. */
+.picture-puzzle .puzzle-intro p:nth-child(2) { transform: translateY(-4px); }
 @media (max-width: 560px) {
  .picture-puzzle { font-size: .85rem; }
  .puzzle-time-rewards { font-size: .7rem; }
@@ -479,3 +481,36 @@ a.story-button { display: inline-block; text-decoration: none; }
 .story-ending-truth{position:absolute;left:4%;right:4%;top:232%;margin:0;padding:10px 16px;border:1px solid #b99053;border-radius:10px;background:#081922e6;font-size:clamp(.72rem,1.02vw,.98rem);line-height:1.4;color:#f7e7cb;text-wrap:balance}
 @media(max-width:680px){.story-ending-truth{position:static;margin:12px 0 0;padding:10px 0 0;border:0;border-top:1px solid #b9905366;border-radius:0;background:none;font-size:.88rem;color:#e3d3b4}}
 .local-runs-table tr.is-lost td{color:#b9ab93}
+
+/* Keep the four artwork games compact without clipping their controls. */
+.dialog-card.story-dark-card:has(.picture-puzzle) {
+  margin: 0 auto;
+  padding: clamp(12px, 2dvh, 24px);
+  max-height: calc(100dvh - 32px);
+}
+.picture-puzzle .artwork-details { margin: 6px 0; font-size: .78rem; color: var(--story-muted); }
+.artwork-details > summary { cursor: pointer; width: fit-content; padding: 5px 0; color: var(--story-gold); }
+.artwork-details > summary:focus-visible { outline: 2px solid var(--story-gold); outline-offset: 2px; }
+.picture-puzzle .artwork-details-content .puzzle-credit { margin: 4px 0; }
+.picture-puzzle .puzzle-clock { margin: 10px 0 6px; }
+.picture-puzzle .puzzle-actions { margin-top: 6px; gap: 8px; }
+.picture-puzzle .puzzle-status { margin: 6px 0; }
+/* Cap width as well as height: the forgery's hit targets must cover the exact image. */
+.picture-puzzle .forgery-pair { width: min(100%, calc((100dvh - 290px) * 2.5)); margin-inline: auto; }
+.catalogue-puzzle .catalogue-artwork img { height: clamp(64px, calc((100dvh - 600px) / 2), 135px); }
+.catalogue-puzzle .catalogue-placement { min-height: 64px; padding: 6px; }
+.catalogue-puzzle .catalogue-card { min-height: 64px; padding: 6px; }
+@media (max-width: 650px) {
+  .dialog-card.story-dark-card:has(.picture-puzzle) { padding: 12px; }
+  .catalogue-layout { gap: 6px; margin: 6px 0; }
+  .catalogue-board, .catalogue-tray { gap: 5px; }
+  .catalogue-labels h3 { margin-bottom: 4px; }
+  .catalogue-puzzle .catalogue-artwork img { height: clamp(42px, calc((100dvh - 770px) / 2), 90px); }
+  .catalogue-title { -webkit-line-clamp: 2; margin: 3px 0; font-size: .68rem; }
+  .catalogue-puzzle .catalogue-placement, .catalogue-puzzle .catalogue-card { font-size: .7rem; min-height: 58px; padding: 4px; }
+}
+
+.story-modal:has(.picture-puzzle) .story-modal-head { display: none; }
+.story-modal:has(.picture-puzzle) .story-modal-body { padding: 12px; }
+html:has(.story-modal[open] .picture-puzzle),
+body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }

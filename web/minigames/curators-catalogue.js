@@ -1,3 +1,4 @@
+import { artworkDetails } from './station-ui.js';
 import { el, button } from '../story/dom.js';
 import { stationById } from '../story/case-1.js';
 import { pictureSpeedPoints } from '../story/scoring.js';
@@ -18,7 +19,7 @@ export function start(container, caseData, onSolved) {
   help.setAttribute('aria-label', 'Curator’s Catalogue instructions');
   const intro = el('div', { className: 'puzzle-intro' }, [
     el('p', { text: 'Match four catalogue labels to the respective artwork to uncover who approved the false wall label.' }),
-    el('p', { text: 'Finish within 30 / 45 / 60 seconds for 15 / 10 / 5 points.' }), help,
+    el('p', { text: 'Points are given based on speed.' }), help,
   ]);
   const begin = shortcutButton('Start', () => {
     if (!art || disposed || popup || state.startedAt !== null) return;
@@ -58,20 +59,19 @@ export function start(container, caseData, onSolved) {
   }
   // Before solving, the credits must not show the answers (artist, title, date, medium, origin):
   // one short line plus "Artwork 1 ↗" … links to the Met pages. After solving, the full credits.
-  const shortCredit = el('p', { className: 'puzzle-credit catalogue-credits' }, [
+  const shortCredit = artworkDetails(el('p', { className: 'puzzle-credit catalogue-credits' }, [
     'Artworks: The Metropolitan Museum of Art · Public domain · ',
     ...works.flatMap((work, i) => [i ? ' · ' : '', el('a', { text: `Artwork ${i + 1} ↗`, props: {
       href: work.url, target: '_blank', rel: 'noopener noreferrer',
     }, attrs: { 'aria-label': `Artwork ${i + 1}, object page at The Met (opens in a new tab)` } })]).filter(Boolean),
-  ]);
-  const fullCredit = el('details', { className: 'puzzle-credit catalogue-credits' }, [
-    el('summary', { text: 'Artwork credits · The Met · Public domain' }),
+  ]));
+  const fullCredit = artworkDetails(el('div', { className: 'puzzle-credit catalogue-credits' }, [
     ...works.map(work => el('p', {}, [
       el('a', { text: `${work.artistDisplayName}, ${work.title}, ${work.date}`, props: {
         href: work.url, target: '_blank', rel: 'noopener noreferrer',
       } }), ` · ${work.credit}. The Metropolitan Museum of Art. Public domain (Open Access).`,
     ])),
-  ]);
+  ]));
   container.replaceChildren(el('div', { className: 'picture-puzzle catalogue-puzzle' }, [pane, overlay]));
   save();
 
