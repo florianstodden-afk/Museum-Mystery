@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: 22
       - name: Run game tests
-        working-directory: web
         run: node --test
 
   deploy:

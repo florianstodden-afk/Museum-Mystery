@@ -4,7 +4,7 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** <https://florianstodden-afk.github.io/Museum-Mystery/>
+**Play it:** The Vercel address shown in the project dashboard is the online version after setup. The [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) remains guest-only.
 
 ## Team
 
@@ -21,7 +21,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 ## How to play
 
-- On the first screen, choose **Continue with GitHub** or **Play as guest**. GitHub players use their GitHub identity for an online save and the shared leaderboard. Guests save locally and cannot open the leaderboard. The online service must be connected before GitHub sign-in works ([setup](docs/leaderboard.md)); [earlier local username/password profiles](docs/local-login.md) are historical.
+- On the first screen, choose **Continue with GitHub** or **Play as guest**. On the Vercel site, GitHub players use their GitHub identity for an online save and shared leaderboard. Guests save locally and cannot open the leaderboard. The database and GitHub OAuth App must be connected before GitHub sign-in works ([Vercel setup](docs/leaderboard.md)); [earlier local username/password profiles](docs/local-login.md) are historical.
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. Rearrange the four letters to open the vault.
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
@@ -32,18 +32,18 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 ## Run locally
 
-JavaScript modules need a small web server (no build step, no packages):
+For guest play and game changes, serve the browser files locally:
 
 ```bash
 python3 -m http.server 8000 --directory web
 ```
 
-Then open <http://localhost:8000>.
+Then open <http://localhost:8000>. GitHub sign-in and shared saves need the configured Vercel deployment; the small local server does not run `api/`.
 
 ## Run tests
 
 ```bash
-cd web && node --test
+node --test
 ```
 
 GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
@@ -55,7 +55,8 @@ GitHub Actions runs the same command for every pull request and after every merg
 | `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.webp` | Page, home screen, menu and compact illustrated journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
-| `server/leaderboard/` | GitHub OAuth callback and Cloudflare D1 data service |
+| `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
+| `vercel.json`, `package.json` | Vercel serves `web/` and installs the database driver |
 | `web/local-auth.js`, `web/story/local-runs.js` | Earlier local account/scoreboard code; no longer used by the entry screen |
 | `web/wall-plaque.js` | Brass name plaques above the Gallery stations |
 | `web/engine.js` | Map and movement rules |
@@ -67,7 +68,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 ## Known limits
 
-- GitHub sign-in, cross-device saves and the shared leaderboard require the Cloudflare service and GitHub OAuth App described in [the setup](docs/leaderboard.md). Until they are configured, guest play remains available.
+- GitHub sign-in, cross-device saves and the shared leaderboard require the Vercel database integration and GitHub OAuth App described in [the setup](docs/leaderboard.md). Until they are configured, guest play remains available.
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.

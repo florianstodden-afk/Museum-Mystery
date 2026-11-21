@@ -1,5 +1,5 @@
-import { deserialize } from '../../web/story/save.js';
-import { scoreboard, synchronizeScore } from '../../web/story/scoring.js';
+import { deserialize } from '../web/story/save.js';
+import { scoreboard, synchronizeScore } from '../web/story/scoring.js';
 
 const random = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
 const hash = async value => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))), b => b.toString(16).padStart(2, '0')).join('');
@@ -52,7 +52,7 @@ async function start(url, env) {
     .bind(await hash(state), verifier, Date.now() + 600000).run();
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   for (const [key, value] of Object.entries({ client_id: env.GITHUB_CLIENT_ID, redirect_uri: env.CALLBACK_URL, state,
-    code_challenge: challenge, code_challenge_method: 'S256', scope: 'read:user' })) authUrl.searchParams.set(key, value);
+    code_challenge: challenge, code_challenge_method: 'S256' })) authUrl.searchParams.set(key, value);
   return redirect(authUrl.href);
 }
 
@@ -110,10 +110,10 @@ async function publish(env, user, origin) {
   return reply({ ok: true, points: board.points }, 200, origin);
 }
 
-export default { async fetch(request, env) {
+export default { async fetch(request, env, route = null) {
   const origin = request.headers.get('Origin');
   if (origin && !(env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).includes(origin)) return reply({ error: 'Origin not allowed.' }, 403);
-  const url = new URL(request.url), path = url.pathname, method = request.method;
+  const url = new URL(request.url), path = route || url.pathname, method = request.method;
   if (method === 'OPTIONS') return new Response(null, { status: 204, headers: {
     'Access-Control-Allow-Origin': origin || '', 'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
     'Access-Control-Allow-Headers': 'Authorization, Content-Type', Vary: 'Origin' } });

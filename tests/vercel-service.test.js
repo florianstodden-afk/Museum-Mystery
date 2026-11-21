@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { ranked, validSave } from './worker.js';
-import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../../web/story/engine.js';
-import { STATION_IDS } from '../../web/story/case-1.js';
+import service, { ranked, validSave } from '../api/_service.js';
+import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../web/story/engine.js';
+import { STATION_IDS } from '../web/story/case-1.js';
 
 const origin = 'https://florianstodden-afk.github.io';
-const endpoint = 'https://museum-mystery-leaderboard.workers.dev';
+const endpoint = 'https://example.vercel.app';
 const env = { ALLOWED_ORIGINS: origin, APP_URL: `${origin}/Museum-Mystery/`, CALLBACK_URL: `${endpoint}/auth/callback`,
   GITHUB_CLIENT_ID: 'client-id', GITHUB_CLIENT_SECRET: 'test-secret' };
 
@@ -65,11 +65,11 @@ test('save validation rejects broken cases and accepts a finished current game',
 
 test('GitHub identity gates cloud saves and ranking submissions', async () => {
   const config = { ...env, DB: database() };
-  assert.equal((await worker.fetch(request('/save'), config)).status, 401);
-  assert.equal((await worker.fetch(request('/runs', 'POST'), config)).status, 401);
-  assert.equal((await worker.fetch(request('/runs'), config)).status, 401);
+  assert.equal((await service.fetch(request('/save'), config)).status, 401);
+  assert.equal((await service.fetch(request('/runs', 'POST'), config)).status, 401);
+  assert.equal((await service.fetch(request('/runs'), config)).status, 401);
   const browserState = 'a'.repeat(64);
-  const start = await worker.fetch(request(`/auth/start?state=${browserState}`), config);
+  const start = await service.fetch(request(`/auth/start?state=${browserState}`), config);
   assert.equal(start.status, 302);
   const authorize = new URL(start.headers.get('Location'));
   assert.equal(authorize.hostname, 'github.com');
@@ -79,20 +79,20 @@ test('GitHub identity gates cloud saves and ranking submissions', async () => {
   globalThis.fetch = async url => new Response(JSON.stringify(String(url).includes('access_token')
     ? { access_token: 'github-token' } : { id: 12345, login: 'verified-player' }), { status: 200 });
   try {
-    const callback = await worker.fetch(request(`/auth/callback?state=${authorize.searchParams.get('state')}&code=code`), config);
+    const callback = await service.fetch(request(`/auth/callback?state=${authorize.searchParams.get('state')}&code=code`), config);
     assert.equal(callback.status, 302);
     const returned = new URL(callback.headers.get('Location'));
     assert.equal(new URLSearchParams(returned.hash.slice(1)).get('auth_state'), browserState);
     const onlyTicket = new URLSearchParams(returned.hash.slice(1)).get('auth_ticket');
-    const exchange = await worker.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config);
+    const exchange = await service.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config);
     assert.equal(exchange.status, 200);
     const token = (await exchange.json()).token;
-    assert.equal((await worker.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config)).status, 401);
-    assert.equal((await worker.fetch(request('/save', 'PUT', token, wonSave()), config)).status, 200);
-    assert.equal((await worker.fetch(request('/runs', 'POST', token), config)).status, 200);
-    const list = await worker.fetch(request('/runs', 'GET', token), config);
+    assert.equal((await service.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config)).status, 401);
+    assert.equal((await service.fetch(request('/save', 'PUT', token, wonSave()), config)).status, 200);
+    assert.equal((await service.fetch(request('/runs', 'POST', token), config)).status, 200);
+    const list = await service.fetch(request('/runs', 'GET', token), config);
     assert.equal((await list.json()).entries[0].name, 'verified-player');
-    assert.equal((await worker.fetch(request('/auth/logout', 'POST', token), config)).status, 200);
-    assert.equal((await worker.fetch(request('/save', 'GET', token), config)).status, 401);
+    assert.equal((await service.fetch(request('/auth/logout', 'POST', token), config)).status, 200);
+    assert.equal((await service.fetch(request('/save', 'GET', token), config)).status, 401);
   } finally { globalThis.fetch = originalFetch; }
 });
