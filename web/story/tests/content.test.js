@@ -308,3 +308,12 @@ test('M explains the setup and, while the safe is closed, the four letters', () 
   assert.deepEqual(dialogueFor('m', s).lines, ['Four stations, four letters. Put them together and the safe is yours.']);
   assert.match(dialogueFor('m', newGame()).lines[0], /is a copy.*curator’s safe.*four clues.*new conservation temp/);
 });
+
+test('after the safe opens the journal spells the code word OILS; before that it keeps station order', () => {
+  let s = started();
+  for (const id of ALL) s = solveStation(s, id, {}).state;
+  assert.equal(journalModel(s).slots.map(slot => slot.letter).join(''), 'ILOS', 'closed safe: by station number, the word stays hidden');
+  s = tryOpenSafe(s, 'OILS').state;
+  assert.equal(journalModel(s).slots.map(slot => slot.letter).join(''), 'OILS');
+  assert.deepEqual(journalModel(s).slots.map(slot => slot.number), [3, 1, 2, 4], 'each letter keeps its station label');
+});

@@ -30,8 +30,9 @@ export function journalModel(state) {
   return {
     mission: { title: CASE.mission.title, text: CASE.mission.text, read: state.missionRead },
     // By station number, not in code-word order: the gaps must not give the word away.
+    // Once the safe is open the word is no secret any more, so the letters spell it (O-I-L-S).
     // A letter shows only once its station is solved; before that the slot shows "?".
-    slots: stationsByNumber().map(station => {
+    slots: (state.safe.open ? CASE.stations : stationsByNumber()).map(station => {
       const solved = state.stations[station.id].solved;
       return {
         stationId: station.id,
