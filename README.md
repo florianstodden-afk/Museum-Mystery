@@ -68,7 +68,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 ## Known limits
 
-- GitHub sign-in, cross-device saves and the shared leaderboard use the Vercel database integration and GitHub OAuth App described in [the setup](docs/leaderboard.md). The API is live; a complete sign-in and two-device save still need a real player test. Guest play remains available.
+- GitHub sign-in, cross-device saves and the shared leaderboard use Vercel and Neon ([details](docs/leaderboard.md)). A real player confirmed sign-in, online save, resuming on a second device and opening the shared board. Publishing a new winning result has automated coverage but still awaits the first live successful ending. Guest play remains available.
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.
