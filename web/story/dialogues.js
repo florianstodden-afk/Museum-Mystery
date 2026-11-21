@@ -66,20 +66,18 @@ function linesForLeon(state) {
 
 function linesForImani(state) {
   if (state.safe.open) {
-    return talk([
-      'The original was in the safe all along? Then the one on the wall …',
-      'I will test its varnish in the morning. Fresh varnish never lies.',
-    ]);
+    return talk(['The original was in the safe? Then Dr. Vale had doubts too.']);
   }
   if (state.stations.restoration.solved) {
     return talk([
-      'That “V” was written in an ink that only shows under the lamp.',
-      'Someone wanted to recognise their own paperwork. A “V” – that could be more than one person here.',
+      'Under my lamp the slip shows a hidden ‘V’. Whoever booked that cart marked it.',
+      'But one letter can fit more than one person in this museum.',
     ]);
   }
   return talk([
-    'The picture puzzle is on the left side of the Gallery, beside Curator’s Catalogue and the frame rack.',
-    'Restore Renoir’s Sea and Cliffs at Station 2. I will then use the lamp to reveal the mark on the transport slip.',
+    'Between us – have you looked at the Van Gogh in the Gallery? The varnish is still sticky.',
+    'A painting from 1889 isn’t. I haven’t told anyone yet.',
+    'Behind the Renoir puzzle at Station 2 there is a transport slip. Restore it, and I’ll check it under my lamp.',
   ]);
 }
 

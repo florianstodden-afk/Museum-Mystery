@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newGame, readMission, solveStation, addNote, tryOpenSafe, accuse, chooseEnding } from '../engine.js';
-import { dialogueFor, renderDialogue } from '../dialogues.js';
+import { dialogueFor, renderDialogue, conversationFor } from '../dialogues.js';
 import { journalModel, renderJournal, evidenceChain } from '../journal.js';
 import { endingModel, renderEnding } from '../endings.js';
 import { renderSafe } from '../safe-ui.js';
@@ -52,11 +52,21 @@ test('Leon changes his story after the Portrait Hall', () => {
   for (const state of [started(), s]) assert.doesNotMatch(dialogueFor('leon', state).lines.join(' '), /missing|alarm|cameras/);
 });
 
-test('Imani points to the Gallery puzzle and reacts to its hidden mark', () => {
+test('Imani spots the fake, points to Station 2 and reacts to its hidden mark', () => {
   let s = started();
-  assert.match(dialogueFor('imani', s).lines.join(' '), /left side of the Gallery/);
+  const before = dialogueFor('imani', s).lines.join(' ');
+  assert.match(before, /Van Gogh in the Gallery\? The varnish is still sticky/);
+  assert.match(before, /haven’t told anyone yet/);
+  assert.match(before, /Renoir puzzle at Station 2/);
   s = solveStation(s, 'restoration', {}).state;
-  assert.match(dialogueFor('imani', s).lines.join(' '), /“V”/);
+  assert.deepEqual(dialogueFor('imani', s).lines, [
+    'Under my lamp the slip shows a hidden ‘V’. Whoever booked that cart marked it.',
+    'But one letter can fit more than one person in this museum.',
+  ]);
+  for (const id of ALL) if (!s.stations[id].solved) s = solveStation(s, id, {}).state;
+  s = tryOpenSafe(s, 'OILS').state;
+  assert.deepEqual(dialogueFor('imani', s).lines, ['The original was in the safe? Then Dr. Vale had doubts too.']);
+  assert.equal(conversationFor('imani', s).autoCloseAfterGreeting, true);
 });
 
 test('Dr. Vale only talks once the safe is open', () => {
