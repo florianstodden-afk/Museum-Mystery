@@ -62,7 +62,7 @@ test('the new evidence texts', () => {
   assert.equal(evidence['shift-log'], 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.');
   assert.equal(evidence['hidden-mark'], 'Hidden mark “V” on the fake transport slip.');
   assert.equal(evidence['frame-label'], 'Frame label: “Ordered by: A. V.”');
-  assert.match(suspectById('vale').counterText, /order came from a patron, and Vale is staff/);
+  assert.match(suspectById('vale').counterText, /frame label names ‘A\. V\.’, not M\. V\./);
 });
 
 test('the solution stays unique: only Voss is a patron with the initials A. V.', () => {

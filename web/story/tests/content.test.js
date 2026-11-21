@@ -75,7 +75,14 @@ test('Dr. Vale only talks once the safe is open', () => {
   assert.equal(dialogueFor('vale', s).available, false);
   s = tryOpenSafe(s, 'OILS').state;
   assert.equal(dialogueFor('vale', s).available, true);
+  assert.deepEqual(dialogueFor('vale', s).lines, [
+    'You opened it. That new wall label in the Gallery never looked right to me – so I locked the original in here, just in case.',
+    'The cart at 21:14 came for it and left empty.',
+    'Someone needed my clues to get in. So – who sent you, and who is behind this?',
+  ]);
   s = accuse(s, 'voss').state;
+  assert.equal(dialogueFor('vale', s).lines[0], 'Voss. That label had his taste all over it – but I needed proof that wasn’t mine.');
+  assert.match(dialogueFor('vale', s).lines.join(' '), /mécène/);
   assert.match(dialogueFor('vale', s).lines.join(' '), /choice is yours/);
 });
 

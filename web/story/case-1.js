@@ -131,9 +131,9 @@ export const CASE = deepFreeze({
       name: 'Dr. Mara Vale',
       pronoun: 'her',
       role: 'Curator',
-      description: 'Locked the original in the safe and left four clues. Her initial is also a “V”.',
+      description: 'Curator. Locked the original in the safe and left four clues. Her initial is also a ‘V’.',
       counterEvidenceId: 'frame-label',
-      counterText: 'The “V” is not Vale: the order came from a patron, and Vale is staff. She hid the original to protect it.',
+      counterText: 'The ‘V’ is not Vale. The frame label names ‘A. V.’, not M. V. – and Vale hid the original to protect it.',
     },
     {
       id: 'voss',

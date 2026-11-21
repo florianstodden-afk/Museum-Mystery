@@ -86,7 +86,7 @@ function linesForVale(state) {
     return away(['Dr. Vale’s office is dark.', 'A card on the door: “Back after the gala. – M. V.”']);
   }
   if (state.ending === 'lost') {
-    return away(['Dr. Vale stands in front of the open safe.', 'The original is gone. So is the patron who planned it.']);
+    return away(['Dr. Vale stands in front of the open safe.', 'The original is still there. The patron who planned it is gone.']);
   }
   if (state.ending === 'open-file') {
     return talk(['The file is open. Tomorrow the painting goes back on its wall – the real one.']);
@@ -96,16 +96,17 @@ function linesForVale(state) {
   }
   if (state.accusation.solved) {
     return talk([
-      'Voss. I suspected him for weeks, but I needed proof that was not mine.',
+      'Voss. That label had his taste all over it – but I needed proof that wasn’t mine.',
       'He signs his private letters with “M” – for mécène, the old word for patron. Everyone here thinks it means Mara.',
       'He could not open my safe, so he needed someone who would follow my clues. You.',
       'You hold the painting and the evidence. The choice is yours now.',
     ]);
   }
+  // Speech-box rule: at most two short sentences per box, so her second line is split in two.
   return talk([
-    'You opened it. Good. I locked the original away the night the false label went up.',
-    'I could not tell anyone – not even Leon. So I left four clues and hoped the right person would follow them.',
-    'Now tell me: who is behind this?',
+    'You opened it. That new wall label in the Gallery never looked right to me – so I locked the original in here, just in case.',
+    'The cart at 21:14 came for it and left empty.',
+    'Someone needed my clues to get in. So – who sent you, and who is behind this?',
   ]);
 }
 
