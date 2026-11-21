@@ -17,5 +17,4 @@ jobs:
         with:
           node-version: 22
       - name: Run node --test
-        working-directory: web
         run: node --test
