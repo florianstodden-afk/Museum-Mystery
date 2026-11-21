@@ -1,3 +1,4 @@
+import { figuresBackToFront } from './character-depth.js?v=1';
 import { newGame, readMission, solveStation } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
@@ -232,9 +233,7 @@ function drawHall(){
   }
   // Station 1 (portraits) is the large painting in the middle of the hall wall.
   drawStationPortrait(interactTarget()?.id==='ledger');
-  const guard=guardDisplay();const person=hallPosition(guard.x,guard.y);
-  const guardFacing=guardFacingNow();
-  drawPerson(person.x,person.y,'guard',guardFacing,animationTime,guardWalking());
+
   // Use the hall's own stone texture so the inscriptions belong to the masonry.
   function stonePlaque(text,x,y,width){
     const left=x-width/2, height=19;
@@ -255,7 +254,12 @@ function drawHall(){
   }
   stonePlaque('SECURITY',176,225,100);
   stonePlaque('GALLERY',800,201,100);
-  const player=hallPosition(displayPlayer.x,displayPlayer.y);drawPerson(player.x,player.y,'rick',facing,animationTime,heldKeys.size > 0);
+  const player=hallPosition(displayPlayer.x,displayPlayer.y);
+  const hallFigures=[{...guardDisplay(),kind:'guard'}, {...displayPlayer,kind:'rick'}];
+  for(const {figure,point} of figuresBackToFront(hallFigures,hallPosition)){
+    const isPlayer=figure.kind==='rick';
+    drawPerson(point.x,point.y,figure.kind,isPlayer?facing:guardFacingNow(),animationTime,isPlayer?heldKeys.size>0:guardWalking());
+  }
   const target=interactTarget(); if(target){ctx.font='bold 15px sans-serif';const text=`E  ${target.label}`;const width=ctx.measureText(text).width+22;ctx.fillStyle='rgba(30,37,38,.92)';ctx.beginPath();ctx.roundRect(player.x-width/2,player.y-93,width,28,6);ctx.fill();ctx.fillStyle='#fff5dd';ctx.fillText(text,player.x-width/2+11,player.y-74);}
 }
 // The frames are already part of the hall background; keep their gold edges visible.
@@ -286,9 +290,8 @@ function drawTreasureRoom(){
   if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)
     drawFramedArtwork(hallPaintings[1],435.5,165,61,52,[.03,.04,.94,.92]);
   const curator=OBJECTS.find(o=>o.id==='curator');
-  const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}].sort((a,b)=>a.y-b.y);
-  for(const figure of figures){
-    const point=vaultPosition(figure.x,figure.y);
+  const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}];
+  for(const {figure,point} of figuresBackToFront(figures,vaultPosition)){
     drawPerson(point.x,point.y,figure.kind,figure.kind==='rick'?facing:talkingTo==='vale'?facingToward(curator,state.player):'down',animationTime,figure.kind==='rick'&&heldKeys.size>0);
   }
   const {x:px,y:py}=vaultPosition(displayPlayer.x,displayPlayer.y);
