@@ -1,5 +1,5 @@
 // The investigation journal: first a pure data model, then a renderer for any container.
-import { CASE, noteById, stationsByNumber } from './case-1.js';
+import { CASE, noteById } from './case-1.js';
 import { nextStep } from './engine.js';
 import { totalScore, maximumScore } from './scoring.js';
 import { el } from './dom.js';
@@ -29,9 +29,9 @@ export const WHO_WAS_M = {
 export function journalModel(state) {
   return {
     mission: { title: CASE.mission.title, text: CASE.mission.text, read: state.missionRead },
-    // By station number, not in code-word order: the gaps must not give the word away.
+    // In code-word order (O-I-L-S), each slot labelled with its station number.
     // A letter shows only once its station is solved; before that the slot shows "?".
-    slots: stationsByNumber().map(station => {
+    slots: CASE.stations.map(station => {
       const solved = state.stations[station.id].solved;
       return {
         stationId: station.id,
