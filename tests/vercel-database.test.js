@@ -17,4 +17,5 @@ test('schema creates the identity, save and ranking tables', async () => {
   assert.ok(calls.some(text => text.includes('CREATE TABLE IF NOT EXISTS saves')));
   assert.ok(calls.some(text => text.includes('CREATE TABLE IF NOT EXISTS sessions')));
   assert.ok(calls.some(text => text.includes('CREATE TABLE IF NOT EXISTS leaderboard')));
+  assert.ok(calls.some(text => text.includes('ALTER TABLE leaderboard ADD COLUMN IF NOT EXISTS total_time_ms BIGINT')));
 });

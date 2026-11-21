@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { canPublish } from './leaderboard.js';
+import { canPublish, renderLeaderboard } from './leaderboard.js';
+import { installFakeDom, createContainer } from './story/tests/fake-dom.js';
 import { initialSession, loginUrl } from './github-auth.js';
 
 test('only current winning runs can enter the shared leaderboard', () => {
@@ -35,4 +36,17 @@ test('login ticket from another browser is rejected before exchange', async () =
     assert.match(result.error, /did not match this browser/);
     assert.equal(result.user, null);
   } finally { globalThis.sessionStorage = original; }
+});
+
+
+test('shared leaderboard displays minigame totals and leaves unknown old times blank', () => {
+  installFakeDom();
+  const box=createContainer();
+  renderLeaderboard(box,[
+    {rank:1,playerId:'a',name:'Ada',points:80,max:80,totalTimeMs:61000,ending:'heist'},
+    {rank:2,playerId:'b',name:'Bea',points:80,max:80,totalTimeMs:null,ending:'open-file'}
+  ],'a');
+  assert.match(box.textContent,/Minigame time/);
+  assert.match(box.textContent,/Ada80 \/ 801:01Thief/);
+  assert.match(box.textContent,/Bea80 \/ 80–Not a thief/);
 });
