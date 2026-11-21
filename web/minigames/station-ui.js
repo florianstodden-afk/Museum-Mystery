@@ -91,6 +91,14 @@ export function artCards({ overlay, pane, works, onClose, closeLabel = 'Back to 
   return close;
 }
 
+/** Native, keyboard-accessible disclosure; credits stay collapsed until requested. */
+export function artworkDetails(...contents) {
+  return el('details', { className: 'artwork-details' }, [
+    el('summary', { text: 'Artwork details' }),
+    el('div', { className: 'artwork-details-content' }, contents),
+  ]);
+}
+
 /** One credit line like L: "Artist, Title, date · …. Public domain · The Metropolitan Museum of Art".
  *  `dates: false` leaves the years out (Station I: the years are the puzzle). */
 export function creditLine(artworks, { dates = true } = {}) {

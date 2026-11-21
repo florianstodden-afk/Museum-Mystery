@@ -9,7 +9,7 @@ import {
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
 import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
-import { introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles, artCards } from './station-ui.js?v=art-cards-1';
+import { artworkDetails, introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles, artCards } from './station-ui.js?v=art-cards-1';
 import { cardView, timelineView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
 /** Station I's points by time, as tiers for the bar (same limits as portraitSpeedPoints). */
@@ -51,17 +51,18 @@ export function start(container, caseData, onSolved) {
   const root = el('div', { className: 'picture-puzzle portrait-timeline' });
   const pane = el('div');
   const overlay = el('div');
-  const ui = introPopup({ task: TASK, pointsText: `Finish within ${PORTRAIT_LIMITS_MS.map(ms => ms / 1000).join(' / ')} seconds for 15 / 10 / 5 points.`, onStart: begin, onBack: leave, onHelp: showHelp });
+  const ui = introPopup({ task: TASK, pointsText: 'Points are given based on speed.', onStart: begin, onBack: leave, onHelp: showHelp });
   const bar = speedBar({ tiers: PORTRAIT_TIERS, label: 'Portrait time' });
   const checkButton = shortcutButton('Check order', check, 'Enter');
   const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
   const grid = el('ol', { className: 'portrait-cards', attrs: { 'aria-label': 'Portraits, oldest on the left' } });
   const axis = timelineView(state.order.length);
-  const arrow = el('div', { className: 'puzzle-drag-demo', text: '↖', attrs: { 'aria-hidden': 'true' } });
+  const arrow = el('div', { className: 'puzzle-drag-demo', text: '←', attrs: { 'aria-hidden': 'true' } });
   const board = el('div', { className: 'portrait-board' }, [grid, axis.root, arrow]);
-  const status = el('p', { className: 'puzzle-status', attrs: { role: 'status', 'aria-live': 'polite' } });
+  // Keep feedback available to screen readers without any visible text below the cards.
+  const status = el('p', { className: 'portrait-sr', attrs: { role: 'status', 'aria-live': 'polite' } });
   const spoken = el('p', { className: 'portrait-sr', attrs: { 'aria-live': 'polite' } }); // dates for screen readers
-  const credit = creditLine(PORTRAIT_ARTWORKS, { dates: false });
+  const credit = artworkDetails(creditLine(PORTRAIT_ARTWORKS, { dates: false }));
   root.append(pane, overlay, spoken);
   container.replaceChildren(root);
   for (const id of state.order) wireDrag(id);
@@ -100,11 +101,11 @@ export function start(container, caseData, onSolved) {
     if (!playing() || reading()) return;
     dismissArrow();
     play('click');
-    if (selected === null) { selected = id; update(state, `${cards[id].artwork.shortTitle} picked up.`); return; }
+    if (selected === null) { selected = id; update(state, ''); spoken.textContent = `${cards[id].artwork.shortTitle} picked up.`; return; }
     if (selected === id) { selected = null; update(state, ''); return; }
     const other = selected;
     selected = null;
-    update(swapCards(state, other, id), 'Swapped.');
+    update(swapCards(state, other, id), '');
     cards[id].face.focus?.();
   }
 
@@ -169,21 +170,21 @@ export function start(container, caseData, onSolved) {
     setTimeout(() => bar.root.classList.remove('is-penalty'), BLINK_MS);
   }
 
-  // ---------- Drag hint arrow (like L): once per round, after the flash, from the last card to place 1 ----------
+  // ---------- Drag hint arrow (like L): once per round, after the flash, between the first two cards, in the same row on every screen ----------
   function dismissArrow() {
     arrow.hidden = true;
     if (!state.demoDismissed) { state = { ...state, demoDismissed: true }; save(); }
   }
 
   function positionArrow() {
-    const from = cards[state.order[state.order.length - 1]].face;
-    const to = axis.slots[0];
+    const from = cards[state.order[1]].face;
+    const to = cards[state.order[0]].face;
     if (!from.getBoundingClientRect || !to.getBoundingClientRect) return;
     const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), box = board.getBoundingClientRect();
     arrow.style.setProperty('--drag-start-x', `${a.left + a.width / 2 - box.left}px`);
     arrow.style.setProperty('--drag-start-y', `${a.top + a.height / 2 - box.top}px`);
     arrow.style.setProperty('--drag-end-x', `${b.left + b.width / 2 - box.left}px`);
-    arrow.style.setProperty('--drag-end-y', `${b.top + b.height / 2 - box.top}px`);
+    arrow.style.setProperty('--drag-end-y', `${a.top + a.height / 2 - box.top}px`);
   }
 
   // ---------- Keyboard (like L: Enter = Start/Check, Esc = back to museum) and mouse ----------
@@ -199,13 +200,15 @@ export function start(container, caseData, onSolved) {
       return;
     }
     if (event.key === 'Escape') { stop(); leave(); return; }
+    // Let the disclosure and credit links keep their native keyboard behavior.
+    if (['SUMMARY', 'A'].includes(event.target?.tagName)) return;
     const index = state.order.findIndex((_, i) => event.key === String(i + 1));   // keys 1…4
     if (index !== -1 && playing()) { stop(); choose(state.order[index]); return; }
     // Enter on "?", "Back to museum" or a Peek button presses that button instead.
     const own = event.target === ui.help || event.target === ui.backButton || Object.values(cards).some(card => card.peek === event.target);
     if (event.key === 'Enter' && !own) { stop(); if (state.startedAt === null) begin(); else check(); return; }
     const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
-    if (step && selected !== null && playing()) { stop(); update(moveCard(state, selected, state.order.indexOf(selected) + step), 'Moved.'); cards[selected]?.face.focus?.(); }
+    if (step && selected !== null && playing()) { stop(); update(moveCard(state, selected, state.order.indexOf(selected) + step), ''); cards[selected]?.face.focus?.(); }
   }
   document.addEventListener?.('keydown', keydown, true);
 
@@ -223,7 +226,7 @@ export function start(container, caseData, onSolved) {
       dragged = null;
       selected = null;
       play('click');
-      update(moveCard(state, from, state.order.indexOf(id)), 'Moved.');
+      update(moveCard(state, from, state.order.indexOf(id)), '');
     });
   }
 
