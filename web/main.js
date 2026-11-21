@@ -627,11 +627,13 @@ const gameJournalToggle=document.querySelector('#game-journal-toggle');
 let journalOpener=null;
 const entryScreen=document.querySelector('#entry-screen');
 const entryMessage=document.querySelector('#entry-message');
-entryMessage.textContent=startup.error || (LEADERBOARD_URL?'':'GitHub login will be available when the online service is connected.');
+entryMessage.textContent=startup.error || (location.hostname.endsWith('github.io')
+  ? 'GitHub sign-in opens the online version of the game.'
+  : LEADERBOARD_URL ? '' : 'GitHub sign-in is available at museum-mystery.vercel.app.');
 document.querySelector('#entry-github').addEventListener('click',()=>{
   const url=loginUrl();
   if(url)location.assign(url);
-  else entryMessage.textContent='GitHub login is not connected yet. You can play as a guest.';
+  else entryMessage.textContent='Open museum-mystery.vercel.app for GitHub sign-in, or play as a guest here.';
 });
 document.querySelector('#entry-guest').addEventListener('click',()=>{
   entryScreen.hidden=true;
@@ -787,6 +789,10 @@ save();
 if(activeProfile){entryScreen.hidden=true;homeScreen.inert=false;}
 showHome(); // The mission starts only after the player chooses Start game.
 if(!activeProfile)document.querySelector('#entry-github').focus();
+if(!activeProfile && LEADERBOARD_URL && new URLSearchParams(location.search).get('github-login')==='1'){
+  history.replaceState(null,'',location.pathname);
+  location.replace(loginUrl());
+}
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) cloudSync?.flush().catch(() => {}); });

@@ -16,7 +16,14 @@ test('cancelled GitHub login clears the callback fragment', async () => {
     { replaceState: (_state, _title, url) => { replaced = url; } });
   assert.equal(result.user, null);
   assert.equal(replaced, '/Museum-Mystery/');
-  assert.equal(loginUrl(), null); // Worker URL has not yet been configured in this checkout.
+  assert.equal(loginUrl(), null); // A plain local server has no online login.
+});
+
+test('GitHub Pages login hands off to the Vercel game before starting OAuth', () => {
+  const originalLocation = globalThis.location;
+  globalThis.location = { hostname: 'florianstodden-afk.github.io' };
+  try { assert.equal(loginUrl(), 'https://museum-mystery.vercel.app/?github-login=1'); }
+  finally { if (originalLocation === undefined) delete globalThis.location; else globalThis.location = originalLocation; }
 });
 
 test('login ticket from another browser is rejected before exchange', async () => {
