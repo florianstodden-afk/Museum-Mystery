@@ -5,15 +5,15 @@
 // - ok: true  → the action worked.
 // - ok: false → it did not work. If the action was NOT ALLOWED (e.g. safe before all
 //   stations, anything after the ending), `state` is the unchanged input state.
-//   A WRONG ANSWER at the safe or the final question is allowed: it is counted as an
-//   attempt, so `state` changes (attempts + 1) and ok is false.
+//   A WRONG ANSWER at the safe is allowed: it is counted as an attempt, so `state`
+//   changes (attempts + 1) and ok is false. A wrong name at the final question ends the case ("lost").
 import { CASE, CASE_VERSION, CODEWORD, STATION_IDS, stationById, noteById, suspectById, stationPlace, stationsByNumber } from './case-1.js';
 import { SPEED_MAX, stationPoints, emptyPenalties, synchronizeScore } from './scoring.js';
 
-// The two endings the player chooses, plus "lost" after too many wrong accusations.
+// The two endings the player chooses, plus "lost" after a wrong accusation.
 export const CHOICE_IDS = ['heist', 'open-file'];
 export const ENDING_IDS = [...CHOICE_IDS, 'lost'];
-export const MAX_ACCUSATIONS = 3;   // the third wrong name ends the case
+export const MAX_ACCUSATIONS = 1;   // one name only: a wrong one ends the case
 
 /** How many names the player may still try at the final question. */
 export function accusationsLeft(state) {
@@ -36,7 +36,7 @@ export function newGame() {
     evidence: [],                      // evidence ids, in the order they were found
     notes: [],                         // story notes without a letter
     safe: { open: false, attempts: 0 },
-    accusation: { solved: false, attempts: 0 },
+    accusation: { solved: false, attempts: 0, accused: null }, // accused: the suspect id the player named
     ending: null,                      // null | "heist" | "open-file" | "lost"
   };
 }
@@ -148,11 +148,12 @@ export function accuse(state, suspectId) {
   if (!suspect) return reject(state, `Unknown suspect: ${suspectId}.`);
 
   const next = copy(state);
+  next.accusation.accused = suspectId;
   if (suspectId !== CASE.culpritId) {
     next.accusation.attempts += 1;
     if (accusationsLeft(next) === 0) {
       next.ending = 'lost';
-      return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. That was your last chance. Case lost.` };
+      return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. That was your only chance. Case lost.` };
     }
     return { state: synchronizeScore(next), ok: false, message: `Not ${suspect.name}. ${suspect.counterText} Try again.` };
   }

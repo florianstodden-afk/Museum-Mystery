@@ -27,7 +27,7 @@ export function stationPlace(station) {
   return station.spot ? `${station.room}, ${station.spot}` : station.room;
 }
 
-export const CASE_VERSION = 2;   // 2: code word OILS (was BILD); older saves start fresh
+export const CASE_VERSION = 3;   // 3: one accusation only (2: code word OILS); older saves start fresh
 
 // The order of this list is the order of the code word (O-I-L-S). Players never see it:
 // journal, signs and scoreboard use the station `number` instead.
@@ -46,7 +46,7 @@ export const CASE = deepFreeze({
     title: 'A message from M',
     text:
       'The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. ' +
-      'Four stations hide the way in. Bring it to me before sunrise. – M',
+      'Four stations hide the way in. Bring it to me tonight. – M',
   },
 
   stations: [
@@ -57,8 +57,8 @@ export const CASE = deepFreeze({
       spot: 'middle painting',
       letter: 'O',
       evidenceId: 'false-label',
-      evidence: 'Voss approved the false wall label.',
-      pointsToVoss: 'The false label went up with Voss’s approval – he wanted the swap to look official.',
+      evidence: 'The false wall label was approved by a patron – not by museum staff.',
+      pointsToVoss: 'A patron, not the staff, approved the false label – Voss wanted the swap to look official.',
       task: 'Play Curator’s Catalogue: match four labels to their artworks to uncover who approved the false wall label.',
       metIds: CATALOGUE_ARTWORKS.map(work => work.id),
     },
@@ -92,8 +92,8 @@ export const CASE = deepFreeze({
       spot: 'frame rack',
       letter: 'S',
       evidenceId: 'frame-label',
-      evidence: 'Frame label: “Ordered by: A. Voss”.',
-      pointsToVoss: 'The frame for the forgery was ordered by A. Voss – so the “V” is his, not Vale’s.',
+      evidence: 'Frame label: “Ordered by: A. V.”',
+      pointsToVoss: 'The frame for the forgery was ordered by “A. V.” – Adrien Voss, the only patron with those initials, not Vale.',
       task: 'Play Spot the Forgery at the Gallery frame rack. Find three changes to uncover the frame label.',
       metIds: [435882],
     },
@@ -118,6 +118,7 @@ export const CASE = deepFreeze({
     {
       id: 'leon',
       name: 'Leon',
+      pronoun: 'him',
       role: 'Night guard',
       description: 'Saw a transport cart at the delivery exit, but not the painting. Nervous since the alarm.',
       // Which evidence speaks against this suspect being the planner:
@@ -127,14 +128,16 @@ export const CASE = deepFreeze({
     {
       id: 'vale',
       name: 'Dr. Mara Vale',
+      pronoun: 'her',
       role: 'Curator',
       description: 'Locked the original in the safe and left four clues. Her initial is also a “V”.',
       counterEvidenceId: 'frame-label',
-      counterText: 'The “V” is not Vale: the frame label says “Ordered by: A. Voss”. Vale hid the original to protect it.',
+      counterText: 'The “V” is not Vale: the order came from a patron, and Vale is staff. She hid the original to protect it.',
     },
     {
       id: 'voss',
       name: 'Adrien Voss',
+      pronoun: 'him',
       role: 'Patron',
       description: 'Generous donor of the museum. Signs his messages with a single letter.',
       counterEvidenceId: null,

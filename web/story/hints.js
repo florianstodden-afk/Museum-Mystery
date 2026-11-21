@@ -2,8 +2,8 @@
 // hintFor(state, level) → { from, text }
 // level 1 = a gentle nudge, level 2 = a concrete tip.
 // Story hints cost no points. (Hints INSIDE a station are the station's own and cost −5 there.)
-// After two wrong tries at the safe or the final question, level 1 is already concrete:
-// the concept says no one may stay stuck.
+// After two wrong tries at the safe, level 1 is already concrete: no one may stay stuck there.
+// The final question has only one try, so its hints are the same two levels for everyone.
 import { CASE, stationPlace, stationsByNumber } from './case-1.js';
 import { allStationsSolved } from './engine.js';
 
@@ -44,10 +44,10 @@ function safeHint(state, concrete) {
 }
 
 function accusationHint(state, concrete) {
-  if (concrete || state.accusation.attempts >= 2) {
-    return hint('Look at the frame label from the Gallery frame rack: whose name is on it? And who would book a “patron visit”?');
+  if (concrete) {
+    return hint('A patron, initials A. V. – who fits both?');
   }
-  return hint('Line up the four pieces of evidence. One name keeps coming back – and the “V” is not who you might think.');
+  return hint('Line up the four pieces of evidence: who approved the label, who booked the cart, whose “V” is it?');
 }
 
 function hint(text) {

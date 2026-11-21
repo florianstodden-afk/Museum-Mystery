@@ -50,12 +50,12 @@ test('the safe hint gives the letters after two wrong words', () => {
   assert.match(hintFor(s).text, /O – I – L – S/);
 });
 
-test('the accusation hint points to the frame label after two wrong answers', () => {
-  let s = tryOpenSafe(allSolved(), 'OILS').state;
-  assert.doesNotMatch(hintFor(s).text, /frame label/);
-  s = accuse(s, 'leon').state;
-  s = accuse(s, 'vale').state;
-  assert.match(hintFor(s).text, /frame label/);
+test('the accusation hint has two levels: line up the evidence, then patron + A. V.', () => {
+  const s = tryOpenSafe(allSolved(), 'OILS').state;
+  assert.match(hintFor(s, 1).text, /^Line up the four pieces of evidence/);
+  assert.doesNotMatch(hintFor(s, 1).text, /A\. V\.|Voss/);
+  assert.equal(hintFor(s, 2).text, 'A patron, initials A. V. – who fits both?');
+  assert.doesNotMatch(hintFor(s, 2).text, /Voss/);
 });
 
 test('asking for a hint never changes state or score', () => {

@@ -78,7 +78,7 @@ export function scoreBreakdown(state) {
     label: 'Final question',
     points: state.accusation.solved ? accusationPoints(state.accusation.attempts) : 0,
     max: ACCUSATION_MAX,
-    detail: state.accusation.solved ? `${state.accusation.attempts} wrong answer(s)` : 'open',
+    detail: state.accusation.solved ? 'right name' : state.accusation.attempts > 0 ? 'wrong name' : 'open',
   });
   return rows;
 }

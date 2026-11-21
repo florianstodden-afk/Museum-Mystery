@@ -4,7 +4,7 @@
 
 ## Plot
 
-The fictional **Museum Nocturne** in New York, at night. The player character (a temporary restoration assistant) receives a job from “M”: take Van Gogh’s *Wheat Field with Cypresses* out of a safe before sunrise.
+The fictional **Museum Nocturne** in New York, at night. The player character (a temporary restoration assistant) receives a job from “M”: take Van Gogh’s *Wheat Field with Cypresses* out of a safe tonight.
 
 Characters (all fictional):
 - **Adrien Voss** (“M”, patron, the real mastermind)
@@ -20,7 +20,7 @@ Characters (all fictional):
 4. The journal places the letters in a fixed order to spell the code word (Station 3 → 1 → 2 → 4)
 5. The **safe** opens only with proof from all four stations **and** the word `OILS` (oil paints; letters in the order Station 3, 1, 2, 4) (wrong input: “Check the order in your journal”, can be corrected)
 6. In the safe: the original + documents
-7. **Final question** “Who planned the false label and the transport slip, and lured you to the safe?” – Leon / Dr. Vale / Adrien Voss, the right answer is **Voss**; a wrong answer explains which evidence speaks against it, and another try is possible
+7. **Final question** “Who planned the false label and the transport slip, and lured you to the safe?” – Leon / Dr. Vale / Adrien Voss, the right answer is **Voss**. There is **one accusation**: the game asks for confirmation first (“You get one chance…”); a wrong name ends the case with **Case lost**, and the end screen explains which evidence clears the accused
 8. **Two endings:** **A “The Heist”** (painting to Voss, the fraud stays hidden, dark ending, no game over) and **B “The Open File”** (painting and evidence to Dr. Vale, Voss is exposed, the work returns)
 
 Nobody can get stuck for good.
@@ -29,8 +29,10 @@ Nobody can get stuck for good.
 |---|---|---|---|
 | 1 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
 | 2 | Gallery, left painting | L | Hidden mark “V” on the fake transport slip. |
-| 3 | Gallery, middle painting | O | Voss approved the false wall label. |
-| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. Voss”. |
+| 3 | Gallery, middle painting | O | The false wall label was approved by a patron – not by museum staff. |
+| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. V.” |
+
+No station names Voss. Only together do the pieces fit one person: a **patron** (stations 1 and 3) with the initials **A. V.** (stations 2 and 4) – Adrien Voss. Dr. Vale also has a “V”, but she is staff, not a patron.
 
 ## Points (max. 100, no time scoring)
 

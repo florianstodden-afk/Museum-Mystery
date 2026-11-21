@@ -24,7 +24,7 @@ function atFinalChoice() {
 
 test('a new game starts empty with four fixed letter slots', () => {
   const s = newGame();
-  assert.equal(s.caseVersion, 2);
+  assert.equal(s.caseVersion, 3);
   assert.equal(s.missionRead, false);
   assert.deepEqual(s.letters, [null, null, null, null]);
   assert.deepEqual(s.evidence, []);
@@ -132,17 +132,20 @@ test('the final question is only possible after the safe is open', () => {
   assert.equal(result.state, s);
 });
 
-test('a wrong accusation names the evidence against it and allows a new try', () => {
+test('a wrong accusation ends the case at once; there is no second try', () => {
   const open = must(tryOpenSafe(withAllStations(), 'OILS'));
-  const leon = accuse(open, 'leon');
-  assert.equal(leon.ok, false);
-  assert.match(leon.message, /night-shift log/);
-  const vale = accuse(leon.state, 'vale');
-  assert.equal(vale.ok, false);
-  assert.match(vale.message, /Ordered by: A\. Voss/);
-  assert.equal(vale.state.accusation.attempts, 2);
-  const voss = must(accuse(vale.state, 'voss'));
+  for (const wrong of ['leon', 'vale']) {
+    const result = accuse(open, wrong);
+    assert.equal(result.ok, false);
+    assert.match(result.message, /only chance\. Case lost/);
+    assert.equal(result.state.ending, 'lost');
+    assert.equal(result.state.accusation.accused, wrong);
+    assert.equal(accuse(result.state, 'voss').ok, false, 'no second try');
+  }
+  const voss = must(accuse(open, 'voss'));
   assert.equal(voss.accusation.solved, true);
+  assert.equal(voss.accusation.accused, 'voss');
+  assert.equal(voss.ending, null);
 });
 
 test('endings are only possible after the right answer', () => {

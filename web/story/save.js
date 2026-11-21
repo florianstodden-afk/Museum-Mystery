@@ -65,15 +65,18 @@ export function isValidState(value) {
   if (typeof value.safe.open !== 'boolean' || !isCount(value.safe.attempts)) return false;
   if (value.accusation === null || typeof value.accusation !== 'object') return false;
   if (typeof value.accusation.solved !== 'boolean' || !isCount(value.accusation.attempts)) return false;
+  const accused = value.accusation.accused ?? null;
+  if (accused !== null && !CASE.suspects.some(suspect => suspect.id === accused)) return false;
   if (value.ending !== null && !ENDING_IDS.includes(value.ending)) return false;
 
   // The story order must hold: safe only after all stations, ending only after the answer.
   const allSolved = STATION_IDS.every(id => value.stations[id].solved);
   if (value.safe.open && !allSolved) return false;
   if (value.accusation.solved && !value.safe.open) return false;
-  // A chosen ending needs the right answer; "lost" needs three wrong ones and no right one.
+  // A chosen ending needs the right answer; "lost" needs one wrong name and no right one.
   if (value.ending === 'lost') {
     if (value.accusation.solved || value.accusation.attempts < MAX_ACCUSATIONS || !value.safe.open) return false;
+    if (accused === CASE.culpritId) return false;
   } else if (value.ending !== null && !value.accusation.solved) return false;
   if (!value.accusation.solved && value.ending === null && value.accusation.attempts >= MAX_ACCUSATIONS) return false;
   return true;

@@ -39,6 +39,8 @@ All visible game texts (English) with word count, collected on 17 Nov 2026 with 
 
 The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name Voss in the journal as soon as a station is solved. That gives the answer away before the final question. Changing it touches the accusation and its tests, so the team should decide: keep it (the chain is the deduction) or name Voss only after the accusation.
 
+**Decided 21.11.2026:** the evidence no longer names Voss (“approved by a patron – not by museum staff”, “Ordered by: A. V.”). `pointsToVoss` still names him, but is shown only after the right accusation. There is one accusation only, and M’s message no longer says “before sunrise”.
+
 ## Full list
 
 | File | Text | Words |
@@ -58,7 +60,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `index.html` | Start new game | 3 |
 | `index.html` | Fictional museum and characters. Artwork data and image: | 8 |
 | `index.html` | The Metropolitan Museum of Art, Open Access | 7 |
-| `index.html` | Bring the Van Gogh painting out before sunrise. | 8 |
+| `index.html` | Bring the Van Gogh painting out tonight. | 7 |
 | `index.html` | Read M’s message | 3 |
 | `index.html` | Evidence &amp; Notes | 3 |
 | `index.html` | Stats &amp; Credit | 3 |
@@ -149,7 +151,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/case-1.js` | Museum Nocturne, New York | 4 |
 | `story/case-1.js` | Fictional museum and characters · Artworks: The Met, Open Access | 10 |
 | `story/case-1.js` | A message from M | 4 |
-| `story/case-1.js` | The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. Four stations hide the way in. Bring it to me before sunrise. – M | 29 |
+| `story/case-1.js` | The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. Four stations hide the way in. Bring it to me tonight. – M | 28 |
 | `story/case-1.js` | Voss approved the false wall label. | 6 |
 | `story/case-1.js` | The false label went up with Voss’s approval – he wanted the swap to look official. | 16 |
 | `story/case-1.js` | Compare the wall label with the Met catalogue and correct the year and the material. | 15 |

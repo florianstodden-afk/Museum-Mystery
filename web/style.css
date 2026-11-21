@@ -190,6 +190,8 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .journal-mission>button{padding:6px 12px;font-size:.8rem}
 .journal-evidence-grid{gap:8px}.journal-evidence-grid h4{font-size:.8rem;margin-bottom:6px}
 .journal-evidence-grid p,.journal-evidence-grid ul{min-height:72px;max-height:140px;overflow:auto;padding:9px;font-size:.77rem}
+/* All four pieces of evidence fit without scrolling: the evidence column is wider than the notes. */
+@media(min-width:701px){.journal-evidence-grid{grid-template-columns:1.6fr 1fr}.journal-evidence-grid ul{max-height:none}}
 .journal-progress .story-next{margin-bottom:10px;padding:8px;font-size:.79rem}
 .journal-progress .story-slots{gap:5px}.journal-progress .story-slot{min-height:67px;padding:4px 2px}
 .journal-progress .story-slot-letter{font-size:1.25rem}.journal-progress .story-slot-room{font-size:.58rem}
@@ -204,6 +206,10 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .journal-page{overflow:visible;padding:3px 12px}
   .journal-page h3:not(:first-child){margin-top:12px;padding-top:9px}
   .journal-progress .story-slot{min-height:65px}
+  /* The mission page must not run into the progress page below it. */
+  .journal-mission-title{margin:2px auto 6px}
+  .journal-mission>button{padding:4px 10px}
+  .journal-evidence-grid p,.journal-evidence-grid ul{max-height:112px}
 }
 
 /* The two supplied paintings are backgrounds; form controls stay real and accessible. */

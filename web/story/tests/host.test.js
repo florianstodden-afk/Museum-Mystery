@@ -55,7 +55,7 @@ test('start() shows M’s message once and accepting it saves the game', () => {
   assert.match(page.storage.getItem('test-key'), /"missionRead\\":true/);
 });
 
-test('a whole game runs through the host, including wrong answers', () => {
+test('a whole game runs through the host, including a wrong code word and a cancelled accusation', () => {
   const page = fakePage();
   const host = createStoryHost({ ...page.options, stations: { landscape: quickStation } });
   host.start();
@@ -76,15 +76,46 @@ test('a whole game runs through the host, including wrong answers', () => {
   assert.equal(host.state.safe.open, true);
 
   click(page, 'Look at the documents');
+  const before = JSON.stringify(host.state);
   click(page, 'Leon');
-  assert.match(page.panel.textContent, /night-shift log/);
+  assert.match(page.panel.textContent, /Name Leon\? You get one chance/);
+  click(page, 'Not yet');
+  assert.equal(JSON.stringify(host.state), before, 'cancelling counts nothing');
+  assert.equal(page.title, 'The final question');
   click(page, 'Adrien Voss');
+  click(page, 'Name him');
   click(page, 'Decide what happens');
   click(page, 'Quit the mission');
   assert.equal(host.state.ending, 'open-file');
   assert.equal(page.title, 'Case closed');
-  // 15 + 15 + 15 + 15 + safe 5 + question 5
-  assert.match(page.panel.textContent, /70 \/ 80/);
+  // 15 + 15 + 15 + 15 + safe 5 + question 10
+  assert.match(page.panel.textContent, /75 \/ 80/);
+});
+
+test('one wrong accusation through the host ends the case at once', () => {
+  const page = fakePage();
+  const finished = [];
+  const played = [];
+  const host = createStoryHost({ ...page.options, onFinished: state => finished.push(state.ending), sound: { play: id => { if (id) played.push(id); } } });
+  host.start();
+  click(page, 'Accept the mission');
+  for (const id of ['landscape', 'portraits', 'restoration', 'archive']) {
+    host.openStation(id);
+    click(page, 'Solve station (placeholder)');
+  }
+  host.openVault();
+  submitWord(page, 'oils');
+  click(page, 'Look at the documents');
+  click(page, 'Dr. Mara Vale');
+  click(page, 'Name her');
+  assert.equal(host.state.ending, 'lost');
+  assert.deepEqual(finished, ['lost']);
+  assert.equal(played.at(-1), 'wrong');
+  assert.equal(page.title, 'Case closed');
+  assert.match(page.panel.textContent, /Case lost/);
+  assert.match(page.panel.textContent, /You named Dr\. Mara Vale\./);
+  host.openVault();
+  assert.equal(page.title, 'Case closed', 'the vault only shows the ending now');
 });
 
 test('the vault always opens the right step of the story', () => {
@@ -262,11 +293,13 @@ test('the host plays a sound for each story moment and stays silent without a pl
   submitWord(page, 'SLIO');  // wrong
   submitWord(page, 'oils');  // opens
   click(page, 'Look at the documents');
-  click(page, 'Leon');       // wrong
+  click(page, 'Leon');
+  click(page, 'Not yet');    // cancelled: silent, nothing counted
   click(page, 'Adrien Voss');
+  click(page, 'Name him');
   click(page, 'Decide what happens');
   click(page, 'Steal the artwork');
-  assert.deepEqual(played, ['page', 'letter', 'letter', 'letter', 'letter', 'hint', 'wrong', 'unlock', 'wrong', 'letter', 'ending-heist']);
+  assert.deepEqual(played, ['page', 'letter', 'letter', 'letter', 'letter', 'hint', 'wrong', 'unlock', 'letter', 'ending-heist']);
 
   const silent = createStoryHost({ ...fakePage().options });
   assert.doesNotThrow(() => silent.showHint());

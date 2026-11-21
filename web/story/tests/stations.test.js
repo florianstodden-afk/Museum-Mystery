@@ -12,7 +12,7 @@ const landscapeLike = {
     caseData.onChange({ ...(caseData.state || {}), mistakes: 1, hints: 0, solved: false });
     caseData.onChange({ mistakes: 1, hints: 1, solved: false });
     caseData.onChange({ mistakes: 1, hints: 1, solved: true });
-    onSolved({ letter: 'O', evidence: 'Voss approved the false wall label.', points: 12 });
+    onSolved({ letter: 'O', evidence: 'The false wall label was approved by a patron – not by museum staff.', points: 12 });
     onSolved({ letter: 'O', evidence: 'twice', points: 12 }); // a buggy second call
   },
 };
