@@ -4,7 +4,7 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) will be the online version after the first successful production deployment and account setup. The [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) remains guest-only.
+**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) is the online game. The older [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) keeps guest play; its GitHub button opens the Vercel game and starts sign-in there.
 
 ## Team
 
@@ -21,7 +21,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 ## How to play
 
-- On the first screen, choose **Continue with GitHub** or **Play as guest**. On the Vercel site, GitHub players use their GitHub identity for an online save and shared leaderboard. Guests save locally and cannot open the leaderboard. The database and GitHub OAuth App must be connected before GitHub sign-in works ([Vercel setup](docs/leaderboard.md)); [earlier local username/password profiles](docs/local-login.md) are historical.
+- On the first screen, choose **Continue with GitHub** or **Play as guest**. GitHub players use their GitHub identity for an online save and shared leaderboard. Guests save locally and cannot open the leaderboard. If you opened the old GitHub Pages link, its GitHub button takes you to the online Vercel game first ([login details](docs/leaderboard.md)); [earlier local username/password profiles](docs/local-login.md) are historical.
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. Rearrange the four letters to open the vault.
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
@@ -52,7 +52,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 | Path | Purpose |
 |---|---|
-| `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.webp` | Page, home screen, menu and compact illustrated journal |
+| `web/index.html`, `web/style.css`, `web/assets/github-login-screen.png`, `web/assets/investigation-journal-*.webp` | Page, illustrated GitHub entry, home screen, menu and compact journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
 | `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
@@ -68,7 +68,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 ## Known limits
 
-- GitHub sign-in, cross-device saves and the shared leaderboard require the Vercel database integration and GitHub OAuth App described in [the setup](docs/leaderboard.md). Until they are configured, guest play remains available.
+- GitHub sign-in, cross-device saves and the shared leaderboard use the Vercel database integration and GitHub OAuth App described in [the setup](docs/leaderboard.md). The API is live; a complete sign-in and two-device save still need a real player test. Guest play remains available.
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.

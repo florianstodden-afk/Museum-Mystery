@@ -2,10 +2,12 @@ import { LEADERBOARD_URL } from './leaderboard-config.js';
 
 const TOKEN_KEY = 'museum-mystery-github-session-v1';
 const STATE_KEY = 'museum-mystery-github-oauth-state-v1';
+const ONLINE_GAME_URL = 'https://museum-mystery.vercel.app/';
 const endpoint = path => `${LEADERBOARD_URL.replace(/\/$/, '')}${path}`;
 
 export function loginUrl() {
-  if (!LEADERBOARD_URL) return null;
+  if (!LEADERBOARD_URL) return typeof location !== 'undefined' && location.hostname.endsWith('github.io')
+    ? `${ONLINE_GAME_URL}?github-login=1` : null;
   const state = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
   sessionStorage.setItem(STATE_KEY, state);
   return `${endpoint('/auth/start')}?state=${state}`;
