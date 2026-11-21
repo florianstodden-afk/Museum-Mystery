@@ -111,6 +111,17 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 }
 
 /* During play the museum fills the screen; all actions live behind one gear. */
+/* GitHub entry: one real sign-in choice over the museum illustration. */
+.entry-github-panel{position:absolute;z-index:2;left:50%;top:52%;transform:translate(-50%,-50%);width:min(470px,82%);padding:28px 32px;text-align:center;background:rgba(12,31,39,.84);border:2px solid #cba564;border-radius:14px;box-shadow:0 18px 65px #000b;backdrop-filter:blur(12px);color:#f8e9c9}
+.entry-github-panel h2{font:700 clamp(1.5rem,2.5vw,2.2rem) Fraunces,Georgia,serif;margin:0 0 10px}
+.entry-github-panel p{line-height:1.45;margin:0 0 18px}
+.entry-github-panel button{display:block;width:100%;margin:10px 0;padding:13px 16px;border:2px solid #cba564;border-radius:9px;background:#203941;color:#f8e9c9;font:700 1.15rem Fraunces,Georgia,serif;cursor:pointer}
+.entry-github-panel button:hover,.entry-github-panel button:focus-visible{background:#38545b;box-shadow:0 0 20px #d2aa6566}
+.entry-github-panel #entry-guest{background:rgba(8,22,29,.6);font-size:1rem}
+.entry-github-panel #entry-message{min-height:1.4em;color:#f4c789;font-size:.86rem;margin:8px 0}
+.entry-github-panel small{color:#d5c5a6}
+@media(max-width:720px){.entry-github-panel{width:min(440px,90%);top:55%;padding:22px}}
+.home-sync-status{position:absolute;z-index:1;top:10%;right:3%;margin:0;padding:5px 10px;border:1px solid #cba564;border-radius:8px;background:#0d252ccc;color:#e8d8b8;font-size:.75rem}
 .game-menu-toggle[hidden],.game-menu[hidden]{display:none}
 .game-menu-toggle{position:fixed;z-index:12;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:grid;place-items:center;width:54px;height:54px;padding:0;border:2px solid #d6ae68;border-radius:12px;background:#14252be8;color:#f5d99b;box-shadow:0 4px 18px #0009,inset 0 0 0 2px #705a37;font-size:2rem;line-height:1}
 .game-menu-toggle:hover,.game-menu-toggle[aria-expanded="true"]{background:#2d4142;box-shadow:0 0 18px #e9bc7770,inset 0 0 0 2px #705a37}

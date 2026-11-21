@@ -1,53 +1,43 @@
-# Shared leaderboard · 20.11.2026
+# GitHub login, online saves and leaderboard on Vercel · 21.11.2026
 
-**Current status:** Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed. As long as `LEADERBOARD_URL` in `web/leaderboard-config.js` is empty, the board shows only the local list (up to 10 finished runs of all profiles and guests in this browser, sorted by points, then by shorter time, status Won/Lost). The online sections, **Refresh** and **Publish finished run** stay hidden. The text below describes the online version for later.
+## Current architecture
 
-## What the player sees
+Vercel serves the browser game from `web/` and the same-origin functions from `api/`. A Neon Postgres database, connected through Vercel Storage, keeps the OAuth handshakes, hashed game sessions, one save per GitHub account and one best result per account. This replaces the earlier Cloudflare Worker/D1 proposal. GitHub Pages remains a guest-only copy: its static hosting has no `/api/` functions.
 
-On the home screen, **Scoreboard** opens a semi-transparent museum board. At the top is the player’s own current run; below it appear up to 25 published results from all devices. The font for headings and buttons is the same Fraunces font as in the existing menus. The home screen background stays visible.
+The entry screen offers **Continue with GitHub** or **Play as guest**. GitHub players can resume a case on another device and open the shared scoreboard. Winning finishes are saved and submitted automatically. The Vercel function derives the account ID and display name from GitHub and calculates the score from the saved game. It ignores names and points supplied by a browser. Guests keep only a local save and cannot open or submit to the leaderboard. Lost runs are saved but never ranked. Equal scores share a place; time does not decide the rank.
 
-A result is **not sent automatically**: only after an ending does **Publish finished run** appear. The player then decides whether their name, score and ending appear publicly on the board. Passwords, saves, notes, art answers and movement data are not sent. **Refresh** loads the list again. If the service is missing or down, the local scoreboard stays usable and shows a clear message.
+The GitHub password and access token never enter the game repository or database. The GitHub access token is used briefly on the server to fetch the numeric account ID, then discarded. The game keeps only a temporary session token in this tab; the database keeps its hash. A one-use OAuth state and PKCE protect the GitHub handoff. The browser loads the online save before starting play and uploads changes after a short pause. If an upload fails, it retains a pending local copy and retries after the next sign-in. One device should be played at a time; the most recent upload wins. GitHub verifies identity, but browser-side gameplay remains open to deliberate manipulation.
 
-## Rules
+## Why the first Vercel deployment failed
 
-- The four stations give at most 60 points together, the safe and the final question 10 each: **80 points**.
-- The server accepts only finished results on the current 80-point scale. Old saves with 85/90 possible points stay visible locally but are not mixed into the shared list.
-- For each browser profile the game creates a permanent random ID. The server keeps the **highest score** per ID. Equal scores share the same place. Time is not a sorting criterion, so solving known puzzles again gives no direct ranking advantage.
-- A local profile name is used as the display name; guests appear as `Guest-…`. These names are **not verified** until a later login connection.
-- **Limits:** Names are not verified, and a result can be faked through the public interface. The Worker still checks the format and the points cap and rejects everything else.
+The imported Vercel project used **Root Directory: `legacy/python`** and **Framework: Python**. That folder is an old Streamlit prototype. Its `app.py` is not a Vercel Python function, which explains `PYTHON_ENTRYPOINT_NOT_FOUND`. The current game lives in `web/`, while its server functions live in root-level `api/`. Both must be inside the Vercel project root.
 
-## Where it happens
+## Set up the existing Vercel project
 
-| File | Purpose |
+1. Open project **museum-mystery → Settings → Build and Deployment → Root Directory**. Remove `legacy/python` so the root is the **repository root** (an empty Root Directory field). Save. Vercel applies this on the next deployment. The repository's `vercel.json` then chooses the **Other** framework and `web` output directory. Do not set Root Directory to `web`, because that would hide `api/` from Vercel.
+2. In the project, open **Storage** and add a **Neon Postgres** database from the Vercel Marketplace. No database was connected when the project owner checked on 21 November. Connect it to this project and select **Production** under Environments. Leave **Custom Prefix** empty: the server expects the automatically injected variable to be named exactly `DATABASE_URL`. Under **Create database branch for deployment**, leave both Production and Preview unchecked for this first setup; an isolated Preview branch can be enabled later if needed. If the Neon resource Settings ask for **Allowed Environments**, choose **Production environment only**. This makes database credentials non-readable; re-enabling Preview later requires a Vercel team owner and reconnecting the project. Do not commit or send the connection URL. The server creates its tables on first use; no manual SQL command is required.
+3. The project owner confirmed the production domain is `museum-mystery.vercel.app`. In GitHub **Settings → Developer settings → OAuth Apps → New OAuth App**, set Homepage URL to `https://museum-mystery.vercel.app/` and Authorization callback URL to `https://museum-mystery.vercel.app/api/auth/callback`. Copy the Client ID and create a Client Secret. The two URLs must use this production domain, not the temporary deployment URLs.
+4. In Vercel **Settings → Environment Variables**, add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` for Production. Choose the **Secret** type for `GITHUB_CLIENT_SECRET` if offered. Never put it in Git or in a chat. Check that `DATABASE_URL` is present from Neon. Vercel's `VERCEL_PROJECT_PRODUCTION_URL` gives the code its production callback address; if system variables are disabled, enable them in Environment Variables.
+5. Merge the [GitHub-login/Vercel change](https://github.com/florianstodden-afk/Museum-Mystery/pull/40) after its checks pass. The merge pushes a new commit to `main` and triggers a Production deployment. If the database or OAuth variables are added later, redeploy Production so the function sees them. The failed Python deployment is not repaired by retrying the same commit with the old Root Directory.
+6. On the Vercel URL, test **Continue with GitHub**. Finish a case on device A and open the same account on device B: the case should resume and the shared scoreboard should show the winning result. Test **Play as guest** separately: no online save or scoreboard.
+
+The public files `vercel.json`, `web/leaderboard-config.js` and `api/` contain no secrets. `package.json` installs the Neon serverless database driver. The server checks the database connection on each request and reports a clear error if Storage has not been connected.
+
+## Code map
+
+| File | Role |
 | --- | --- |
-| `web/index.html`, `web/story/story.css` | Board, buttons, transparent look and journal sources |
-| `web/main.js`, `web/leaderboard.js` | Loading, showing, voluntary publishing and local player ID |
-| `web/leaderboard-config.js` | Public URL of the online service after deployment |
-| `server/leaderboard/worker.js` | Public read and write interface, input checks, ranking |
-| `server/leaderboard/migrations/0001_leaderboard.sql` | Database table, one best score per player ID |
-| `server/leaderboard/wrangler.jsonc` | Cloudflare Worker configuration |
+| `web/index.html`, `web/style.css` | GitHub/guest choice, illustrated screens and save status |
+| `web/github-auth.js`, `web/main.js` | OAuth ticket exchange, load and upload save, sign-out and guest separation |
+| `web/leaderboard.js`, `web/story/story.css` | Shared scores and transparent museum board |
+| `web/leaderboard-config.js` | Uses `/api` on Vercel; keeps GitHub Pages guest-only |
+| `api/auth/*.js`, `api/save.js`, `api/runs.js` | Small Vercel function entry points |
+| `api/_service.js` | GitHub OAuth, verified sessions, saves and scoreboard rules |
+| `api/_database.js`, `api/_runtime.js` | Postgres tables, safe queries and Vercel environment |
+| `vercel.json`, `package.json` | Website root and Neon driver dependency |
 
-GitHub Pages cannot store shared results itself. So the database lives in Cloudflare D1 and is accessed through a Worker. **The Worker is online only after someone with a Cloudflare account has carried out the following steps.** Until then the board reports that it is not connected yet. A Cloudflare URL or database ID is not a password; secret credentials never belong in `web/` or in the repository.
+## Checks and limits
 
-## One-time deployment
+`node --test` covers the game, OAuth state, one-use ticket, session authorization, saves, ranking and the database adapter. A real GitHub round trip and a two-device check need the Vercel project, Neon and OAuth App to be configured. Earlier local username/password saves are not automatically migrated. A guest can still finish all endings. The older Cloudflare proposal remains visible only in dated entries of `docs/work-log.md`.
 
-The steps are run in the `server/leaderboard` folder. Node.js and a Cloudflare account are needed.
-
-1. `npx wrangler login` opens the Cloudflare sign-in.
-2. `npx wrangler d1 create museum-mystery-leaderboard` creates the database and shows its `database_id`. Put this ID into `wrangler.jsonc` instead of `REPLACE_WITH_D1_DATABASE_ID`.
-3. `npx wrangler d1 migrations apply museum-mystery-leaderboard --remote` creates the table.
-4. `npx wrangler deploy` publishes the Worker and shows an `https://…workers.dev` URL.
-5. Put this URL as `LEADERBOARD_URL` into `web/leaderboard-config.js` and bring the change into `main` through a pull request. GitHub Pages then loads the connected version.
-6. Open the site on two devices. On device A finish a current run and publish it; on device B choose **Scoreboard → Refresh**. The result must appear there.
-
-The Worker currently allows the GitHub Pages address and local development on port 8000. If another game address is used, add it to `ALLOWED_ORIGINS` in `wrangler.jsonc` and deploy again. The origin list prevents accidental calls from other websites; it does **not replace a sign-in**.
-
-## Later login connection
-
-The current local password does not prove to the Worker who sends a request. Before the login connection, anyone who knows the public interface could fake a name or score. The board is therefore usable for the game group, but not yet a tamper-proof competition ranking. For the later connection the Worker must require a sign-in that the server can check, and derive the player ID from the checked identity instead of taking `playerId` and `name` from the request. Only then are names unique. Even a signed login alone does not prove that the score was earned honestly; if that becomes important, the server would also have to check game events or a plausible proof of the result.
-
-## Checks
-
-`cd web && node --test` checks the game modules. `node --test server/leaderboard/worker.test.js` checks the Worker’s rules and responses without a Cloudflare account. The real exchange across two devices can only be checked after step 5.
-
-Technical basis: [Cloudflare D1 Worker API](https://developers.cloudflare.com/d1/worker-api/), [D1 migrations](https://developers.cloudflare.com/d1/reference/migrations/) and [Wrangler configuration](https://developers.cloudflare.com/workers/wrangler/configuration/).
+References: [Vercel Root Directory](https://vercel.com/docs/builds/configure-a-build), [Vercel Functions](https://vercel.com/docs/functions/runtimes/node-js), [Vercel Storage Marketplace](https://vercel.com/docs/marketplace-storage), [Neon serverless driver](https://github.com/neondatabase/serverless/blob/main/CONFIG.md), [GitHub OAuth flow](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps).

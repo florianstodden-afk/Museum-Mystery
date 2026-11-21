@@ -16,15 +16,15 @@ import { journalModel, renderJournal } from './story/journal.js?v=journal-blank-
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
-import { canPublish, loadLeaderboard, publicPlayer, publishRun, renderLeaderboard } from './leaderboard.js';
+import { canPublish, loadLeaderboard, publishRun, renderLeaderboard } from './leaderboard.js';
 import { LEADERBOARD_URL } from './leaderboard-config.js';
-import { localRunsStore, renderLocalRuns } from './story/local-runs.js?v=1';
+import { createCloudSync, initialSession, loginUrl, signOut } from './github-auth.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js?v=npc-conversation-1';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
-import { SESSION_KEY, registerLocalAccount, logInLocalAccount, profileStorageKey, checkEntryInput } from './local-auth.js?v=entry-check-1';
+import { profileStorageKey } from './local-auth.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');
@@ -37,8 +37,17 @@ function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Ma
 const dialog = document.querySelector('#dialog');
 let dialogOpener = null;
 const vaultPreview = new URLSearchParams(location.search).get('vault-preview') === '1';
-let activeProfile = null;
-try { activeProfile = sessionStorage.getItem(SESSION_KEY) || null; } catch {}
+const startup = vaultPreview ? { user: null, save: null, error: null } : await initialSession();
+const activeProfile = startup.user ? `github:${startup.user.id}` : null;
+const activeLogin = startup.user?.login || null;
+const pendingKey = activeProfile ? profileStorageKey('museum-mystery-pending-save-v1', activeProfile) : null;
+try { if(pendingKey){const pending=JSON.parse(localStorage.getItem(pendingKey));if(pending)startup.save=pending;} } catch {}
+if (startup.save && activeProfile) {
+  try {
+    localStorage.setItem(profileStorageKey('museum-nocturne-story-v1', activeProfile), JSON.stringify(startup.save.story));
+    localStorage.setItem(profileStorageKey('museum-mystery-walk-v1', activeProfile), JSON.stringify(startup.save.walk));
+  } catch { startup.error = 'This browser cannot load your online save.'; }
+}
 let previewStory = readMission(newGame()).state;
 if (vaultPreview) for (const id of STATION_IDS) previewStory = solveStation(previewStory, id).state;
 let previewSave = JSON.stringify({story: JSON.stringify(previewStory), progress: {}});
@@ -59,7 +68,7 @@ const speech = createSpeechBox(document.body, {
 });
 
 // The story (stations, safe, endings) is run by web/story/host.js inside our dialog.
-const localRuns=localRunsStore((()=>{try{return localStorage;}catch{return null;}})());
+let cloudSync = null;
 const story = createStoryHost({
   openPanel(title) {
     showDialog(title, '', []);
@@ -71,10 +80,13 @@ const story = createStoryHost({
   onChange() { const unlocked = !state.doorOpen && story.state.safe.open; state = { ...state, doorOpen: story.state.safe.open }; if(unlocked) vaultOpenedAt = performance.now(); savePosition(); draw(); },
   onReset: resetWorld,
   onHome: showHome,
-  // Each finished run (won or lost) goes into the local list of this browser.
   onFinished(finalState, progress) {
     const board = scoreboard(finalState, progress);
-    localRuns.add({ name: activeProfile || 'Guest', points: board.points, max: board.max, timeMs: board.timeMs, status: board.status });
+    if (!activeProfile) return;
+    (async () => {
+      try { await cloudSync.flush(); if(canPublish(board))await publishRun(board); }
+      catch (error) { console.warn('Online result could not be saved:', error.message); }
+    })();
   },
   sound,
   speech,
@@ -86,6 +98,10 @@ const story = createStoryHost({
 let state;
 try { state = vaultPreview ? {...initialState(), player: {x:16.5,y:9}, doorOpen:false} : restoreState(JSON.parse(localStorage.getItem(storeKey)), story.state.safe.open); }
 catch { state = restoreState(null, story.state.safe.open); }
+if (activeProfile) cloudSync = createCloudSync(() => ({
+  story: JSON.parse(localStorage.getItem(profileStorageKey('museum-nocturne-story-v1', activeProfile))), walk: state,
+}), message => { const label=document.querySelector('#home-sync-status'); label.textContent=message; label.hidden=false; }, pendingKey);
+if(pendingKey)try{if(localStorage.getItem(pendingKey))cloudSync.schedule();}catch{}
 // Older saves may place the player inside the newly solid picture wall.
 if (state.player.x < 8.5 && state.player.y < 3.5) state = { ...state, player: { ...state.player, y: 4 } };
 const hallPaintings = [436121, 436535, 12127].map(id => {
@@ -431,7 +447,7 @@ const heldKeys = new Map();
 let lastSavedAt=0;
 let lastStepAt=0; // time of the last footstep sound
 function currentRoom(){return state.room==='security'?'security':state.player.x<9?'hall':state.player.x<18?'gallery':'storage';}
-function savePosition(){try{if(!vaultPreview)localStorage.setItem(storeKey,JSON.stringify(state));}catch{}updateSidebar();}
+function savePosition(){try{if(!vaultPreview)localStorage.setItem(storeKey,JSON.stringify(state));}catch{}if(cloudSync)cloudSync.schedule();updateSidebar();}
 function stopMovement(){heldKeys.clear();savePosition();}
 function animate(now){
   const delta=lastFrame ? Math.min(100,now-lastFrame) : 0;lastFrame=now;
@@ -591,18 +607,13 @@ const homeScoreboard=document.querySelector('#home-scoreboard');
 const homeScoreboardPanel=document.querySelector('#home-scoreboard-panel');
 const leaderboardStatus=document.querySelector('#leaderboard-status');
 const leaderboardResults=document.querySelector('#leaderboard-results');
-const leaderboardPublish=document.querySelector('#leaderboard-publish');
-let leaderboardBusy=false;
-// The online leaderboard stays hidden until server/leaderboard is deployed and LEADERBOARD_URL is set.
-const ONLINE=Boolean(LEADERBOARD_URL);
+const ONLINE=Boolean(LEADERBOARD_URL && activeProfile);
 document.querySelector('#leaderboard-online').hidden=!ONLINE;
 async function refreshLeaderboard(){
   leaderboardStatus.textContent='Loading shared results…';
   try {
     const data=await loadLeaderboard();
-    let ownId=null;
-    try { ownId=publicPlayer(localStorage,activeProfile).playerId; } catch {}
-    renderLeaderboard(leaderboardResults,data.entries,ownId);
+    renderLeaderboard(leaderboardResults,data.entries,activeProfile);
     leaderboardStatus.textContent='Results from all published players.';
   } catch(error) {
     leaderboardResults.replaceChildren();
@@ -610,89 +621,22 @@ async function refreshLeaderboard(){
   }
 }
 document.querySelector('#leaderboard-refresh').addEventListener('click',refreshLeaderboard);
-leaderboardPublish.addEventListener('click',async()=>{
-  if(leaderboardBusy)return;
-  leaderboardBusy=true;leaderboardPublish.disabled=true;
-  leaderboardStatus.textContent='Publishing result…';
-  try {
-    const player=publicPlayer(localStorage,activeProfile);
-    await publishRun(scoreboard(story.state,story.progress),story.state.ending,player);
-    await refreshLeaderboard();
-    leaderboardStatus.textContent=`Published as ${player.name}. Your best score is kept.`;
-  } catch(error) { leaderboardStatus.textContent=error.message; }
-  finally { leaderboardBusy=false;leaderboardPublish.disabled=false; }
-});
 const homeConfirm=document.querySelector('#home-confirm');
 const journalOverlay=document.querySelector('#sidebar');
 const gameJournalToggle=document.querySelector('#game-journal-toggle');
 let journalOpener=null;
 const entryScreen=document.querySelector('#entry-screen');
-const entryChoices=document.querySelector('#entry-choices');
-const entryPanel=document.querySelector('#entry-panel');
-const entryLogin=document.querySelector('#entry-login');
-const entrySignup=document.querySelector('#entry-signup');
-const entryBackdrop=document.querySelector('.entry-backdrop');
-const entryForm=document.querySelector('#entry-form');
 const entryMessage=document.querySelector('#entry-message');
-let entryOpener=entryLogin;
-let entryMode='login';
-function openEntryPanel(mode, opener){
-  entryMode=mode;
-  entryOpener=opener;
-  const signingUp=mode==='signup';
-  document.querySelector('#entry-panel-title').textContent=signingUp?'Sign Up':'Log In';
-  entryBackdrop.src=signingUp?'assets/signup-screen-reference.webp':'assets/login-form-reference.webp';
-  document.querySelector('#entry-password').autocomplete=signingUp?'new-password':'current-password';
-  document.querySelector('#entry-forgot').hidden=signingUp;
-  entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
-  entryChoices.hidden=true;
-  entryPanel.hidden=false;
-  document.querySelector('#entry-username').focus();
-}
-function closeEntryPanel(){
-  entryPanel.hidden=true;
-  entryChoices.hidden=false;
-  entryBackdrop.src='assets/login-screen-reference.webp';
-  entryForm.reset();entryMessage.textContent='';for(const f of entryForm.querySelectorAll('input'))f.removeAttribute('aria-invalid');
-  entryOpener.focus();
-}
-entryLogin.addEventListener('click',()=>openEntryPanel('login',entryLogin));
-entrySignup.addEventListener('click',()=>openEntryPanel('signup',entrySignup));
-document.querySelector('#entry-back').addEventListener('click',closeEntryPanel);
-entryForm.addEventListener('submit',async event=>{
-  event.preventDefault();
-  // Our own check instead of the browser's bubble: message in #entry-message, focus and aria-invalid on the field.
-  const fields={username:document.querySelector('#entry-username'),password:document.querySelector('#entry-password')};
-  for(const field of Object.values(fields))field.removeAttribute('aria-invalid');
-  const input=checkEntryInput(fields.username.value,fields.password.value);
-  if(!input.ok){entryMessage.textContent=input.message;fields[input.field].setAttribute('aria-invalid','true');fields[input.field].focus();return;}
-  const submit=document.querySelector('#entry-submit');
-  submit.disabled=true;
-  entryMessage.textContent='Checking…';
-  let result;
-  try {
-    const storage=localStorage;
-    const username=document.querySelector('#entry-username').value;
-    const password=document.querySelector('#entry-password').value;
-    result=entryMode==='signup'
-      ? await registerLocalAccount(storage,username,password)
-      : await logInLocalAccount(storage,username,password);
-  } catch { result={ok:false,message:'Account storage is unavailable. Try guest play.'}; }
-  submit.disabled=false;
-  if(!result.ok){entryMessage.textContent=result.message;document.querySelector('#entry-password').focus();return;}
-  try {sessionStorage.setItem(SESSION_KEY,result.username);location.reload();}
-  catch {entryMessage.textContent='This browser cannot start a local profile. Try guest play.';}
-});
-document.querySelector('#entry-forgot').addEventListener('click',()=>{
-  entryMessage.textContent='Local accounts have no password reset. Create another account or play as guest.';
+entryMessage.textContent=startup.error || (LEADERBOARD_URL?'':'GitHub login will be available when the online service is connected.');
+document.querySelector('#entry-github').addEventListener('click',()=>{
+  const url=loginUrl();
+  if(url)location.assign(url);
+  else entryMessage.textContent='GitHub login is not connected yet. You can play as a guest.';
 });
 document.querySelector('#entry-guest').addEventListener('click',()=>{
   entryScreen.hidden=true;
   homeScreen.inert=false;
   showHome();
-});
-entryScreen.addEventListener('keydown',event=>{
-  if(event.key==='Escape' && !entryPanel.hidden){closeEntryPanel();event.preventDefault();}
 });
 function closeHomePanels(){
   homeSettingsPanel.hidden=true;homeScoreboardPanel.hidden=true;homeConfirm.hidden=true;
@@ -767,8 +711,14 @@ function showHome(){
   if(!dialog.classList.contains('hidden'))closeDialog();
   homeScreen.hidden=false;
   const profileLabel=document.querySelector('#home-current-profile');
-  profileLabel.hidden=!activeProfile;
-  profileLabel.textContent=activeProfile?`Local profile: ${activeProfile}`:'';
+  profileLabel.hidden=false;
+  profileLabel.textContent=activeProfile?`GitHub: @${activeLogin}`:'Guest · progress on this device only';
+  const syncLabel=document.querySelector('#home-sync-status');
+  syncLabel.hidden=!activeProfile;
+  if(activeProfile && !syncLabel.textContent)syncLabel.textContent='Online save ready';
+  homeScoreboard.disabled=!activeProfile;
+  homeScoreboard.setAttribute('aria-label',activeProfile?'Scoreboard':'Leaderboard requires GitHub sign-in');
+  document.querySelector('#home-switch-profile').textContent=activeProfile?'Sign out':'Sign in with GitHub';
   gameMenuToggle.hidden=true;
   gameJournalToggle.hidden=true;
   document.querySelector('.shell').inert=true;
@@ -779,8 +729,8 @@ function showHome(){
   // A finished run may become the best run (stored on this device only).
   const best=board.finished?bestRun.record({points:board.points,timeMs:board.timeMs,max:board.max,status:board.status}):bestRun.get();
   renderScoreboard(document.querySelector('#home-scoreboard-result'),board,best);
-  renderLocalRuns(document.querySelector('#local-runs-results'),localRuns.top());
-  leaderboardPublish.hidden=!ONLINE || !canPublish(board);
+  // Retry a winning result if the previous automatic publication was interrupted.
+  if(activeProfile && canPublish(board))cloudSync.flush().then(()=>publishRun(board)).catch(()=>{});
   showSaveNotice();
   closeHomePanels();
   (homeStart.disabled?homeNew:homeStart).focus();
@@ -813,11 +763,12 @@ homeSettings.addEventListener('click',()=>{
   homeSettings.setAttribute('aria-expanded',String(opening));
   if(opening)document.querySelector('#home-sound').focus();
 });
-document.querySelector('#home-switch-profile').addEventListener('click',()=>{
-  try {sessionStorage.removeItem(SESSION_KEY);} catch {}
-  location.reload();
+document.querySelector('#home-switch-profile').addEventListener('click',async()=>{
+  if(activeProfile){try{await cloudSync?.flush();}catch{}await signOut();location.reload();}
+  else {const url=loginUrl();if(url)location.assign(url);else location.reload();}
 });
 homeScoreboard.addEventListener('click',()=>{
+  if(!activeProfile)return;
   const opening=homeScoreboardPanel.hidden;closeHomePanels();homeScoreboardPanel.hidden=!opening;
   homeScoreboard.setAttribute('aria-expanded',String(opening));
   if(opening){homeScoreboardPanel.querySelector('button').focus();if(ONLINE)refreshLeaderboard();}
@@ -835,6 +786,7 @@ document.querySelector('#home-button').addEventListener('click',showHome);
 save();
 if(activeProfile){entryScreen.hidden=true;homeScreen.inert=false;}
 showHome(); // The mission starts only after the player chooses Start game.
-if(!activeProfile)entryLogin.focus();
+if(!activeProfile)document.querySelector('#entry-github').focus();
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) cloudSync?.flush().catch(() => {}); });
