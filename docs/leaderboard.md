@@ -27,7 +27,7 @@ The public files `vercel.json`, `web/leaderboard-config.js` and `api/` contain n
 
 | File | Role |
 | --- | --- |
-| `web/index.html`, `web/style.css` | GitHub/guest choice, illustrated screens and save status |
+| `web/index.html`, `web/style.css`, `web/assets/github-login-background.png` | GitHub/guest choice, new illustrated login screen and save status |
 | `web/github-auth.js`, `web/main.js` | OAuth ticket exchange, load and upload save, sign-out and guest separation |
 | `web/leaderboard.js`, `web/story/story.css` | Shared scores and transparent museum board |
 | `web/leaderboard-config.js` | Uses `/api` on Vercel; keeps GitHub Pages guest-only |

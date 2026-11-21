@@ -111,16 +111,22 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 }
 
 /* During play the museum fills the screen; all actions live behind one gear. */
-/* GitHub entry: one real sign-in choice over the museum illustration. */
-.entry-github-panel{position:absolute;z-index:2;left:50%;top:52%;transform:translate(-50%,-50%);width:min(470px,82%);padding:28px 32px;text-align:center;background:rgba(12,31,39,.84);border:2px solid #cba564;border-radius:14px;box-shadow:0 18px 65px #000b;backdrop-filter:blur(12px);color:#f8e9c9}
-.entry-github-panel h2{font:700 clamp(1.5rem,2.5vw,2.2rem) Fraunces,Georgia,serif;margin:0 0 10px}
-.entry-github-panel p{line-height:1.45;margin:0 0 18px}
-.entry-github-panel button{display:block;width:100%;margin:10px 0;padding:13px 16px;border:2px solid #cba564;border-radius:9px;background:#203941;color:#f8e9c9;font:700 1.15rem Fraunces,Georgia,serif;cursor:pointer}
-.entry-github-panel button:hover,.entry-github-panel button:focus-visible{background:#38545b;box-shadow:0 0 20px #d2aa6566}
-.entry-github-panel #entry-guest{background:rgba(8,22,29,.6);font-size:1rem}
-.entry-github-panel #entry-message{min-height:1.4em;color:#f4c789;font-size:.86rem;margin:8px 0}
-.entry-github-panel small{color:#d5c5a6}
-@media(max-width:720px){.entry-github-panel{width:min(440px,90%);top:55%;padding:22px}}
+/* The artwork has no embedded form. GitHub and guest actions remain real HTML buttons. */
+.entry-brand{position:absolute;z-index:2;top:7%;left:50%;transform:translateX(-50%);width:min(66%,700px);padding:10px 18px 13px;text-align:center;border:2px solid #c7a267;border-radius:12px;background:linear-gradient(130deg,#203338f2,#0e2128f0);box-shadow:0 8px 26px #000a,inset 0 0 0 2px #665336;color:#f6e5c1}
+.entry-brand span{display:block;margin-bottom:3px;color:#d9b97d;font:700 clamp(.62rem,1.15vw,.84rem) 'DM Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.entry-brand h1{font-size:clamp(1.6rem,3.2vw,2.8rem);line-height:1.1;text-shadow:0 2px 4px #0009}
+.entry-github-panel{position:absolute;z-index:2;left:50%;top:53%;transform:translate(-50%,-50%);width:min(510px,82%);padding:28px 32px 24px;text-align:center;background:radial-gradient(circle at 50% 0%,#2b4142f2,#0f242bf5 78%);border:3px double #d9b36f;border-radius:18px;box-shadow:0 24px 70px #000c,inset 0 0 0 4px #263b3b,inset 0 0 0 7px #96794c;color:#f8e9c9}
+.entry-github-panel:before{content:'✦';display:block;margin-bottom:3px;color:#d9b36f;font-size:1.3rem;line-height:1}
+.entry-github-panel h2{font:700 clamp(1.6rem,2.5vw,2.3rem) Fraunces,Georgia,serif;margin:0 0 12px}
+.entry-github-panel p{max-width:400px;margin:0 auto 18px;line-height:1.45}
+.entry-github-panel button{display:block;width:100%;min-height:60px;margin:10px 0;padding:11px 16px;border:3px double #d9b676;border-radius:11px;background:linear-gradient(#3b5654,#1b3033);box-shadow:inset 0 0 0 2px #1c2e30,0 4px 9px #0008;color:#f8e9c9;font:700 clamp(1rem,1.6vw,1.3rem) Fraunces,Georgia,serif;cursor:pointer}
+.entry-github-panel #entry-github{background:linear-gradient(#74603d,#3a3c32);border-color:#f0cf89}
+.entry-github-panel button:hover,.entry-github-panel button:focus-visible{filter:brightness(1.18);outline:2px solid #ffe4a3;outline-offset:2px}
+.entry-github-panel #entry-guest{min-height:50px;background:#142a2dcc;font-size:1rem}
+.entry-github-panel #entry-message{color:#f4c789;font-size:.86rem;margin:10px auto}
+.entry-github-panel #entry-message:empty{display:none}
+.entry-github-panel small{display:block;margin-top:10px;color:#d5c5a6}
+@media(max-width:720px){.entry-brand{top:3%;width:88%}.entry-brand h1{font-size:clamp(1.3rem,6vw,2rem)}.entry-github-panel{width:min(440px,88%);top:57%;padding:20px 22px}.entry-github-panel button{min-height:52px}}
 .home-sync-status{position:absolute;z-index:1;top:10%;right:3%;margin:0;padding:5px 10px;border:1px solid #cba564;border-radius:8px;background:#0d252ccc;color:#e8d8b8;font-size:.75rem}
 .game-menu-toggle[hidden],.game-menu[hidden]{display:none}
 .game-menu-toggle{position:fixed;z-index:12;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:grid;place-items:center;width:54px;height:54px;padding:0;border:2px solid #d6ae68;border-radius:12px;background:#14252be8;color:#f5d99b;box-shadow:0 4px 18px #0009,inset 0 0 0 2px #705a37;font-size:2rem;line-height:1}

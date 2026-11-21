@@ -52,7 +52,7 @@ GitHub Actions runs the same command for every pull request and after every merg
 
 | Path | Purpose |
 |---|---|
-| `web/index.html`, `web/style.css`, `web/assets/investigation-journal-*.webp` | Page, home screen, menu and compact illustrated journal |
+| `web/index.html`, `web/style.css`, `web/assets/github-login-background.png`, `web/assets/investigation-journal-*.webp` | Page, illustrated GitHub entry, home screen, menu and compact journal |
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
 | `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
