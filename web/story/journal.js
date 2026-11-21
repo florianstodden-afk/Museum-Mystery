@@ -4,7 +4,8 @@ import { nextStep } from './engine.js';
 import { totalScore, maximumScore } from './scoring.js';
 import { el } from './dom.js';
 
-// Which evidence points to Voss, in the fixed station order. Used by journal, accusation and endings.
+// The evidence in the fixed station order. `pointsToVoss` names Voss, so it is shown only after
+// the right accusation (chain of evidence) or on the end screen – never in the journal before that.
 export function evidenceChain(state) {
   return CASE.stations.map(station => ({
     id: station.evidenceId,

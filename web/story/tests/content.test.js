@@ -76,7 +76,8 @@ test('journal renders slots, evidence and notes', () => {
   const container = createContainer();
   renderJournal(container, journalModel(s));
   const text = container.textContent;
-  assert.match(text, /Ordered by: A\. Voss/);
+  assert.match(text, /Frame label: “Ordered by: A\. V\.”/);
+  assert.doesNotMatch(text, /Voss/);
   assert.match(text, /Shift schedule/);
   const slots = findAll(container, node => node.tagName === 'LI' && node.className.startsWith('story-slot'));
   assert.deepEqual(slots.map(slot => slot.textContent.charAt(0)), ['?', '?', '?', 'S']);

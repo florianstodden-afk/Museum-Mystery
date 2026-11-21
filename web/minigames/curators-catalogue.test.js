@@ -210,7 +210,8 @@ test('completion reports once, displays the O clue, and freezes reward', async t
   document.pressKey('Enter'); time = 46000;
   for (let id = 0; id < 4; id++) { card(p.root, id).click(); slots(p.root)[id].click(); }
   assert.equal(p.awards.length, 1);
-  assert.match(p.root.textContent, /Voss approved the false wall label/);
+  assert.match(p.root.textContent, /The false wall label was approved by a patron – not by museum staff\./);
+  assert.doesNotMatch(p.root.textContent, /Voss/);
   assert.match(p.root.textContent, /Oadded to journal/);
   assert.match(p.root.textContent, /\+10 points earned/);
   slots(p.root)[0].click(); time = 999999;

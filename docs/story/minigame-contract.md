@@ -104,7 +104,7 @@ A second call of `onSolved` is ignored.
 |---|---|---|---|---|
 | Portrait Hall | `portraits` | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | 436121, 12127, 435876 (**done:** `web/minigames/portrait-timeline.js`) |
 | Gallery, left painting | `restoration` | L | Hidden mark “V” on the fake transport slip. | 435882 |
-| Gallery, frame rack | `archive` | D | Frame label: “Ordered by: A. Voss”. | 435882 (since 15.11.2026; before that 436121, which Station I now uses) |
+| Gallery, frame rack | `archive` | D | Frame label: “Ordered by: A. V.” | 435882 (since 15.11.2026; before that 436121, which Station I now uses) |
 
 Station I (Portrait Hall) fulfils this contract as the second example after Station B: three files (`portrait-rules.js` pure rules, `portrait-artwork.js` Met API with checks and offline copy, `portrait-timeline.js` interface) plus `portrait-timeline.test.js`. The right order comes from the frozen fields `objectBeginDate`/`objectEndDate` in `case-1.js`, never from live data.
 

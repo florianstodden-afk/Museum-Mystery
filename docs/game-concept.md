@@ -29,8 +29,10 @@ Nobody can get stuck for good.
 |---|---|---|---|
 | 1 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
 | 2 | Gallery, left painting | L | Hidden mark “V” on the fake transport slip. |
-| 3 | Gallery, middle painting | O | Voss approved the false wall label. |
-| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. Voss”. |
+| 3 | Gallery, middle painting | O | The false wall label was approved by a patron – not by museum staff. |
+| 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. V.” |
+
+No station names Voss. Only together do the pieces fit one person: a **patron** (stations 1 and 3) with the initials **A. V.** (stations 2 and 4) – Adrien Voss. Dr. Vale also has a “V”, but she is staff, not a patron.
 
 ## Points (max. 100, no time scoring)
 

@@ -6,10 +6,12 @@ All texts in `web/story/` were proofread (mission, stations, notes, dialogues, f
 
 | Letter | Evidence | Points to Voss because … | Enough on its own? |
 |---|---|---|---|
-| B | Voss approved the false wall label. | names him directly as the one who approved the false label. | Yes, but only “approved” – could be a mistake. |
+| B | The false wall label was approved by a patron – not by museum staff. | rules out the staff (Leon, Vale); points to a patron. | No, needs the suspect list (only Voss is a patron). |
 | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. | clears Leon; “patron visit” leads to the patron (Voss). | No, needs the knowledge “Voss = patron” (listed with the suspects). |
 | L | Hidden mark “V” on the fake transport slip. | “V” fits **V**oss – but also **V**ale. A deliberate false trail. | No. |
-| D | Frame label: “Ordered by: A. Voss”. | resolves the “V” clearly. | Yes, together with L. |
+| D | Frame label: “Ordered by: A. V.” | resolves the “V”: Vale’s initials are M. V. | Only together with B or I (patron) and the suspect list. |
+
+*Update 21.11.2026:* B and D no longer name Voss, so the final question stays a puzzle. The solution is still unique: Adrien Voss is the only patron with the initials A. V. A test (`web/story/tests/no-spoiler.test.js`) checks that no text before the accusation names Voss.
 
 **Result:** The chain is consistent. Only all four together rule out Leon (I) and Vale (D explains L). This fits the concept “four stations, one result”.
 

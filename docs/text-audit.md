@@ -39,6 +39,8 @@ All visible game texts (English) with word count, collected on 17 Nov 2026 with 
 
 The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name Voss in the journal as soon as a station is solved. That gives the answer away before the final question. Changing it touches the accusation and its tests, so the team should decide: keep it (the chain is the deduction) or name Voss only after the accusation.
 
+**Decided 21.11.2026:** the evidence no longer names Voss (“approved by a patron – not by museum staff”, “Ordered by: A. V.”). `pointsToVoss` still names him, but is shown only after the right accusation. There is one accusation only, and M’s message no longer says “before sunrise”.
+
 ## Full list
 
 | File | Text | Words |
