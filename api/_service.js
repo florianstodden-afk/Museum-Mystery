@@ -11,9 +11,10 @@ const redirect = url => new Response(null, { status: 302, headers: { Location: u
 export function ranked(rows) {
   let last = null, rank = 0;
   return rows.map(row => {
-    if (row.points !== last) rank++;
-    last = row.points;
-    return { rank, playerId: row.player_id, name: row.display_name, points: row.points, max: row.max_points, ending: row.ending };
+    const timeMs = row.total_time_ms == null ? null : Number(row.total_time_ms);
+    if (!last || row.points !== last.points || timeMs !== last.timeMs) rank++;
+    last = {points:row.points,timeMs};
+    return { rank, playerId: row.player_id, name: row.display_name, points: row.points, max: row.max_points, ending: row.ending, totalTimeMs:timeMs };
   });
 }
 
@@ -95,6 +96,12 @@ async function exchange(request, env, origin) {
   return reply({ token: sessionToken, user: { id: ticket.github_id, login: ticket.login } }, 200, origin);
 }
 
+// Only complete minigame timings are comparable; historic/incomplete runs stay unranked by time.
+export function totalMinigameTime(board) {
+  if (board.stations.length !== 4 || !board.stations.every(row => row.solved && Number.isFinite(row.timeMs) && row.timeMs >= 0)) return null;
+  return Math.floor(board.stations.reduce((sum,row)=>sum+row.timeMs,0)/1000)*1000;
+}
+
 async function publish(env, user, origin) {
   const row = await env.DB.prepare('SELECT snapshot FROM saves WHERE github_id = ?').bind(user.github_id).first();
   if (!row) return reply({ error: 'Save a finished run first.' }, 409, origin);
@@ -103,10 +110,12 @@ async function publish(env, user, origin) {
   const state = synchronizeScore(deserialize(snapshot.story.story), snapshot.story.progress);
   const board = scoreboard(state, snapshot.story.progress);
   if (!board.finished || board.ending === 'lost' || board.max !== 80) return reply({ error: 'Finish a winning current run first.' }, 409, origin);
-  await env.DB.prepare(`INSERT INTO leaderboard (player_id, display_name, points, max_points, ending) VALUES (?, ?, ?, 80, ?)
+  await env.DB.prepare(`INSERT INTO leaderboard (player_id, display_name, points, max_points, ending, total_time_ms) VALUES (?, ?, ?, 80, ?, ?)
     ON CONFLICT(player_id) DO UPDATE SET display_name=excluded.display_name, points=excluded.points,
-    ending=excluded.ending, created_at=CURRENT_TIMESTAMP WHERE excluded.points > leaderboard.points`)
-    .bind(`github:${user.github_id}`, user.login, board.points, board.ending).run();
+    ending=excluded.ending, total_time_ms=excluded.total_time_ms, created_at=CURRENT_TIMESTAMP
+    WHERE excluded.points > leaderboard.points OR (excluded.points = leaderboard.points
+      AND excluded.total_time_ms IS NOT NULL AND (leaderboard.total_time_ms IS NULL OR excluded.total_time_ms < leaderboard.total_time_ms))`)
+    .bind(`github:${user.github_id}`, user.login, board.points, board.ending, totalMinigameTime(board)).run();
   return reply({ ok: true, points: board.points }, 200, origin);
 }
 
@@ -125,7 +134,7 @@ export default { async fetch(request, env, route = null) {
     const user = await identity(request, env);
     if (!user) return reply({ error: 'Sign in with GitHub first.' }, 401, origin);
     if (path === '/runs' && method === 'GET') {
-      const rows = await env.DB.prepare("SELECT player_id, display_name, points, max_points, ending FROM leaderboard WHERE player_id LIKE 'github:%' ORDER BY points DESC, created_at ASC, player_id ASC LIMIT 25").all();
+      const rows = await env.DB.prepare("SELECT player_id, display_name, points, max_points, ending, total_time_ms FROM leaderboard WHERE player_id LIKE 'github:%' ORDER BY points DESC, total_time_ms ASC NULLS LAST, created_at ASC, player_id ASC LIMIT 25").all();
       return reply({ entries: ranked(rows.results || []) }, 200, origin);
     }
     if (path === '/auth/me' && method === 'GET') return reply({ user: { id: user.github_id, login: user.login } }, 200, origin);

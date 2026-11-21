@@ -16,7 +16,7 @@ import { journalModel, renderJournal } from './story/journal.js?v=journal-blank-
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
-import { canPublish, loadLeaderboard, publishRun, renderLeaderboard } from './leaderboard.js';
+import { canPublish, loadLeaderboard, publishRun, renderLeaderboard } from './leaderboard.js?v=run-time-1';
 import { LEADERBOARD_URL } from './leaderboard-config.js';
 import { createCloudSync, initialSession, loginUrl, signOut } from './github-auth.js';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';

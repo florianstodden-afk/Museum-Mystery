@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import service, { ranked, validSave } from '../api/_service.js';
+import service, { ranked, validSave, totalMinigameTime } from '../api/_service.js';
 import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../web/story/engine.js';
 import { STATION_IDS } from '../web/story/case-1.js';
 
@@ -54,7 +54,7 @@ function wonSave() {
   return { story: { story: JSON.stringify(state), progress: {} }, walk: { player: { x: 12, y: 7 } } };
 }
 
-test('ranking shares places on equal points, without a time tiebreak', () => {
+test('legacy ranking shares places when time was not recorded', () => {
   assert.deepEqual(ranked([80,70,70,50].map((points,i) => ({ player_id: String(i), display_name: 'x', points, max_points: 80, ending: 'heist' }))).map(x => x.rank), [1,2,2,3]);
 });
 
@@ -95,4 +95,22 @@ test('GitHub identity gates cloud saves and ranking submissions', async () => {
     assert.equal((await service.fetch(request('/auth/logout', 'POST', token), config)).status, 200);
     assert.equal((await service.fetch(request('/save', 'GET', token), config)).status, 401);
   } finally { globalThis.fetch = originalFetch; }
+});
+
+
+test('ranking breaks equal scores by total time and preserves unknown old times', () => {
+  const rows=[[80,60000],[80,60000],[80,90000],[80,null],[70,10000]].map(([points,total_time_ms],i)=>({player_id:String(i),display_name:'x',points,max_points:80,ending:'heist',total_time_ms}));
+  const result=ranked(rows);
+  assert.deepEqual(result.map(x=>x.rank),[1,1,2,3,4]);
+  assert.deepEqual(result.map(x=>x.totalTimeMs),[60000,60000,90000,null,10000]);
+});
+
+
+test('tiebreak time sums all four minigames and excludes incomplete or historic timings', () => {
+  const board={stations:[1000,2200,3300,4500].map(timeMs=>({solved:true,timeMs}))};
+  assert.equal(totalMinigameTime(board),11000);
+  board.stations[1].timeMs=null;
+  assert.equal(totalMinigameTime(board),null);
+  board.stations[1]={solved:false,timeMs:2000};
+  assert.equal(totalMinigameTime(board),null);
 });

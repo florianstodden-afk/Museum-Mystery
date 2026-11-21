@@ -1,4 +1,5 @@
 import { api } from './github-auth.js';
+import { formatClock } from './story/scoring.js';
 
 export function canPublish(board) {
   return board.finished && board.ending !== 'lost' && board.max === 80
@@ -16,7 +17,7 @@ export function renderLeaderboard(container, entries, ownId) {
   table.className = 'leaderboard-table';
   const caption = document.createElement('caption'); caption.textContent = 'Shared results'; table.append(caption);
   const head = document.createElement('thead'), header = document.createElement('tr');
-  for (const title of ['Place', 'Player', 'Points', 'Ending']) {
+  for (const title of ['Place', 'Player', 'Points', 'Minigame time', 'Ending']) {
     const cell = document.createElement('th'); cell.scope = 'col'; cell.textContent = title; header.append(cell);
   }
   head.append(header); table.append(head);
@@ -24,7 +25,7 @@ export function renderLeaderboard(container, entries, ownId) {
   for (const entry of entries) {
     const row = document.createElement('tr');
     if (entry.playerId === ownId) row.className = 'is-own-run';
-    for (const value of [entry.rank, entry.name, `${entry.points} / ${entry.max}`, entry.ending === 'heist' ? 'Thief' : 'Not a thief']) {
+    for (const value of [entry.rank, entry.name, `${entry.points} / ${entry.max}`, entry.totalTimeMs == null ? '–' : formatClock(entry.totalTimeMs), entry.ending === 'heist' ? 'Thief' : 'Not a thief']) {
       const cell = document.createElement('td'); cell.textContent = String(value); row.append(cell);
     }
     body.append(row);
