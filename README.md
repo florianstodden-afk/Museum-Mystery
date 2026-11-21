@@ -4,7 +4,7 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** The Vercel address shown in the project dashboard is the online version after setup. The [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) remains guest-only.
+**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) will be the online version after the first successful production deployment and account setup. The [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) remains guest-only.
 
 ## Team
 
