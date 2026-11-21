@@ -42,12 +42,11 @@ test('mistakes, hints and wrong answers are deducted correctly', () => {
   const s = play({
     results: { landscape: { mistakes: 1, hints: 1 }, portraits: { mistakes: 9, hints: 0 } },
     wrongWords: 1,
-    wrongSuspects: ['leon'],
   });
-  // 15 + 5 + 15 + 15 + safe 5 + question 5 = 60; B has no count deductions
-  assert.equal(totalScore(s), 60);
+  // 15 + 5 + 15 + 15 + safe 5 + question 10 = 65; B has no count deductions
+  assert.equal(totalScore(s), 65);
   const rows = scoreBreakdown(s);
-  assert.deepEqual(rows.map(row => row.points), [15, 5, 15, 15, 5, 5]);
+  assert.deepEqual(rows.map(row => row.points), [15, 5, 15, 15, 5, 10]);
   assert.equal(rows.reduce((sum, row) => sum + row.max, 0), 80);
 });
 

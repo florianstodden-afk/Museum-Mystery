@@ -1,5 +1,5 @@
 // The two endings: data model, the choice before it, and the closing screen.
-import { CASE, workById } from './case-1.js';
+import { CASE, workById, suspectById } from './case-1.js';
 import { evidenceChain } from './journal.js';
 import { renderChain } from './accusation-ui.js';
 import { scoreBreakdown, totalScore, maximumScore, scoreboard, formatClock } from './scoring.js';
@@ -18,11 +18,10 @@ export const ENDINGS = {
     ],
   },
   lost: {
-    kicker: 'BEFORE SUNRISE',
+    kicker: 'THE WRONG NAME',
     title: 'Case lost',
-    paragraphs: [
-      'You named the wrong person three times. By sunrise, Voss and the original are gone. The museum will never know who planned it.',
-    ],
+    // Filled in by lostParagraphs(), because the text names the person the player accused.
+    paragraphs: [],
   },
   'open-file': {
     kicker: 'QUIT THE MISSION',
@@ -39,8 +38,19 @@ const PAINTING = workById(436535);
 const DETAIL_INTRO = {
   heist: 'You keep the original. The forgery remains in the Gallery.',
   'open-file': 'Dr. Vale keeps the original safe. The evidence reveals Voss’s plan to the museum.',
-  lost: 'Three wrong names. The evidence you found is listed below.',
+  lost: 'One wrong name. The evidence you found is listed below.',
 };
+
+/** The story after a wrong accusation (≤ 45 words), then who it really was and why the accused is innocent (≤ 30 words). */
+export function lostParagraphs(state) {
+  const accused = suspectById(state.accusation.accused);
+  const culprit = suspectById(CASE.culpritId);
+  const name = accused?.name ?? 'the wrong person';
+  return [
+    `You named ${name}. By morning the word had reached ${culprit.name}. He left the city before anyone asked a question – and the case left with him.`,
+    `It was ${culprit.name}, the ${culprit.role.toLowerCase()}. ${accused?.counterText ?? ''}`.trim(),
+  ];
+}
 
 // Everything the end screen needs, or null while the game has no ending.
 // `progress` (optional) is the saved station progress; it adds the Renoir time to the run time.
@@ -53,7 +63,8 @@ export function endingModel(state, progress = {}) {
     timeMs: scoreboard(state, progress).timeMs,
     kicker: ending.kicker,
     title: ending.title,
-    paragraphs: ending.paragraphs,
+    paragraphs: state.ending === 'lost' ? lostParagraphs(state).slice(0, 1) : ending.paragraphs,
+    truth: state.ending === 'lost' ? lostParagraphs(state)[1] : null,   // who it really was (lost only)
     image: {
       src: new URL('../assets/met-436535.jpg', import.meta.url).href,
       alt: `${PAINTING.shortTitle}, ${PAINTING.artist}, ${PAINTING.date}`,
@@ -121,6 +132,7 @@ export function renderEnding(container, model, options = {}) {
       el('p', { className: 'story-eyebrow', text: model.kicker }),
       el('h2', { className: 'story-ending-title', text: model.title }),
       ...model.paragraphs.map(text => el('p', { className: 'story-text', text })),
+      model.truth ? el('p', { className: 'story-ending-truth', text: model.truth }) : null,
     ]),
     el('div', { className: 'story-ending-bottom' }, [
       figure,

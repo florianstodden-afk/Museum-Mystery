@@ -27,7 +27,7 @@ export function stationPlace(station) {
   return station.spot ? `${station.room}, ${station.spot}` : station.room;
 }
 
-export const CASE_VERSION = 2;   // 2: code word OILS (was BILD); older saves start fresh
+export const CASE_VERSION = 3;   // 3: one accusation only (2: code word OILS); older saves start fresh
 
 // The order of this list is the order of the code word (O-I-L-S). Players never see it:
 // journal, signs and scoreboard use the station `number` instead.
@@ -118,6 +118,7 @@ export const CASE = deepFreeze({
     {
       id: 'leon',
       name: 'Leon',
+      pronoun: 'him',
       role: 'Night guard',
       description: 'Saw a transport cart at the delivery exit, but not the painting. Nervous since the alarm.',
       // Which evidence speaks against this suspect being the planner:
@@ -127,6 +128,7 @@ export const CASE = deepFreeze({
     {
       id: 'vale',
       name: 'Dr. Mara Vale',
+      pronoun: 'her',
       role: 'Curator',
       description: 'Locked the original in the safe and left four clues. Her initial is also a “V”.',
       counterEvidenceId: 'frame-label',
@@ -135,6 +137,7 @@ export const CASE = deepFreeze({
     {
       id: 'voss',
       name: 'Adrien Voss',
+      pronoun: 'him',
       role: 'Patron',
       description: 'Generous donor of the museum. Signs his messages with a single letter.',
       counterEvidenceId: null,

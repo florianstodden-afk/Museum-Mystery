@@ -25,8 +25,8 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - Move with **WASD** or the **arrow keys**. Press **E** next to a marked object or a person.
 - Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. Rearrange the four letters to open the vault.
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
-- In the vault, answer the final question: who planned it all? You have three tries. Up to 80 points (older completed saves retain their original rewards).
-- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. Three wrong names end the night with **Case lost**. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
+- In the vault, answer the final question: who planned it all? You have **one accusation**: pick a name, confirm it, and it counts. Up to 80 points (older completed saves retain their original rewards).
+- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** shows your current run and the ten best finished runs (Won or Lost) of all local profiles and guests in this browser. Scoreboard is local to this browser; an online version is prepared in `server/leaderboard` but not deployed ([details](docs/leaderboard.md)). Lost runs never count as a best run.
 

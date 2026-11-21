@@ -1,41 +1,89 @@
-// The final question with three answers. After an answer it shows the chain of evidence.
-// renderAccusation(container, { state, message }, onAccuse) – onAccuse(suspectId) on click.
-import { CASE } from './case-1.js';
+// The final question with three answers. After the right answer it shows the chain of evidence.
+// renderAccusation(container, { state, message }, onAccuse) – onAccuse(suspectId) only after
+// the player confirmed the name: there is exactly one accusation, so a click alone never counts.
+import { CASE, suspectById } from './case-1.js';
 import { evidenceChain } from './journal.js';
-import { accusationsLeft } from './engine.js';
 import { el, button } from './dom.js';
 
+/** The short question before the one and only accusation (≤ 20 words). */
+export function confirmText(suspect) {
+  return `Name ${suspect.name}? You get one chance – once you speak, M will hear of it.`;
+}
+
+export function confirmLabel(suspect) {
+  return `Name ${suspect.pronoun ?? 'them'}`;
+}
+
 export function renderAccusation(container, { state, message = '' }, onAccuse) {
-  const parts = [
-    el('p', { className: 'story-eyebrow', text: 'THE FINAL QUESTION' }),
-    el('h3', { className: 'story-title', text: CASE.accusationQuestion }),
-  ];
+  let pendingKey = null;   // the keydown listener while the confirmation is open
+  let focusTarget = null;
 
-  if (!state.accusation.solved && state.ending === null) {
-    const choices = el('div', { className: 'story-choices' });
-    for (const suspect of CASE.suspects) {
-      const choice = button('', () => onAccuse(suspect.id), 'story-choice');
-      choice.append(
-        el('strong', { text: suspect.name }),
-        el('span', { className: 'story-choice-role', text: suspect.role }),
-        el('span', { className: 'story-choice-text', text: suspect.description }),
-      );
-      choices.append(choice);
-    }
-    parts.push(choices);
-    if (state.ending === null) {
-      const left = accusationsLeft(state);
-      parts.push(el('p', { className: 'story-attempts', text: `Attempts left: ${left}` }));
-    }
+  function stopKeys() {
+    if (pendingKey) document.removeEventListener('keydown', pendingKey, true);
+    pendingKey = null;
   }
 
-  parts.push(el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } }));
+  function draw(pendingId = null) {
+    stopKeys();
+    const parts = [
+      el('p', { className: 'story-eyebrow', text: 'THE FINAL QUESTION' }),
+      el('h3', { className: 'story-title', text: CASE.accusationQuestion }),
+    ];
+    const open = !state.accusation.solved && state.ending === null;
+    const pending = open && pendingId ? suspectById(pendingId) : null;
 
-  // The chain appears only after the right answer – earlier it would give the answer away.
-  if (state.accusation.solved) {
-    parts.push(renderChain(evidenceChain(state)));
+    if (pending) {
+      parts.push(renderConfirm(pending));
+    } else if (open) {
+      const choices = el('div', { className: 'story-choices' });
+      for (const suspect of CASE.suspects) {
+        const choice = button('', () => draw(suspect.id), 'story-choice');
+        choice.append(
+          el('strong', { text: suspect.name }),
+          el('span', { className: 'story-choice-role', text: suspect.role }),
+          el('span', { className: 'story-choice-text', text: suspect.description }),
+        );
+        choices.append(choice);
+      }
+      parts.push(choices);
+    }
+
+    parts.push(el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } }));
+
+    // The chain appears only after the right answer – earlier it would give the answer away.
+    if (state.accusation.solved) {
+      parts.push(renderChain(evidenceChain(state)));
+    }
+    container.replaceChildren(el('section', { className: 'story-accusation' }, parts));
+    if (pending) focusTarget?.focus();
   }
-  container.replaceChildren(el('section', { className: 'story-accusation' }, parts));
+
+  function renderConfirm(suspect) {
+    const confirm = () => { stopKeys(); onAccuse(suspect.id); };
+    const cancel = () => draw(null);
+    const yes = button('', confirm, 'story-button story-confirm-yes');
+    focusTarget = yes;
+    yes.append(confirmLabel(suspect), ' ', el('kbd', { text: '↵' }));
+    const no = button('', cancel, 'story-button story-confirm-no');
+    no.append('Not yet ', el('kbd', { text: 'Esc' }));
+    const box = el('div', { className: 'story-confirm', attrs: { role: 'alertdialog', 'aria-label': `Name ${suspect.name}?` } }, [
+      el('p', { className: 'story-text', text: confirmText(suspect) }),
+      el('div', { className: 'story-confirm-actions' }, [yes, no]),
+    ]);
+    // Capture phase, so Escape goes back to the list instead of closing the whole panel.
+    pendingKey = event => {
+      if (box.isConnected === false) { stopKeys(); return; }
+      if (event.key !== 'Escape' && event.key !== 'Enter') return;
+      event.preventDefault();
+      event.stopPropagation?.();
+      event.stopImmediatePropagation?.();
+      if (event.key === 'Enter') confirm(); else cancel();
+    };
+    document.addEventListener('keydown', pendingKey, true);
+    return box;
+  }
+
+  draw(null);
 }
 
 export function renderChain(chain) {

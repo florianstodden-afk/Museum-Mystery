@@ -28,7 +28,7 @@ The game’s story as independent, tested building blocks. They do **not** depen
 | `web/story/dialogues.js` | `dialogueFor(characterId, state)` and `renderDialogue`. |
 | `web/story/journal.js` | `journalModel`, `renderJournal`, `evidenceChain`. |
 | `web/story/safe-ui.js` | Code word input for the safe. |
-| `web/story/accusation-ui.js` | Final question with three answers and the chain of evidence. |
+| `web/story/accusation-ui.js` | Final question with three answers, the one-chance confirmation and the chain of evidence. |
 | `web/story/endings.js` | Decision and closing screen of both endings with a points breakdown. |
 | `web/story/story.css` | Style of all building blocks (only classes with the prefix `story-`). |
 | `web/story/security-office/security-office.js` | **Prototype:** draws a security office in code. Not used in the game, only in the preview (see [security-office.md](security-office.md)). |
@@ -70,7 +70,7 @@ Then open in the browser:
 4. Landscape Gallery: the real Station 1. Once wrong (1881 + Oil), then right (1889 + Oil).
 5. Solve the picture puzzle L; I and D still use placeholders. The journal shows B‑I‑L‑D in fixed places.
 6. Safe: two wrong words (e.g. `SLIO`, `LIOS`), then “💡 Hint” (now names the letters), then `oils`.
-7. “Look at the documents”: first choose Leon or Dr. Vale (feedback on which evidence speaks against it), then Adrien Voss.
+7. “Look at the documents”: choose Leon or Dr. Vale, press “Not yet” in the confirmation (nothing counts), then name Adrien Voss and confirm. (Confirming Leon or Dr. Vale ends the case with “Case lost”.)
 8. Choose an ending, look at the points, “New game” → confirm, play the second ending.
 
 The preview’s save lives in `localStorage` under `museum-nocturne-story-preview-v1` (separate from the main game).

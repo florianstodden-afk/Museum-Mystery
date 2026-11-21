@@ -102,10 +102,10 @@ test('ending model gives the right breakdown for both endings', () => {
   assert.match(heist.image.src, /assets\/met-436535\.jpg$/);
   assert.match(heist.disclaimer, /Fictional museum and characters/);
 
-  const openFile = endingModel(finished('open-file', { wrongSuspect: 'vale' }));
+  const openFile = endingModel(finished('open-file'));
   assert.equal(openFile.title, 'I am not a thief');
   assert.match(openFile.paragraphs.join(' '), /evidence exposes Voss/);
-  assert.equal(openFile.total, 75);
+  assert.equal(openFile.total, 80);
   assert.equal(openFile.chain.every(link => link.found), true);
 });
 
@@ -153,6 +153,9 @@ test('accusation UI offers three suspects and reports the choice', () => {
   const choices = findAll(container, node => node.tagName === 'BUTTON');
   assert.equal(choices.length, 3);
   findButton(container, 'Adrien Voss').click();
+  assert.equal(chosen, undefined, 'a click alone is not yet an accusation');
+  assert.match(container.textContent, /Name Adrien Voss\? You get one chance/);
+  findButton(container, 'Name him').click();
   assert.equal(chosen, 'voss');
 });
 
@@ -164,14 +167,15 @@ test('dialogue renders every line', () => {
   assert.equal(findAll(container, node => node.className === 'story-dialogue-line').length, 2);
 });
 
-test('the chain of evidence stays hidden after a wrong answer', () => {
+test('the chain of evidence stays hidden until the right answer', () => {
   installFakeDom();
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
   s = tryOpenSafe(s, 'OILS').state;
-  s = accuse(s, 'leon').state;
   const container = createContainer();
-  renderAccusation(container, { state: s, message: 'Not Leon.' }, () => {});
+  renderAccusation(container, { state: s }, () => {});
+  assert.doesNotMatch(container.textContent, /CHAIN OF EVIDENCE/);
+  renderAccusation(container, { state: accuse(s, 'leon').state, message: 'Not Leon.' }, () => {});
   assert.doesNotMatch(container.textContent, /CHAIN OF EVIDENCE/);
   renderAccusation(container, { state: accuse(s, 'voss').state }, () => {});
   assert.match(container.textContent, /CHAIN OF EVIDENCE/);
@@ -231,10 +235,12 @@ test('journal reveals "Who was M?" only after the right accusation', () => {
   let s = started();
   for (const id of ALL) s = solveStation(s, id, {}).state;
   s = tryOpenSafe(s, 'OILS').state;
-  s = accuse(s, 'vale').state;
   const before = createContainer();
   renderJournal(before, journalModel(s));
   assert.doesNotMatch(before.textContent, /Who was M|mécène/);
+  const lostJournal = createContainer();
+  renderJournal(lostJournal, journalModel(accuse(s, 'vale').state));
+  assert.doesNotMatch(lostJournal.textContent, /Who was M|mécène/);
   s = accuse(s, 'voss').state;
   const after = createContainer();
   renderJournal(after, journalModel(s));
@@ -251,6 +257,7 @@ test('the choice explains why stealing is still possible, and every ending text 
   assert.match(box.textContent, /used you as his thief/);
   assert.ok(CHOICE_TEXT.split(/\s+/).length <= 45);
   for (const ending of Object.values(ENDINGS)) assert.ok(ending.paragraphs.join(' ').split(/\s+/).length <= 40, ending.title);
+  assert.deepEqual(ENDINGS.lost.paragraphs, [], 'the lost text is built per run (see case-lost.test.js)');
   assert.match(ENDINGS['open-file'].paragraphs[0], /Vale/);
 });
 
