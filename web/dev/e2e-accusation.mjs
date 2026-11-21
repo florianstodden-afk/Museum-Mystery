@@ -140,7 +140,7 @@ async function startAt(page, story, player = { x: 22, y: 5 }) {
     localStorage.setItem('${WALK_KEY}', ${JSON.stringify(JSON.stringify({ player, steps: 0, doorOpen: story.safe.open }))});
     sessionStorage.clear();`);
   await page.goto(`${base}/`);
-  await page.click('Continue as guest');
+  await page.click('Play as guest');
   await page.click('Resume Game');
   await wait(300);
 }
