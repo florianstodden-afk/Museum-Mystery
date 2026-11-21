@@ -112,7 +112,7 @@ test('goodbye says one line and the next key closes the box', () => {
   const { box, parts, log } = setup({ reduced: true });
   box.show(conversation);
   box.handleKey(key('3'));
-  assert.equal(parts().text, 'Mind the cameras.');
+  assert.equal(parts().text, 'Gloves on before you touch anything.');
   assert.equal(box.isOpen, true);
   box.handleKey(key(' '));
   assert.equal(box.isOpen, false);

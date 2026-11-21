@@ -47,20 +47,21 @@ function linesForLeon(state) {
   }
   if (state.stations.portraits.solved) {
     return talk([
-      'The log proves it, doesn’t it? I was on the east stairs at 21:14.',
-      'Someone booked that cart as a “patron visit”. Not me – guards cannot book anything.',
+      'East stairs at 21:14 – signed in the log. I couldn’t have moved that cart.',
+      'And it was booked as a ‘patron visit’. Guards can’t book visits.',
     ]);
   }
-  const lines = [
-    'I know how it looks. I was on duty, and a painting is missing.',
-    'At 21:14 I saw a transport cart at the delivery exit. I never saw what was inside.',
-  ];
-  if (!state.notes.includes('transport-cart')) {
-    lines.push('If you don’t believe me, look at the monitor wall in the security office.');
-  } else {
-    lines.push('The night-shift log is in the Portrait Hall. It will show where I really was.');
+  if (state.notes.includes('transport-cart')) {
+    return talk([
+      'I know – the guard always looks guilty first.',
+      'The night-shift log hangs in the Portrait Hall. It shows where I was at 21:14.',
+    ]);
   }
-  return talk(lines);
+  return talk([
+    'At 21:14 a covered transport cart left the delivery exit.',
+    'Nobody told me about a delivery. I couldn’t see what was on it.',
+    'The monitors in the security office recorded it.',
+  ]);
 }
 
 function linesForImani(state) {
@@ -160,7 +161,7 @@ function leonConversation(state) {
       { id: 'night', label: 'Rough night so far?', lines: leonNight(state) },
       { id: 'quiet', label: 'Quiet in here, isn’t it?', lines: leonRound(state) },
     ],
-    goodbye: { id: 'bye', label: 'I’ll let you get back to it.', lines: ['Mind the cameras.'] },
+    goodbye: { id: 'bye', label: 'I’ll let you get back to it.', lines: ['Gloves on before you touch anything.'] },
   };
 }
 
@@ -168,34 +169,12 @@ function leonGreeting(state) {
   if (state.accusation.solved) return 'There you are. The whole building is talking.';
   if (state.safe.open) return 'The vault was open? Nobody tells me anything.';
   if (state.stations.portraits.solved) return 'Ah. You again. I suppose you’ve read the log.';
-  return 'Evening. Keep your voice down – the cameras have ears tonight.';
+  return 'Evening. You must be the new conservation temp. Quiet night – mostly.';
 }
 
-// Option 1: Leon's own story. It follows the trail of the night.
+// Option 1: Leon's own story. It follows the trail of the night (same lines as his main dialogue).
 function leonNight(state) {
-  if (state.accusation.solved) return linesForLeon(state).lines;
-  if (state.stations.portraits.solved) {
-    return [
-      'East stairs at 21:14. It’s in the log now, black on white.',
-      'And the cart? Booked as a “patron visit”.',
-      'I can’t book a coffee, let alone a cart.',
-    ];
-  }
-  if (state.notes.includes('transport-cart')) {
-    return [
-      'So you’ve seen the footage. A cart, nothing more.',
-      'Everyone looks at the guard first.',
-      'Funny – nobody asks where the guard actually was.',
-      'Somebody keeps the night-shift log by the portraits.',
-      'Neat handwriting, terrible coffee.',
-    ];
-  }
-  return [
-    'Rough? A cart rolled out of the delivery exit at 21:14.',
-    'Covered. Didn’t see what was under the sheet.',
-    'The monitors in the security office caught it.',
-    'If you don’t believe me, look for yourself.',
-  ];
+  return linesForLeon(state).lines;
 }
 
 // Option 2: small talk about his round. What seemed odd to him points at the first open station.

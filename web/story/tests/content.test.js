@@ -33,12 +33,23 @@ test('M starts with the mission message', () => {
 test('Leon changes his story after the Portrait Hall', () => {
   let s = started();
   const before = dialogueFor('leon', s);
-  assert.match(before.lines.join(' '), /21:14/);
-  assert.match(before.lines.join(' '), /monitor wall/);
+  assert.deepEqual(before.lines, [
+    'At 21:14 a covered transport cart left the delivery exit.',
+    'Nobody told me about a delivery. I couldn’t see what was on it.',
+    'The monitors in the security office recorded it.',
+  ]);
   s = addNote(s, 'transport-cart').state;
-  assert.match(dialogueFor('leon', s).lines.join(' '), /night-shift log/);
+  assert.deepEqual(dialogueFor('leon', s).lines, [
+    'I know – the guard always looks guilty first.',
+    'The night-shift log hangs in the Portrait Hall. It shows where I was at 21:14.',
+  ]);
   s = solveStation(s, 'portraits', {}).state;
-  assert.match(dialogueFor('leon', s).lines.join(' '), /log proves it/);
+  assert.deepEqual(dialogueFor('leon', s).lines, [
+    'East stairs at 21:14 – signed in the log. I couldn’t have moved that cart.',
+    'And it was booked as a ‘patron visit’. Guards can’t book visits.',
+  ]);
+  // An honest guard: no missing painting, no alarm, no camera whispering.
+  for (const state of [started(), s]) assert.doesNotMatch(dialogueFor('leon', state).lines.join(' '), /missing|alarm|cameras/);
 });
 
 test('Imani points to the Gallery puzzle and reacts to its hidden mark', () => {

@@ -121,10 +121,10 @@ export const CASE = deepFreeze({
       name: 'Leon',
       pronoun: 'him',
       role: 'Night guard',
-      description: 'Saw a transport cart at the delivery exit, but not the painting. Nervous since the alarm.',
+      description: 'Night guard. Saw a covered cart leave at 21:14 – and was on duty all night.',
       // Which evidence speaks against this suspect being the planner:
       counterEvidenceId: 'shift-log',
-      counterText: 'The night-shift log shows Leon was on his round elsewhere – and the transport was booked as a patron visit, not by a guard.',
+      counterText: 'The night-shift log puts Leon on the east stairs at 21:14, and a guard cannot book a patron visit.',
     },
     {
       id: 'vale',
