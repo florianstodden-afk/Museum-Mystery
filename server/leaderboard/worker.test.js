@@ -1,43 +1,98 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker, { ranked, validSubmission } from './worker.js';
+import worker, { ranked, validSave } from './worker.js';
+import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding } from '../../web/story/engine.js';
+import { STATION_IDS } from '../../web/story/case-1.js';
 
 const origin = 'https://florianstodden-afk.github.io';
-const run = { playerId: '2b41111a-aaaa-4bbb-8ccc-123456789abc', name: 'Player_1', points: 70, max: 80, ending: 'heist' };
-const env = { ALLOWED_ORIGINS: origin };
+const endpoint = 'https://museum-mystery-leaderboard.workers.dev';
+const env = { ALLOWED_ORIGINS: origin, APP_URL: `${origin}/Museum-Mystery/`, CALLBACK_URL: `${endpoint}/auth/callback`,
+  GITHUB_CLIENT_ID: 'client-id', GITHUB_CLIENT_SECRET: 'test-secret' };
 
-test('submissions require a completed current-scale score and a safe public name', () => {
-  assert.equal(validSubmission(run), true);
-  assert.equal(validSubmission({ ...run, points: 81 }), false);
-  assert.equal(validSubmission({ ...run, max: 90 }), false);
-  assert.equal(validSubmission({ ...run, name: '<script>' }), false);
-  assert.equal(validSubmission({ ...run, ending: 'invented' }), false);
+function database() {
+  const states = new Map(), tickets = new Map(), sessions = new Map(), saves = new Map(), scores = new Map();
+  return { prepare(sql) {
+    let args = [];
+    return { bind(...values) { args = values; return this; },
+      async first() {
+        if (sql.includes('FROM oauth_states')) { const row = states.get(args[0]); return row?.expires_at > args[1] ? row : null; }
+        if (sql.includes('FROM login_tickets')) { const row = tickets.get(args[0]); return row?.expires_at > args[1] ? row : null; }
+        if (sql.includes('FROM sessions')) { const row = sessions.get(args[0]); return row?.expires_at > args[1] ? row : null; }
+        if (sql.includes('FROM saves')) return saves.get(args[0]) || null;
+        throw new Error(`Unexpected query ${sql}`);
+      },
+      async all() { return { results: [...scores.values()].sort((a,b) => b.points-a.points) }; },
+      async run() {
+        if (sql.startsWith('INSERT INTO oauth_states')) states.set(args[0], { verifier: args[1], expires_at: args[2] });
+        else if (sql.startsWith('DELETE FROM oauth_states')) states.delete(args[0]);
+        else if (sql.startsWith('INSERT INTO login_tickets')) tickets.set(args[0], { github_id: args[1], login: args[2], expires_at: args[3] });
+        else if (sql.startsWith('DELETE FROM login_tickets')) tickets.delete(args[0]);
+        else if (sql.startsWith('INSERT INTO sessions')) sessions.set(args[0], { github_id: args[1], login: args[2], expires_at: args[3] });
+        else if (sql.startsWith('DELETE FROM sessions')) sessions.delete(args[0]);
+        else if (sql.startsWith('INSERT INTO saves')) saves.set(args[0], { snapshot: args[1] });
+        else if (sql.startsWith('INSERT INTO leaderboard')) {
+          const old = scores.get(args[0]);
+          if (!old || args[2] > old.points) scores.set(args[0], { player_id: args[0], display_name: args[1], points: args[2], max_points: 80, ending: args[3] });
+        } else throw new Error(`Unexpected update ${sql}`);
+        return { success: true };
+      },
+    };
+  } };
+}
+
+function request(path, method = 'GET', token = null, body = null) {
+  return new Request(endpoint + path, { method, headers: { Origin: origin, ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(body ? { 'Content-Type': 'application/json' } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) });
+}
+
+function wonSave() {
+  let state = readMission(newGame()).state;
+  for (const id of STATION_IDS) state = solveStation(state, id).state;
+  state = tryOpenSafe(state, 'OILS').state;
+  state = accuse(state, 'voss').state;
+  state = chooseEnding(state, 'heist').state;
+  return { story: { story: JSON.stringify(state), progress: {} }, walk: { player: { x: 12, y: 7 } } };
+}
+
+test('ranking shares places on equal points, without a time tiebreak', () => {
+  assert.deepEqual(ranked([80,70,70,50].map((points,i) => ({ player_id: String(i), display_name: 'x', points, max_points: 80, ending: 'heist' }))).map(x => x.rank), [1,2,2,3]);
 });
 
-test('equal points share a place; time never changes rank', () => {
-  const rows = [80, 70, 70, 55].map((points, index) => ({ player_id: String(index), display_name: `Player${index}`, points, max_points: 80, ending: 'heist' }));
-  assert.deepEqual(ranked(rows).map(entry => entry.rank), [1, 2, 2, 3]);
+test('save validation rejects broken cases and accepts a finished current game', () => {
+  assert.equal(validSave(wonSave()), true);
+  assert.equal(validSave({ story: { story: '{}' }, walk: { player: { x: 1, y: 2 } } }), false);
 });
 
-test('worker rejects untrusted origins and invalid results before database writes', async () => {
-  const request = (body, from = origin) => new Request('https://example.workers.dev/runs', { method: 'POST', headers: { Origin: from }, body: JSON.stringify(body) });
-  assert.equal((await worker.fetch(request(run, 'https://other.example'), env)).status, 403);
-  assert.equal((await worker.fetch(request({ ...run, points: 100 }), env)).status, 503);
-  const fakeDb = { prepare() { throw new Error('A rejected run must not reach the database'); } };
-  assert.equal((await worker.fetch(request({ ...run, points: 100 }), { ...env, DB: fakeDb })).status, 400);
-});
-
-test('worker returns shared scores and stores one validated run', async () => {
-  let bound = null;
-  const fakeDb = { prepare(sql) { return {
-    all: async () => ({ results: [{ player_id: run.playerId, display_name: run.name, points: run.points, max_points: 80, ending: run.ending }] }),
-    bind: (...values) => { bound = values; return { run: async () => ({ success: true }) }; },
-  }; } };
-  const config = { ...env, DB: fakeDb };
-  const get = await worker.fetch(new Request('https://example.workers.dev/runs', { headers: { Origin: origin } }), config);
-  assert.equal(get.status, 200);
-  assert.equal((await get.json()).entries[0].name, run.name);
-  const post = await worker.fetch(new Request('https://example.workers.dev/runs', { method: 'POST', headers: { Origin: origin }, body: JSON.stringify(run) }), config);
-  assert.equal(post.status, 200);
-  assert.deepEqual(bound, [run.playerId, run.name, run.points, 80, run.ending]);
+test('GitHub identity gates cloud saves and ranking submissions', async () => {
+  const config = { ...env, DB: database() };
+  assert.equal((await worker.fetch(request('/save'), config)).status, 401);
+  assert.equal((await worker.fetch(request('/runs', 'POST'), config)).status, 401);
+  assert.equal((await worker.fetch(request('/runs'), config)).status, 401);
+  const browserState = 'a'.repeat(64);
+  const start = await worker.fetch(request(`/auth/start?state=${browserState}`), config);
+  assert.equal(start.status, 302);
+  const authorize = new URL(start.headers.get('Location'));
+  assert.equal(authorize.hostname, 'github.com');
+  assert.equal(authorize.searchParams.get('state'), browserState);
+  assert.equal(authorize.searchParams.get('code_challenge_method'), 'S256');
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async url => new Response(JSON.stringify(String(url).includes('access_token')
+    ? { access_token: 'github-token' } : { id: 12345, login: 'verified-player' }), { status: 200 });
+  try {
+    const callback = await worker.fetch(request(`/auth/callback?state=${authorize.searchParams.get('state')}&code=code`), config);
+    assert.equal(callback.status, 302);
+    const returned = new URL(callback.headers.get('Location'));
+    assert.equal(new URLSearchParams(returned.hash.slice(1)).get('auth_state'), browserState);
+    const onlyTicket = new URLSearchParams(returned.hash.slice(1)).get('auth_ticket');
+    const exchange = await worker.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config);
+    assert.equal(exchange.status, 200);
+    const token = (await exchange.json()).token;
+    assert.equal((await worker.fetch(request('/auth/exchange', 'POST', null, { ticket: onlyTicket }), config)).status, 401);
+    assert.equal((await worker.fetch(request('/save', 'PUT', token, wonSave()), config)).status, 200);
+    assert.equal((await worker.fetch(request('/runs', 'POST', token), config)).status, 200);
+    const list = await worker.fetch(request('/runs', 'GET', token), config);
+    assert.equal((await list.json()).entries[0].name, 'verified-player');
+    assert.equal((await worker.fetch(request('/auth/logout', 'POST', token), config)).status, 200);
+    assert.equal((await worker.fetch(request('/save', 'GET', token), config)).status, 401);
+  } finally { globalThis.fetch = originalFetch; }
 });

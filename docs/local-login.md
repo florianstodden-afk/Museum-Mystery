@@ -1,5 +1,7 @@
 # Local profiles: sign-in and game start
 
+**Historical implementation.** The current entry screen offers GitHub sign-in or guest play; the local username/password forms are no longer in the game. Existing local account data remains in the browser but is not automatically transferred. See [GitHub sign-in and shared saves](leaderboard.md).
+
 **Status: 19.11.2026, branch `codex/local-login-screens`.** This text describes the change for the pull request. On the published site it applies only after the merge and publication by GitHub Pages.
 
 ## Flow for players

@@ -44,13 +44,15 @@ test('the local table shows place, player, points, time and Won/Lost', () => {
   assert.match(box.textContent, /No finished runs on this device yet/);
 });
 
-test('without LEADERBOARD_URL no online elements are visible', () => {
+test('GitHub or guest entry keeps the shared board hidden until sign-in', () => {
   assert.equal(LEADERBOARD_URL, '');
   const html = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
   assert.match(html, /<section id="leaderboard-online"[^>]*\bhidden\b/, 'online section starts hidden');
-  assert.match(html, /id="leaderboard-publish"[^>]*\bhidden\b/);
+  assert.match(html, /id="entry-github"/);
+  assert.match(html, /id="entry-guest"/);
+  assert.doesNotMatch(html, /id="entry-password"/);
   const main = readFileSync(new URL('../../main.js', import.meta.url), 'utf8');
-  assert.match(main, /const ONLINE=Boolean\(LEADERBOARD_URL\)/);
+  assert.match(main, /const ONLINE=Boolean\(LEADERBOARD_URL && activeProfile\)/);
   assert.match(main, /if\(ONLINE\)refreshLeaderboard\(\)/);
-  assert.match(main, /leaderboardPublish\.hidden=!ONLINE/);
+  assert.match(main, /homeScoreboard\.disabled=!activeProfile/);
 });
