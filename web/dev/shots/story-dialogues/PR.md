@@ -36,6 +36,9 @@ One commit per section (sections 5 and 6 together), plus a browser check with sc
 - **Leon `counterText`** is shorter than in the brief: the Case lost screen allows at most 30 words for “It was Adrien Voss, the patron.” plus the counter text (existing test).
 - **Lost ending**: Vale’s old line “The original is gone” contradicted the story (the original stays in the safe), so it now says it is still there.
 
+## Journal: OILS after the safe opens
+Once the safe is open, the journal shows the letters in code-word order **O-I-L-S** (each still labelled with its station number). Before that they stay in station order (I-L-O-S), so the journal never gives the word away. Test in `content.test.js`.
+
 ## Screenshots (1440×900 and 390×844)
 
 | | Desktop | Phone |
