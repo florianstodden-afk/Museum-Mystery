@@ -34,8 +34,7 @@ function linesForM(state) {
     return talk(['You found it? Good.', 'Bring it to the loading dock. Come alone, and do not talk to the curator.']);
   }
   return talk([
-    'Keep moving. Four wings, four clues.',
-    'The curator thinks she is clever. Her clues will spell the way into the safe.',
+    'Four stations, four letters. Put them together and the safe is yours.',
   ]);
 }
 

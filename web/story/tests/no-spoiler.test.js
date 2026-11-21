@@ -84,6 +84,8 @@ test('after the right accusation the chain may name Voss openly', () => {
 });
 
 test('M promises no deadline: there is no overall clock', () => {
-  assert.match(CASE.mission.text, /Bring it to me tonight\. – M$/);
+  assert.match(CASE.mission.text, /^The Van Gogh in the Gallery is a copy\./);
+  assert.match(CASE.mission.text, /Bring me the painting tonight\. – M$/);
+  assert.ok(CASE.mission.text.split(/\s+/).length <= 50, 'mission ≤ 50 words');
   assert.doesNotMatch(CASE.mission.text, /sunrise|dawn|before morning/i);
 });
