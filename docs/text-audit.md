@@ -60,7 +60,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `index.html` | Start new game | 3 |
 | `index.html` | Fictional museum and characters. Artwork data and image: | 8 |
 | `index.html` | The Metropolitan Museum of Art, Open Access | 7 |
-| `index.html` | Bring the Van Gogh painting out before sunrise. | 8 |
+| `index.html` | Bring the Van Gogh painting out tonight. | 7 |
 | `index.html` | Read M’s message | 3 |
 | `index.html` | Evidence &amp; Notes | 3 |
 | `index.html` | Stats &amp; Credit | 3 |
@@ -151,7 +151,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/case-1.js` | Museum Nocturne, New York | 4 |
 | `story/case-1.js` | Fictional museum and characters · Artworks: The Met, Open Access | 10 |
 | `story/case-1.js` | A message from M | 4 |
-| `story/case-1.js` | The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. Four stations hide the way in. Bring it to me before sunrise. – M | 29 |
+| `story/case-1.js` | The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. Four stations hide the way in. Bring it to me tonight. – M | 28 |
 | `story/case-1.js` | Voss approved the false wall label. | 6 |
 | `story/case-1.js` | The false label went up with Voss’s approval – he wanted the swap to look official. | 16 |
 | `story/case-1.js` | Compare the wall label with the Met catalogue and correct the year and the material. | 15 |

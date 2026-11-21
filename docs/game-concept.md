@@ -4,7 +4,7 @@
 
 ## Plot
 
-The fictional **Museum Nocturne** in New York, at night. The player character (a temporary restoration assistant) receives a job from “M”: take Van Gogh’s *Wheat Field with Cypresses* out of a safe before sunrise.
+The fictional **Museum Nocturne** in New York, at night. The player character (a temporary restoration assistant) receives a job from “M”: take Van Gogh’s *Wheat Field with Cypresses* out of a safe tonight.
 
 Characters (all fictional):
 - **Adrien Voss** (“M”, patron, the real mastermind)

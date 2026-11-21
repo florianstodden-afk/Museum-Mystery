@@ -46,7 +46,7 @@ export const CASE = deepFreeze({
     title: 'A message from M',
     text:
       'The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. ' +
-      'Four stations hide the way in. Bring it to me before sunrise. – M',
+      'Four stations hide the way in. Bring it to me tonight. – M',
   },
 
   stations: [

@@ -82,3 +82,8 @@ test('after the right accusation the chain may name Voss openly', () => {
   assert.match(CASE.stations.map(st => st.pointsToVoss).join(' '), /Voss/);
   assert.match(journalModel(s).caseNotes[0].text, /Adrien Voss/);
 });
+
+test('M promises no deadline: there is no overall clock', () => {
+  assert.match(CASE.mission.text, /Bring it to me tonight\. – M$/);
+  assert.doesNotMatch(CASE.mission.text, /sunrise|dawn|before morning/i);
+});

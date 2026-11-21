@@ -244,7 +244,7 @@ export function createStoryHost(options) {
   }
 
   function showEndingChoice() {
-    const { content, actions } = scene('Before sunrise');
+    const { content, actions } = scene('Your decision');
     renderEndingChoice(content, endingId => {
       const result = act(chooseEnding(state, endingId), 'chooseEnding');
       if (result.ok) onFinished(state, progress);
