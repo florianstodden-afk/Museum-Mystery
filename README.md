@@ -4,7 +4,7 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) is the online game. The older [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) keeps guest play; its GitHub button opens the Vercel game and starts sign-in there.
+**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) is the online game, with guest play and GitHub login. The older [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) keeps guest play; its GitHub button opens the Vercel game and starts sign-in there.
 
 ## Team
 
@@ -19,6 +19,19 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 
 ![The museum at night](docs/screenshots/readme-game.png)
 
+## About the project
+
+*Museum Mystery* is a short detective game that runs in any modern browser, made for casual players and anyone curious about art. You are the new temp in a fictional New York museum at night. You walk through the halls, talk to the staff and solve four quick stations built around real works from The Metropolitan Museum of Art. Their letters open a safe; then you make one accusation and choose between three endings.
+
+## Objectives
+
+- Build a complete, playable browser game as a team and deploy it online.
+- Teach a little art history through real works from The Metropolitan Museum of Art (Open Access).
+- Reward speed: short mini-games scored by time, like a speedrun.
+- Keep the game logic separate from the display, so it can be tested automatically.
+- Handle invalid input and broken saves without crashing.
+- Offer guest play and an optional GitHub login with online saves and a shared leaderboard.
+
 ## How to play
 
 - On the first screen, choose **Continue with GitHub** or **Play as guest**. GitHub players use their GitHub identity for an online save and shared leaderboard. Guests save locally and cannot open the leaderboard. If you opened the old GitHub Pages link, its GitHub button takes you to the online Vercel game first ([login details](docs/leaderboard.md)); [earlier local username/password profiles](docs/local-login.md) are historical.
@@ -30,23 +43,48 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** is for GitHub players. It shows the current run and shared results. A winning finish is submitted automatically; the highest score for each GitHub account appears. Lost runs never enter the shared leaderboard ([details](docs/leaderboard.md)).
 
-## Run locally
+## Installation
 
-For guest play and game changes, serve the browser files locally:
+Requirements:
+
+- [Git](https://git-scm.com/)
+- [Python 3](https://www.python.org/) – only for the small local web server; any other static file server works too
+- [Node.js](https://nodejs.org/) 18 or newer – only for the tests
+
+The game and the tests need no `npm install` and no build step. Get the code:
+
+```bash
+git clone https://github.com/florianstodden-afk/Museum-Mystery.git
+cd Museum-Mystery
+```
+
+**Optional – online features (GitHub login, online saves, shared leaderboard).** These run only on Vercel. You need a Vercel project for this repository, a Neon Postgres database and a GitHub OAuth app, and these environment variables in Vercel (names as read in `api/_runtime.js`; never commit their values):
+
+| Variable | What it is |
+|---|---|
+| `DATABASE_URL` | Neon Postgres connection string |
+| `GITHUB_CLIENT_ID` | Client ID of the GitHub OAuth app |
+| `GITHUB_CLIENT_SECRET` | Client secret of the GitHub OAuth app |
+
+Vercel installs the database driver from `package.json` itself. Setup details and the OAuth callback URL: [docs/leaderboard.md](docs/leaderboard.md).
+
+## Run the application
+
+From the repository folder, serve the browser files:
 
 ```bash
 python3 -m http.server 8000 --directory web
 ```
 
-Then open <http://localhost:8000>. GitHub sign-in and shared saves need the configured Vercel deployment; the small local server does not run `api/`.
+Then open <http://localhost:8000> and choose **Play as guest**. Locally only guest mode works: GitHub sign-in, online saves and the shared leaderboard need the Vercel deployment, because the small local server does not run `api/`.
 
-## Run tests
+## Run the tests
 
 ```bash
 node --test
 ```
 
-GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
+Run it from the repository folder. GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
 ## Project structure
 
