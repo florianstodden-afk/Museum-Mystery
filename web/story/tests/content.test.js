@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { newGame, readMission, solveStation, addNote, tryOpenSafe, accuse, chooseEnding } from '../engine.js';
-import { dialogueFor, renderDialogue } from '../dialogues.js';
+import { dialogueFor, renderDialogue, conversationFor } from '../dialogues.js';
 import { journalModel, renderJournal, evidenceChain } from '../journal.js';
 import { endingModel, renderEnding } from '../endings.js';
 import { renderSafe } from '../safe-ui.js';
@@ -33,19 +33,40 @@ test('M starts with the mission message', () => {
 test('Leon changes his story after the Portrait Hall', () => {
   let s = started();
   const before = dialogueFor('leon', s);
-  assert.match(before.lines.join(' '), /21:14/);
-  assert.match(before.lines.join(' '), /monitor wall/);
+  assert.deepEqual(before.lines, [
+    'At 21:14 a covered transport cart left the delivery exit.',
+    'Nobody told me about a delivery. I couldn’t see what was on it.',
+    'The monitors in the security office recorded it.',
+  ]);
   s = addNote(s, 'transport-cart').state;
-  assert.match(dialogueFor('leon', s).lines.join(' '), /night-shift log/);
+  assert.deepEqual(dialogueFor('leon', s).lines, [
+    'I know – the guard always looks guilty first.',
+    'The night-shift log hangs in the Portrait Hall. It shows where I was at 21:14.',
+  ]);
   s = solveStation(s, 'portraits', {}).state;
-  assert.match(dialogueFor('leon', s).lines.join(' '), /log proves it/);
+  assert.deepEqual(dialogueFor('leon', s).lines, [
+    'East stairs at 21:14 – signed in the log. I couldn’t have moved that cart.',
+    'And it was booked as a ‘patron visit’. Guards can’t book visits.',
+  ]);
+  // An honest guard: no missing painting, no alarm, no camera whispering.
+  for (const state of [started(), s]) assert.doesNotMatch(dialogueFor('leon', state).lines.join(' '), /missing|alarm|cameras/);
 });
 
-test('Imani points to the Gallery puzzle and reacts to its hidden mark', () => {
+test('Imani spots the fake, points to Station 2 and reacts to its hidden mark', () => {
   let s = started();
-  assert.match(dialogueFor('imani', s).lines.join(' '), /left side of the Gallery/);
+  const before = dialogueFor('imani', s).lines.join(' ');
+  assert.match(before, /Van Gogh in the Gallery\? The varnish is still sticky/);
+  assert.match(before, /haven’t told anyone yet/);
+  assert.match(before, /Renoir puzzle at Station 2/);
   s = solveStation(s, 'restoration', {}).state;
-  assert.match(dialogueFor('imani', s).lines.join(' '), /“V”/);
+  assert.deepEqual(dialogueFor('imani', s).lines, [
+    'Under my lamp the slip shows a hidden ‘V’. Whoever booked that cart marked it.',
+    'But one letter can fit more than one person in this museum.',
+  ]);
+  for (const id of ALL) if (!s.stations[id].solved) s = solveStation(s, id, {}).state;
+  s = tryOpenSafe(s, 'OILS').state;
+  assert.deepEqual(dialogueFor('imani', s).lines, ['The original was in the safe? Then Dr. Vale had doubts too.']);
+  assert.equal(conversationFor('imani', s).autoCloseAfterGreeting, true);
 });
 
 test('Dr. Vale only talks once the safe is open', () => {
@@ -54,7 +75,14 @@ test('Dr. Vale only talks once the safe is open', () => {
   assert.equal(dialogueFor('vale', s).available, false);
   s = tryOpenSafe(s, 'OILS').state;
   assert.equal(dialogueFor('vale', s).available, true);
+  assert.deepEqual(dialogueFor('vale', s).lines, [
+    'You opened it. That new wall label in the Gallery never looked right to me – so I locked the original in here, just in case.',
+    'The cart at 21:14 came for it and left empty.',
+    'Someone needed my clues to get in. So – who sent you, and who is behind this?',
+  ]);
   s = accuse(s, 'voss').state;
+  assert.equal(dialogueFor('vale', s).lines[0], 'Voss. That label had his taste all over it – but I needed proof that wasn’t mine.');
+  assert.match(dialogueFor('vale', s).lines.join(' '), /mécène/);
   assert.match(dialogueFor('vale', s).lines.join(' '), /choice is yours/);
 });
 
@@ -273,4 +301,10 @@ test('an empty journal before the mission shows one quiet sentence, which goes o
     renderJournal(box, journalModel(started()), side);
     assert.doesNotMatch(box.textContent, /The pages are still blank/);
   }
+});
+
+test('M explains the setup and, while the safe is closed, the four letters', () => {
+  const s = readMission(newGame()).state;
+  assert.deepEqual(dialogueFor('m', s).lines, ['Four stations, four letters. Put them together and the safe is yours.']);
+  assert.match(dialogueFor('m', newGame()).lines[0], /is a copy.*curator’s safe.*four clues.*new conservation temp/);
 });

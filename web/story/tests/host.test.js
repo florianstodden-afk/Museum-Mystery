@@ -161,7 +161,7 @@ test('hints start gentle, get concrete, and reset when the story moves on', () =
   host.start();
   click(page, 'Accept the mission');
   host.showHint();
-  assert.match(page.panel.textContent, /Four wings/);
+  assert.match(page.panel.textContent, /Four stations, four letters/);
   click(page, 'Tell me more');
   assert.match(page.panel.textContent, /MORE CONCRETE HINT/);
   host.openStation('landscape');

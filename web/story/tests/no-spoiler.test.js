@@ -59,10 +59,11 @@ test('no evidence, task, note, journal page, hint or dialogue names Voss before 
 test('the new evidence texts', () => {
   const evidence = Object.fromEntries(CASE.stations.map(s => [s.evidenceId, s.evidence]));
   assert.equal(evidence['false-label'], 'The false wall label was approved by a patron – not by museum staff.');
-  assert.equal(evidence['shift-log'], 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.');
+  assert.equal(evidence['shift-log'], 'Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’.');
+  assert.equal(CASE.notes.find(n => n.id === 'transport-cart').text, 'A covered transport cart left the delivery exit at 21:14. No delivery was announced.');
   assert.equal(evidence['hidden-mark'], 'Hidden mark “V” on the fake transport slip.');
   assert.equal(evidence['frame-label'], 'Frame label: “Ordered by: A. V.”');
-  assert.match(suspectById('vale').counterText, /order came from a patron, and Vale is staff/);
+  assert.match(suspectById('vale').counterText, /frame label names ‘A\. V\.’, not M\. V\./);
 });
 
 test('the solution stays unique: only Voss is a patron with the initials A. V.', () => {
@@ -84,6 +85,15 @@ test('after the right accusation the chain may name Voss openly', () => {
 });
 
 test('M promises no deadline: there is no overall clock', () => {
-  assert.match(CASE.mission.text, /Bring it to me tonight\. – M$/);
+  assert.match(CASE.mission.text, /^The Van Gogh in the Gallery is a copy\./);
+  assert.match(CASE.mission.text, /Bring me the painting tonight\. – M$/);
+  assert.ok(CASE.mission.text.split(/\s+/).length <= 50, 'mission ≤ 50 words');
   assert.doesNotMatch(CASE.mission.text, /sunrise|dawn|before morning/i);
+});
+
+test('no leftovers that contradict the story: nothing is missing, there was no alarm', () => {
+  for (const state of statesBeforeAccusation()) {
+    for (const text of visibleTexts(state)) assert.doesNotMatch(text, /\balarm\b|painting is missing|cameras have ears|sunrise/i, text);
+  }
+  for (const suspect of CASE.suspects) assert.doesNotMatch(suspect.description, /alarm|missing/i, suspect.id);
 });

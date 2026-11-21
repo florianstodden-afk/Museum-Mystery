@@ -29,7 +29,7 @@ test('Leon offers two small-talk questions and a goodbye', () => {
   assert.equal(talk.role, 'Night guard');
   assert.deepEqual(talk.questions.map(q => q.label), ['Rough night so far?', 'Quiet in here, isn’t it?']);
   assert.equal(talk.goodbye.label, 'I’ll let you get back to it.');
-  assert.deepEqual(talk.goodbye.lines, ['Mind the cameras.']);
+  assert.deepEqual(talk.goodbye.lines, ['Gloves on before you touch anything.']);
   assert.equal(conversationFor('nobody', states().start), null);
   const imani = conversationFor('imani', states().start);
   assert.deepEqual(questionsFor('imani', states().start), [], 'Imani just says her lines');
@@ -39,16 +39,19 @@ test('Leon offers two small-talk questions and a goodbye', () => {
 
 test('the greeting follows the story', () => {
   const s = states();
-  assert.match(conversationFor('leon', s.start).greeting[0], /Evening/);
+  assert.equal(conversationFor('leon', s.start).greeting[0], 'Evening. You must be the new conservation temp. Quiet night – mostly.');
   assert.match(conversationFor('leon', s.portraits).greeting[0], /read the log/);
   assert.match(conversationFor('leon', s.open).greeting[0], /vault was open/);
 });
 
 test('"Rough night" tells Leon’s story for each stage', () => {
   const s = states();
-  assert.match(answer(s.start, 'night').join(' '), /delivery exit at 21:14.*security office/s);
-  assert.match(answer(s.withNote, 'night').join(' '), /seen the footage.*by the portraits/s);
+  assert.match(answer(s.start, 'night').join(' '), /21:14 a covered transport cart left the delivery exit.*security office/s);
+  assert.match(answer(s.withNote, 'night').join(' '), /guard always looks guilty first.*Portrait Hall/s);
   assert.match(answer(s.portraits, 'night').join(' '), /East stairs at 21:14.*patron visit/s);
+  for (const stage of ['start', 'withNote', 'portraits']) {
+    assert.deepEqual(answer(s[stage], 'night'), dialogueFor('leon', s[stage]).lines, `${stage}: one story, no duplicates`);
+  }
   assert.deepEqual(answer(s.solved, 'night'), dialogueFor('leon', s.solved).lines, 'after the accusation: his thanks');
 });
 

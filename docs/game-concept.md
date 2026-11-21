@@ -27,7 +27,7 @@ Nobody can get stuck for good.
 
 | Station | Room | Letter | Evidence |
 |---|---|---|---|
-| 1 | Portrait Hall | I | Night-shift log: Leon was elsewhere; the transport was booked as a patron visit. |
+| 1 | Portrait Hall | I | Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’. |
 | 2 | Gallery, left painting | L | Hidden mark “V” on the fake transport slip. |
 | 3 | Gallery, middle painting | O | The false wall label was approved by a patron – not by museum staff. |
 | 4 | Gallery, frame rack | S | Frame label: “Ordered by: A. V.” |

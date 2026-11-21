@@ -45,8 +45,9 @@ export const CASE = deepFreeze({
     from: 'M',
     title: 'A message from M',
     text:
-      'The Museum Nocturne is yours tonight. A safe holds Van Gogh’s “Wheat Field with Cypresses”. ' +
-      'Four stations hide the way in. Bring it to me tonight. – M',
+      'The Van Gogh in the Gallery is a copy. The real ‘Wheat Field with Cypresses’ is locked in the curator’s safe. ' +
+      'She hid four clues in the museum – together they open it. Everyone thinks you are the new conservation temp. ' +
+      'Bring me the painting tonight. – M',
   },
 
   stations: [
@@ -68,7 +69,7 @@ export const CASE = deepFreeze({
       room: 'Portrait Hall',
       letter: 'I',
       evidenceId: 'shift-log',
-      evidence: 'Night-shift log: Leon was elsewhere; the transport was booked as a patron visit.',
+      evidence: 'Night-shift log: Leon was on the east stairs at 21:14, when the cart left. The cart was booked as a ‘patron visit’.',
       pointsToVoss: 'Leon was on his round; the cart was booked as a “patron visit” – and Voss is the patron.',
       task: 'Put the four portraits in the order they were painted, oldest first – their backs hold the night-shift log.',
       metIds: [436703, 436121, 12127, 435876],
@@ -104,7 +105,7 @@ export const CASE = deepFreeze({
     {
       id: 'transport-cart',
       title: 'Monitor wall, 21:14',
-      text: 'Leon saw a transport cart at the delivery exit at 21:14. He could not see what was inside.',
+      text: 'A covered transport cart left the delivery exit at 21:14. No delivery was announced.',
     },
     {
       id: 'duty-roster',
@@ -120,19 +121,19 @@ export const CASE = deepFreeze({
       name: 'Leon',
       pronoun: 'him',
       role: 'Night guard',
-      description: 'Saw a transport cart at the delivery exit, but not the painting. Nervous since the alarm.',
+      description: 'Night guard. Saw a covered cart leave at 21:14 – and was on duty all night.',
       // Which evidence speaks against this suspect being the planner:
       counterEvidenceId: 'shift-log',
-      counterText: 'The night-shift log shows Leon was on his round elsewhere – and the transport was booked as a patron visit, not by a guard.',
+      counterText: 'The night-shift log puts Leon on the east stairs at 21:14, and a guard cannot book a patron visit.',
     },
     {
       id: 'vale',
       name: 'Dr. Mara Vale',
       pronoun: 'her',
       role: 'Curator',
-      description: 'Locked the original in the safe and left four clues. Her initial is also a “V”.',
+      description: 'Curator. Locked the original in the safe and left four clues. Her initial is also a ‘V’.',
       counterEvidenceId: 'frame-label',
-      counterText: 'The “V” is not Vale: the order came from a patron, and Vale is staff. She hid the original to protect it.',
+      counterText: 'The ‘V’ is not Vale. The frame label names ‘A. V.’, not M. V. – and Vale hid the original to protect it.',
     },
     {
       id: 'voss',
