@@ -86,6 +86,12 @@ node --test
 
 Run it from the repository folder. GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
+Browser checks (needs Node ≥ 22 and Chrome or Edge, no Playwright) start their own server and save screenshots in `web/dev/shots/`:
+
+```bash
+node web/dev/run-e2e.mjs
+```
+
 ## Project structure
 
 | Path | Purpose |

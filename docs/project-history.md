@@ -214,18 +214,10 @@ Renoir: up to and including 30 seconds 15 points, up to 45 seconds 10, up to 60 
 
 Active cameras show a blinking red status light. New rooms and camera views should use the shared display in `web/camera-lights.js` for this. With the operating system setting for reduced motion turned on, the light stays lit instead of blinking.
 
-### End-to-end test Station I
+### Browser checks
 
-`web/dev/e2e-station-i.mjs` checks Station I in a real browser (wrong check, solving, points, no scrolling at 1280×720, 1440×900, 390×844, no console errors, images with the Met API blocked). Playwright is not part of the project:
-
-```bash
-npm i -D playwright && npx playwright install chromium
-```
+`web/dev/e2e-*.mjs` check the game in a real browser: Station 1 (`e2e-station-1.mjs`: wrong check, sorting, letter I, art cards, no scrolling at 1440×900, 1280×720, 390×844, images with the Met API blocked), Station 3 (`e2e-station-3.mjs`), the story dialogues, the journal page "People" and the accusation. They drive Chrome or Edge over the DevTools protocol (`web/dev/cdp.mjs`); Playwright is not needed. One command starts a small server and runs all of them:
 
 ```bash
-python3 -m http.server 8000 --directory web
-```
-
-```bash
-node web/dev/e2e-station-i.mjs
+node web/dev/run-e2e.mjs
 ```

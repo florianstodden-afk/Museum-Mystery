@@ -46,6 +46,12 @@ export function renderSafe(container, { state, message = '', playSound = () => {
     const select = el('button',{className:'vault-wheel-hub',text:'A',attrs:{type:'button','aria-label':'Select letter A'}});
     const dial=el('div',{className:'vault-wheel'},[ring,select]);
     let lastNotch = 0;
+    // While dragging, the ring follows the pointer directly (no transition, at most one update per frame).
+    let frame=0;
+    function scheduleUpdate(){
+      if(frame)return;
+      frame=(globalThis.requestAnimationFrame ?? (fn=>setTimeout(fn,16)))(()=>{frame=0;update();});
+    }
     function update(){
       const notch=Math.round(-degrees/increment);
       if(notch!==lastNotch){playSound('vault-tick');lastNotch=notch;}
@@ -63,16 +69,18 @@ export function renderSafe(container, { state, message = '', playSound = () => {
       if(event.target===select || (event.button!==undefined && event.button!==0))return;
       event.preventDefault();previousAngle=angle(event);pointerId=event.pointerId;
       dial.setPointerCapture?.(pointerId);
+      ring.classList.add('is-dragging');
     });
     dial.addEventListener('pointermove',event=>{
       if(pointerId!==event.pointerId || previousAngle===null)return;
       const next=angle(event);let delta=next-previousAngle;
       if(delta>180)delta-=360;if(delta< -180)delta+=360;
-      degrees+=delta;previousAngle=next;update();
+      degrees+=delta;previousAngle=next;scheduleUpdate();
     });
     function finish(event){
       if(pointerId!==event.pointerId)return;
-      previousAngle=null;pointerId=null;degrees=Math.round(degrees/increment)*increment;update();
+      previousAngle=null;pointerId=null;ring.classList.remove('is-dragging');
+      degrees=Math.round(degrees/increment)*increment;update();   // snaps to the nearest letter with the CSS transition
     }
     dial.addEventListener('pointerup',finish);dial.addEventListener('pointercancel',finish);
     dial.addEventListener('keydown',event=>{

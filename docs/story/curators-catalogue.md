@@ -63,12 +63,10 @@ cd web
 node --test
 ```
 
-The real-browser script uses isolated browser storage, plays main and story preview at 1280 × 720 and 390 × 844, and saves screenshots in `docs/screenshots/station-b-*.png`. It covers mouse drag, click and touch placement, swaps, return to tray, Tab/Enter/Space completion, help, close/reopen, exact saved reward, duplicate completion, offline images and failed-image retry. Main-game tests open Station B with **E** from its existing approach position.
+The real-browser check `web/dev/e2e-station-3.mjs` plays Station 3 in the real game with the Met API blocked, at 1440 × 900, 1280 × 720 and 390 × 844: no clock before Start, four offline images, no horizontal overflow, all labels placed, the clue in the success popup (without naming Voss), letter O saved once, and no replay or second reward when the station is opened again. Screenshots go to `web/dev/shots/station-3/`. It drives Chrome or Edge over the DevTools protocol (`web/dev/cdp.mjs`), so Playwright is not needed:
 
 ```sh
-python3 -m http.server 8000 --directory web
-# With Playwright installed, in another terminal:
-node web/dev/e2e-station-b.mjs
+node web/dev/run-e2e.mjs
 ```
 
-Optional environment variables: `STATION_URL` for the server URL, `PLAYWRIGHT_MODULE` for an existing Playwright module path, and `CHROME_PATH` for an installed Chromium/Chrome binary.
+The runner starts its own small server and runs every `web/dev/e2e-*.mjs`. `CHROME_PATH` points at another Chrome/Chromium/Edge; `CHROME_NO_SANDBOX=1` is for Linux containers.

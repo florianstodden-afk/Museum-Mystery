@@ -182,7 +182,8 @@ a.story-button { display: inline-block; text-decoration: none; }
 .vault-wheel { touch-action: none; cursor: grab; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, #282b29 0 24%, #967b4c 25% 29%, #3b3930 30% 47%, #ad8951 48% 51%, #302e29 52% 70%, #cfaa66 71% 74%, #51412b 75% 80%, #b28b4f 81% 84%, #35291c 85%); box-shadow: 0 10px 25px #0009, inset 0 2px 5px #f4dba1a0, inset 0 -5px 12px #000b; }
 .vault-wheel:active { cursor: grabbing; }
 .vault-wheel-ring:focus-visible { outline: 3px solid #e7c477; outline-offset: 4px; }
-.vault-wheel-ring { pointer-events: auto; position: absolute; inset: 0; border-radius: 50%; transition: transform .22s ease-out; }
+.vault-wheel-ring { pointer-events: auto; position: absolute; inset: 0; border-radius: 50%; transition: transform .22s ease-out; will-change: transform; }
+.vault-wheel-ring.is-dragging { transition: none; }
 .vault-wheel-letter { position: absolute; left: 50%; top: 50%; width: 1.1em; height: 1.1em; margin: -.55em; color: #f4dcaa; font: bold clamp(9px, 2.4vw, 13px) Georgia, serif; text-align: center; transform: rotate(var(--letter-angle)) translateY(calc(min(250px, 68vw) * -.355)) rotate(calc(-1 * var(--letter-angle))); text-shadow: 0 1px 2px #000; }
 .vault-wheel-pointer { position: absolute; z-index: 2; left: 50%; top: -6px; transform: translateX(-50%); width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 16px solid #f6d582; filter: drop-shadow(0 2px 2px #000); }
 .dialog-card .vault-wheel-hub, .vault-wheel-hub { position: absolute; z-index: 1; top: 32%; left: 32%; width: 36%; height: 36%; margin: 0; padding: 0; border-radius: 50%; border: 3px solid #d5b371; background: radial-gradient(circle at 35% 30%, #ddc38d, #8c6937 54%, #4b3823); color: #2a2118; box-shadow: 0 3px 9px #000a, inset 0 1px 3px #fff9; font: bold clamp(24px, 7vw, 38px) Georgia, serif; }
