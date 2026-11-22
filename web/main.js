@@ -444,7 +444,7 @@ function closeDialog(){
   homeScreen.inert = false;
   gameMenuToggle.hidden = !homeScreen.hidden || !entryScreen.hidden;
   document.querySelector('#game-journal-toggle').hidden = !homeScreen.hidden || !entryScreen.hidden;
-  const target = dialogOpener?.isConnected && dialogOpener !== document.body && !dialogOpener.closest('[hidden]') ? dialogOpener : homeScreen.hidden ? canvas : document.querySelector('#home-journal');
+  const target = dialogOpener?.isConnected && dialogOpener !== document.body && !dialogOpener.closest('[hidden]') ? dialogOpener : homeScreen.hidden ? canvas : document.querySelector('#home-start');
   target.focus();
 }
 function handleInteract(){
@@ -571,10 +571,7 @@ document.addEventListener('keydown',event=>{
     if(event.key==='Escape' || event.key.toLowerCase()==='j'){event.preventDefault();closeJournal();}
     return;
   }
-  if(!homeScreen.hidden){
-    if(event.key.toLowerCase()==='j' && !event.repeat){event.preventDefault();openJournal(document.querySelector('#home-journal'));}
-    return;
-  }
+  if(!homeScreen.hidden)return;   // the journal opens in the game (J or the menu), not on the Home screen
   if(!gameMenu.hidden){
     if(event.key==='Escape'){event.preventDefault();closeGameMenu();return;}
     if(event.key.toLowerCase()==='j' && !event.repeat){event.preventDefault();closeGameMenu(false);openJournal(document.querySelector('#journal-toggle'));return;}
@@ -622,7 +619,6 @@ document.querySelectorAll('[data-move]').forEach(button=>{
 document.querySelector('#touch-interact').addEventListener('click',handleInteract);
 document.querySelector('#journal-toggle').addEventListener('click', event=>{closeGameMenu(false);openJournal(event.currentTarget);});
 document.querySelector('#game-journal-toggle').addEventListener('click',event=>openJournal(event.currentTarget));
-document.querySelector('#home-journal').addEventListener('click',event=>openJournal(event.currentTarget));
 document.querySelector('#hint').addEventListener('click',()=>{closeGameMenu(false);canvas.focus();story.showHint();});
 const soundButton=document.querySelector('#sound-toggle');
 const homeSoundButton=document.querySelector('#home-sound');
@@ -640,7 +636,7 @@ homeMusicButton.addEventListener('click',toggleMusic);
 showMusicState();
 // Browsers only allow sound after the first click or key press; music that was left on starts then.
 for(const type of ['pointerdown','keydown'])document.addEventListener(type,()=>sound.resumeMusic(),{once:true});
-document.querySelector('#mission').addEventListener('click',()=>{closeJournal(false);(homeScreen.hidden?canvas:document.querySelector('#home-journal')).focus();story.showMission();});
+document.querySelector('#mission').addEventListener('click',()=>{closeJournal(false);(homeScreen.hidden?canvas:document.querySelector('#home-start')).focus();story.showMission();});
 const homeStart=document.querySelector('#home-start');
 const homeNew=document.querySelector('#home-new');
 const homeSettings=document.querySelector('#home-settings');
@@ -706,7 +702,7 @@ function closeJournal(restoreFocus=true){
   document.querySelector('.shell').inert=!homeScreen.hidden;
   gameMenuToggle.hidden=!homeScreen.hidden || !entryScreen.hidden;
   gameJournalToggle.hidden=!homeScreen.hidden || !entryScreen.hidden;
-  if(restoreFocus)(journalOpener?.isConnected && !journalOpener.closest('[hidden]')?journalOpener:homeScreen.hidden?canvas:document.querySelector('#home-journal')).focus();
+  if(restoreFocus)(journalOpener?.isConnected && !journalOpener.closest('[hidden]')?journalOpener:homeScreen.hidden?canvas:document.querySelector('#home-start')).focus();
 }
 document.querySelector('#journal-close').addEventListener('click',()=>closeJournal());
 journalOverlay.addEventListener('click',event=>{if(event.target===journalOverlay)closeJournal();});

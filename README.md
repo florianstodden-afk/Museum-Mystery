@@ -40,7 +40,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question: who planned it all? You have **one accusation**: pick a name, confirm it, and it counts. Up to 80 points (older completed saves retain their original rewards).
 - Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
-- **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
+- In the game, **J** (or the menu) opens the journal: **Case** shows the letters, evidence and notes, **People** who is who. **Esc** opens the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** is for GitHub players. It shows the current run and shared results. A winning finish is submitted automatically; the highest score for each GitHub account appears. Lost runs never enter the shared leaderboard ([details](docs/leaderboard.md)).
 
 ## Installation
