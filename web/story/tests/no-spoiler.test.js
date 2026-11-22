@@ -97,3 +97,13 @@ test('no leftovers that contradict the story: nothing is missing, there was no a
   }
   for (const suspect of CASE.suspects) assert.doesNotMatch(suspect.description, /alarm|missing/i, suspect.id);
 });
+
+test('before the accusation no text ties Voss to “M” or to a single letter', () => {
+  const voss = CASE.suspects.find(s => s.id === 'voss');
+  assert.equal(voss.description, 'Patron of the museum. Paid for the new Gallery wing – and its wall labels.');
+  for (const state of statesBeforeAccusation()) {
+    for (const text of [...visibleTexts(state), voss.description]) {
+      assert.doesNotMatch(text, /single letter|signs (his|her|things)|signed as/i, text);
+    }
+  }
+});

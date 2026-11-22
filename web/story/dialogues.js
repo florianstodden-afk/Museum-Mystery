@@ -188,6 +188,6 @@ function leonRound(state) {
   const open = STATION_IDS.find(id => !state.stations[id].solved);
   if (open) return ODD_ON_MY_ROUND[open];
   if (!state.safe.open) return ['Dr. Vale went down to the vault earlier.', 'Came back pale as a sheet.'];
-  if (!state.accusation.solved) return ['Whoever planned this didn’t wear a uniform.', 'Think about who signs things around here.'];
+  if (!state.accusation.solved) return ['Whoever planned this didn’t wear a uniform.', 'Think about who pays for things around here.'];
   return ['Quiet again, finally.', 'I might even finish my coffee tonight.'];
 }

@@ -67,7 +67,7 @@ test('"Quiet in here" points at a different open station each time', () => {
   const s = states();
   assert.match(answer(s.start, 'quiet').join(' '), /wall label/);
   assert.match(answer(s.all, 'quiet').join(' '), /vault/);
-  assert.match(answer(s.open, 'quiet').join(' '), /signs things/);
+  assert.match(answer(s.open, 'quiet').join(' '), /pays for things/);
 });
 
 test('no box holds more than two short sentences', () => {

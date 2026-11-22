@@ -200,10 +200,10 @@ for (const [width, height] of VIEWPORTS) {
   check((await page.scrolls()).length === 0, `${size}: confirmation needs no scrolling`);
   await page.shot(`confirm-${size}.png`);
   await page.click('Not yet');
-  check(/Generous donor/.test(await page.dialogText()), `${size}: "Not yet" returns to the three names`);
+  check(/Paid for the new Gallery wing/.test(await page.dialogText()), `${size}: "Not yet" returns to the three names`);
   await page.click('Leon');
   await page.key('Escape');
-  check(/Generous donor/.test(await page.dialogText()), `${size}: Escape returns to the names and keeps the panel open`);
+  check(/Paid for the new Gallery wing/.test(await page.dialogText()), `${size}: Escape returns to the names and keeps the panel open`);
   const untouched = await page.story();
   check(untouched.accusation.attempts === 0 && untouched.ending === null && untouched.accusation.accused === null, `${size}: cancelling counts no accusation`);
   await page.click('Dr. Mara Vale');
