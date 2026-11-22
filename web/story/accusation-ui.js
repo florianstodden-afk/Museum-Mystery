@@ -70,8 +70,8 @@ export function renderAccusation(container, { state, message = '' }, onAccuse, o
     pane.append(...parts);
     container.replaceChildren(el('section', { className: 'story-accusation' }, [pane, overlay]));
     if (state.accusation.solved) {
-      showPopup({overlay, pane, label:'Mystery Solved', actionLabel:'Decide what happens', keys:['Enter'], onAction:onContinue,
-        contents:[el('h3', {className:'vault-correct', text:'Mystery Solved'}),
+      showPopup({overlay, pane, label:'Mystery solved', actionLabel:'Decide what happens', keys:['Enter'], onAction:onContinue,
+        contents:[el('h3', {className:'vault-correct', text:'Mystery solved'}),
           el('p', {text:'Adrien Voss sent you.'}),
           el('p', {text:'The label, patron visit, “V” and frame order all lead to him. “M” is for mécène, patron.'}),
           renderChain(evidenceChain(state))]});

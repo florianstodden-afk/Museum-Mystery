@@ -533,7 +533,7 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
   width:100%;
   margin:0 0 .5rem;
   text-align:center;
-  font-size:clamp(2.1rem, 5vw, 2.85rem);
+  font-size:clamp(1.9rem, 4.6vw, 2.6rem);
   line-height:1.15;
   color:#fff;
   text-shadow:0 0 5px #ffdc75, 0 0 15px #ffc943bb, 0 0 26px #ffb90077;
