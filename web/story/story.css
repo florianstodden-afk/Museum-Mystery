@@ -535,11 +535,11 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
   text-align:center;
   font-size:clamp(2.1rem, 5vw, 2.85rem);
   line-height:1.15;
-  color:#ffde76;
+  color:#ebc453;
   text-shadow:0 0 5px #ffdc75, 0 0 15px #ffc943bb, 0 0 26px #ffb90077;
 }
-.story-accusation .puzzle-popup:has(.vault-correct) { text-align:left; justify-items:start; max-height:85dvh; overflow:auto; }
+.story-accusation .puzzle-popup:has(.vault-correct) { text-align:left; justify-items:stretch; max-height:85dvh; overflow:auto; }
 .story-accusation .story-chain summary { cursor:pointer; }
 .story-accusation .puzzle-popup:has(.vault-correct) > .story-button { display:block; width:auto; margin:12px auto 0 0; }
 
-.story-accusation .puzzle-popup:has(.vault-correct) > p { text-align:center; }
+.story-accusation .puzzle-popup:has(.vault-correct) > p { width:100%; text-align:center; }
