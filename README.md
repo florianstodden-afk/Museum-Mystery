@@ -66,7 +66,7 @@ cd Museum-Mystery
 | `GITHUB_CLIENT_ID` | Client ID of the GitHub OAuth app |
 | `GITHUB_CLIENT_SECRET` | Client secret of the GitHub OAuth app |
 
-Vercel installs the database driver from `package.json` itself. Setup details and the OAuth callback URL: [docs/leaderboard.md](docs/leaderboard.md).
+One runtime dependency (Neon driver), pinned in package-lock.json. Vercel installs it from the lockfile itself. Setup details and the OAuth callback URL: [docs/leaderboard.md](docs/leaderboard.md).
 
 ## Run the application
 
@@ -94,7 +94,7 @@ Run it from the repository folder. GitHub Actions runs the same command for ever
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
 | `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
-| `vercel.json`, `package.json` | Vercel serves `web/` and installs the database driver |
+| `vercel.json`, `package.json`, `package-lock.json` | Vercel serves `web/` and installs the pinned database driver |
 | `web/local-auth.js`, `web/story/local-runs.js` | Earlier local account/scoreboard code; no longer used by the entry screen |
 | `web/wall-plaque.js` | Brass name plaques above the Gallery stations |
 | `web/engine.js` | Map and movement rules |
