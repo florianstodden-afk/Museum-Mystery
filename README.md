@@ -49,7 +49,7 @@ Requirements:
 
 - [Git](https://git-scm.com/)
 - [Python 3](https://www.python.org/) – only for the small local web server; any other static file server works too
-- [Node.js](https://nodejs.org/) 18 or newer – only for the tests
+- [Node.js](https://nodejs.org/) 22 or newer – only for the tests
 
 The game and the tests need no `npm install` and no build step. Get the code:
 

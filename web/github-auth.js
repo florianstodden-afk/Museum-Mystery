@@ -57,10 +57,8 @@ export async function signOut() {
 }
 
 export function createCloudSync(snapshot, onStatus = () => {}, pendingKey = null) {
-  let timer = null, pending = false, running = false;
-  async function send() {
-    if (running || !pending) return;
-    running = true;
+  let timer = null, pending = false, inFlight = null;
+  async function uploadPending() {
     try {
       while (pending) {
         pending = false;
@@ -74,7 +72,11 @@ export function createCloudSync(snapshot, onStatus = () => {}, pendingKey = null
           onStatus('Online save unavailable; progress remains on this device.'); throw error;
         }
       }
-    } finally { running = false; }
+    } finally { inFlight = null; }
+  }
+  function send() {
+    if (!inFlight && pending) inFlight = uploadPending();
+    return inFlight ?? Promise.resolve();
   }
   return {
     schedule() { pending = true; clearTimeout(timer); timer = setTimeout(() => { send().catch(() => {}); }, 1200); },
