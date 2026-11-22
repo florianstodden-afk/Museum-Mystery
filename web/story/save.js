@@ -3,6 +3,7 @@
 import { CASE, CASE_VERSION, STATION_IDS } from './case-1.js';
 import { ENDING_IDS, MAX_ACCUSATIONS } from './engine.js';
 import { synchronizeScore, emptyPenalties } from './scoring.js';
+import { PERSON_IDS } from './people.js';
 
 export function serialize(state) {
   return JSON.stringify(state);
@@ -60,6 +61,8 @@ export function isValidState(value) {
   if (!isListOf(value.evidence, evidenceIds)) return false;
   const noteIds = CASE.notes.map(note => note.id);
   if (!isListOf(value.notes, noteIds)) return false;
+  // People met (journal "People" page). Optional: older saves have no such field.
+  if (value.met !== undefined && !isListOf(value.met, PERSON_IDS)) return false;
 
   if (value.safe === null || typeof value.safe !== 'object') return false;
   if (typeof value.safe.open !== 'boolean' || !isCount(value.safe.attempts)) return false;

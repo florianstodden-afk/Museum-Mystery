@@ -12,7 +12,8 @@ import * as catalogueStation from './minigames/curators-catalogue.js?v=credits-1
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=flash-4s-1';
-import { createStoryHost } from './story/host.js?v=oils-1';
+import { createStoryHost } from './story/host.js?v=people-1';
+import { peopleModel, renderPeople } from './story/people.js?v=people-1';
 import { journalModel, renderJournal } from './story/journal.js?v=journal-blank-1';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
@@ -162,12 +163,43 @@ function updateSidebar() {
   document.querySelector('#progress').textContent = `${model.slots.filter(slot => slot.solved).length} / 4 letters`;
   document.querySelector('#pass').textContent = `${model.score.total} / ${model.score.max} points`;
   renderJournal(document.querySelector('#journal'), model, document.querySelector('#journal-evidence'));
+  renderPeople(document.querySelector('#journal-people'), peopleModel(story.state), drawPortrait);
 }
+
+// A small portrait for the journal's "People" page, drawn with the game's own figure.
+function drawPortrait(canvas, kind){
+  const c=canvas.getContext('2d');
+  if(!c)return;
+  c.clearRect(0,0,canvas.width,canvas.height);
+  c.save();c.scale(1.15,1.15);
+  drawPerson(28,62,kind,'down',0,false,c);
+  c.restore();
+}
+
+// Journal tabs: "Case" (letters, evidence, notes) and "People".
+function showJournalTab(name){
+  const people=name==='people';
+  for(const [id,on] of [['#journal-tab-case',!people],['#journal-tab-people',people]]){
+    const tab=document.querySelector(id);tab.setAttribute('aria-selected',String(on));tab.tabIndex=on?0:-1;
+  }
+  document.querySelector('#journal-case-pages').hidden=people;
+  document.querySelector('#journal-people-page').hidden=!people;
+}
+document.querySelector('#journal-tab-case').addEventListener('click',()=>showJournalTab('case'));
+document.querySelector('#journal-tab-people').addEventListener('click',()=>showJournalTab('people'));
+document.querySelector('.journal-tabs').addEventListener('keydown',event=>{
+  if(event.key!=='ArrowLeft'&&event.key!=='ArrowRight')return;
+  event.preventDefault();
+  const next=document.querySelector('#journal-tab-people').getAttribute('aria-selected')==='true'?'case':'people';
+  showJournalTab(next);document.querySelector(`#journal-tab-${next}`).focus();
+});
 
 function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h);}
 function tile(x,y,color){rect(x*TILE,y*TILE,TILE,TILE,color);}
 function hallPosition(x,y){ return {x: (x + 0.5) * 896 / 9, y: 345 + (y - 2) * 14}; }
-function drawPerson(x,y,kind,direction='down',time=0,moving=false){
+// `target` lets the journal draw the same figure on its own small canvas.
+function drawPerson(x,y,kind,direction='down',time=0,moving=false,target=ctx){
+  const ctx=target;
   ctx.save(); ctx.translate(x,y);
   const sway = kind === 'guard' ? Math.sin(time / 800) * 1.5 : moving ? Math.sin(time / 100) * 2 : 0;
   ctx.translate(0,sway);
