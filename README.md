@@ -95,7 +95,7 @@ Run it from the repository folder. GitHub Actions runs the same command for ever
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
 | `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
 | `vercel.json`, `package.json`, `package-lock.json` | Vercel serves `web/` and installs the pinned database driver |
-| `web/local-auth.js`, `web/story/local-runs.js` | Earlier local account/scoreboard code; no longer used by the entry screen |
+| `web/storage-keys.js` | Storage keys per player (guest or GitHub account) |
 | `web/wall-plaque.js` | Brass name plaques above the Gallery stations |
 | `web/engine.js` | Map and movement rules |
 | `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |

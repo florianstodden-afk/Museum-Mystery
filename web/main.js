@@ -26,7 +26,7 @@ import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
 import { createSpeechBox } from './story/speech-box.js?v=npc-conversation-1';
 import { talkPartner, shouldCloseTalk, distanceBetween, facingToward } from './story/proximity.js?v=npc-e-1';
-import { profileStorageKey } from './local-auth.js';
+import { profileStorageKey } from './storage-keys.js';
 
 const TILE = 32;
 const canvas = document.querySelector('#game');

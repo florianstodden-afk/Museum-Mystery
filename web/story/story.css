@@ -480,7 +480,6 @@ a.story-button { display: inline-block; text-decoration: none; }
 /* Lost: below the plaque, who it really was and why the accused is innocent. */
 .story-ending-truth{position:absolute;left:4%;right:4%;top:232%;margin:0;padding:10px 16px;border:1px solid #b99053;border-radius:10px;background:#081922e6;font-size:clamp(.72rem,1.02vw,.98rem);line-height:1.4;color:#f7e7cb;text-wrap:balance}
 @media(max-width:680px){.story-ending-truth{position:static;margin:12px 0 0;padding:10px 0 0;border:0;border-top:1px solid #b9905366;border-radius:0;background:none;font-size:.88rem;color:#e3d3b4}}
-.local-runs-table tr.is-lost td{color:#b9ab93}
 
 /* Keep the four artwork games compact without clipping their controls. */
 .dialog-card.story-dark-card:has(.picture-puzzle) {
