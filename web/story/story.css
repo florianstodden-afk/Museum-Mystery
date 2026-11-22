@@ -535,8 +535,8 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
   text-align:center;
   font-size:clamp(1.9rem, 4.6vw, 2.6rem);
   line-height:1.15;
-  color:var(--story-gold-deep);
-  text-shadow:0 0 5px color-mix(in srgb, var(--story-gold-deep) 35%, transparent);
+  color:var(--story-gold);
+  text-shadow:0 0 5px color-mix(in srgb, var(--story-gold) 35%, transparent);
 }
 .story-accusation .puzzle-popup:has(.vault-correct) { text-align:left; justify-items:stretch; max-height:85dvh; overflow:auto; }
 .story-accusation .story-chain summary { cursor:pointer; }
