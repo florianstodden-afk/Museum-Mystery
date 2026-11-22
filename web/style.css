@@ -331,6 +331,10 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .journal-page > * { flex-shrink: 0; }
 }
 @media (max-width: 700px) {
-  .journal-book { width: min(94vw, 510px); max-height: calc(100dvh - 62px); }
+  .journal-book { width: min(94vw, 510px); height: min(89dvh, 760px); max-height: calc(100dvh - 62px); }
   .journal-pages { grid-auto-rows: max-content; }
+}
+@media (min-width: 701px) {
+  .journal-book > .journal-pages { left: 3%; right: 3%; }
+  .journal-evidence-grid ul { padding-block: 4px; }
 }

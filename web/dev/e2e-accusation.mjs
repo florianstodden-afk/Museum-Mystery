@@ -111,6 +111,11 @@ for (const [width, height] of VIEWPORTS) {
   // Journal with the new evidence texts (all stations solved, before the final question).
   await startAt(page, allSolved(), { x: 11, y: 6 });
   await page.key('j');
+  for (let attempt = 0; attempt < 20; attempt++) {
+    if (await page.evaluate("!document.querySelector('#sidebar').hidden")) break;
+    await wait(50);
+  }
+  check(await page.evaluate("document.querySelector('#journal-title').getBoundingClientRect().bottom <= document.querySelector('.journal-book').getBoundingClientRect().top"), size + ': title sits above book');
   const journal = await page.evaluate(`document.querySelector('.journal-book')?.innerText ?? document.body.innerText`);
   check(/approved by a patron – not by museum staff/.test(journal) && /Ordered by: A\. V\./.test(journal), `${size}: journal shows the new evidence`);
   check(!/Voss/.test(journal), `${size}: journal names no Voss before the accusation`);
