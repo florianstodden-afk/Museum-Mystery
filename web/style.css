@@ -154,11 +154,10 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .game-menu button:hover,.game-menu button[aria-pressed="true"]{background:linear-gradient(#4b6661,#253b3b)}
 .game-menu-actions{margin-top:28px;gap:14px}.game-menu-actions button{min-height:72px}
 .game-menu #game-menu-resume{background:linear-gradient(#61573f,#2a2e2d)}
-.game-journal-toggle[hidden],.home-journal[hidden]{display:none}
+.game-journal-toggle[hidden]{display:none}
 .game-journal-toggle{position:fixed;z-index:12;top:max(16px,env(safe-area-inset-top));right:78px;min-height:46px;padding:8px 15px;border:2px solid #d6ae68;border-radius:11px;background:#14252be8;color:#f5d99b;font:700 1rem Fraunces,Georgia,serif;box-shadow:0 4px 18px #0009}
 .game-journal-toggle kbd{margin-left:5px;background:#33494a;color:#f7dfb5}
-.home-journal{position:absolute;z-index:3;right:3%;top:4%;padding:9px 17px;border:2px solid #d6ae68;border-radius:10px;background:#14252bf0;color:#f5d99b;font:700 1.1rem Fraunces,Georgia,serif;box-shadow:0 4px 16px #0009}
-.game-journal-toggle:hover,.home-journal:hover{background:#345052}
+.game-journal-toggle:hover{background:#345052}
 .sidebar[hidden]{display:none}
 .sidebar:not([hidden]){position:fixed;z-index:40;inset:0;display:grid;place-items:center;width:auto;max-height:none;padding:18px;background:#061016c7;backdrop-filter:blur(6px);overflow:auto}
 .journal-book{position:relative;width:min(1120px,100%);max-height:calc(100dvh - 36px);overflow:auto;padding:28px 34px;border:4px double #ddbb78;border-radius:22px;background:linear-gradient(90deg,#172d32 0 49.8%,#09191e 50%,#172d32 50.2%);box-shadow:0 25px 90px #000d,inset 0 0 0 6px #284349,inset 0 0 0 9px #987646;color:#f1e5cd}
@@ -172,7 +171,7 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .journal-progress .story-slots{gap:10px}.journal-progress .story-slot{min-height:120px;align-content:center;background:#0d1b21;border-color:#84765b}.journal-progress .story-slot-letter{font-size:2rem}.journal-progress .story-slot-room{font-size:.78rem;color:#e3d8bf}
 .journal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.journal-stats span{display:grid;place-items:center;min-height:70px;padding:8px;border:1px solid #9a8b6e;border-radius:40px;background:#ffffff14;text-align:center;font-size:.9rem}
 .journal-sources{margin:25px 0 0;text-align:center;color:#cbbda5;font-size:.78rem}.journal-sources a{color:#edcf93}
-.sidebar button:focus-visible,.sidebar a:focus-visible,.game-journal-toggle:focus-visible,.home-journal:focus-visible{outline:3px solid #f7d38e;outline-offset:3px}
+.sidebar button:focus-visible,.sidebar a:focus-visible,.game-journal-toggle:focus-visible{outline:3px solid #f7d38e;outline-offset:3px}
 @media(max-width:700px){.game-menu{padding:12px}.game-menu-card{max-height:calc(100dvh - 24px)}.game-menu button:not(.game-menu-toggle){min-height:56px}.game-menu-grid{gap:9px}.game-menu-actions{margin-top:16px}.game-journal-toggle{right:68px;font-size:.85rem}.game-journal-toggle kbd{display:none}.sidebar:not([hidden]){padding:8px}.journal-book{max-height:calc(100dvh - 16px);padding:20px 12px}.journal-book>h2{font-size:1.5rem;margin:8px 40px 15px}.journal-pages{grid-template-columns:1fr;gap:12px}.journal-page{padding:8px}.journal-page h3:not(:first-child){margin-top:22px;padding-top:18px}.journal-evidence-grid p,.journal-evidence-grid ul{min-height:80px}.journal-progress .story-slot{min-height:95px}.journal-progress .story-slot-room{font-size:.64rem}}
 
 /* Smaller open-book journal; the current home or game scene remains visible around it. */
@@ -196,6 +195,31 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
 .journal-progress .story-slot-letter{font-size:1.25rem}.journal-progress .story-slot-room{font-size:.58rem}
 .journal-stats{gap:5px}.journal-stats span{min-height:40px;padding:4px;font-size:.69rem}
 .journal-sources{margin:10px 0 0;font-size:.65rem}
+/* Journal tabs "Case" / "People": small, top left of the book, opposite the close button. */
+.journal-book{position:relative}
+.journal-tabs{position:absolute;z-index:2;top:22px;left:34px;display:flex;gap:4px}
+.journal-tabs button{padding:4px 10px;border:1px solid #b39a64;border-radius:7px;background:#14262acc;color:#e8c789;font:700 .72rem system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.journal-tabs button[aria-selected="true"]{background:#d5b477;color:#14262a}
+.journal-tabs button:focus-visible{outline:2px solid #f5d99b;outline-offset:2px}
+.journal-people-page[hidden],.journal-pages[hidden]{display:none}
+.journal-people-page{height:calc(100% - 53px);padding:4px 30px 8px;overflow:hidden}
+.journal-people-page h3{text-align:center;margin:0 0 12px;color:#e8c789;font:700 .88rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em}
+.journal-people-page #journal-people{height:100%}
+/* Desktop: two people per book page, with the same space to the gold frame and to the spine,
+   centred on their page. The tab already says "People", so the shared heading on the spine is only for screen readers. */
+.journal-people{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;grid-auto-flow:column;align-content:center;height:100%;gap:18px 74px}
+@media(min-width:701px){.journal-people-page h3{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
+.journal-person{display:flex;align-items:center;gap:12px;min-width:0;padding:10px;border-radius:12px;background:#ffffff13}
+.journal-person-portrait{flex:none;width:64px;height:64px;border-radius:50%;background:#0c1d21;border:1px solid #b39a64}
+.journal-person-portrait.is-unknown{display:grid;place-items:center;color:#b39a64;font:700 1.6rem Fraunces,Georgia,serif}
+.journal-person-portrait.is-silhouette{position:relative;overflow:hidden}
+.journal-silhouette{position:absolute;left:50%;bottom:-10px;width:38px;height:30px;transform:translateX(-50%);border-radius:19px 19px 4px 4px;background:#3b4a4e}
+.journal-silhouette::before{content:"";position:absolute;left:50%;top:-25px;width:22px;height:22px;transform:translateX(-50%);border-radius:50%;background:#3b4a4e}
+.journal-person-text{display:grid;gap:2px;min-width:0}
+.journal-person-text strong{color:#f4d69d;font:700 1rem Fraunces,Georgia,serif}
+.journal-person-role{color:#e8c789;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase}
+.journal-person-line{font-size:.8rem;line-height:1.35}
+.journal-person.is-unknown .journal-person-line{color:#c9b998;font-style:italic}
 @media(max-width:700px){
   .sidebar:not([hidden]){padding:8px}
   .journal-book{width:min(94vw,510px);height:min(80dvh,690px);max-height:calc(100dvh - 16px);aspect-ratio:auto;padding:24px 29px 28px;background-image:url('assets/investigation-journal-page.webp');background-size:100% 100%}
@@ -203,12 +227,21 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .journal-close{top:16px;right:18px;width:30px;height:30px}
   .journal-pages{height:calc(100% - 48px);grid-template-columns:1fr;gap:6px;overflow:auto}
   .journal-page{overflow:visible;padding:3px 12px}
-  .journal-page h3:not(:first-child){margin-top:12px;padding-top:9px}
+  .journal-page h3:not(:first-child){margin-top:10px;padding-top:7px}
   .journal-progress .story-slot{min-height:65px}
   /* The mission page must not run into the progress page below it. */
-  .journal-mission-title{margin:2px auto 6px}
+  .journal-mission-title{margin:0 auto 3px}
   .journal-mission>button{padding:4px 10px}
   .journal-evidence-grid p,.journal-evidence-grid ul{max-height:112px}
+  /* Phone: one-line title, tabs in their own row below it. */
+  .journal-book>h2{font-size:.95rem;white-space:nowrap;margin:2px 36px 6px}
+  .journal-tabs{position:static;justify-content:center;margin:0 0 6px}
+  .journal-pages{height:calc(100% - 68px)}
+  .journal-people-page{height:calc(100% - 68px);padding:3px 4px;overflow:auto}
+  .journal-people-page #journal-people{height:auto}
+  .journal-people{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row;align-content:start;height:auto;gap:8px}
+  .journal-person{padding:8px}
+  .journal-person-portrait{width:56px;height:56px}
 }
 
 /* The two supplied paintings are backgrounds; form controls stay real and accessible. */
@@ -243,4 +276,16 @@ body[data-room='security']:before{background:radial-gradient(ellipse at 50% 45%,
   .entry-forgot,.entry-message,.entry-guest,.entry-local-note{position:static;display:block;width:100%;transform:none;text-align:center}
   .entry-forgot{margin:12px 0 0}.entry-message{min-height:1.2em;margin:9px 0 0}
   .entry-guest{margin:8px auto 0}.entry-local-note{margin:12px 0 0;line-height:1.3}
+}
+/* Desktop Case pages: the same space to the gold frame and the spine as the People page, and the two sections
+   of each page spread over its height (headings stay at the top; the rest of the space goes between and below). */
+@media(min-width:701px){
+  .journal-pages:not(.journal-people-page) .journal-page{display:flex;flex-direction:column;padding:2px 30px 4px}
+  .journal-page>h3:not(:first-child){margin-top:auto}
+  .journal-page>h3:not(:first-child)::before{content:'';display:block;height:6px}
+  .journal-page::after{content:'';margin-top:auto}
+  .journal-mission>button{margin:0 auto}
+  .journal-evidence-grid p,.journal-evidence-grid ul{min-height:96px}
+  .journal-progress .story-next{margin-bottom:14px}
+  .journal-sources{margin-top:14px}
 }

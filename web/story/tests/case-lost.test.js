@@ -145,3 +145,14 @@ test('a lost run is never stored as the best run', () => {
   store.record({ points: 70, timeMs: 1000, max: 80, status: 'Lost' });
   assert.equal(store.get().points, 40);
 });
+
+test('the accusation view shows a quiet nudge to check the evidence, only while the question is open', async () => {
+  const { ACCUSATION_NUDGE } = await import('../accusation-ui.js');
+  installFakeDom();
+  const box = createContainer();
+  assert.ok(ACCUSATION_NUDGE.split(/\s+/).length <= 12);
+  renderAccusation(box, { state: atAccusation() }, () => {});
+  assert.equal(findAll(box, node => node.className === 'story-muted story-accusation-nudge')[0].textContent, ACCUSATION_NUDGE);
+  renderAccusation(box, { state: accuse(atAccusation(), 'voss').state }, () => {});
+  assert.doesNotMatch(box.textContent, /Check your journal/);
+});

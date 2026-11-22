@@ -172,7 +172,7 @@ The four evidence lines in `story/case-1.js` (`evidence`, `pointsToVoss`) name V
 | `story/case-1.js` | Dr. Mara Vale | 3 |
 | `story/case-1.js` | Locked the original in the safe and left four clues. Her initial is also a “V”. | 16 |
 | `story/case-1.js` | The ‘V’ is not Vale. The frame label names ‘A. V.’, not M. V. – and Vale hid the original to protect it. | 21 |
-| `story/case-1.js` | Generous donor of the museum. Signs his messages with a single letter. | 12 |
+| `story/case-1.js` | Patron of the museum. Paid for the new Gallery wing – and its wall labels. | 13 |
 | `story/case-1.js` | Who planned the false label and the transport slip, and lured you to the safe? | 15 |
 | `story/case-1.js` | Wheat Field with Cypresses | 4 |
 | `story/case-1.js` | Wheat Field with Cypresses | 4 |

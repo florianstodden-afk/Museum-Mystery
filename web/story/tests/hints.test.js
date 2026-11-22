@@ -42,17 +42,20 @@ test('station hints name the open rooms and become concrete on level 2', () => {
   assert.match(hintFor(s, 2).text, /Portrait Hall: Put the four portraits in the order they were painted/);
 });
 
-test('the safe hint gives the letters after two wrong words', () => {
+test('the safe hints point to the journal and never spell the code word', () => {
   let s = allSolved();
-  assert.doesNotMatch(hintFor(s).text, /O – I – L – S/);
+  assert.equal(hintFor(s, 1).text, 'Your journal already holds the code – four letters, read left to right.');
+  assert.equal(hintFor(s, 2).text, 'Type the four letters from your journal, in the order they stand there.');
   s = tryOpenSafe(s, 'SLIO').state;
+  assert.equal(hintFor(s, 1).text, 'Your journal already holds the code – four letters, read left to right.', 'one wrong word: still level 1');
   s = tryOpenSafe(s, 'LIBD').state;
-  assert.match(hintFor(s).text, /O – I – L – S/);
+  assert.equal(hintFor(s, 1).text, 'Type the four letters from your journal, in the order they stand there.', 'two wrong words: concrete');
+  for (const level of [1, 2]) assert.doesNotMatch(hintFor(s, level).text, /OILS|O\W+I\W+L\W+S/i);
 });
 
-test('the accusation hint has two levels: line up the evidence, then patron + A. V.', () => {
+test('the accusation hint has two levels: label + initials, then patron + A. V.', () => {
   const s = tryOpenSafe(allSolved(), 'OILS').state;
-  assert.match(hintFor(s, 1).text, /^Line up the four pieces of evidence/);
+  assert.equal(hintFor(s, 1).text, 'Two clues matter most: who approved the false label, and whose initials are on the frame order.');
   assert.doesNotMatch(hintFor(s, 1).text, /A\. V\.|Voss/);
   assert.equal(hintFor(s, 2).text, 'A patron, initials A. V. – who fits both?');
   assert.doesNotMatch(hintFor(s, 2).text, /Voss/);

@@ -140,7 +140,7 @@ export const CASE = deepFreeze({
       name: 'Adrien Voss',
       pronoun: 'him',
       role: 'Patron',
-      description: 'Generous donor of the museum. Signs his messages with a single letter.',
+      description: 'Patron of the museum. Paid for the new Gallery wing – and its wall labels.',
       counterEvidenceId: null,
       counterText: '',
     },

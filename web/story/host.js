@@ -22,7 +22,7 @@ import { serialize, deserialize } from './save.js';
 import { openStation as runStation } from './stations.js';
 import * as placeholderStation from './placeholder-station.js';
 import { dialogueFor, renderDialogue, conversationFor } from './dialogues.js?v=oils-1';
-import { renderSafe } from './safe-ui.js?v=vault-wheel-7';
+import { renderSafe } from './safe-ui.js?v=vault-wheel-8';
 import { renderAccusation } from './accusation-ui.js';
 import { endingModel, renderEnding, renderEndingChoice } from './endings.js';
 import { hintFor } from './hints.js';
@@ -33,6 +33,7 @@ import { validCatalogue } from '../minigames/catalogue-rules.js';
 import { validForgery } from '../minigames/forgery-rules.js';
 import { validPuzzle } from '../minigames/picture-rules.js';
 import { soundFor } from './sound.js';
+import { meet } from './people.js';
 
 export const DEFAULT_STORAGE_KEY = 'museum-nocturne-story-v1';
 
@@ -154,6 +155,9 @@ export function createStoryHost(options) {
   }
 
   function talkTo(characterId) {
+    // The journal's "People" page unlocks a person after the first conversation (or Vale's door card).
+    const met = meet(state, characterId);
+    if (met !== state) { state = met; save(); onChange(state, ''); }
     // Characters with a short conversation talk in the speech box (if the page has one).
     const conversation = speech && conversationFor(characterId, state);
     if (conversation) {

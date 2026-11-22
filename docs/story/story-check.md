@@ -30,7 +30,7 @@ After that his dialogue changes too (“The log proves it …”, after the solu
 | **Who is “M”?** After the right answer the game only said “M was Voss”, without a reason. “M” even looks like **M**ara Vale. | After the right answer: “M” stands for *mécène* (old word for patron). Dr. Vale says so in her dialogue too (“Everyone here thinks it means Mara.”). The mix-up is thus a deliberate second false trail that gets resolved. |
 | **Why does Voss lure the player character to the safe?** Was not explained. | After the right answer and in Vale’s dialogue: Voss could not open Vale’s safe himself and needed someone who follows her clues. |
 | **The chain of evidence gave the solution away** after a wrong answer (every line mentions Voss). | The chain of evidence appears only after the right answer (M4, with a test). |
-| Suspect text for Voss: “Signs his messages with a single letter.” | Stays on purpose as a fair hint for attentive players (the mission is signed with “M”). |
+| Suspect text for Voss: “Signs his messages with a single letter.” | Gave the answer away at once (the mission is signed with “M”). Since 22.11.2026: “Patron of the museum. Paid for the new Gallery wing – and its wall labels.” – it points to the false label (Station 3, “approved by a patron”) without naming him. |
 
 ## Open points for the team
 

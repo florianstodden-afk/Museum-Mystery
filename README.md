@@ -40,7 +40,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question: who planned it all? You have **one accusation**: pick a name, confirm it, and it counts. Up to 80 points (older completed saves retain their original rewards).
 - Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
-- **J** opens the journal, **Esc** the menu. The hint button helps when you are stuck.
+- In the game, **J** (or the menu) opens the journal: **Case** shows the letters, evidence and notes, **People** who is who. **Esc** opens the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** is for GitHub players. It shows the current run and shared results. A winning finish is submitted automatically; the highest score for each GitHub account appears. Lost runs never enter the shared leaderboard ([details](docs/leaderboard.md)).
 
 ## Installation
@@ -66,7 +66,7 @@ cd Museum-Mystery
 | `GITHUB_CLIENT_ID` | Client ID of the GitHub OAuth app |
 | `GITHUB_CLIENT_SECRET` | Client secret of the GitHub OAuth app |
 
-Vercel installs the database driver from `package.json` itself. Setup details and the OAuth callback URL: [docs/leaderboard.md](docs/leaderboard.md).
+One runtime dependency (Neon driver), pinned in package-lock.json. Vercel installs it from the lockfile itself. Setup details and the OAuth callback URL: [docs/leaderboard.md](docs/leaderboard.md).
 
 ## Run the application
 
@@ -86,6 +86,12 @@ node --test
 
 Run it from the repository folder. GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
+Browser checks (needs Node ≥ 22 and Chrome or Edge, no Playwright) start their own server and save screenshots in `web/dev/shots/`:
+
+```bash
+node web/dev/run-e2e.mjs
+```
+
 ## Project structure
 
 | Path | Purpose |
@@ -94,8 +100,8 @@ Run it from the repository folder. GitHub Actions runs the same command for ever
 | `web/main.js` | Drawing, input, rooms, connects the game to the story |
 | `web/github-auth.js`, `web/leaderboard.js` | GitHub sign-in, online saves and shared scoreboard |
 | `api/` | Vercel functions for GitHub OAuth, Postgres saves and the shared leaderboard |
-| `vercel.json`, `package.json` | Vercel serves `web/` and installs the database driver |
-| `web/local-auth.js`, `web/story/local-runs.js` | Earlier local account/scoreboard code; no longer used by the entry screen |
+| `vercel.json`, `package.json`, `package-lock.json` | Vercel serves `web/` and installs the pinned database driver |
+| `web/storage-keys.js` | Storage keys per player (guest or GitHub account) |
 | `web/wall-plaque.js` | Brass name plaques above the Gallery stations |
 | `web/engine.js` | Map and movement rules |
 | `web/story/` | Story engine, save, scoring, dialogues, hints, endings, sound |

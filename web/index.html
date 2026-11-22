@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Museum Mystery – The Night of the Forgery</title>
-  <link rel="stylesheet" href="style.css?v=github-login-art-3">
+  <link rel="stylesheet" href="style.css?v=people-layout-1">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="story/story.css?v=github-login-1">
+  <link rel="stylesheet" href="story/story.css?v=vault-wheel-8">
 </head>
 <body>
   <section id="entry-screen" class="entry-screen" aria-labelledby="entry-title">
@@ -31,7 +31,6 @@
       <p id="home-current-profile" class="home-current-profile" hidden></p>
       <p id="home-sync-status" class="home-sync-status" role="status" aria-live="polite" hidden></p>
       <p id="home-notice" class="home-notice" role="status" hidden></p>
-      <button id="home-journal" class="home-journal" type="button" aria-haspopup="dialog">Journal</button>
       <div id="home-settings-panel" class="home-panel" hidden>
         <button class="home-panel-close" type="button" data-close-home-panel aria-label="Close settings">×</button>
         <h2>Settings</h2>
@@ -79,7 +78,11 @@
     <div class="journal-book">
       <button id="journal-close" class="journal-close" type="button" aria-label="Close journal">×</button>
       <h2 id="journal-title">Investigation Journal</h2>
-      <div class="journal-pages">
+      <div class="journal-tabs" role="tablist" aria-label="Journal pages">
+        <button id="journal-tab-case" type="button" role="tab" aria-selected="true" aria-controls="journal-case-pages">Case</button>
+        <button id="journal-tab-people" type="button" role="tab" aria-selected="false" aria-controls="journal-people-page" tabindex="-1">People</button>
+      </div>
+      <div class="journal-pages" id="journal-case-pages" role="tabpanel" aria-labelledby="journal-tab-case">
         <section class="journal-page journal-mission" aria-label="Mission and evidence">
           <h3>Mission</h3>
           <p class="journal-mission-title">Bring the Van Gogh painting out tonight.</p>
@@ -95,6 +98,10 @@
           <p class="journal-sources">Artworks: The Metropolitan Museum of Art, Open Access · <a href="https://github.com/florianstodden-afk/Museum-Mystery/blob/main/docs/art-credits.md" target="_blank" rel="noopener">Full artwork credits</a></p>
         </section>
       </div>
+      <section class="journal-people-page" id="journal-people-page" role="tabpanel" aria-labelledby="journal-tab-people" hidden>
+        <h3>People</h3>
+        <div id="journal-people"></div>
+      </section>
     </div>
   </aside>
   <div id="game-menu" class="game-menu" role="dialog" aria-modal="true" aria-labelledby="game-menu-title" hidden>
@@ -115,6 +122,6 @@
   <div id="dialog" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-card" tabindex="-1"><p class="eyebrow">MUSEUM MYSTERY</p><h2 id="dialog-title">Discovery</h2><div id="dialog-body"></div><div id="dialog-actions"></div></div>
   </div>
-  <script type="module" src="main.js?v=character-depth-scoreboard-1"></script>
+  <script type="module" src="main.js?v=people-layout-1"></script>
 </body>
 </html>

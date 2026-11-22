@@ -4,7 +4,7 @@
 // Story hints cost no points. (Hints INSIDE a station are the station's own and cost −5 there.)
 // After two wrong tries at the safe, level 1 is already concrete: no one may stay stuck there.
 // The final question has only one try, so its hints are the same two levels for everyone.
-import { CASE, stationPlace, stationsByNumber } from './case-1.js';
+import { stationPlace, stationsByNumber } from './case-1.js';
 import { allStationsSolved } from './engine.js';
 
 export const HINT_GIVER = 'Imani';
@@ -38,16 +38,16 @@ function stationHint(state, concrete) {
 
 function safeHint(state, concrete) {
   if (concrete || state.safe.attempts >= 2) {
-    return hint(`Put the four letters from your journal in this order: ${CASE.stations.map(s => s.letter).join(' – ')}.`);
+    return hint('Type the four letters from your journal, in the order they stand there.');
   }
-  return hint('Four letters, one word: what every painter in this museum worked with.');
+  return hint('Your journal already holds the code – four letters, read left to right.');
 }
 
 function accusationHint(state, concrete) {
   if (concrete) {
     return hint('A patron, initials A. V. – who fits both?');
   }
-  return hint('Line up the four pieces of evidence: who approved the label, who booked the cart, whose “V” is it?');
+  return hint('Two clues matter most: who approved the false label, and whose initials are on the frame order.');
 }
 
 function hint(text) {
