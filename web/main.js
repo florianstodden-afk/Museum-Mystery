@@ -12,8 +12,8 @@ import * as catalogueStation from './minigames/curators-catalogue.js?v=credits-1
 import * as forgeryStation from './minigames/spot-the-forgery.js';
 import * as pictureStation from './minigames/picture-puzzle.js';
 import * as portraitStation from './minigames/portrait-timeline.js?v=flash-4s-1';
-import { createStoryHost } from './story/host.js?v=people-2';
-import { peopleModel, renderPeople } from './story/people.js?v=people-1';
+import { createStoryHost } from './story/host.js?v=vault-ending-1';
+import { peopleModel, renderPeople } from './story/people.js?v=vault-ending-1';
 import { journalModel, renderJournal } from './story/journal.js?v=journal-blank-1';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';
 import { scoreboard, bestRunStore } from './story/scoring.js';
