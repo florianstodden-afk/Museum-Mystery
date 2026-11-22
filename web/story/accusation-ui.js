@@ -10,6 +10,9 @@ export function confirmText(suspect) {
   return `Name ${suspect.name}? You get one chance – once you speak, M will hear of it.`;
 }
 
+/** A quiet nudge under the question, before anyone is named (≤ 12 words). */
+export const ACCUSATION_NUDGE = 'Check your journal’s evidence before you name anyone.';
+
 export function confirmLabel(suspect) {
   return `Name ${suspect.pronoun ?? 'them'}`;
 }
@@ -31,6 +34,7 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
     ];
     const open = !state.accusation.solved && state.ending === null;
     const pending = open && pendingId ? suspectById(pendingId) : null;
+    if (open) parts.push(el('p', { className: 'story-muted story-accusation-nudge', text: ACCUSATION_NUDGE }));
 
     if (pending) {
       parts.push(renderConfirm(pending));

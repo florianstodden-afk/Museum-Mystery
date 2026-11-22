@@ -514,3 +514,4 @@ a.story-button { display: inline-block; text-decoration: none; }
 .story-modal:has(.picture-puzzle) .story-modal-body { padding: 12px; }
 html:has(.story-modal[open] .picture-puzzle),
 body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
+.story-accusation-nudge{margin:-4px 0 12px;font-size:.82rem}
