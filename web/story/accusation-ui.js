@@ -17,7 +17,7 @@ export function confirmLabel(suspect) {
   return `Name ${suspect.pronoun ?? 'them'}`;
 }
 
-export function renderAccusation(container, { state, message = '' }, onAccuse) {
+export function renderAccusation(container, { state, message = '' }, onAccuse, onContinue) {
   let pendingKey = null;   // the keydown listener while the confirmation is open
   let focusTarget = null;
 
@@ -28,17 +28,15 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
 
   function draw(pendingId = null) {
     stopKeys();
-    const parts = [
-      el('p', { className: 'story-eyebrow', text: 'THE FINAL QUESTION' }),
-      el('h3', { className: 'story-title', text: CASE.accusationQuestion }),
-    ];
+    const parts = [];
     const open = !state.accusation.solved && state.ending === null;
     const pending = open && pendingId ? suspectById(pendingId) : null;
-    if (open) parts.push(el('p', { className: 'story-muted story-accusation-nudge', text: ACCUSATION_NUDGE }));
-
-    if (pending) {
-      parts.push(renderConfirm(pending));
-    } else if (open) {
+    if (open) {
+      parts.push(el('h3', { className: 'story-title', text: CASE.accusationQuestion + ' - Careful you get one chance' }),
+        el('details', {className:'vault-help'}, [
+          el('summary', {text:'?', attrs:{'aria-label':'Accusation help'}}),
+          el('p', {text:ACCUSATION_NUDGE + ' You get one chance – once you speak, M will hear of it. A wrong accusation ends the case.'})
+        ]));
       const choices = el('div', { className: 'story-choices' });
       for (const suspect of CASE.suspects) {
         const choice = button('', () => draw(suspect.id), 'story-choice');
@@ -47,16 +45,23 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
           el('span', { className: 'story-choice-role', text: suspect.role }),
           el('span', { className: 'story-choice-text', text: suspect.description }),
         );
+        choice.setAttribute('aria-expanded', String(suspect.id === pendingId));
         choices.append(choice);
+        if (suspect.id === pendingId) choices.append(renderConfirm(suspect));
       }
       parts.push(choices);
     }
 
-    parts.push(el('p', { className: 'story-feedback', text: message, attrs: { 'aria-live': 'polite' } }));
-
-    // The chain appears only after the right answer – earlier it would give the answer away.
     if (state.accusation.solved) {
-      parts.push(renderChain(evidenceChain(state)));
+      const next = button('Decide what happens', onContinue);
+      next.append(' ', el('kbd', {text:'↵'}));
+      parts.push(el('div', {className:'story-choice vault-correct-option', text:suspectById(CASE.culpritId).name}),
+        el('div', {className:'vault-result'}, [
+          el('h3', {text:'Correct'}),
+          el('p', {text:'Mystery solved – Adrien Voss sent you.'}),
+          el('p', {text:'The label, patron visit, “V” and frame order all lead to him. “M” is for mécène, patron.'}),
+          renderChain(evidenceChain(state)), next
+        ]));
     }
     container.replaceChildren(el('section', { className: 'story-accusation' }, parts));
     if (pending) focusTarget?.focus();
@@ -78,6 +83,7 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
     pendingKey = event => {
       if (box.isConnected === false) { stopKeys(); return; }
       if (event.key !== 'Escape' && event.key !== 'Enter') return;
+      if (event.key === 'Enter' && event.target?.tagName && event.target !== yes) return;
       event.preventDefault();
       event.stopPropagation?.();
       event.stopImmediatePropagation?.();
@@ -91,8 +97,8 @@ export function renderAccusation(container, { state, message = '' }, onAccuse) {
 }
 
 export function renderChain(chain) {
-  return el('div', { className: 'story-chain' }, [
-    el('p', { className: 'story-eyebrow', text: 'CHAIN OF EVIDENCE' }),
+  return el('details', { className: 'story-chain' }, [
+    el('summary', { text: 'Chain of evidence' }),
     el('ol', { className: 'story-chain-list' }, chain.map(link =>
       el('li', { className: link.found ? 'story-chain-item' : 'story-chain-item is-missing' }, [
         el('span', { className: 'story-chain-letter', text: link.letter, attrs: { 'aria-hidden': 'true' } }),

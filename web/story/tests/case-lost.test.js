@@ -90,7 +90,7 @@ test('choosing a suspect asks first; only the confirmation counts as the accusat
   assert.match(box.textContent, /Name Dr\. Mara Vale\?/);
   assert.match(box.textContent, /Name her ↵/);
   assert.match(box.textContent, /Not yet Esc/);
-  assert.equal(findAll(box, node => node.className === 'story-choice').length, 0, 'list is replaced by the question');
+  assert.equal(findAll(box, node => node.className === 'story-choice').length, 3, 'all suspects remain visible');
 
   // Cancel by button: back to the list, nothing counted, state unchanged.
   findButton(box, 'Not yet').click();
@@ -152,7 +152,7 @@ test('the accusation view shows a quiet nudge to check the evidence, only while 
   const box = createContainer();
   assert.ok(ACCUSATION_NUDGE.split(/\s+/).length <= 12);
   renderAccusation(box, { state: atAccusation() }, () => {});
-  assert.equal(findAll(box, node => node.className === 'story-muted story-accusation-nudge')[0].textContent, ACCUSATION_NUDGE);
+  assert.ok(findAll(box, node => node.className === 'vault-help')[0].textContent.includes(ACCUSATION_NUDGE));
   renderAccusation(box, { state: accuse(atAccusation(), 'voss').state }, () => {});
   assert.doesNotMatch(box.textContent, /Check your journal/);
 });

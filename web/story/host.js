@@ -241,10 +241,8 @@ export function createStoryHost(options) {
       const result = act(accuse(state, suspectId), 'accuse');
       if (state.ending === 'lost') { onFinished(state, progress); showEnding(); }
       else showAccusation(result.message);
-    });
-    actions.append(state.accusation.solved
-      ? button('Decide what happens', () => showEndingChoice())
-      : closeButton());
+    }, showEndingChoice);
+    if (!state.accusation.solved) actions.append(closeButton());
   }
 
   function showEndingChoice() {

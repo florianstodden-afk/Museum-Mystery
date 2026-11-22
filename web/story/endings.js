@@ -82,7 +82,6 @@ export function endingModel(state, progress = {}) {
 // The decision after the right answer. onChoose(endingId).
 export function renderEndingChoice(container, onChoose) {
   container.replaceChildren(el('section', { className: 'story-ending-choice' }, [
-    el('p', { className: 'story-eyebrow', text: 'ONE FINAL CHOICE' }),
     el('p', { className: 'story-text', text: CHOICE_TEXT }),
     el('div', { className: 'story-choices' }, [
       button(`${ENDINGS.heist.choiceLabel} · I am a thief`, () => onChoose('heist'), 'story-choice'),

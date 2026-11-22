@@ -203,11 +203,11 @@ test('the chain of evidence stays hidden until the right answer', () => {
   s = tryOpenSafe(s, 'OILS').state;
   const container = createContainer();
   renderAccusation(container, { state: s }, () => {});
-  assert.doesNotMatch(container.textContent, /CHAIN OF EVIDENCE/);
+  assert.doesNotMatch(container.textContent, /Chain of evidence/);
   renderAccusation(container, { state: accuse(s, 'leon').state, message: 'Not Leon.' }, () => {});
-  assert.doesNotMatch(container.textContent, /CHAIN OF EVIDENCE/);
+  assert.doesNotMatch(container.textContent, /Chain of evidence/);
   renderAccusation(container, { state: accuse(s, 'voss').state }, () => {});
-  assert.match(container.textContent, /CHAIN OF EVIDENCE/);
+  assert.match(container.textContent, /Chain of evidence/);
 });
 
 test('vault wheel selects letters, wraps around, and removes mistakes', () => {

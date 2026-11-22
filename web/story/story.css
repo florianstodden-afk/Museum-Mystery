@@ -515,3 +515,20 @@ a.story-button { display: inline-block; text-decoration: none; }
 html:has(.story-modal[open] .picture-puzzle),
 body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
 .story-accusation-nudge{margin:-4px 0 12px;font-size:.82rem}
+
+.dialog-card:has(.story-accusation) > :is(.eyebrow, #dialog-title),
+.dialog-card:has(.story-ending-choice) > .eyebrow { display:none; }
+.story-accusation { position:relative; }
+.story-accusation > h3 { padding-right:42px; }
+.vault-help { position:absolute; top:0; right:0; z-index:2; }
+.vault-help summary { cursor:pointer; list-style:none; margin-left:auto; display:grid; place-items:center; width:32px; height:32px; border:1px solid var(--story-gold); border-radius:50%; background:#24343a; color:var(--story-gold); font-weight:bold; }
+.vault-help p, .vault-result { padding:16px; background:#1a292d; border:1px solid var(--story-gold-deep); border-radius:10px; }
+.vault-help p { max-width:260px; box-shadow:0 8px 24px #0009; }
+.story-choice[aria-expanded=true] { outline:1px solid var(--story-gold); }
+.dialog-card .vault-correct-option { border-color:#8edbad; box-shadow:0 0 16px #64bc8b88; color:#bdffd8; }
+.vault-result { margin-top:12px; box-shadow:0 8px 24px #0006; text-align:center; animation:vault-reveal .2s ease-out; }
+.vault-result h3 { margin:0; font: bold 2rem Georgia,serif; color:#bdffd8; text-shadow:0 0 12px #64bc8b; }
+.vault-result details { text-align:left; margin:12px 0; }
+.vault-result summary { cursor:pointer; }
+@keyframes vault-reveal { from { opacity:0; transform:translateY(5px); } }
+@media(prefers-reduced-motion:reduce){.vault-result{animation:none}}
