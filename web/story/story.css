@@ -518,7 +518,7 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
 
 .dialog-card:has(.story-accusation) > .eyebrow,
 .dialog-card:has(.story-ending-choice) > .eyebrow { display:none; }
-.dialog-card:has(.story-ending-choice) #dialog-title { margin-bottom:1.25rem; }
+.dialog-card:has(.story-accusation, .story-ending-choice) #dialog-title { margin-bottom:1.25rem; }
 .story-accusation { position:relative; }
 .vault-choices-pane .story-title { padding-right:42px; margin-bottom:4px; }
 .vault-warning { color:var(--story-gold); font-size:.85rem; margin:0 0 12px; }
@@ -528,7 +528,16 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
 .vault-suspect .story-confirm { padding:0 14px 10px; border:0; background:none; }
 .vault-suspect:has([aria-expanded=true]) { border-color:var(--story-gold); }
 .vault-winner { border-color:#ffde76; box-shadow:0 0 16px #ffd14da6; }
-.story-accusation .vault-correct { color:#ffde76; text-shadow:0 0 12px #ffc943; }
+.story-accusation .vault-correct {
+  width:100%;
+  margin:0 0 .5rem;
+  text-align:center;
+  font-size:clamp(2.5rem, 6vw, 3.5rem);
+  line-height:1.15;
+  color:transparent;
+  -webkit-text-stroke:1.5px #ffde76;
+  filter:drop-shadow(0 0 4px #ffc94399);
+}
 .story-accusation .puzzle-popup:has(.vault-correct) { text-align:left; justify-items:start; max-height:85dvh; overflow:auto; }
 .story-accusation .story-chain summary { cursor:pointer; }
 .story-accusation .puzzle-popup:has(.vault-correct) > .story-button { display:block; width:auto; margin:12px auto 0 0; }
