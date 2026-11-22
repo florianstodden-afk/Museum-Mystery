@@ -82,7 +82,7 @@ test('the page renders a portrait, name, role and line per person', () => {
   const drawn = [];
   renderPeople(box, peopleModel(meet(safeOpen(), 'leon')), (canvas, kind) => drawn.push(kind));
   assert.equal(findAll(box, n => n.tagName === 'LI').length, 4);
-  assert.deepEqual(drawn, ['guard', 'restorer'], 'Leon and Vale use the game figures');
+  assert.deepEqual(drawn, ['guard', 'curator'], 'Leon and Vale use the game figures');
   assert.equal(findAll(box, n => n.className === 'journal-silhouette').length, 1, 'Voss is a silhouette');
   assert.match(box.textContent, /LeonNight guardOn duty all night\./);
   assert.match(box.textContent, /\?Not met yet/, 'Imani not met yet');

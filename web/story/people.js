@@ -11,7 +11,7 @@ import { el } from './dom.js';
 export const PEOPLE = [
   { id: 'leon', name: 'Leon', role: 'Night guard', line: 'On duty all night.', portrait: 'guard' },
   { id: 'imani', name: 'Imani', role: 'Conservator', line: 'In the studio until 22:00.', portrait: 'restorer' },
-  { id: 'vale', name: 'Dr. Mara Vale', role: 'Curator', line: 'Away at the gala tonight.', portrait: 'restorer' },
+  { id: 'vale', name: 'Dr. Mara Vale', role: 'Curator', line: 'Away at the gala tonight.', portrait: 'curator' },
   { id: 'voss', name: 'Adrien Voss', role: 'Patron', line: 'Paid for the new Gallery wing.', portrait: 'silhouette' },
 ];
 
