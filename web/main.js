@@ -1,5 +1,5 @@
 import { figuresBackToFront } from './character-depth.js?v=1';
-import { newGame, readMission, solveStation } from './story/engine.js';
+import { newGame, readMission, solveStation, tryOpenSafe } from './story/engine.js';
 import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
@@ -38,7 +38,8 @@ ctx.setTransform(2,0,0,2,0,0);
 function viewportForGame(){const r=canvas.getBoundingClientRect();const scale=Math.min(r.width/896,r.height/576);return {width:896*scale,height:576*scale};}
 const dialog = document.querySelector('#dialog');
 let dialogOpener = null;
-const vaultPreview = new URLSearchParams(location.search).get('vault-preview') === '1';
+const questionPreview = new URLSearchParams(location.search).has('question-preview');
+const vaultPreview = questionPreview || new URLSearchParams(location.search).get('vault-preview') === '1';
 const startup = vaultPreview ? { user: null, save: null, error: null } : await initialSession();
 const activeProfile = startup.user ? `github:${startup.user.id}` : null;
 const activeLogin = startup.user?.login || null;
@@ -52,6 +53,7 @@ if (startup.save && activeProfile) {
 }
 let previewStory = readMission(newGame()).state;
 if (vaultPreview) for (const id of STATION_IDS) previewStory = solveStation(previewStory, id).state;
+if (questionPreview) previewStory = tryOpenSafe(previewStory, previewStory.letters.join('')).state;
 let previewSave = JSON.stringify({story: JSON.stringify(previewStory), progress: {}});
 const previewStorage = { getItem: () => previewSave, setItem: (_key, value) => { previewSave = value; } };
 const storeKey = profileStorageKey('museum-mystery-walk-v1', activeProfile); // player position and steps
@@ -830,6 +832,12 @@ if(!activeProfile)document.querySelector('#entry-github').focus();
 if(!activeProfile && LEADERBOARD_URL && new URLSearchParams(location.search).get('github-login')==='1'){
   history.replaceState(null,'',location.pathname);
   location.replace(loginUrl());
+}
+if (questionPreview) {
+  entryScreen.hidden = true;
+  homeScreen.inert = false;
+  enterGame();
+  story.openVault();
 }
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });

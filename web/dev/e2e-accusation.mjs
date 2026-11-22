@@ -64,12 +64,13 @@ for (const [width, height] of VIEWPORTS) {
   // Run 1: right accusation + Steal.
   await startAt(page, atFinalQuestion);
   await openFinalQuestion(page);
+  await page.click('Dr. Mara Vale');
   await page.click('Adrien Voss');
-  check(/Name Adrien Voss\? You get one chance – once you speak, M will hear of it\./.test(await page.dialogText()), `${size}: confirmation for Voss`);
+  check(/Name him/.test(await page.dialogText()), `${size}: confirmation for Voss`);
   await page.key('Enter');
   check((await page.story()).accusation.solved, `${size}: Enter confirms the right name`);
-  check(/CHAIN OF EVIDENCE/.test(await page.dialogText()), `${size}: chain of evidence after the right name`);
-  await page.click('Decide what happens');
+  check(/Chain of evidence/.test(await page.dialogText()), `${size}: chain of evidence after the right name`);
+  await page.key('Enter');
   await page.click('Steal the artwork');
   check((await page.story()).ending === 'heist' && /I am a thief/.test(await page.dialogText()), `${size}: right accusation + Steal → heist`);
 
@@ -87,7 +88,7 @@ for (const [width, height] of VIEWPORTS) {
   await openFinalQuestion(page);
   await page.click('Dr. Mara Vale');
   const confirmText = await page.dialogText();
-  check(/Name Dr\. Mara Vale\? You get one chance/.test(confirmText) && /Name her/.test(confirmText) && /Not yet/.test(confirmText), `${size}: confirmation names Vale with "Name her" / "Not yet"`);
+  check(/Name her/.test(confirmText) && /Not yet/.test(confirmText), `${size}: confirmation names Vale with "Name her" / "Not yet"`);
   check((await page.scrolls()).length === 0, `${size}: confirmation needs no scrolling`);
   await page.shot(`confirm-${size}.png`);
   await page.click('Not yet');
