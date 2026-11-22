@@ -233,10 +233,10 @@ function drawPerson(x,y,kind,direction='down',time=0,moving=false,target=ctx){
     const stride=moving ? Math.sin(time/210)*5 : 0;
     ctx.strokeStyle='#263743';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,-12);ctx.lineTo(-7-stride,0);ctx.moveTo(6,-12);ctx.lineTo(7+stride,0);ctx.stroke();
     ctx.fillStyle='#263743';ctx.fillRect(-11-stride,-2,7,4);ctx.fillRect(4+stride,-2,7,4);
-    ctx.fillStyle=kind==='restorer'?'#765777':'#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
+    ctx.fillStyle=({curator:'#28543d',restorer:'#765777',guard:'#355568'})[kind] ?? '#355568';ctx.beginPath();ctx.roundRect(-13,-34,26,26,4);ctx.fill();
     const guardArm=moving?Math.sin(time/210)*3:0;ctx.strokeStyle='#263743';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-11,-30);ctx.lineTo(-16+guardArm,-13);ctx.moveTo(11,-30);ctx.lineTo(16-guardArm,-13);ctx.stroke();
     ctx.fillStyle='#d4a888';ctx.beginPath();ctx.ellipse(Math.sin(time/2200)*2,-40,9,10,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle=kind==='restorer'?'#543d32':'#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
+    ctx.fillStyle=(kind==='restorer'||kind==='curator')?'#543d32':'#223440';ctx.fillRect(-10,-50,20,6);ctx.fillRect(-12,-46,24,3);
     if(direction!=='up'){
       const look=(direction==='left'?-3:direction==='right'?3:0)+Math.sin(time/2200);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3+look,-41,2.6,0,Math.PI*2);ctx.arc(4+look,-41,2.6,0,Math.PI*2);ctx.fill();
       ctx.fillStyle='#243038';ctx.fillRect(-3+look,-42,1.3,2.5);ctx.fillRect(4+look,-42,1.3,2.5);ctx.strokeStyle='#6c4237';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2+look,-35);ctx.lineTo(3+look,-35);ctx.stroke();
@@ -322,7 +322,7 @@ function drawTreasureRoom(){
   if(hallPaintings[1].complete && hallPaintings[1].naturalWidth)
     drawFramedArtwork(hallPaintings[1],435.5,165,61,52,[.03,.04,.94,.92]);
   const curator=OBJECTS.find(o=>o.id==='curator');
-  const figures=[{...curator,kind:'restorer'}, {...displayPlayer,kind:'rick'}];
+  const figures=[{...curator,kind:'curator'}, {...displayPlayer,kind:'rick'}];
   for(const {figure,point} of figuresBackToFront(figures,vaultPosition)){
     drawPerson(point.x,point.y,figure.kind,figure.kind==='rick'?facing:talkingTo==='vale'?facingToward(curator,state.player):'down',animationTime,figure.kind==='rick'&&heldKeys.size>0);
   }
@@ -335,7 +335,7 @@ function cameraPeople(){
   const guardFacing=guardFacingNow();
   const restorer=OBJECTS.find(object=>object.id==='restorer');
   const curator=OBJECTS.find(object=>object.id==='curator');
-  const rooms={hall:[{...guard,kind:'guard',facing:guardFacing,moving:guardWalking()}],gallery:[{...restorer,kind:'restorer'}],vault:[{...curator,kind:'restorer'}]};
+  const rooms={hall:[{...guard,kind:'guard',facing:guardFacing,moving:guardWalking()}],gallery:[{...restorer,kind:'restorer'}],vault:[{...curator,kind:'curator'}]};
   if(state.room!=='security'){
     const room=state.player.x<9?'hall':state.player.x<18?'gallery':'vault';
     rooms[room].push({...displayPlayer,kind:'rick',facing,moving:heldKeys.size>0});
@@ -395,7 +395,7 @@ function drawScene() {
     const isPerson=['guard','restorer','curator'].includes(object.id);
     if(isPerson) ctx.translate(Math.sin(animationTime/1600 + object.x)*2,Math.sin(animationTime/800 + object.y));
     if(isPerson){
-      rect(x+8,y+5,16,22,{guard:'#294d68',restorer:'#694f71',curator:'#8a3f3a'}[object.id]);rect(x+10,y+2,12,10,'#e3b88b');rect(x+8,y+26,6,5,'#26343c');rect(x+18,y+26,6,5,'#26343c');
+      rect(x+8,y+5,16,22,{guard:'#294d68',restorer:'#694f71',curator:'#28543d'}[object.id]);rect(x+10,y+2,12,10,'#e3b88b');rect(x+8,y+26,6,5,'#26343c');rect(x+18,y+26,6,5,'#26343c');
     }else if(object.id==='painting'){rect(x+3,y+3,26,26,'#d2a350');rect(x+6,y+6,20,20,'#648e86');rect(x+15,y+8,3,18,'#294e44');}
     else if(object.id==='frames'){for(const dx of [3,10,17]){rect(x+dx,y+2,12,27,'#c99a45');rect(x+dx+3,y+5,6,21,'#3b2c1f');}}
     else if(object.id==='monitors'){rect(x+2,y+4,28,22,'#1d252a');for(const [mx,my] of [[4,6],[13,6],[22,6],[4,15],[13,15],[22,15]])rect(x+mx,y+my,7,7,Math.sin(animationTime/300+mx+my)>0?'#7fb6d8':'#4c6f84');}
