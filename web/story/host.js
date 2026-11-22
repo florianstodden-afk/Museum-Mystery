@@ -236,7 +236,7 @@ export function createStoryHost(options) {
   }
 
   function showAccusation(message) {
-    const { content, actions } = scene('The final question');
+    const { content, actions } = scene('Final question');
     renderAccusation(content, { state, message }, suspectId => {
       const result = act(accuse(state, suspectId), 'accuse');
       if (state.ending === 'lost') { onFinished(state, progress); showEnding(); }

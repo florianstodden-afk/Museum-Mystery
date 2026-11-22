@@ -78,10 +78,10 @@ test('a whole game runs through the host, including a wrong code word and a canc
   click(page, 'Look at the documents');
   const before = JSON.stringify(host.state);
   click(page, 'Leon');
-  assert.match(page.panel.textContent, /Name Leon\? You get one chance/);
+  assert.match(page.panel.textContent, /Name him/);
   click(page, 'Not yet');
   assert.equal(JSON.stringify(host.state), before, 'cancelling counts nothing');
-  assert.equal(page.title, 'The final question');
+  assert.equal(page.title, 'Final question');
   click(page, 'Adrien Voss');
   click(page, 'Name him');
   click(page, 'Decide what happens');

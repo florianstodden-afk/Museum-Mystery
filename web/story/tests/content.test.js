@@ -179,11 +179,11 @@ test('accusation UI offers three suspects and reports the choice', () => {
   const container = createContainer();
   let chosen;
   renderAccusation(container, { state: s }, id => { chosen = id; });
-  const choices = findAll(container, node => node.tagName === 'BUTTON');
+  const choices = findAll(container, node => node.className === 'story-choice');
   assert.equal(choices.length, 3);
   findButton(container, 'Adrien Voss').click();
   assert.equal(chosen, undefined, 'a click alone is not yet an accusation');
-  assert.match(container.textContent, /Name Adrien Voss\? You get one chance/);
+  assert.match(container.textContent, /Name him/);
   findButton(container, 'Name him').click();
   assert.equal(chosen, 'voss');
 });

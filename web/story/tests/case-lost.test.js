@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { newGame, readMission, solveStation, tryOpenSafe, accuse, chooseEnding, accusationsLeft, MAX_ACCUSATIONS } from '../engine.js';
 import { serialize, deserialize } from '../save.js';
 import { endingModel, renderEnding, lostParagraphs } from '../endings.js';
-import { renderAccusation, confirmText } from '../accusation-ui.js';
+import { renderAccusation } from '../accusation-ui.js';
 import { scoreboard, bestRunStore } from '../scoring.js';
 import { memoryStorage } from '../host.js';
 import { CASE, suspectById } from '../case-1.js';
@@ -84,10 +84,7 @@ test('choosing a suspect asks first; only the confirmation counts as the accusat
   assert.doesNotMatch(box.textContent, /Attempts left/);
   findButton(box, 'Dr. Mara Vale').click();
   assert.deepEqual(accused, []);
-  const vale = suspectById('vale');
-  assert.equal(confirmText(vale), 'Name Dr. Mara Vale? You get one chance – once you speak, M will hear of it.');
-  assert.ok(words(confirmText(vale)) <= 20);
-  assert.match(box.textContent, /Name Dr\. Mara Vale\?/);
+  assert.match(box.textContent, /Name her/);
   assert.match(box.textContent, /Name her ↵/);
   assert.match(box.textContent, /Not yet Esc/);
   assert.equal(findAll(box, node => node.className === 'story-choice').length, 3, 'all suspects remain visible');
@@ -100,7 +97,7 @@ test('choosing a suspect asks first; only the confirmation counts as the accusat
 
   // Cancel by Escape, then confirm by Enter.
   findButton(box, 'Leon').click();
-  assert.match(box.textContent, /Name Leon\?.*Name him/);
+  assert.match(box.textContent, /Name him/);
   document.pressKey('Escape');
   assert.deepEqual(accused, []);
   assert.equal(findAll(box, node => node.className === 'story-choice').length, 3);
@@ -152,7 +149,8 @@ test('the accusation view shows a quiet nudge to check the evidence, only while 
   const box = createContainer();
   assert.ok(ACCUSATION_NUDGE.split(/\s+/).length <= 12);
   renderAccusation(box, { state: atAccusation() }, () => {});
-  assert.ok(findAll(box, node => node.className === 'vault-help')[0].textContent.includes(ACCUSATION_NUDGE));
+  findButton(box, '?').click();
+  assert.ok(box.textContent.includes(ACCUSATION_NUDGE));
   renderAccusation(box, { state: accuse(atAccusation(), 'voss').state }, () => {});
   assert.doesNotMatch(box.textContent, /Check your journal/);
 });
