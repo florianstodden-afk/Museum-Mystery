@@ -16,3 +16,6 @@ __pycache__/
 
 
 node_modules/
+
+# Local Claude Code helper files (dev server)
+.claude/
