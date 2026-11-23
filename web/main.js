@@ -4,7 +4,7 @@ import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
-import { createSecurityRenderer } from './security-room.js?v=live-people-3';
+import { createSecurityRenderer } from './security-room.js?v=empty-hook-1';
 import { createGalleryRenderer } from './gallery.js?v=plaques-1';
 import { drawWallPlaque } from './wall-plaque.js?v=1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=position-1';
