@@ -114,6 +114,18 @@ node web/dev/run-e2e.mjs
 | `legacy/`, `web/legacy/` | Code the game no longer uses (first Python prototype, old prototype story) |
 | `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
 
+## Which documentation is current?
+
+This root `README.md` is the **only project README** and the starting point for the finished game. The repository keeps older plans and test evidence so the team can explain how the project changed:
+
+| Read next | Purpose |
+|---|---|
+| [Work log](docs/work-log.md), [login and leaderboard](docs/leaderboard.md), [security review](docs/security-review.md) | Implementation history and current online features |
+| [Project history](docs/project-history.md), [early game concept](docs/game-concept.md), [old story architecture](docs/story/historical-story-architecture.md) | **Historical** decisions and designs; some details no longer describe the game |
+| [First Python prototype](legacy/python/historical-python-prototype.md), [pixel comparison from image optimization](web/dev/shots/image-compare/historical-pixel-comparison.md) | **Historical** prototype and a dated visual check; neither is a second setup guide |
+
+`docs/screenshots/` holds general development evidence; `docs/story/screenshots/` holds story-specific evidence. `web/dev/shots/` contains browser-check screenshots. These folders have different purposes and are not extra game versions.
+
 ## Known limits
 
 - GitHub sign-in, cross-device saves and the shared leaderboard use Vercel and Neon ([details](docs/leaderboard.md)). A real player confirmed sign-in, online save, resuming on a second device and opening the shared board. Publishing a new winning result has automated coverage but still awaits the first live successful ending. Guest play remains available.
