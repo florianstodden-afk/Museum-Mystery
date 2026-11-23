@@ -1,6 +1,8 @@
 # Game concept “Museum Nocturne” – short version
 
-> The full concept document is kept by the team (not in the repository). This short version is the basis for the story logic in `web/story/` and was taken over from the assignment on 12.11.2026.
+> **Historical concept snapshot, not the current game specification.** This document records an early design from 12 November 2026. For the playable version, start with the [current README](../README.md) and the implemented [case data](../web/story/case-1.js). The current game has **four finished mini-games**, the safe word **`OILS`**, a maximum of **80 points**, and optional **GitHub login** with online saves and a shared leaderboard. In the finished heist ending the player keeps the artwork for themselves; a wrong final accusation ends in **Case lost**. The older point rules and ending description below are retained only to show how the design changed.
+
+> The team's full original concept document is not in this repository. This short version was taken from the assignment on 12 November 2026.
 
 ## Plot
 
@@ -34,7 +36,7 @@ Nobody can get stuck for good.
 
 No station names Voss. Only together do the pieces fit one person: a **patron** (stations 1 and 3) with the initials **A. V.** (stations 2 and 4) – Adrien Voss. Dr. Vale also has a “V”, but she is staff, not a patron.
 
-## Points (max. 100, no time scoring)
+## Points in the original proposal (historical; replaced by timed scoring)
 
 - up to 20 per station (−3 per wrong try, −5 per hint, at least 5 when solved)
 - Safe 10 (5 after a wrong try)

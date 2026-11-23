@@ -1,24 +1,26 @@
 # Museum Mystery – project history
 
-> Moved unchanged from the former `README.md` on 17 Nov 2026 (only relative links were adjusted to the new folder). The short English README is now in [../README.md](../README.md). Translated from German into English on 20 Nov 2026.
+> **Historical development record, not a current setup guide.** Entries below preserve what the team believed or planned on their dates; later decisions superseded them. For the finished game, read the [current README](../README.md) first, then the [login and leaderboard guide](leaderboard.md) and [security review](security-review.md). The current game has **four finished mini-games**, the safe word **`OILS`**, a maximum of **80 points**, and optional **GitHub login**. The primary live and presentation URL is [museum-mystery.vercel.app](https://museum-mystery.vercel.app/). Earlier references below to `BILD`, placeholder stations, 90/100 points, no login or GitHub Pages as the main game are historical.
 
-A shared game project for **Introduction to Programming (Nova SBE, 2026/27)**. This README is our starting point for team members and new AI chats. **Before every task, read this file and the current code first.** Then check the state on GitHub. A chat does not know about later changes automatically.
+> This file was moved from the former `README.md` on 17 November 2026 and translated into English on 20 November 2026.
 
-**Status: 17 November 2026.** After positive feedback from the professor, the group is improving the existing walkable 2D game instead of building the earlier idea kit. The focus is on clear rooms and interactions, short texts, a tidy journal, four clean mini-games, a home screen and two understandable endings. **Current decision: no real sign-in for now.** The prepared entry shows the login image but leads to the home screen as a guest. A shared online leaderboard is not implemented. Earlier statements in the project history each refer to the state at their time.
+A shared game project for **Introduction to Programming (Nova SBE, 2026/27)**. The [current README](../README.md) and code on `main` are the starting point for team members and new AI chats. This page explains how the project evolved; a chat does not know about later changes automatically.
+
+**Historical status on 17 November 2026.** After positive feedback from the professor, the group was improving the walkable 2D game instead of building the earlier idea kit. At that time, the focus was clear rooms and interactions, short texts, a tidy journal, four mini-games, a home screen and two endings. **Decision at that time: no real sign-in yet.** The entry led to guest play; a shared online leaderboard had not been implemented. Later work changed this, as the current README explains.
 
 **Login idea paused:** On 17.11., first username/password and then GitHub sign-in were discussed and prepared on the separate branch [`codex/login-signup`](https://github.com/florianstodden-afk/Museum-Mystery/tree/codex/login-signup). Florian then decided explicitly: no Clerk and **no login at all** for now. This branch is a paused draft, was **not** taken into `main` and is not part of the public game. No player accounts were created. [Why passwords cannot be stored in the GitHub repository](https://docs.github.com/en/code-security/concepts/secret-security/secret-leakage-risks).
 
 **Guest entry:** [PR #17](https://github.com/florianstodden-afk/Museum-Mystery/pull/17) puts Florian’s login image in front of the home screen. “Log In” and “Sign Up” open only their own guest intermediate views for now; **Continue as guest** leads to the home screen and from there to the game. No accounts are created. The exact flow and the checks are in [docs/guest-entry-flow.md](guest-entry-flow.md).
 
-**Current work on the game menu:** While playing, the museum scene stays free of the title, keyboard hints and the former buttons at the top. The gear at the top right opens a menu with Sound, Music, Hint, Journal, Resume Game and Exit to Main Menu. The exact implementation and checks are in [docs/in-game-menu.md](in-game-menu.md). A new game still starts only from the home screen.
+**Game-menu work at that time:** While playing, the museum scene stayed free of the title, keyboard hints and the former buttons at the top. The gear at the top right opened a menu with Sound, Music, Hint, Journal, Resume Game and Exit to Main Menu. The implementation and checks are in [docs/in-game-menu.md](in-game-menu.md). A new game started only from the home screen.
 
 **Next revision:** The menu opens and closes with `Esc`. The journal can be reached with a button at the top of the game and with `J`; it also opens from the home screen without starting the game. Both windows now use a tidy design following Florian’s reference images. Leon starts his conversation only on `E` near him; his speech box lets the museum scene shine through. [Flow and checks](menu-journal-leon.md).
 
 Repository: <https://github.com/florianstodden-afk/Museum-Mystery>
 
-Public game (state of `main`): <https://florianstodden-afk.github.io/Museum-Mystery/>
+Historical GitHub Pages guest copy: <https://florianstodden-afk.github.io/Museum-Mystery/>. The current presentation URL is <https://museum-mystery.vercel.app/>.
 
-Course: <https://nova-sbe-introduction-to-programming.github.io/intro-to-programming-2026/index.html>
+Current course requirements: <https://2477-introduction-programming.gitlab.io/wiki/team-project/>
 
 Idea comparison: <https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8>
 
@@ -34,7 +36,7 @@ The [course overview](https://nova-sbe-introduction-to-programming.github.io/int
 
 **Museum Mystery** should play like a small adventure in a 2D top-down view: walk around the museum, talk to people, examine objects, combine evidence and make a decision with consequences at the end. The [Collection API of the Metropolitan Museum of Art](https://metmuseum.github.io/) delivers a real work and verifiable art data. The design of the map and characters is original; Harvest Moon and Pokémon are only references for perspective and the feel of movement.
 
-### Current prototype: The Night of the Forgery
+### Prototype as described on 17 November: The Night of the Forgery
 
 Since 12.11.2026 the main game runs the **Nocturne story** (short version: [docs/game-concept.md](game-concept.md)). “M” sends the player character to take Van Gogh’s *Wheat Field with Cypresses* out of the safe. Four stations in any order give the letters B‑I‑L‑D; the vault door between gallery and storage opens with this word. In the storage room the final question and two endings follow (*The Heist* / *The Open File*), at most 90 points. Station B is the real landscape mini-game. **Station I (Portrait Hall)** is a speedrun: after “Start”, a catalogue scan shows the real Met data of three portraits (Degas, Sargent, Cézanne) for 3 seconds; then you sort them from oldest to newest (click, drag or keys 1/2/3, Enter checks). “Peek” and a wrong check cost 5 seconds each. Then the cards turn over and form the night-shift log, which clears the guard Leon (`web/minigames/portrait-*`). Station L is the Renoir picture puzzle (Tab, Enter/Space, click or drag and drop). Station D stays a placeholder. A hint button keeps anyone from getting stuck. Movement: WASD or arrow keys, interaction: `E`. The old prototype story (three pieces of evidence, badge, code 2114) stays unchanged in `web/legacy/`.
 
@@ -42,7 +44,7 @@ Since 12.11.2026 the main game runs the **Nocturne story** (short version: [docs
 
 **Security room:** On the left of the main entrance, the arch labelled “SECURITY” leads into a separate walkable room. The monitor wall shows three illustrative camera previews (entrance hall, gallery, vault); the other six screens have no signal. The previews are not live surveillance. In the room, the monitor wall, duty roster, radio and key board can be examined with `E`. The exit at the bottom leads back to the entrance hall; position and story progress are saved locally.
 
-**Current start page:** `web/index.html` through a local web server (instructions below). `web/engine.js` holds the map and movement, `web/story/` the story (overview: [docs/story/README.md](story/README.md)), `web/main.js` drawing, input and the connection to the story through `web/story/host.js`. `cd web && node --test` checks map, story, mini-game and legacy code. The earlier Python app and its SQLite file are **not** connected to this browser save.
+**Start page at that time:** `web/index.html` through a local web server (instructions below). `web/engine.js` holds the map and movement, `web/story/` the story (overview: [docs/story/README.md](story/README.md)), `web/main.js` drawing, input and the connection to the story through `web/story/host.js`. `cd web && node --test` checks map, story, mini-game and legacy code. The earlier Python app and its SQLite file are **not** connected to this browser save.
 
 The [shared idea comparison](https://chatgpt.com/share/6aedc9ea-ef64-83eb-9a0e-0dd42623f0f8) compared twelve game ideas and recommended Museum Mystery as a balance of a vivid demo, clear rules and a feasible build for beginners. It **only assumed 3–4 people, 4–6 weeks and almost no budget**. These numbers are not confirmed team data. A quiz was the lower-risk alternative; a weather festival the more ambitious one. We chose Museum Mystery as the topic.
 
@@ -148,7 +150,7 @@ cd Museum-Mystery
 
 The existing repository is not started again with `git init`. `gh repo clone ...` would only be needed with the GitHub CLI installed and signed in; a normal `git clone` is enough. An SSH address (`git@github.com:...`) requires an SSH key stored in the GitHub account.
 
-## Technical start and current state
+## Technical start and state at that time
 
 ### Start the walkable game
 
@@ -194,7 +196,7 @@ The `.gitignore` excludes `.venv/`, Python caches, local SQLite files and secret
 
 **Correction of 09.11.2026:** Contrary to the first check, two works chosen first had no usable public image. After the error message on opening they were replaced and all six current IDs were checked again. The error and the tests are in the [work log](work-log.md).
 
-## Next shared decisions
+## Next shared decisions proposed at that time (historical)
 
 1. Play the walkable game completely together, test both endings and rate movement, dialogues and puzzle fun.
 2. Confirm team size, schedule and the teacher’s exact requirements; in particular clarify whether API integration is required or comes from our own idea concept. The publicly available evaluation page does not explicitly name login or an API. The group has paused login for now.
@@ -202,7 +204,7 @@ The `.gitignore` excludes `.venv/`, Python caches, local SQLite files and secret
 4. After reviewing the quest, improve the map, characters, hints and further cases; only then consider extra systems.
 5. After **every** task, update the log, README and PR explanation. Before the presentation, every member explains someone else’s function and the whole route through the game.
 
-## For a new AI chat
+## Prompt proposed for new AI chats at that time (historical)
 
 Copy as the task: “First read the README and the current state of the Museum Mystery repository. Tell me in simple words what is already implemented and what is only planned. Then work only on **[concrete task]** on its own branch. Explain every change, check it and extend the documentation so that every team member can explain it later.”
 
