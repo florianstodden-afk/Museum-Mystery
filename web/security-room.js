@@ -14,6 +14,12 @@ export function officePosition(x,y){return {x:100+(x-1)*100,y:330+(y-1)*20};}
 export function canEnterOffice(x,y){
   return x>=1 && x<=8 && y>=2 && y<=10 && !SECURITY_OBJECTS.some(o=>o.x===x&&o.y===y);
 }
+// The side walls are part of the artwork. Keep the character's shoulders on
+// the interior side of those walls, even between rounded movement tiles.
+export function officeFootprintFits(x,y){
+  const p=officePosition(x,y);
+  return p.x-17>=53 && p.x+17<=843;
+}
 export function officePortal(state,from,to){
   if(state.room==='security'){
     if(to.y>from.y && to.y>=9.7 && to.x>=4 && to.x<=5)

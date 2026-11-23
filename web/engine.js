@@ -1,4 +1,4 @@
-import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
+import { SECURITY_OBJECTS, canEnterOffice, officeFootprintFits, OFFICE_START } from './security-room.js';
 import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-route-8';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
@@ -43,7 +43,7 @@ export function restoreState(saved, doorOpen) {
   const state = { player: { x: saved.player.x, y: saved.player.y }, steps: saved.steps, doorOpen };
   if(saved.room==='security'){
     state.room='security';
-    if(!canEnterOffice(Math.round(state.player.x),Math.round(state.player.y))) state.player={...OFFICE_START};
+    if(!canEnterOffice(Math.round(state.player.x),Math.round(state.player.y)) || !officeFootprintFits(state.player.x,state.player.y)) state.player={...OFFICE_START};
     return state;
   }
   // Someone saved inside the storage room but the safe is closed in the new story: start outside.
