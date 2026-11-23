@@ -23,6 +23,7 @@ const KEYS = {
   Enter: { code: 'Enter', keyCode: 13, text: '\r' }, Escape: { code: 'Escape', keyCode: 27 }, Tab: { code: 'Tab', keyCode: 9 },
   ArrowLeft: { code: 'ArrowLeft', keyCode: 37 }, ArrowUp: { code: 'ArrowUp', keyCode: 38 },
   ArrowRight: { code: 'ArrowRight', keyCode: 39 }, ArrowDown: { code: 'ArrowDown', keyCode: 40 }, ' ': { code: 'Space', keyCode: 32, text: ' ' },
+  Backspace: { code: 'Backspace', keyCode: 8 },
 };
 
 export async function launchBrowser() {

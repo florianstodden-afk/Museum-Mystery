@@ -4,7 +4,7 @@ import { STATION_IDS } from './story/case-1.js';
 import { drawCameraLights, VAULT_CAMERAS } from './camera-lights.js';
 import { vaultPosition } from './vault-layout.js';
 import { galleryPosition } from './gallery-layout.js';
-import { createSecurityRenderer } from './security-room.js?v=live-people-3';
+import { createSecurityRenderer } from './security-room.js?v=empty-hook-1';
 import { createGalleryRenderer } from './gallery.js?v=plaques-1';
 import { drawWallPlaque } from './wall-plaque.js?v=1';
 import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=position-1';
@@ -12,7 +12,7 @@ import * as catalogueStation from './minigames/curators-catalogue.js?v=clock-not
 import * as forgeryStation from './minigames/spot-the-forgery.js?v=clock-note-1';
 import * as pictureStation from './minigames/picture-puzzle.js?v=clock-note-1';
 import * as portraitStation from './minigames/portrait-timeline.js?v=clock-note-1';
-import { createStoryHost } from './story/host.js?v=vault-ending-1';
+import { createStoryHost } from './story/host.js?v=type-code-1';
 import { peopleModel, renderPeople } from './story/people.js?v=vault-ending-1';
 import { journalModel, renderJournal } from './story/journal.js?v=journal-blank-1';
 import { createSoundPlayer, STEP_INTERVAL_MS } from './story/sound.js?v=vault-wheel-7';

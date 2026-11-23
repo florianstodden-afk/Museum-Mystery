@@ -47,6 +47,26 @@ async function openFinalQuestion(page) {
   check(!/Attempts left/.test(text), 'no "Attempts left" line');
 }
 
+// ---------- typing the safe code (desktop) ----------
+{
+  const page = await openPage();
+  await page.viewport(1440, 900);
+  await startAt(page, allSolved(), { x: 16.6, y: 7 });   // in front of the vault door, safe still shut
+  await page.key('e');
+  check(/Or type the letters\./.test(await page.dialogText()), 'safe panel shows the typing hint');
+  const walk = () => page.evaluate(`localStorage.getItem('${WALK_KEY}')`);
+  const before = await walk();
+  for (const key of ['w', 'a', 's', 'd', 'Backspace', 'x', 'Enter']) await page.key(key);   // wrong code: WASX
+  const slotsAfterWrong = await page.evaluate("[...document.querySelectorAll('.vault-code-slot')].map(n => n.textContent).join('')");
+  check(slotsAfterWrong === '····' && !(await page.evaluate("document.querySelector('#dialog').classList.contains('hidden')")), 'a wrong typed code is rejected like before');
+  check(await walk() === before, 'typing W A S D does not move the player');
+  for (const key of [...CODEWORD.toLowerCase(), 'Enter']) await page.key(key);
+  const opened = await page.evaluate(`JSON.parse(JSON.parse(localStorage.getItem('${STORY_KEY}')).story).safe`);
+  check(opened.open === true && opened.attempts === 1, 'the typed code word opens the safe');
+  check(page.errors.length === 0, `typed safe: console without errors ${page.errors.join(' | ')}`);
+  page.close();
+}
+
 for (const [width, height] of VIEWPORTS) {
   const size = `${width}x${height}`;
   const page = await openPage();
