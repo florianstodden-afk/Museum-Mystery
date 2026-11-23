@@ -546,3 +546,6 @@ body.story-page:has(.story-modal[open] .picture-puzzle) { overflow: hidden; }
 .story-accusation .puzzle-popup:has(.vault-correct) > .story-button { display:block; width:auto; margin:12px auto 0 0; }
 
 .story-accusation .puzzle-popup:has(.vault-correct) > p { width:100%; text-align:center; }
+
+/* Typing the code needs a keyboard; touch screens keep the wheel only. */
+@media (hover: none) and (pointer: coarse) { .vault-type-hint { display: none; } }

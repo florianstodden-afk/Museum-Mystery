@@ -22,7 +22,7 @@ import { serialize, deserialize } from './save.js';
 import { openStation as runStation } from './stations.js';
 import * as placeholderStation from './placeholder-station.js';
 import { dialogueFor, renderDialogue, conversationFor } from './dialogues.js?v=oils-1';
-import { renderSafe } from './safe-ui.js?v=vault-wheel-8';
+import { renderSafe } from './safe-ui.js?v=type-code-1';
 import { renderAccusation } from './accusation-ui.js?v=vault-ending-1';
 import { endingModel, renderEnding, renderEndingChoice } from './endings.js?v=vault-ending-1';
 import { hintFor } from './hints.js';

@@ -88,9 +88,15 @@ export function renderSafe(container, { state, message = '', playSound = () => {
         event.preventDefault();event.stopPropagation?.();degrees+=(event.key==='ArrowLeft'?increment:-increment);update();
       }
     });
-    select.addEventListener('click',()=>{if(input.value.length<4){const letter=currentLetter();playSound(letter===CODEWORD[input.value.length]?'vault-correct':'vault-set');input.value+=letter;showSlots();}});
+    // One way to add a letter, for the centre button and for typing: same sound, same slots, at most four.
+    function addLetter(letter){
+      if(input.value.length>=4)return;
+      playSound(letter===CODEWORD[input.value.length]?'vault-correct':'vault-set');input.value+=letter;showSlots();
+    }
+    function removeLetter(){input.value=input.value.slice(0,-1);showSlots();}
+    select.addEventListener('click',()=>addLetter(currentLetter()));
     const erase=el('button',{className:'story-button',text:'Remove last letter',attrs:{type:'button'}});
-    erase.addEventListener('click',()=>{input.value=input.value.slice(0,-1);showSlots();});
+    erase.addEventListener('click',removeLetter);
     const wheel=el('div',{className:'vault-wheel-wrap'},[
       el('div',{className:'vault-wheel-pointer',attrs:{'aria-hidden':'true'}}),dial,
     ]);
@@ -98,10 +104,31 @@ export function renderSafe(container, { state, message = '', playSound = () => {
       el('button',{className:'story-button',text:'Try the lock',attrs:{type:'submit'}}),
     ]);
     form.addEventListener('submit', event=>{event.preventDefault();onTry(input.value);});
-    parts.push(el('p',{className:'story-text',text:'Drag the wheel to a letter, then press the centre. Repeat for all four letters.'}),wheel,form);
+    // Typing: A–Z fills the next slot (the wheel turns along), Backspace erases, Enter tries the lock.
+    // Esc is left to the page (it closes the panel). Keys never reach the game while the safe is shown.
+    function typed(event){
+      if(section.isConnected===false || section.closest?.('.hidden,[hidden]')){
+        if(section.isConnected===false)document.removeEventListener('keydown',typed,true);
+        return;
+      }
+      if(event.ctrlKey||event.metaKey||event.altKey||event.key==='Escape'||event.key==='Tab'||event.key.startsWith('Arrow')||event.key===' ')return;
+      event.preventDefault();event.stopImmediatePropagation?.();
+      if(event.repeat)return;
+      if(/^[a-z]$/i.test(event.key)){
+        const letter=event.key.toUpperCase();
+        degrees=-alphabet.indexOf(letter)*increment;update();
+        addLetter(letter);
+      }
+      else if(event.key==='Backspace')removeLetter();
+      else if(event.key==='Enter')onTry(input.value);
+    }
+    document.addEventListener?.('keydown',typed,true);
+    parts.push(el('p',{className:'story-text',text:'Drag the wheel to a letter, then press the centre. Repeat for all four letters.'}),
+      el('p',{className:'story-muted vault-type-hint',text:'Or type the letters.'}),wheel,form);
   }
 
   parts.push(feedback);
-  container.replaceChildren(el('section', { className: 'story-safe' }, parts));
+  const section = el('section', { className: 'story-safe' }, parts);
+  container.replaceChildren(section);
 
 }
