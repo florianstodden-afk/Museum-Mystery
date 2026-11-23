@@ -20,7 +20,7 @@ import { scoreboard, bestRunStore } from './story/scoring.js';
 import { renderScoreboard } from './story/scoreboard-view.js';
 import { canPublish, loadLeaderboard, publishRun, renderLeaderboard } from './leaderboard.js?v=run-time-1';
 import { LEADERBOARD_URL } from './leaderboard-config.js';
-import { createCloudSync, initialSession, loginUrl, signOut } from './github-auth.js';
+import { createCloudSync, initialSession, loginUrl, signOut, OFFLINE_TEXT } from './github-auth.js?v=offline-1';
 import { movementDuration, advancePlayer } from './motion.js?v=gallery-route-8';
 import { chooseGuardAction } from './guard.js?v=station-i-patrol-1';
 import { interactionFor, nudgeOffset } from './interaction.js';
@@ -757,7 +757,7 @@ function showHome(){
   profileLabel.textContent=activeProfile?`GitHub: @${activeLogin}`:'Guest · progress on this device only';
   const syncLabel=document.querySelector('#home-sync-status');
   syncLabel.hidden=!activeProfile;
-  if(activeProfile && !syncLabel.textContent)syncLabel.textContent='Online save ready';
+  if(activeProfile && !syncLabel.textContent)syncLabel.textContent=startup.offline?OFFLINE_TEXT:'Online save ready';
   homeScoreboard.disabled=!activeProfile;
   homeScoreboard.setAttribute('aria-label',activeProfile?'Scoreboard':'Leaderboard requires GitHub sign-in');
   document.querySelector('#home-switch-profile').textContent=activeProfile?'Sign out':'Sign in with GitHub';
@@ -842,3 +842,6 @@ if (questionPreview) {
 setInterval(() => story.tick(), 250);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) story.tick(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) cloudSync?.flush().catch(() => {}); });
+// Back online: send the progress that was kept on this device.
+window.addEventListener('online', () => cloudSync?.flush().catch(() => {}));
+if (startup.offline) cloudSync?.schedule();
