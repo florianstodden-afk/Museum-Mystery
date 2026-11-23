@@ -1,10 +1,10 @@
-import { artworkDetails } from './station-ui.js';
+import { artworkDetails, speedLines } from './station-ui.js?v=clock-note-1';
 import { el, button } from '../story/dom.js';
 import { pictureSpeedPoints } from '../story/scoring.js';
 import { CASE } from '../story/case-1.js';
 import { elapsedMs, startPuzzle } from './picture-rules.js';
 import { regions, guess, initialForgery, validForgery, REQUIRED_FINDS } from './forgery-rules.js';
-import { shortcutButton, puzzlePopup, puzzleReward, puzzleClock } from './puzzle-ui.js';
+import { shortcutButton, puzzlePopup, puzzleReward, puzzleClock } from './puzzle-ui.js?v=clock-note-1';
 
 export const originalUrl = new URL('../assets/DT1946_original.jpg', import.meta.url).href;
 const forgeryUrl = new URL('../assets/DT1946_v2_forgery.jpg', import.meta.url).href;
@@ -19,13 +19,13 @@ export function start(container, caseData, onSolved) {
   let disposed = false, ready = false, popup = null;
   let aim = { x: .5, y: .5 };
   const save = () => caseData.onChange(state);
-  const leave = () => caseData.onClose?.();
+  const leave = () => { if (!disposed) caseData.onClose?.(); };
   const pane = el('div'), overlay = el('div');
   const help = button('?', showHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Spot the Forgery instructions');
   const intro = el('div', { className: 'puzzle-intro' }, [
     el('p', { text: 'Find three of five changes in the forged version to reveal the frame label.' }),
-    el('p', { text: 'Points are given based on speed.' }), help,
+    ...speedLines(), help,
   ]);
   const begin = shortcutButton('Start', () => {
     if (!ready || disposed || popup || state.startedAt !== null) return;
@@ -65,7 +65,7 @@ export function start(container, caseData, onSolved) {
       puzzlePopup(pane, overlay, 'Forgery identified', [
         el('h3', { text: 'Forgery identified!' }),
         el('p', { text: CASE.stations.find(s => s.id === 'archive').evidence }),
-        ...puzzleReward('S', pictureSpeedPoints(elapsedMs(state))),
+        ...puzzleReward('S', pictureSpeedPoints(elapsedMs(state, now()))),
       ], { actionLabel: 'Return to museum', onAction: leave, keys: ['Enter', 'Escape'] });
     }
   }, 'forgery-target');

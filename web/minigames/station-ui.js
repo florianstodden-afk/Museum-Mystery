@@ -14,11 +14,20 @@ export function shortcutButton(label, action, ...keys) {
   return control;
 }
 
-/** The intro above a station: one task line, the gold speed line, a round "?" and the Start/Back buttons. */
-export function introPopup({ task, pointsText, onStart, onBack, onHelp }) {
+/** Every timed station says the same two things under its task: speed counts, and the clock never pauses. */
+export const SPEED_TEXT = 'Points are given based on speed.';
+export const CLOCK_NOTE = 'The clock keeps running if you leave.';
+
+/** The two intro lines below the task, identical in all four stations. */
+export function speedLines(pointsText = SPEED_TEXT) {
+  return [el('p', { text: pointsText }), el('p', { className: 'station-clock-note', text: CLOCK_NOTE })];
+}
+
+/** The intro above a station: one task line, the gold speed line, the clock note, a round "?" and the Start/Back buttons. */
+export function introPopup({ task, pointsText = SPEED_TEXT, onStart, onBack, onHelp }) {
   const help = button('?', onHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Instructions');
-  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: task }), el('p', { text: pointsText }), help]);
+  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: task }), ...speedLines(pointsText), help]);
   const startButton = shortcutButton('Start', onStart, 'Enter');
   const backButton = shortcutButton('Back to museum', onBack, 'Escape');
   return { intro, help, startButton, backButton, controls: el('div', { className: 'story-actions puzzle-actions' }) };

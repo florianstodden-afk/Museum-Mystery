@@ -1,11 +1,11 @@
-import { artworkDetails } from './station-ui.js';
+import { artworkDetails, speedLines } from './station-ui.js?v=clock-note-1';
 import { el, button } from '../story/dom.js';
 import { stationById } from '../story/case-1.js';
 import { pictureSpeedPoints } from '../story/scoring.js';
 import { CATALOGUE_ARTWORKS as works } from './catalogue-data.js';
 import { loadCatalogue } from './catalogue-artwork.js';
 import { initialCatalogue, validCatalogue, startCatalogue, placeLabel, elapsedMs } from './catalogue-rules.js';
-import { shortcutButton, puzzleClock, puzzlePopup, puzzleReward } from './puzzle-ui.js';
+import { shortcutButton, puzzleClock, puzzlePopup, puzzleReward } from './puzzle-ui.js?v=clock-note-1';
 
 export function start(container, caseData, onSolved) {
   let state = validCatalogue(caseData.state) ? structuredClone(caseData.state) : initialCatalogue(Math.random, caseData.state);
@@ -19,7 +19,7 @@ export function start(container, caseData, onSolved) {
   help.setAttribute('aria-label', 'Curator’s Catalogue instructions');
   const intro = el('div', { className: 'puzzle-intro' }, [
     el('p', { text: 'Match four catalogue labels to the respective artwork to uncover who approved the false wall label.' }),
-    el('p', { text: 'Points are given based on speed.' }), help,
+    ...speedLines(), help,
   ]);
   const begin = shortcutButton('Start', () => {
     if (!art || disposed || popup || state.startedAt !== null) return;
