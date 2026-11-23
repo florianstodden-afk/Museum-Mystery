@@ -41,7 +41,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. The journal shows the four letters in the order of the code word; enter it at the vault.
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question: who planned it all? You have **one accusation**: pick a name, confirm it, and it counts. Up to 80 points (older completed saves retain their original rewards).
-- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
+- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score.
 - In the game, **J** (or the menu) opens the journal: **Case** shows the letters, evidence and notes, **People** who is who. **Esc** opens the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** is for GitHub players. It shows the current run and shared results. A winning finish is submitted automatically; the highest score for each GitHub account appears. Lost runs never enter the shared leaderboard ([details](docs/leaderboard.md)).
 
@@ -112,7 +112,8 @@ node web/dev/run-e2e.mjs
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
 | `web/dev/` | Preview pages, screenshots and browser checks |
 | `legacy/`, `web/legacy/` | Code the game no longer uses (first Python prototype, old prototype story) |
-| `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
+| `docs/` | Work log, design notes, artwork credits and verification records |
+| [`specs/`](specs/) | Historical specifications for the first Python case and the early walkable prototype |
 
 ## Which documentation is current?
 
@@ -120,7 +121,8 @@ This root `README.md` is the **only project README** and the starting point for 
 
 | Read next | Purpose |
 |---|---|
-| [Work log](docs/work-log.md), [login and leaderboard](docs/leaderboard.md), [security review](docs/security-review.md) | Implementation history and current online features |
+| [Work log](docs/work-log.md) and [merged pull requests](https://github.com/florianstodden-afk/Museum-Mystery/pulls?q=is%3Apr+is%3Amerged) | Read the log in date order to follow the decisions. Open a pull request to see the corresponding code changes. |
+| [Login and leaderboard](docs/leaderboard.md), [security review](docs/security-review.md) | Current online features and how they were verified |
 | [Project history](docs/project-history.md), [early game concept](docs/game-concept.md), [old story architecture](docs/story/historical-story-architecture.md) | **Historical** decisions and designs; some details no longer describe the game |
 | [First Python prototype](legacy/python/historical-python-prototype.md), [pixel comparison from image optimization](web/dev/shots/image-compare/historical-pixel-comparison.md) | **Historical** prototype and a dated visual check; neither is a second setup guide |
 
@@ -147,4 +149,4 @@ Artworks and data: [The Metropolitan Museum of Art Collection API](https://metmu
 
 ## Course context
 
-Team project for *Introduction to Programming* at Nova SBE (2026/27). Earlier decisions, the old setup guide and the full history are in [docs/project-history.md](docs/project-history.md).
+Team project for *Introduction to Programming* at Nova SBE (2026/27). The [archived project history](docs/project-history.md) preserves the original setup guide and early design decisions.

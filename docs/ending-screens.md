@@ -1,5 +1,7 @@
 # The two ending screens
 
+> **Historical design record from 19 November 2026.** This page documents the artwork for the two endings available at the time. The [current play guide](../README.md#how-to-play) explains the vault and all three endings in the released game.
+
 **Status: 19.11.2026, branch `codex/ending-screen-art`.** The change applies to the public game only after the pull request is merged and GitHub Pages has published it.
 
 ## The way to the end

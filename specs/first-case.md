@@ -1,5 +1,7 @@
 # Task 1: A complete local Museum Mystery case
 
+> **Historical specification for the first Python prototype.** This was the six-artwork Streamlit case, now in [legacy/python](../legacy/python/). See the [current README](../README.md) for the finished browser game.
+
 ## Why?
 
 We need a small, playable case whose rules every team member can explain. Artworks and images should come from the Met Collection API; the game state should survive an app restart.

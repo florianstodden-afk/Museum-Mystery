@@ -1,5 +1,7 @@
 # Contract for stations (mini-games) – Museum Nocturne
 
+> **Historical station integration plan.** The station numbers, room names and example files below belong to an earlier design. The [current play guide](../../README.md#how-to-play) lists the four released stations in walking order.
+
 This contract applies to stations 2–4 (**Portrait Hall**, **Conservation Studio**, **Frame Archive**) and describes how each station is connected to the story engine in `web/story/`. Station 1 (`web/minigames/landscape.js`) already fulfils it.
 
 ## In short

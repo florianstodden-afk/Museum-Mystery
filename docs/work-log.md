@@ -1,14 +1,6 @@
 # Work log
 
-### 2026-11-12 – Take over the existing walk as the starting point
-
-- **People involved:** user assignment; Codex. Human review pending.
-- **Starting point:** The shared branch `feature/museum-walk` contains a walkable prototype; the newer Nocturne concept with four stations is not implemented there yet.
-- **Decision:** The existing branch was taken into a new branch from `main` so that its history is kept. The game rules of the new concept still have to be implemented.
-- **Implementation:** `web/main.js` leaves keyboard input in open dialogs to the dialog instead of catching it for the player character.
-- **Check:** The existing test run with Node `--test` reported 6 passed tests. A manual browser test of this change is pending.
-
-After every task, this file records what actually happened. The template and the rules are in the [README](project-history.md). Missing facts are not added until they are checked.
+After every task, this file records what actually happened. The template and the rules are in the [archived project history](project-history.md). Missing facts are not added until they are checked.
 
 ### 2026-11-09 – First local Museum Mystery case
 
@@ -36,6 +28,14 @@ After every task, this file records what actually happened. The template and the
 - **Implementation:** `web/engine.js` separates rules and state; `web/main.js` draws map/character and handles keys, dialog, Met API and the local browser save; `web/index.html` and `web/style.css` contain interface and styling. `web/engine.test.js` checks the rules. README and specification were adapted to the new direction.
 - **Check:** `node --test` → 6 tests passed, among them a route through the quest to both endings. `node --check main.js` and `node --check engine.js` → no syntax errors. The local web server served `index.html`, JavaScript and CSS each with HTTP 200. A browser view showed map, journal and dialog. The old Python tests passed too (6/6) with the managed Python interpreter; `uv run pytest` was at times blocked by application control on this Windows computer. The old local Streamlit demo server was stopped; the browser prototype stays reachable on port 8000. A complete manual playthrough by a team member is still pending.
 - **Addendum:** A four-digit door code from the log time was added as a separate deduction step. A wrong code causes no state change; the right solution opens the door only after the evidence and the badge. `node --test` and the syntax check succeeded again. The map and story must be played and judged by the team. Online accounts, shared storage, public deployment and extra cases are not implemented. Add branch/commit/PR after publication.
+
+### 2026-11-12 – Take over the existing walk as the starting point
+
+- **People involved:** user assignment; Codex. Human review pending.
+- **Starting point:** The shared branch `feature/museum-walk` contains a walkable prototype; the newer Nocturne concept with four stations is not implemented there yet.
+- **Decision:** The existing branch was taken into a new branch from `main` so that its history is kept. The game rules of the new concept still have to be implemented.
+- **Implementation:** `web/main.js` leaves keyboard input in open dialogs to the dialog instead of catching it for the player character.
+- **Check:** The existing test run with Node `--test` reported 6 passed tests. A manual browser test of this change is pending.
 
 ### 2026-11-12 – Landscape gallery as the first station
 
@@ -508,3 +508,9 @@ Portrait timeline, sound and JPG backgrounds integrated. Both artworks (Station 
 - **Request:** Make the root `README.md` the only file with that name, so GitHub's file tree does not suggest several current project guides.
 - **Change:** Renamed the old story overview to `docs/story/historical-story-architecture.md`, the first Python prototype note to `legacy/python/historical-python-prototype.md`, and the dated image optimization measurements to `web/dev/shots/image-compare/historical-pixel-comparison.md`. Each now identifies itself as historical and points to the current root README. Updated the two references to the former story filename and added a documentation map to the root README. Kept the screenshot folders in place because their different locations reflect general documentation, story evidence and browser-check output; moving them would break many evidence links without improving the game.
 - **Checks:** The tracked-file inventory finds exactly one `README.md`, at repository root; no reference to the three old paths remains. `node --test` passes **349/349** on this branch.
+
+## 2026-11-23 · Documentation review before submission
+
+The play guide now describes all three endings directly. The November 19 ending artwork notes, both early prototype specifications and the original station integration plan each point readers to the finished game. The README links to this log for dated decisions and to merged pull requests for the accompanying changes. The November 12 entry on adopting the museum walk now follows the November 9 prototype entries.
+
+All 368 tests passed with `node --test`. The relative Markdown links and image paths resolved, and the dated entries in this log were checked in ascending order.
