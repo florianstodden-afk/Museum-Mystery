@@ -118,6 +118,8 @@ node web/dev/run-e2e.mjs
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.
+- A station's clock starts with Start and keeps running when you leave a station (also across reloads), like a speedrun.
+- Without a connection, signed-in players keep playing; progress is saved on the device and uploaded on the next successful request. Two devices are not merged: the last upload wins.
 
 ## Security and dependencies
 
