@@ -1,5 +1,14 @@
 import { deserialize } from '../web/story/save.js';
 import { scoreboard, synchronizeScore } from '../web/story/scoring.js';
+import { CASE, STATION_IDS } from '../web/story/case-1.js';
+import { validCatalogue } from '../web/minigames/catalogue-rules.js';
+import { validForgery } from '../web/minigames/forgery-rules.js';
+import { validPuzzle } from '../web/minigames/picture-rules.js';
+import { validTimeline } from '../web/minigames/portrait-rules.js';
+import { validPosition } from '../web/engine.js';
+
+const stationValidators = { landscape: validCatalogue, portraits: validTimeline,
+  restoration: validPuzzle, archive: validForgery };
 
 const random = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
 const hash = async value => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))), b => b.toString(16).padStart(2, '0')).join('');
@@ -38,8 +47,47 @@ export function validSave(snapshot) {
     const state = deserialize(snapshot.story?.story);
     const player = snapshot.walk?.player;
     return Boolean(state && snapshot.story.progress && typeof snapshot.story.progress === 'object'
-      && Number.isFinite(player?.x) && Number.isFinite(player?.y));
+      && (snapshot.walk.steps === undefined || (Number.isInteger(snapshot.walk.steps) && snapshot.walk.steps >= 0))
+      && validPosition({ x: player?.x, y: player?.y, ...(snapshot.walk.room ? { room: snapshot.walk.room } : {}) }, state.safe.open)
+      && consistentStory(state, snapshot.story.progress));
   } catch { return false; }
+}
+
+// The browser may send a save, but it cannot invent a logically impossible case.
+// Older valid saves without detailed station progress remain loadable.
+function consistentStory(state, progress) {
+  const solved = CASE.stations.filter(station => state.stations[station.id].solved);
+  if (!state.missionRead && (solved.length || state.evidence.length || state.notes.length
+    || state.safe.open || state.ending !== null)) return false;
+  if (state.evidence.length !== solved.length
+    || !solved.every(station => state.evidence.includes(station.evidenceId))) return false;
+  for (const id of STATION_IDS) {
+    const station = state.stations[id];
+    if (!station.solved && station.points !== 0) return false;
+    if (station.solved && (station.points < 0 || station.points > 20)) return false;
+    if (station.timeMs !== undefined && (!Number.isFinite(station.timeMs) || station.timeMs < 0)) return false;
+  }
+  if (state.accusation.attempts > 1) return false;
+  if (state.accusation.solved) {
+    if (state.accusation.accused !== CASE.culpritId || state.accusation.attempts !== 0) return false;
+  } else if (state.accusation.accused !== null && state.ending !== 'lost') return false;
+  if (state.ending === 'lost' && (state.accusation.attempts !== 1 || state.accusation.accused === null)) return false;
+  const calculated = synchronizeScore(state, progress);
+  for (const id of STATION_IDS) {
+    if (stationValidators[id](progress[id]) && progress[id].solved
+      && state.stations[id].points !== calculated.stations[id].points) return false;
+  }
+  return true;
+}
+
+// A published result needs the four actual station snapshots, not only four
+// "solved" flags in the story. This checks consistency, not honest human play.
+function validRankedSave(snapshot, state) {
+  const progress = snapshot.story.progress;
+  if (!STATION_IDS.every(id => stationValidators[id](progress[id]) && progress[id].solved
+    && progress[id].startedAt !== null && progress[id].finishedAt !== null)) return false;
+  const calculated = synchronizeScore(state, progress);
+  return STATION_IDS.every(id => state.stations[id].points === calculated.stations[id].points);
 }
 
 async function start(url, env) {
@@ -107,7 +155,8 @@ async function publish(env, user, origin) {
   if (!row) return reply({ error: 'Save a finished run first.' }, 409, origin);
   const snapshot = JSON.parse(row.snapshot);
   if (!validSave(snapshot)) return reply({ error: 'Saved game is invalid.' }, 409, origin);
-  const state = synchronizeScore(deserialize(snapshot.story.story), snapshot.story.progress);
+  const state = deserialize(snapshot.story.story);
+  if (!validRankedSave(snapshot, state)) return reply({ error: 'Complete all four current puzzles before publishing.' }, 409, origin);
   const board = scoreboard(state, snapshot.story.progress);
   if (!board.finished || board.ending === 'lost' || board.max !== 80) return reply({ error: 'Finish a winning current run first.' }, 409, origin);
   await env.DB.prepare(`INSERT INTO leaderboard (player_id, display_name, points, max_points, ending, total_time_ms) VALUES (?, ?, ?, 80, ?, ?)

@@ -1,5 +1,7 @@
 # Task: Walkable Museum Mystery
 
+> **Historical specification for the first walkable prototype.** This records the move from a static picture puzzle to a museum the player could explore. See the [current README](../README.md) for the finished rooms, stations and endings.
+
 ## Why?
 
 The first prototype was a static picture puzzle and too simple and boring for the group. The game feel we want is an original 2D top-down view with movement through a museum, a mystery quest and at least two different endings. Harvest Moon and Pokémon serve only as orientation for perspective and controls; we use no graphics or characters from these games.

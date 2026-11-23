@@ -1,14 +1,6 @@
 # Work log
 
-### 2026-11-12 – Take over the existing walk as the starting point
-
-- **People involved:** user assignment; Codex. Human review pending.
-- **Starting point:** The shared branch `feature/museum-walk` contains a walkable prototype; the newer Nocturne concept with four stations is not implemented there yet.
-- **Decision:** The existing branch was taken into a new branch from `main` so that its history is kept. The game rules of the new concept still have to be implemented.
-- **Implementation:** `web/main.js` leaves keyboard input in open dialogs to the dialog instead of catching it for the player character.
-- **Check:** The existing test run with Node `--test` reported 6 passed tests. A manual browser test of this change is pending.
-
-After every task, this file records what actually happened. The template and the rules are in the [README](project-history.md). Missing facts are not added until they are checked.
+After every task, this file records what actually happened. The template and the rules are in the [archived project history](project-history.md). Missing facts are not added until they are checked.
 
 ### 2026-11-09 – First local Museum Mystery case
 
@@ -36,6 +28,14 @@ After every task, this file records what actually happened. The template and the
 - **Implementation:** `web/engine.js` separates rules and state; `web/main.js` draws map/character and handles keys, dialog, Met API and the local browser save; `web/index.html` and `web/style.css` contain interface and styling. `web/engine.test.js` checks the rules. README and specification were adapted to the new direction.
 - **Check:** `node --test` → 6 tests passed, among them a route through the quest to both endings. `node --check main.js` and `node --check engine.js` → no syntax errors. The local web server served `index.html`, JavaScript and CSS each with HTTP 200. A browser view showed map, journal and dialog. The old Python tests passed too (6/6) with the managed Python interpreter; `uv run pytest` was at times blocked by application control on this Windows computer. The old local Streamlit demo server was stopped; the browser prototype stays reachable on port 8000. A complete manual playthrough by a team member is still pending.
 - **Addendum:** A four-digit door code from the log time was added as a separate deduction step. A wrong code causes no state change; the right solution opens the door only after the evidence and the badge. `node --test` and the syntax check succeeded again. The map and story must be played and judged by the team. Online accounts, shared storage, public deployment and extra cases are not implemented. Add branch/commit/PR after publication.
+
+### 2026-11-12 – Take over the existing walk as the starting point
+
+- **People involved:** user assignment; Codex. Human review pending.
+- **Starting point:** The shared branch `feature/museum-walk` contains a walkable prototype; the newer Nocturne concept with four stations is not implemented there yet.
+- **Decision:** The existing branch was taken into a new branch from `main` so that its history is kept. The game rules of the new concept still have to be implemented.
+- **Implementation:** `web/main.js` leaves keyboard input in open dialogs to the dialog instead of catching it for the player character.
+- **Check:** The existing test run with Node `--test` reported 6 passed tests. A manual browser test of this change is pending.
 
 ### 2026-11-12 – Landscape gallery as the first station
 
@@ -489,3 +489,28 @@ Portrait timeline, sound and JPG backgrounds integrated. Both artworks (Station 
 - **Login handoff:** On the older GitHub Pages copy, Continue with GitHub now opens the Vercel game with `?github-login=1`; the Vercel page immediately starts OAuth and stores its one-use state on the correct origin. Existing guest saves on GitHub Pages are not deleted, but they are not transferred to a GitHub account. A plain local server remains guest-only.
 - **Checks:** A 1376 × 768 Chrome screenshot confirmed the painted labels and click targets line up. All 333 Node tests on the updated `main` base pass, including a regression test for the Pages-to-Vercel handoff. The complete player-authorized GitHub login, cross-device save and winning leaderboard entry still require a live test after this change is deployed.
 - **Deployment and player checks after merge:** PR #42 merged as `4a2a72b`. Vercel and GitHub Pages both served the finished login image, and the GitHub Pages test/deploy workflows succeeded. Vercel's `/api/auth/start` still redirected to GitHub; anonymous `/api/auth/me`, `/api/save` and `/api/runs` returned 401. Florian Stodden confirmed that GitHub authorization returns to the Home screen with his GitHub name, “Saved online” appears after play, and the same case resumes on a second browser/device. He opened the signed-in Scoreboard without an error. He had not yet completed a successful ending, so automatic insertion of a new winning result is tested in `tests/vercel-service.test.js` but not yet observed on Production. No account secret or session token was shared or written to Git.
+
+## 2026-11-23 · Security and API verification before submission
+
+- **Request:** Complete the final task list's security and test package: rejected API requests, consistent online saves, and a dated dependency review. Work started from `main` commit `bb292a1` on branch `codex/security-verification-20261123`.
+- **Change:** The server now checks that solved stations match their evidence, unsolved stations have no points, points agree with valid saved mini-game progress, and the accusation and ending fit together. Publishing to the shared board additionally requires valid completed snapshots from all four current mini-games. Old structurally valid saves can still be kept without publishing them.
+- **Tests:** Added invalid and expired OAuth state/ticket, foreign Origin, malformed and oversized request, impossible game data, incomplete ranking result and two-account save separation checks. `node --test` passed **349/349** locally. These tests use a fake GitHub response and in-memory database; a newly won result still needs a live Production check.
+- **Dependencies and limits:** The deployed Node app has one exact dependency, `@neondatabase/serverless@1.2.1`, pinned in `package-lock.json`. On 23 November the OSV query for that package/version returned zero reported vulnerabilities, and the maintainer had no published GitHub advisory. The browser can still fabricate internally consistent progress; the leaderboard is not a proof of honest play. Details and reproduction are in [security-review.md](security-review.md).
+
+## 2026-11-23 · Historical docs and GitHub Pages check
+
+- **Request:** Mark the old game concept and project history as dated development records, and check the previously failed GitHub Pages deployment before the submission.
+- **Documentation:** The top of `docs/game-concept.md` and `docs/project-history.md` now directs readers to the current README and names the final four mini-games, `OILS`, 80-point scale and optional GitHub login. The README identifies Vercel as the primary live and presentation URL.
+- **Pages check:** The workflow run for `main` commit `d50735b` completed successfully on 23 November after the failed run for `bb292a1`. The Pages URL returned 200, its HTML matched `web/index.html` on `main`, and its GitHub login handoff pointed to Vercel. No rerun was needed. GitHub Pages remains a secondary guest-play copy; online features run on Vercel.
+
+## 2026-11-23 · One project README and clearer archive names
+
+- **Request:** Make the root `README.md` the only file with that name, so GitHub's file tree does not suggest several current project guides.
+- **Change:** Renamed the old story overview to `docs/story/historical-story-architecture.md`, the first Python prototype note to `legacy/python/historical-python-prototype.md`, and the dated image optimization measurements to `web/dev/shots/image-compare/historical-pixel-comparison.md`. Each now identifies itself as historical and points to the current root README. Updated the two references to the former story filename and added a documentation map to the root README. Kept the screenshot folders in place because their different locations reflect general documentation, story evidence and browser-check output; moving them would break many evidence links without improving the game.
+- **Checks:** The tracked-file inventory finds exactly one `README.md`, at repository root; no reference to the three old paths remains. `node --test` passes **349/349** on this branch.
+
+## 2026-11-23 · Documentation review before submission
+
+The play guide now describes all three endings directly. The November 19 ending artwork notes, both early prototype specifications and the original station integration plan each point readers to the finished game. The README links to this log for dated decisions and to merged pull requests for the accompanying changes. The November 12 entry on adopting the museum walk now follows the November 9 prototype entries.
+
+All 368 tests passed with `node --test`. The relative Markdown links and image paths resolved, and the dated entries in this log were checked in ascending order.

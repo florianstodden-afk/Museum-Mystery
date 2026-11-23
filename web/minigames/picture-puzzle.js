@@ -1,4 +1,4 @@
-import { artworkDetails } from './station-ui.js';
+import { artworkDetails, speedLines } from './station-ui.js?v=clock-note-1';
 // Station L. The host owns persistence and scoring; this component owns presentation.
 import { el, button } from '../story/dom.js';
 import { initialPuzzle, validPuzzle, startPuzzle, placePiece, elapsedMs } from './picture-rules.js';
@@ -17,7 +17,7 @@ export function start(container, caseData, onSolved) {
   const status = el('p', { className: 'puzzle-status', attrs: { role: 'status' } });
   const help = button('?', showHelp, 'story-button puzzle-help');
   help.setAttribute('aria-label', 'Puzzle instructions');
-  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s eight-piece picture to uncover the hidden mark on the transport slip.' }), el('p', { text: 'Points are given based on speed.' }), help]);
+  const intro = el('div', { className: 'puzzle-intro' }, [el('p', { text: 'Restore Renoir’s eight-piece picture to uncover the hidden mark on the transport slip.' }), ...speedLines(), help]);
   const controls = el('div', { className: 'story-actions puzzle-actions' });
   const startButton = shortcutButton('Start puzzle', begin, 'Enter');
   const back = shortcutButton('Back to museum', leave, 'Escape');

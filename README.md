@@ -4,7 +4,9 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) is the online game, with guest play and GitHub login. The older [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) keeps guest play; its GitHub button opens the Vercel game and starts sign-in there.
+**Live game and presentation URL:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/). This is the complete version with guest play, GitHub login, online saves and the shared leaderboard. Open this URL for the course demo.
+
+The secondary [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) offers guest play; its GitHub button opens the Vercel game to sign in. The Pages deployment for `main` commit `d50735b` succeeded on 23 November 2026 after a failed attempt on the previous commit. The live Pages HTML was checked against the same file on `main` on that date. Vercel remains the primary game URL because its server functions provide login, cloud saves and the leaderboard.
 
 ## Team
 
@@ -39,7 +41,7 @@ In the Git history, Fabian appears as `OliverMSchilz`, Florian Baumgartl as `Flo
 - Four numbered stations, in walking order: **1 · Portraits** (Portrait Hall), **2 · Puzzle**, **3 · Catalogue** and **4 · Forgery** (Gallery, left to right). Each gives a letter that stays hidden until you solve it. The journal shows the four letters in the order of the code word; enter it at the vault.
 - **Station 3 — Curator’s Catalogue:** match four Met artwork labels with drag, click/tap, or Tab + Enter/Space. Labels can be moved, swapped, or returned to the tray. [Artwork credits, timing and save behavior](docs/story/curators-catalogue.md).
 - In the vault, answer the final question: who planned it all? You have **one accusation**: pick a name, confirm it, and it counts. Up to 80 points (older completed saves retain their original rewards).
-- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score ([ending flow](docs/ending-screens.md)).
+- Three endings: name the planner, then **Steal the artwork** or **Quit the mission**. A wrong name ends the night at once with **Case lost**: the planner is warned and gets away, and the end screen explains why the person you named was innocent. Each ending has its own result screen with the real Met painting, evidence and score.
 - In the game, **J** (or the menu) opens the journal: **Case** shows the letters, evidence and notes, **People** who is who. **Esc** opens the menu. The hint button helps when you are stuck.
 - The Home screen's **Scoreboard** is for GitHub players. It shows the current run and shared results. A winning finish is submitted automatically; the highest score for each GitHub account appears. Lost runs never enter the shared leaderboard ([details](docs/leaderboard.md)).
 
@@ -86,6 +88,8 @@ node --test
 
 Run it from the repository folder. GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
+The API tests also check rejected requests: missing or expired sign-in, foreign origins, invalid or oversized JSON, impossible saves and incomplete results. The [security and verification review](docs/security-review.md) explains the checks, their limits and the dated dependency scan.
+
 Browser checks (needs Node ≥ 22 and Chrome or Edge, no Playwright) start their own server and save screenshots in `web/dev/shots/`:
 
 ```bash
@@ -108,7 +112,21 @@ node web/dev/run-e2e.mjs
 | `web/minigames/` | The station mini-games and their shared UI (`station-ui.js`) |
 | `web/dev/` | Preview pages, screenshots and browser checks |
 | `legacy/`, `web/legacy/` | Code the game no longer uses (first Python prototype, old prototype story) |
-| `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
+| `docs/` | Work log, design notes, artwork credits and verification records |
+| [`specs/`](specs/) | Historical specifications for the first Python case and the early walkable prototype |
+
+## Which documentation is current?
+
+This root `README.md` is the **only project README** and the starting point for the finished game. The repository keeps older plans and test evidence so the team can explain how the project changed:
+
+| Read next | Purpose |
+|---|---|
+| [Work log](docs/work-log.md) and [merged pull requests](https://github.com/florianstodden-afk/Museum-Mystery/pulls?q=is%3Apr+is%3Amerged) | Read the log in date order to follow the decisions. Open a pull request to see the corresponding code changes. |
+| [Login and leaderboard](docs/leaderboard.md), [security review](docs/security-review.md) | Current online features and how they were verified |
+| [Project history](docs/project-history.md), [early game concept](docs/game-concept.md), [old story architecture](docs/story/historical-story-architecture.md) | **Historical** decisions and designs; some details no longer describe the game |
+| [First Python prototype](legacy/python/historical-python-prototype.md), [pixel comparison from image optimization](web/dev/shots/image-compare/historical-pixel-comparison.md) | **Historical** prototype and a dated visual check; neither is a second setup guide |
+
+`docs/screenshots/` holds general development evidence; `docs/story/screenshots/` holds story-specific evidence. `web/dev/shots/` contains browser-check screenshots. These folders have different purposes and are not extra game versions.
 
 ## Known limits
 
@@ -116,6 +134,14 @@ node web/dev/run-e2e.mjs
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.
+- A station's clock starts with Start and keeps running when you leave a station (also across reloads), like a speedrun.
+- Without a connection, signed-in players keep playing; progress is saved on the device and uploaded on the next successful request. Two devices are not merged: the last upload wins.
+
+## Security and dependencies
+
+The deployed game has one direct Node runtime dependency, `@neondatabase/serverless` **1.2.1**, pinned exactly in `package.json` and `package-lock.json`; the lockfile lists no transitive runtime packages. `legacy/python/` is an older prototype and is not deployed by Vercel. On **23 November 2026**, a query to [OSV](https://osv.dev/) for this package and version returned **zero reported vulnerabilities**; the maintainer's [GitHub advisories](https://github.com/neondatabase/serverless/security/advisories) also listed none. This is a dated check, not a guarantee against future discoveries.
+
+The API requires a GitHub session for online saves and ranking, validates request size and game-state consistency, and reads database and OAuth secrets only from Vercel environment variables. A winning entry needs four completed, valid mini-game snapshots. Since the game still runs in the player's browser, a determined player can fabricate internally consistent progress; the leaderboard is not cheat-proof. The [security and verification review](docs/security-review.md) shows what is enforced and what would need a server-authoritative game to change.
 
 ## Credits
 
@@ -123,4 +149,4 @@ Artworks and data: [The Metropolitan Museum of Art Collection API](https://metmu
 
 ## Course context
 
-Team project for *Introduction to Programming* at Nova SBE (2026/27). Earlier decisions, the old setup guide and the full history are in [docs/project-history.md](docs/project-history.md).
+Team project for *Introduction to Programming* at Nova SBE (2026/27). The [archived project history](docs/project-history.md) preserves the original setup guide and early design decisions.

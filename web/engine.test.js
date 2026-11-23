@@ -89,9 +89,9 @@ test('old saves keep position and steps but nothing from the old story',()=>{
   assert.deepEqual(restoreState(old,false),{player:{x:13,y:10},steps:40,doorOpen:false});
 });
 
-test('a save inside the locked storage room starts outside again',()=>{
+test('a save inside the locked storage room starts just outside its door',()=>{
   const inside={player:{x:22,y:9},steps:3};
-  assert.deepEqual(restoreState(inside,false).player,START);
+  assert.deepEqual(restoreState(inside,false).player,{x:17,y:9});
   assert.deepEqual(restoreState(inside,true).player,{x:22,y:9});
   assert.deepEqual(restoreState('broken',false),initialState());
 });

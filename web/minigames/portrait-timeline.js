@@ -9,7 +9,7 @@ import {
 } from './portrait-rules.js';
 import { PORTRAIT_ARTWORKS, loadPortraits } from './portrait-artwork.js';
 import { portraitSpeedPoints, formatClock, PORTRAIT_LIMITS_MS } from '../story/scoring.js';
-import { artworkDetails, introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles, artCards } from './station-ui.js?v=art-cards-1';
+import { artworkDetails, introPopup, showPopup, successPopup, creditLine, speedBar, shortcutButton, ensureStationStyles, artCards } from './station-ui.js?v=clock-note-1';
 import { cardView, timelineView, bestTimeStore, ensureStylesheet, safeStorage } from './portrait-view.js';
 
 /** Station I's points by time, as tiers for the bar (same limits as portraitSpeedPoints). */
@@ -51,7 +51,7 @@ export function start(container, caseData, onSolved) {
   const root = el('div', { className: 'picture-puzzle portrait-timeline' });
   const pane = el('div');
   const overlay = el('div');
-  const ui = introPopup({ task: TASK, pointsText: 'Points are given based on speed.', onStart: begin, onBack: leave, onHelp: showHelp });
+  const ui = introPopup({ task: TASK, onStart: begin, onBack: leave, onHelp: showHelp });
   const bar = speedBar({ tiers: PORTRAIT_TIERS, label: 'Portrait time' });
   const checkButton = shortcutButton('Check order', check, 'Enter');
   const cards = Object.fromEntries(state.order.map(id => [id, cardView(id, { onChoose: choose, onPeek: peek })]));
