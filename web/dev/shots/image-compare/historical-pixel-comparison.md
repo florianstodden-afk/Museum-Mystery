@@ -1,4 +1,6 @@
-# Pixel comparison before/after image optimization
+# Historical pixel comparison: image optimization run
+
+**Archived visual-check result.** This table records one image optimization run; it does not describe the current game or its setup. Start with the [current project README](../../../../README.md).
 
 Mean = average absolute difference per pixel (0–255). >16 = share of pixels that differ by more than 16 levels. Two runs without any change differ by mean 0.00–0.21 (baseline).
 

@@ -1,4 +1,4 @@
-# Story logic “Museum Nocturne” (`web/story/`)
+# Historical story architecture: “Museum Nocturne” (`web/story/`)
 
 **Historical architecture overview from November 2026.** Some tables below name earlier placeholders and point values. For the current state see the [README](../../README.md), [Station 3](curators-catalogue.md) and [Leaderboard](../leaderboard.md). The old details stay as development history.
 
