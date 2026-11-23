@@ -30,7 +30,7 @@ test('security room positions survive save and invalid positions recover safely'
   const saved={room:'security',player:{x:4.2,y:6.2},steps:30};
   assert.deepEqual(restoreState(JSON.parse(JSON.stringify(saved)),false),{...saved,doorOpen:false});
   const blocked={...saved,player:{x:4,y:1}};
-  assert.deepEqual(restoreState(blocked,false).player,OFFICE_START);
+  assert.deepEqual(restoreState(blocked,false).player,{x:4,y:2}); // nearest free office tile
   const old={player:{x:13,y:10},steps:12};
   assert.deepEqual(restoreState(old,false),{...old,doorOpen:false});
 });

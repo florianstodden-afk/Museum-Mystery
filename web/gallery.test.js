@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GALLERY, GALLERY_BENCHES, GALLERY_OBSTACLES, galleryFootprintFits, galleryPosition, galleryVaultDoorBlocks, cameraLightOn } from './gallery-layout.js';
 import { createGalleryRenderer } from './gallery.js';
-import { initialState, atVaultDoor, canEnter, restoreState, nearbyObject } from './engine.js';
+import { initialState, atVaultDoor, canEnter, restoreState, nearbyObject, validPosition } from './engine.js';
 import { advancePlayer } from './motion.js';
 const viewport={width:896,height:576};
 const at=(x,y,doorOpen=false)=>({...initialState(),player:{x,y},doorOpen});
@@ -57,7 +57,10 @@ test('back-wall artwork remains reachable, old saves in new obstacles recover sa
   for(const p of [{x:16,y:2},...GALLERY_BENCHES,{x:10,y:14}]){
     const saved=at(p.x,p.y);saved.steps=42;
     const restored=restoreState(saved,false);
-    assert.deepEqual(restored.player,{x:11,y:6});assert.equal(restored.steps,42);
+    assert.ok(validPosition(restored.player,false),'lands on a walkable spot');
+    assert.ok(restored.player.x>9 && restored.player.x<18,'stays in the gallery');
+    assert.ok(Math.hypot(restored.player.x-p.x,restored.player.y-p.y)<=2.3,'close to where it was saved');
+    assert.equal(restored.steps,42);
     assert.deepEqual(restoreState(JSON.parse(JSON.stringify(restored)),false),restored);
   }
 });

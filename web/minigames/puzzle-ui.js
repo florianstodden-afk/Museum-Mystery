@@ -1,4 +1,4 @@
-import { shortcutButton, showPopup, successPopup, speedBar, ensureStationStyles } from './station-ui.js';
+import { shortcutButton, showPopup, successPopup, speedBar, ensureStationStyles } from './station-ui.js?v=clock-note-1';
 
 export { shortcutButton };
 

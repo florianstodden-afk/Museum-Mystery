@@ -248,6 +248,8 @@ a.story-button { display: inline-block; text-decoration: none; }
 .puzzle-intro { position: relative; padding-right: 48px; }
 .puzzle-intro p { margin: 0 0 10px; }
 .puzzle-intro p:nth-child(2) { color: #c9b585; font-size: .9rem; }
+/* Same quiet line in every station: the clock never pauses. */
+.puzzle-intro .station-clock-note { color: #a99f8a; font-size: .82rem; }
 .picture-puzzle .puzzle-help { position: absolute; right: 0; top: 0; width: 34px; height: 34px; min-height: 34px; padding: 0; border-radius: 50%; }
 .puzzle-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .puzzle-key {
@@ -320,6 +322,7 @@ a.story-button { display: inline-block; text-decoration: none; }
 .picture-puzzle .puzzle-intro p { margin: 0 0 6px; }
 /* Give the Start button’s focus outline more breathing room. */
 .picture-puzzle .puzzle-intro p:nth-child(2) { transform: translateY(-4px); }
+.picture-puzzle .puzzle-intro .station-clock-note { margin-top: -8px; }
 @media (max-width: 560px) {
  .picture-puzzle { font-size: .85rem; }
  .puzzle-time-rewards { font-size: .7rem; }
