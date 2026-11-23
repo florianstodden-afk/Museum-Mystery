@@ -4,7 +4,9 @@
 
 A small top-down detective game in the browser: walk through a museum at night, solve four art stations with real works from The Met and decide what happens to a Van Gogh.
 
-**Play it:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/) is the online game, with guest play and GitHub login. The older [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) keeps guest play; its GitHub button opens the Vercel game and starts sign-in there.
+**Live game and presentation URL:** [museum-mystery.vercel.app](https://museum-mystery.vercel.app/). This is the complete version with guest play, GitHub login, online saves and the shared leaderboard. Open this URL for the course demo.
+
+The secondary [GitHub Pages copy](https://florianstodden-afk.github.io/Museum-Mystery/) offers guest play; its GitHub button opens the Vercel game to sign in. The Pages deployment for `main` commit `d50735b` succeeded on 23 November 2026 after a failed attempt on the previous commit. The live Pages HTML was checked against the same file on `main` on that date. Vercel remains the primary game URL because its server functions provide login, cloud saves and the leaderboard.
 
 ## Team
 
@@ -111,6 +113,18 @@ node web/dev/run-e2e.mjs
 | `web/dev/` | Preview pages, screenshots and browser checks |
 | `legacy/`, `web/legacy/` | Code the game no longer uses (first Python prototype, old prototype story) |
 | `docs/` | Work log, concept, design notes, [project history](docs/project-history.md) |
+
+## Which documentation is current?
+
+This root `README.md` is the **only project README** and the starting point for the finished game. The repository keeps older plans and test evidence so the team can explain how the project changed:
+
+| Read next | Purpose |
+|---|---|
+| [Work log](docs/work-log.md), [login and leaderboard](docs/leaderboard.md), [security review](docs/security-review.md) | Implementation history and current online features |
+| [Project history](docs/project-history.md), [early game concept](docs/game-concept.md), [old story architecture](docs/story/historical-story-architecture.md) | **Historical** decisions and designs; some details no longer describe the game |
+| [First Python prototype](legacy/python/historical-python-prototype.md), [pixel comparison from image optimization](web/dev/shots/image-compare/historical-pixel-comparison.md) | **Historical** prototype and a dated visual check; neither is a second setup guide |
+
+`docs/screenshots/` holds general development evidence; `docs/story/screenshots/` holds story-specific evidence. `web/dev/shots/` contains browser-check screenshots. These folders have different purposes and are not extra game versions.
 
 ## Known limits
 

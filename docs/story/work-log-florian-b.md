@@ -76,7 +76,7 @@ A separate file, so there is no conflict with the shared `docs/work-log.md`.
 
 - **Goal:** A plan for taking it into the main game, an overview, this log.
 - **Decision:** Old saves are not converted during the integration (the old story does not fit the new one); only the player position is taken over.
-- **Files:** `docs/story/integration-plan.md`, `docs/story/README.md`, this log; a small link from the story preview to the security office preview.
+- **Files at the time:** `docs/story/integration-plan.md`, the story overview (now [historical-story-architecture.md](historical-story-architecture.md)), this log; a small link from the story preview to the security office preview.
 - **Check:** `node --test` → see commit.
 - **Open points:** install Node.js; create `security-office.png`; stations 2–4 from teammates; integration after agreement with Fabian.
 - **Commit:** `a63e050 Document story logic and integration plan` (`node --test` → 73 / 73 passed)
