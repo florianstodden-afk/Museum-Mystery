@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createSecurityRenderer, SECURITY_OBJECTS, OFFICE_START, HALL_RETURN, canEnterOffice, officePortal } from './security-room.js';
+import { createSecurityRenderer, SECURITY_OBJECTS, OFFICE_START, HALL_RETURN, canEnterOffice, officeFootprintFits, officePortal, officePosition } from './security-room.js';
 import { initialState, nearbyObject, restoreState, canEnter } from './engine.js';
 import { advancePlayer } from './motion.js';
 import { INTERACTION_POINTS } from './story/security-office/interactions.js';
@@ -20,6 +20,18 @@ test('hall doorway enters security and exits onto the hall floor',()=>{
 test('office boundaries and furniture block movement',()=>{
   for(const [x,y] of [[0,4],[9,4],[4,0],[4,11],[2,1],[4,1],[6,1],[7,1]]) assert.equal(canEnterOffice(x,y),false);
   assert.equal(canEnterOffice(4,2),true);assert.equal(canEnterOffice(3,1),false);
+});
+test('office side walls keep the character inside the visible floor',()=>{
+  const start={...initialState(),room:'security',player:{x:4.5,y:6}};
+  const left=advancePlayer(start,[-1,0],5000,viewport,[],canEnter);
+  const right=advancePlayer(start,[1,0],5000,viewport,[],canEnter);
+  assert.ok(officePosition(left.player.x,left.player.y).x-17>=53);
+  assert.ok(officePosition(right.player.x,right.player.y).x+17<=843);
+  assert.equal(officeFootprintFits(.69,6),false);
+  assert.equal(officeFootprintFits(.7,6),true);
+  assert.equal(officeFootprintFits(8.26,6),true);
+  assert.equal(officeFootprintFits(8.27,6),false);
+  assert.deepEqual(restoreState({...start,player:{x:.6,y:6}},false).player,{x:1,y:6});
 });
 test('office stations reuse the real security story actions',()=>{
   for(const obj of SECURITY_OBJECTS) assert.ok(INTERACTION_POINTS.some(p=>p.id===obj.story.examine));

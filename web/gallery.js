@@ -55,7 +55,19 @@ export function createGalleryRenderer() {
     const items=[...objects.filter(o=>o.x>9&&o.x<18&&!['note','painting','frames'].includes(o.id)),{...player,id:'player'}].sort((a,b)=>a.y-b.y);
     ctx.save();ctx.beginPath();ctx.rect(20,150,856,400);ctx.clip();
     for(const item of items){const p=galleryPosition(item.x,item.y);
-      if(item.id==='player'){drawPerson(p.x,p.y,'rick',facing,time,moving);continue;}
+      if(item.id==='player'){
+        drawPerson(p.x,p.y,'rick',facing,time,moving);
+        // The open door is baked into the background. Repaint only its shape
+        // over a player behind its angled bottom edge, not over the floor.
+        if(state.doorOpen && doorProgress>=1 && openVault.complete && openVault.naturalWidth &&
+           p.x+24>713 && p.x-24<769 && p.y<342-Math.max(0,Math.min(56,p.x-713))*.55){
+          ctx.save();ctx.beginPath();ctx.moveTo(713,342);ctx.lineTo(713,231);
+          ctx.bezierCurveTo(713,207,725,195,738,194);ctx.bezierCurveTo(749,191,763,194,765,202);
+          ctx.lineTo(765,297);ctx.lineTo(759,310);ctx.lineTo(725,341);ctx.closePath();ctx.clip();
+          ctx.drawImage(openVault,16,0,864,576);ctx.restore();
+        }
+        continue;
+      }
       if(item.id==='restorer'){drawPerson(p.x,p.y,'restorer','down',time,false);continue;}
       ctx.fillStyle='#080d1455';ctx.beginPath();ctx.ellipse(p.x,p.y+4,31,8,0,0,Math.PI*2);ctx.fill();
       box(ctx,p.x-25,p.y-9,4,14,'#a18452');box(ctx,p.x+21,p.y-9,4,14,'#a18452');

@@ -1,4 +1,4 @@
-import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
+import { SECURITY_OBJECTS, canEnterOffice, officeFootprintFits, OFFICE_START } from './security-room.js';
 import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
@@ -49,7 +49,7 @@ export function validPosition(position, doorOpen = false) {
   const room = roomOf(position);
   if (!room || !Number.isFinite(position.y)) return false;
   const { x, y } = position;
-  if (room === 'security') return canEnterOffice(Math.round(x), Math.round(y));
+  if (room === 'security') return canEnterOffice(Math.round(x), Math.round(y)) && officeFootprintFits(x,y);
   if (x < 0.5 || x >= WIDTH - 1.5 || y < 0.5 || y >= HEIGHT - 1.5) return false;
   if (room === 'storage' && !doorOpen) return false;
   const state = { player: { x, y }, doorOpen };

@@ -1,5 +1,5 @@
 import { VAULT_STEP_X, VAULT_STEP_Y, vaultFloorContains } from './vault-layout.js';
-import { officePortal, canEnterOffice } from './security-room.js';
+import { officePortal, canEnterOffice, officeFootprintFits } from './security-room.js';
 import { GALLERY, galleryFootprintFits, galleryDoorTransition, galleryVaultDoorBlocks } from './gallery-layout.js?v=gallery-route-8';
 // Movement duration follows displayed distance, even when the room is stretched to fit the window.
 export const PLAYER_SPEED = 220; // screen pixels per second
@@ -29,7 +29,7 @@ export function advancePlayer(state, direction, milliseconds, viewport, guards, 
       return {...state,...officeLanding,steps:state.steps+1};
     }
     if(room==='security'){
-      if(!canEnterOffice(Math.round(nx),Math.round(ny))) break;
+      if(!canEnterOffice(Math.round(nx),Math.round(ny)) || !officeFootprintFits(nx,ny)) break;
       x=nx;y=ny;continue;
     }
     // Cross at the painted vault doorway only after the story code unlocks it.

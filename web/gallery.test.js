@@ -155,6 +155,27 @@ test('vault door collision follows the visible closed face or swung-open panel',
   assert.ok(freeWithClosedDoor.player.x>blockedByOpenDoor.player.x);
 });
 
+test('open vault door is drawn in front of a player behind the panel only',()=>{
+  const oldImage=globalThis.Image;
+  globalThis.Image=class {constructor(){this.complete=true;this.naturalWidth=1536;this.naturalHeight=1024;}};
+  try {
+    const render=(x,y,doorOpen=true)=>{
+      const events=[];
+      const ctx=new Proxy({}, {get(target,key){
+        if(key==='drawImage') return image=>events.push(image.src);
+        return target[key] ?? (()=>{});
+      },set(target,key,value){target[key]=value;return true;}});
+      createGalleryRenderer()(ctx,{time:0,state:{doorOpen},player:{x,y},objects:[],target:null,facing:'down',moving:false,
+        drawPerson(){events.push('player');},vaultNearby:false,reducedMotion:false});
+      return events.slice(events.indexOf('player')+1).filter(event=>event==='./assets/gallery-vault-open.jpg').length;
+    };
+    assert.equal(render(15.99,6.2),1,'panel covers player beside its collision boundary');
+    assert.equal(render(16.15,9),0,'panel does not cover player in front');
+    assert.equal(render(16.15,6.2,false),0,'closed door does not draw open panel');
+    assert.equal(render(13,6.2),0,'panel is not redrawn for distant player');
+  } finally {globalThis.Image=oldImage;}
+});
+
 test('plant foliage is drawn in front of someone standing behind its base',()=>{
   const oldImage=globalThis.Image, oldDocument=globalThis.document;
   globalThis.document={createElement(){return {getContext(){return {drawImage(){},getImageData(){return {data:new Uint8ClampedArray(4)};},putImageData(){}};}};}};
