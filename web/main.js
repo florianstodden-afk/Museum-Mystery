@@ -7,7 +7,7 @@ import { galleryPosition } from './gallery-layout.js';
 import { createSecurityRenderer } from './security-room.js?v=live-people-3';
 import { createGalleryRenderer } from './gallery.js?v=plaques-1';
 import { drawWallPlaque } from './wall-plaque.js?v=1';
-import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=station-numbers-1';
+import { WIDTH, HEIGHT, OBJECTS, initialState, restoreState, canEnter, nearbyObject, atVaultDoor } from './engine.js?v=position-1';
 import * as catalogueStation from './minigames/curators-catalogue.js?v=clock-note-1';
 import * as forgeryStation from './minigames/spot-the-forgery.js?v=clock-note-1';
 import * as pictureStation from './minigames/picture-puzzle.js?v=clock-note-1';

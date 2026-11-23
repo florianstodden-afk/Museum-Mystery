@@ -5,6 +5,7 @@ import { validCatalogue } from '../web/minigames/catalogue-rules.js';
 import { validForgery } from '../web/minigames/forgery-rules.js';
 import { validPuzzle } from '../web/minigames/picture-rules.js';
 import { validTimeline } from '../web/minigames/portrait-rules.js';
+import { validPosition } from '../web/engine.js';
 
 const stationValidators = { landscape: validCatalogue, portraits: validTimeline,
   restoration: validPuzzle, archive: validForgery };
@@ -46,7 +47,8 @@ export function validSave(snapshot) {
     const state = deserialize(snapshot.story?.story);
     const player = snapshot.walk?.player;
     return Boolean(state && snapshot.story.progress && typeof snapshot.story.progress === 'object'
-      && Number.isFinite(player?.x) && Number.isFinite(player?.y)
+      && (snapshot.walk.steps === undefined || (Number.isInteger(snapshot.walk.steps) && snapshot.walk.steps >= 0))
+      && validPosition({ x: player?.x, y: player?.y, ...(snapshot.walk.room ? { room: snapshot.walk.room } : {}) }, state.safe.open)
       && consistentStory(state, snapshot.story.progress));
   } catch { return false; }
 }

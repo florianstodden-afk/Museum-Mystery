@@ -67,7 +67,7 @@ function wonSave() {
     archive: { ...initialForgery(), found: [0, 1, 2], startedAt: 1000, finishedAt: 11000, solved: true },
   };
   state = synchronizeScore(state, progress);
-  return { story: { story: JSON.stringify(state), progress }, walk: { player: { x: 12, y: 7 } } };
+  return { story: { story: JSON.stringify(state), progress }, walk: { player: { x: 11, y: 6 } } };
 }
 
 async function authorizationTicket(config, browserState = 'b'.repeat(64), githubUser = { id: 12345, login: 'verified-player' }) {

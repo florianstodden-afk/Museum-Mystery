@@ -1,5 +1,5 @@
 import { SECURITY_OBJECTS, canEnterOffice, OFFICE_START } from './security-room.js';
-import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js?v=gallery-route-8';
+import { galleryWalkable, galleryFootprintFits, galleryDoorTransition, GALLERY_HALL_ROW } from './gallery-layout.js';
 // The walkable map: size, walls, objects, movement and "what is nearby".
 // The story itself (stations, safe, endings) lives in web/story/. The old prototype story is in web/legacy/.
 export const WIDTH = 28;
@@ -37,22 +37,49 @@ export function validState(value) {
     && Number.isInteger(value.steps) && value.steps >= 0;
 }
 
+// One rule for "may the player stand here?", used by the game (loading) and the server (saving):
+// the room exists, the coordinates are finite, inside that room and on a walkable spot.
+export function roomOf(position) {
+  if (position?.room === 'security') return 'security';
+  if (position?.room !== undefined && position.room !== 'museum') return null;
+  const x = position?.x;
+  return !Number.isFinite(x) ? null : x < 9 ? 'hall' : x < 18 ? 'gallery' : 'storage';
+}
+export function validPosition(position, doorOpen = false) {
+  const room = roomOf(position);
+  if (!room || !Number.isFinite(position.y)) return false;
+  const { x, y } = position;
+  if (room === 'security') return canEnterOffice(Math.round(x), Math.round(y));
+  if (x < 0.5 || x >= WIDTH - 1.5 || y < 0.5 || y >= HEIGHT - 1.5) return false;
+  if (room === 'storage' && !doorOpen) return false;
+  const state = { player: { x, y }, doorOpen };
+  if (!canEnter(state, Math.round(x), Math.round(y))) return false;
+  return room !== 'gallery' || galleryFootprintFits(x, y, doorOpen);
+}
+// The closest valid tile in the same room (a closed storage room counts as the gallery side of its door).
+export function nearestValidPosition(position, doorOpen = false) {
+  let room = roomOf(position);
+  if (!room || !Number.isFinite(position.y)) return { ...START };
+  if (room === 'storage' && !doorOpen) room = 'gallery';
+  const extra = room === 'security' ? { room: 'security' } : {};
+  let best = null, bestDistance = Infinity;
+  for (let x = 1; x < WIDTH - 1; x++) for (let y = 1; y < HEIGHT - 1; y++) {
+    const candidate = { x, y, ...extra };
+    if (roomOf(candidate) !== room || !validPosition(candidate, doorOpen)) continue;
+    const distance = (x - position.x) ** 2 + (y - position.y) ** 2;
+    if (distance < bestDistance) { best = { x, y }; bestDistance = distance; }
+  }
+  return best ?? (room === 'security' ? { ...OFFICE_START } : { ...START });
+}
+
 // Turns a saved value into a map state. The door is set from the story afterwards.
+// An invalid spot moves the player to the nearest walkable spot in the same room; progress stays.
 export function restoreState(saved, doorOpen) {
-  if (!validState(saved)) return { ...initialState(), doorOpen };
-  const state = { player: { x: saved.player.x, y: saved.player.y }, steps: saved.steps, doorOpen };
-  if(saved.room==='security'){
-    state.room='security';
-    if(!canEnterOffice(Math.round(state.player.x),Math.round(state.player.y))) state.player={...OFFICE_START};
-    return state;
-  }
-  // Someone saved inside the storage room but the safe is closed in the new story: start outside.
-  if (!doorOpen && state.player.x >= VAULT_DOOR.x) state.player = { ...START };
-  // New furniture/walls must not trap a position from an older save.
-  if (!canEnter(state, Math.round(state.player.x), Math.round(state.player.y))
-      || (state.player.x >= 9 && state.player.x < 18 && !galleryFootprintFits(state.player.x,state.player.y,doorOpen))) {
-    state.player = state.player.x >= 9 && state.player.x < 18 ? { x: 11, y: 6 } : { ...START };
-  }
+  if (!saved || !Number.isFinite(saved.player?.x) || !Number.isFinite(saved.player?.y) || !Number.isInteger(saved.steps) || saved.steps < 0) return { ...initialState(), doorOpen };
+  const position = { x: saved.player?.x, y: saved.player?.y, ...(saved.room === 'security' ? { room: 'security' } : {}) };
+  const state = { player: { x: position.x, y: position.y }, steps: saved.steps, doorOpen };
+  if (saved.room === 'security') state.room = 'security';
+  if (!validPosition(position, doorOpen)) state.player = nearestValidPosition(position, doorOpen);
   return state;
 }
 
