@@ -86,6 +86,8 @@ node --test
 
 Run it from the repository folder. GitHub Actions runs the same command for every pull request and after every merge to `main` (badge above). The folder `legacy/` holds code the game no longer uses: `legacy/python/` is the first Streamlit prototype with its tests (`cd legacy/python && uv run pytest`).
 
+The API tests also check rejected requests: missing or expired sign-in, foreign origins, invalid or oversized JSON, impossible saves and incomplete results. The [security and verification review](docs/security-review.md) explains the checks, their limits and the dated dependency scan.
+
 Browser checks (needs Node ≥ 22 and Chrome or Edge, no Playwright) start their own server and save screenshots in `web/dev/shots/`:
 
 ```bash
@@ -116,6 +118,12 @@ node web/dev/run-e2e.mjs
 - Guests use a local save only. Clearing browser data removes it. Earlier local username/password saves are not automatically moved to a GitHub account.
 - A GitHub account proves the player's name; it does not prove that a browser-side score was earned honestly.
 - Met data is a frozen snapshot in the repo; the game runs without the Met API.
+
+## Security and dependencies
+
+The deployed game has one direct Node runtime dependency, `@neondatabase/serverless` **1.2.1**, pinned exactly in `package.json` and `package-lock.json`; the lockfile lists no transitive runtime packages. `legacy/python/` is an older prototype and is not deployed by Vercel. On **23 November 2026**, a query to [OSV](https://osv.dev/) for this package and version returned **zero reported vulnerabilities**; the maintainer's [GitHub advisories](https://github.com/neondatabase/serverless/security/advisories) also listed none. This is a dated check, not a guarantee against future discoveries.
+
+The API requires a GitHub session for online saves and ranking, validates request size and game-state consistency, and reads database and OAuth secrets only from Vercel environment variables. A winning entry needs four completed, valid mini-game snapshots. Since the game still runs in the player's browser, a determined player can fabricate internally consistent progress; the leaderboard is not cheat-proof. The [security and verification review](docs/security-review.md) shows what is enforced and what would need a server-authoritative game to change.
 
 ## Credits
 
